@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:book",
+    "minecraft:red_dye",
+    "minecraft:feather"
+  ],
+  "result": {
+    "id": "codenamecoraline:bestiary"
+  }
+}

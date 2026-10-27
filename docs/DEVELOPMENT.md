@@ -22,6 +22,12 @@ Primeira execução: baixa a distribuição do Gradle 9.2.1, o JDK 25 (se ausent
 
 Diretórios de execução: `run/` (ignorado pelo Git). Esses comandos são caros; use-os somente quando a mudança exigir verificação em jogo.
 
+## Texturas geradas (Redcap)
+
+`src/main/resources/assets/codenamecoraline/textures/entity/redcap.png` e `redcap_eyes.png` (128x64, mesmo tamanho declarado em `RedcapModel.createBodyLayer`) foram pintados em 2026-10-27 por uma ferramenta Java descartável fora do projeto (scratchpad da sessão de IA). A ferramenta lê a geometria real de `RedcapModel` (`ModelPart.visit`), pinta cada face por material e renderiza um preview com culling de faces traseiras. A ferramenta não é versionada: os PNGs são a fonte. Para repintar, edite os PNGs (ex.: Blockbench).
+
+Verificado pela ferramenta: nenhuma sobreposição de UV entre cubos diferentes; `redcap_eyes.png` com 4 pixels opacos (`#FF1E00` e `#FF6A2A`) na face frontal da cabeça. Verificado em preview fora do jogo: silhueta, cores e posição das peças. Verificado em jogo (2026-10-27): as texturas carregam e o visual corresponde ao preview. Não verificado em jogo: animações de caminhada e ataque.
+
 ## Testes
 
 - Não há testes automatizados (JUnit ou gametests) no projeto.
@@ -53,3 +59,10 @@ Diretórios de execução: `run/` (ignorado pelo Git). Esses comandos são caros
 2. `./gradlew build` sem erros.
 3. Opcional, sob demanda: `./gradlew runServer` e confirmar a linha de carregamento do mod no log.
 4. Atualize o status na tabela acima com a data e o resultado real.
+
+## Como acrescentar um mob ao Bestiário
+
+1. Anexe um `BestiaryEntry` em `bestiary/Bestiary.java` (e à lista `ENTRIES`), com as páginas desejadas.
+2. Escreva as chaves `bestiary.codenamecoraline.<id>.*` em `lang/pt_br.json` e `lang/en_us.json`: `name`, e `title`/`body` por página (`caption` nas páginas com desenho; `body` pode ser `""`). O texto de uma página só com texto cabe em cerca de 15 linhas de 21 caracteres; passando disso ele continua numa página extra.
+3. Desenhos: PNG de 112 de largura em `textures/gui/bestiary/`. Os do Redcap foram gerados a partir do próprio modelo e das texturas por uma ferramenta descartável (render em perfil, contornos e hachuras em tinta sépia, capuz em tinta vermelha) que não é versionada: os PNGs são a fonte.
+4. Escreva só o que o jogo faz de fato. O capítulo do Redcap diz que a geração natural ainda não existe ("por ora, só se invoca com o ovo"); atualize esse trecho quando as regras de geração forem implementadas.

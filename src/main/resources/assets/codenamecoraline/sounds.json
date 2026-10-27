@@ -1,0 +1,198 @@
+{
+  "entity.redcap.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.redcap.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:entity/witch/ambient1",
+        "pitch": 1.5
+      },
+      {
+        "name": "minecraft:entity/witch/ambient4",
+        "pitch": 1.5
+      },
+      {
+        "name": "minecraft:mob/vindication_illager/idle2",
+        "pitch": 1.6
+      },
+      {
+        "name": "minecraft:mob/vindication_illager/idle4",
+        "pitch": 1.6
+      },
+      {
+        "name": "minecraft:mob/piglin/idle2",
+        "pitch": 1.4,
+        "volume": 0.8
+      },
+      {
+        "name": "minecraft:mob/piglin/idle4",
+        "pitch": 1.4,
+        "volume": 0.8
+      }
+    ]
+  },
+  "entity.redcap.laugh": {
+    "subtitle": "subtitles.codenamecoraline.entity.redcap.laugh",
+    "sounds": [
+      {
+        "name": "minecraft:entity/witch/celebrate",
+        "pitch": 1.3
+      },
+      {
+        "name": "minecraft:mob/pillager/celebrate1",
+        "pitch": 1.5
+      },
+      {
+        "name": "minecraft:mob/pillager/celebrate3",
+        "pitch": 1.5
+      }
+    ]
+  },
+  "entity.redcap.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.redcap.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:mob/piglin/hurt1",
+        "pitch": 1.5
+      },
+      {
+        "name": "minecraft:mob/piglin/hurt2",
+        "pitch": 1.5
+      },
+      {
+        "name": "minecraft:mob/vindication_illager/hurt1",
+        "pitch": 1.6
+      },
+      {
+        "name": "minecraft:mob/vindication_illager/hurt2",
+        "pitch": 1.6
+      }
+    ]
+  },
+  "entity.redcap.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.redcap.death",
+    "sounds": [
+      {
+        "name": "minecraft:mob/vex/death1",
+        "pitch": 0.8
+      },
+      {
+        "name": "minecraft:mob/illusion_illager/death1",
+        "pitch": 1.5
+      },
+      {
+        "name": "minecraft:entity/witch/death2",
+        "pitch": 1.5
+      }
+    ]
+  },
+  "entity.redcap.attack": {
+    "subtitle": "subtitles.codenamecoraline.entity.redcap.attack",
+    "sounds": [
+      {
+        "name": "minecraft:mob/piglin_brute/angry1",
+        "pitch": 1.5
+      },
+      {
+        "name": "minecraft:mob/piglin_brute/angry3",
+        "pitch": 1.5
+      },
+      {
+        "name": "minecraft:mob/piglin_brute/angry5",
+        "pitch": 1.5
+      }
+    ]
+  },
+  "entity.redcap.step": {
+    "subtitle": "subtitles.codenamecoraline.entity.redcap.step",
+    "sounds": [
+      {
+        "name": "minecraft:mob/irongolem/walk1",
+        "pitch": 1.7,
+        "volume": 0.6
+      },
+      {
+        "name": "minecraft:mob/irongolem/walk2",
+        "pitch": 1.7,
+        "volume": 0.6
+      },
+      {
+        "name": "minecraft:mob/irongolem/walk3",
+        "pitch": 1.7,
+        "volume": 0.6
+      },
+      {
+        "name": "minecraft:mob/irongolem/walk4",
+        "pitch": 1.7,
+        "volume": 0.6
+      }
+    ]
+  },
+  "entity.redcap.sniff": {
+    "subtitle": "subtitles.codenamecoraline.entity.redcap.sniff",
+    "sounds": [
+      {
+        "name": "minecraft:mob/fox/sniff1",
+        "pitch": 0.8
+      },
+      {
+        "name": "minecraft:mob/fox/sniff2",
+        "pitch": 0.8
+      },
+      {
+        "name": "minecraft:mob/fox/sniff3",
+        "pitch": 0.8
+      }
+    ]
+  },
+  "entity.redcap.sharpen": {
+    "subtitle": "subtitles.codenamecoraline.entity.redcap.sharpen",
+    "sounds": [
+      {
+        "name": "minecraft:block/grindstone/grindstone1",
+        "pitch": 1.4,
+        "volume": 0.5
+      },
+      {
+        "name": "minecraft:block/grindstone/grindstone2",
+        "pitch": 1.4,
+        "volume": 0.5
+      },
+      {
+        "name": "minecraft:block/grindstone/grindstone3",
+        "pitch": 1.4,
+        "volume": 0.5
+      }
+    ]
+  },
+  "entity.redcap.throw": {
+    "subtitle": "subtitles.codenamecoraline.entity.redcap.throw",
+    "sounds": [
+      {
+        "name": "minecraft:random/bow",
+        "pitch": 0.7,
+        "volume": 0.8
+      },
+      {
+        "name": "minecraft:mob/pillager/celebrate2",
+        "pitch": 1.5
+      }
+    ]
+  },
+  "entity.redcap.rock_hit": {
+    "subtitle": "subtitles.codenamecoraline.entity.redcap.rock_hit",
+    "sounds": [
+      {
+        "name": "minecraft:dig/stone1"
+      },
+      {
+        "name": "minecraft:dig/stone2"
+      },
+      {
+        "name": "minecraft:dig/stone3"
+      },
+      {
+        "name": "minecraft:dig/stone4"
+      }
+    ]
+  }
+}

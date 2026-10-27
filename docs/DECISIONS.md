@@ -46,3 +46,51 @@ Registro apenas de decisões relevantes: contexto, decisão e consequências. N�
 - **Contexto:** a licença do mod não foi definida.
 - **Decisão:** `mod_license=All Rights Reserved`, sem arquivo de licença no repositório.
 - **Consequências:** definir a licença real antes de qualquer publicação aberta; ver `docs/ROADMAP.md`.
+
+## D-008 — Group ID e pacote raiz mantidos
+
+- **Contexto:** `com.codenamecoraline` foi escolhido como provisório. O usuário decidiu mantê-lo.
+- **Decisão:** `mod_group_id=com.codenamecoraline` e pacote `com.codenamecoraline` ficam como estão.
+- **Consequências:** trocar o pacote no futuro exige renomear as classes e o `mod_id` continua independente. Não há publicação externa que dependa do group ID.
+
+## D-009 — Animações: keyframes do jogo + procedural, sem biblioteca
+
+- **Contexto:** o Redcap precisava de estocada com o pique, caminhada própria e variações de idle. Existem bibliotecas de animação (ex.: GeckoLib), mas seriam uma dependência nova.
+- **Decisão:** usar o sistema de keyframes do próprio Minecraft (`AnimationDefinition`, `KeyframeAnimation`, `AnimationState`, o mesmo do Warden) para ações pontuais, e código procedural em `setupAnim` para movimentos contínuos (caminhada, respiração, movimento secundário). Os keyframes ficam em Java (`RedcapAnimations`), no mesmo formato que o Blockbench exporta.
+- **Consequências:** nenhuma dependência nova. Os nomes de partes do modelo precisam ser únicos. A estocada atrasa o dano em 5 ticks (`PikeThrustGoal`) para coincidir com o golpe visual; se o alvo sair do alcance nesse intervalo, o golpe erra.
+
+## D-010 — Sons do Redcap montados com áudios do jogo base
+
+- **Contexto:** não há encoder OGG Vorbis instalado (sem ffmpeg, oggenc, sox nem bibliotecas Python de áudio), e o jogo só aceita `.ogg`. Instalar ferramentas exige autorização.
+- **Decisão:** os eventos de som são do mod (`ModSounds`, legendas próprias), mas `sounds.json` aponta para áudios do jogo base com pitch alterado (bruxa e illagers para a voz, golem de ferro para as botas, raposa para farejar, rebolo para afiar). Nenhum áudio do jogo é copiado para o repositório.
+- **Consequências:** funciona sem arquivos de áudio novos. Para uma voz original basta adicionar `.ogg` em `assets/codenamecoraline/sounds/` e trocar as entradas de `sounds.json`; o código não muda.
+
+## D-011 — Variantes do Redcap por arma
+
+- **Contexto:** o usuário quer Redcaps que carregam armas diferentes: lança, adaga, e um sem arma que ataca com garras e arremessa pedras. Também queria só uma mão atacando por golpe.
+- **Decisão:** uma única entidade (`codenamecoraline:redcap`) com a variante como dado sincronizado, em vez de três tipos de entidade. Um único ovo de geração (`redcap_spawn_egg`) cria Redcaps de qualquer variante, sorteada ao nascer; `/summon codenamecoraline:redcap {Variant:"dagger"}` fixa a variante (o NBT `Variant` tem prioridade sobre o sorteio). Os números de cada variante ficam em `RedcapVariant`.
+- **Consequências:** um só modelo, renderizador e conjunto de sons. Variantes novas exigem um valor no enum, uma parte de arma no modelo e uma animação de ataque. O `MeleeAttackGoal` precisa de `followingTargetEvenIfNotSeen = true`: com `false` o objetivo termina quando o caminho acaba e cancela o golpe que ainda está na antecipação (causa dos golpes que nunca acertavam).
+
+## D-012 — Comportamento coletivo sem módulo próprio
+
+- **Contexto:** o usuário quer um senso de ataque coletivo entre Redcaps. O dossiê original descreve o Redcap como solitário.
+- **Decisão:** a coordenação fica dentro de `Redcap` (alerta de alvo, `FlankGoal`, `StayBackGoal`), usando só consultas de entidades próximas em raio de 24 blocos; não há gerenciador de bando nem estado compartilhado. A pedra ignora Redcaps (`canHitEntity`).
+- **Consequências:** funciona sem estrutura nova e sobrevive a descarregamento de chunks, mas cada Redcap decide só pelo que vê em volta. Se o raio de alerta ou o cerco se mostrarem caros com muitos Redcaps, a consulta de vizinhos é o ponto a otimizar. A regra de geração solitária do dossiê continua pendente.
+
+## D-013 — Drops feitos no código, itens de combate reaproveitam os do jogo
+
+- **Contexto:** os drops têm chance por utilidade, a arma é a da variante e sai com desgaste aleatório, e a touca muda o comportamento da mob.
+- **Decisão:** `Redcap.dropCustomDeathLoot` sorteia os drops (a tabela de saque do tipo fica vazia). A adaga usa `Item.Properties.sword` e o pique `Item.Properties.spear` do jogo, com um material próprio de ferro enferrujado (durabilidade 140), em vez de itens com lógica de ataque própria. A touca usa `humanoidArmor` e a amizade vem de checar o item na cabeça, sem componente nem efeito.
+- **Consequências:** looting não aumenta os drops (a tabela de saque padrão não é usada). Mudar chances é editar as constantes `DROP_*`. Por não haver NBT de dono, a "amizade" não é persistente: depende de o jogador estar com a touca na cabeça.
+
+## D-014 — Touca como modelo de item na cabeça, não como armadura
+
+- **Contexto:** a touca como armadura (camada plana de 64x32 sobre o modelo humanoide) ficou esquisita: uma caixa vermelha sem a forma de capuz nem a ponta caída.
+- **Decisão:** a touca é um item `Equippable` de cabeça sem asset de armadura, e o jogo desenha o modelo 3D do próprio item na cabeça (`display_context: head`). O modelo usa só caixas alinhadas aos eixos (calota em degraus, abas, nuca, ponta em degraus), sem rotação de elementos, e foi verificado fora do jogo com a mesma cadeia de transformações da camada de cabeça (`CustomHeadLayer`).
+- **Consequências:** não há defesa nem durabilidade. A forma é de voxels, não de curvas. Se uma versão futura do jogo mudar a camada de cabeça, é este modelo que precisa ser reajustado.
+
+## D-015 — Bestiário próprio em vez de livro escrito
+
+- **Contexto:** o usuário quer um livro que explique cada mob (lado místico, ataque, onde encontrar) com rascunhos desenhados, e que cresça a cada mob.
+- **Decisão:** uma tela própria (`BestiaryScreen`) alimentada por dados (`Bestiary.ENTRIES` e chaves de tradução), em vez de um livro escrito do jogo, porque este só mostra texto. O índice e as páginas são montados a partir da lista de capítulos.
+- **Consequências:** acrescentar um mob é acrescentar dados e textos, sem mexer na tela. Todo o texto fica nos arquivos `lang`. A paginação depende da fonte do jogo, então o ajuste fino da quebra de linha só se confirma no jogo.

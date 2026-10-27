@@ -1,0 +1,19 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "cases": [
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "codenamecoraline:item/redcap_cap_worn"
+        },
+        "when": "head"
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "codenamecoraline:item/redcap_cap"
+    },
+    "property": "minecraft:display_context"
+  }
+}
