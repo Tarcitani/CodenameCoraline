@@ -1,6 +1,6 @@
 # Codename Coraline
 
-Mod de Minecraft Java para NeoForge. Nome provisório. Atualmente contém apenas a fundação técnica do projeto: build, metadados e ponto de entrada. **Não há funcionalidades de gameplay implementadas.**
+Mod de Minecraft Java para NeoForge. Nome provisório. Contém o Redcap, o Basilisco da Praga e um Bestiário com capítulos em português e inglês.
 
 ## Versões
 
@@ -49,9 +49,11 @@ Resumo em [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Instruções para sessõ
 ## Estado atual
 
 - Build configurado com NeoForge 26.1.2 e Java 25.
-- Ponto de entrada `com.codenamecoraline.CodenameCoraline` (`@Mod`).
+- Redcap com variantes, coordenação em grupo, itens e touca de disfarce.
+- Basilisco da Praga com saltos, sopro antecipado, névoa, barra de acúmulo de praga, repulsão por luz das almas e recompensas fabricáveis. Detalhes em [docs/design/basilisk.md](docs/design/basilisk.md).
+- Bestiário com informações de combate, habitat e recompensas dos dois mobs.
 - Metadados `neoforge.mods.toml` gerados a partir de `gradle.properties`.
-- Testes automatizados: não existem ainda.
+- Testes de integração do Basilisco: `.\gradlew.bat runBasiliskTest`, em mundo descartável dentro de `build/`.
 - Status de validação por comando: ver [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) e [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Licença

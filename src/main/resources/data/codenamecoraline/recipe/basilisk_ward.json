@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "codenamecoraline:basilisk_eye_cyst",
+    "minecraft:gold_ingot",
+    "minecraft:iron_chain"
+  ],
+  "result": {
+    "id": "codenamecoraline:basilisk_ward",
+    "count": 1
+  }
+}

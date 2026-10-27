@@ -21,7 +21,10 @@ public final class ModCreativeTabs {
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup." + CodenameCoraline.MOD_ID + ".spawn_eggs"))
                     .icon(() -> new ItemStack(ModItems.REDCAP_SPAWN_EGG.get()))
-                    .displayItems((parameters, output) -> output.accept(ModItems.REDCAP_SPAWN_EGG.get()))
+                    .displayItems((parameters, output) -> {
+                        output.accept(ModItems.REDCAP_SPAWN_EGG.get());
+                        output.accept(ModItems.BASILISK_SPAWN_EGG.get());
+                    })
                     .build());
 
     private ModCreativeTabs() {}
@@ -32,11 +35,16 @@ public final class ModCreativeTabs {
             event.accept(ModItems.REDCAP_DAGGER.get());
             event.accept(ModItems.REDCAP_PIKESTAFF.get());
             event.accept(ModItems.REDCAP_CAP.get());
+            event.accept(ModItems.MIST_FLASK.get());
+            event.accept(ModItems.BASILISK_WARD.get());
         } else if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(ModItems.BESTIARY.get());
         } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.REDCAP_NAIL.get());
             event.accept(ModItems.REDCAP_TOOTH.get());
+            event.accept(ModItems.CATACOMB_LILY.get());
+            event.accept(ModItems.ROTTEN_BUTTERFLY.get());
+            event.accept(ModItems.BASILISK_EYE_CYST.get());
         }
     }
 

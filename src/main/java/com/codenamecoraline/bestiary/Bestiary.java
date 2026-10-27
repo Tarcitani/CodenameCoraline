@@ -19,7 +19,16 @@ public final class Bestiary {
             BestiaryPage.text("where"),
             BestiaryPage.text("drops")));
 
-    public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP);
+    public static final BestiaryEntry BASILISK = new BestiaryEntry("basilisk", List.of(
+            BestiaryPage.text("anatomy"),
+            BestiaryPage.text("habitat"),
+            BestiaryPage.text("mist"),
+            BestiaryPage.text("survive"),
+            BestiaryPage.text("light"),
+            BestiaryPage.text("spoils"),
+            BestiaryPage.text("cyst")));
+
+    public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK);
 
     private Bestiary() {}
 }

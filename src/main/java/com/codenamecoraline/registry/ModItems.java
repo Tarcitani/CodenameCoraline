@@ -2,6 +2,8 @@ package com.codenamecoraline.registry;
 
 import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.item.BestiaryItem;
+import com.codenamecoraline.item.CatacombLilyItem;
+import com.codenamecoraline.item.MistFlaskItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
@@ -54,6 +56,16 @@ public final class ModItems {
     /** The bestiary book: lore, attack patterns and habitats of every mob of this mod. */
     public static final DeferredItem<Item> BESTIARY = ITEMS.registerItem("bestiary", BestiaryItem::new,
             properties -> properties.stacksTo(1));
+
+    public static final DeferredItem<Item> BASILISK_SPAWN_EGG = ITEMS.registerItem("basilisk_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.BASILISK.get()));
+    public static final DeferredItem<Item> CATACOMB_LILY = ITEMS.registerItem("catacomb_lily", CatacombLilyItem::new);
+    public static final DeferredItem<Item> ROTTEN_BUTTERFLY = ITEMS.registerSimpleItem("rotten_butterfly");
+    public static final DeferredItem<Item> BASILISK_EYE_CYST = ITEMS.registerSimpleItem("basilisk_eye_cyst");
+    public static final DeferredItem<Item> MIST_FLASK = ITEMS.registerItem("mist_flask", MistFlaskItem::new,
+            properties -> properties.stacksTo(16));
+    public static final DeferredItem<Item> BASILISK_WARD = ITEMS.registerSimpleItem("basilisk_ward",
+            () -> new Item.Properties().stacksTo(1));
 
     private ModItems() {}
 

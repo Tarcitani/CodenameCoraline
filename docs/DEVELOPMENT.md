@@ -9,7 +9,7 @@ Procedimentos de compilação, execução, testes e diagnóstico. Cada comando t
 | `./gradlew build` (PowerShell: `.\gradlew.bat build`) | Compila, executa verificações e gera `build/libs/codenamecoraline-<versão>.jar` | VALIDADO em 2026-10-27: `BUILD SUCCESSFUL` em `build.log`; jar `codenamecoraline-0.1.0-SNAPSHOT.jar` gerado com `neoforge.mods.toml` expandido e classe compilada em Java 25 |
 | `./gradlew compileJava` | Compila apenas o código Java | VALIDADO em 2026-10-27 (incluído no `build`) |
 
-Observação: o shell do agente de IA não consegue executar o Gradle (`Unable to establish loopback connection`). A validação acima foi feita fora dele, no terminal do usuário.
+Houve uma falha histórica de loopback no ambiente anterior do agente (`Unable to establish loopback connection`). Em 2026-10-27, no workspace `C:\Users\Venti\CodenameCoraline`, `build`, `runBasiliskTest` e o cliente de inspeção executaram pelo shell do agente com sucesso. O diagnóstico histórico abaixo é mantido para referência.
 
 Primeira execução: baixa a distribuição do Gradle 9.2.1, o JDK 25 (se ausente), o Minecraft 26.1.2 e o NeoForge. Pode levar vários minutos e vários GB.
 
@@ -30,9 +30,9 @@ Verificado pela ferramenta: nenhuma sobreposição de UV entre cubos diferentes;
 
 ## Testes
 
-- Não há testes automatizados (JUnit ou gametests) no projeto.
-- A verificação atual é a compilação (`build`) e a carga do mod nas execuções de desenvolvimento.
-- Quando houver lógica testável, decida o framework em `docs/DECISIONS.md` antes de adicioná-lo.
+- `.\gradlew.bat runBasiliskTest` executa os Game Tests do Basilisco em `build/basilisk-gametest/`, sem abrir os mundos do usuário. Não exige um framework externo (D-017).
+- Os testes só são registrados com `coraline.basiliskTests=true`, configurado nessa execução Gradle. Não são ativados por `runClient` ou `runServer` comuns.
+- A compilação (`build`) verifica o código e gera o JAR; os Game Tests verificam o comportamento no servidor. A aparência, o HUD e a paginação do Bestiário precisam também de revisão no cliente.
 
 ## Depuração
 
@@ -66,3 +66,18 @@ Verificado pela ferramenta: nenhuma sobreposição de UV entre cubos diferentes;
 2. Escreva as chaves `bestiary.codenamecoraline.<id>.*` em `lang/pt_br.json` e `lang/en_us.json`: `name`, e `title`/`body` por página (`caption` nas páginas com desenho; `body` pode ser `""`). O texto de uma página só com texto cabe em cerca de 15 linhas de 21 caracteres; passando disso ele continua numa página extra.
 3. Desenhos: PNG de 112 de largura em `textures/gui/bestiary/`. Os do Redcap foram gerados a partir do próprio modelo e das texturas por uma ferramenta descartável (render em perfil, contornos e hachuras em tinta sépia, capuz em tinta vermelha) que não é versionada: os PNGs são a fonte.
 4. Escreva só o que o jogo faz de fato. O capítulo do Redcap diz que a geração natural ainda não existe ("por ora, só se invoca com o ovo"); atualize esse trecho quando as regras de geração forem implementadas.
+
+## Verificação do Basilisco — 2026-10-27
+
+- `.\gradlew.bat build runBasiliskTest`: **VALIDADO**, 12 testes obrigatórios aprovados (11 do mod e um do framework). Repetido após as correções da revisão visual, novamente com sucesso.
+- Cobertura dos testes do mod: pulsos e decadência da barra; imunidades e multiplicadores de dano; luz das almas nas duas mãos e provocação; névoa sem dano direto; sobreposição sem multiplicar acúmulo; 100 de dano atravessando armadura; consumo e sobrevivência com totem; quatro consumíveis de cura; amuleto; sequência real de saltar/inspirar/expelir; cura e resistência do golem pelo lírio.
+- Os logs de servidor foram revisados além do resultado dos testes. Foi corrigida uma receita que referenciava `minecraft:chain`; o identificador usado no 26.1.2 é `minecraft:iron_chain`.
+- Inspeção em cliente: mundo descartável copiado dos Game Tests para `build/basilisk-preview/saves/BasiliskInspection`, sem modificar `run/saves/`. A execução recebeu um init script temporário do Gradle para usar esse diretório.
+- Bestiário em português: índice, botão do Basilisco e todas as sete páginas (13–19 nesta tradução) conferidos no jogo, sem corte de títulos, texto ou rodapés. Foram corrigidos os acentos que haviam virado `?` nos novos textos.
+- Ícones dos seis novos itens (incluindo o ovo) conferidos na barra rápida, sem textura ausente. Modelo conferido de frente e em três quartos no jogo; as seções dos olhos e as placas das pupilas receberam espessuras distintas para remover faces coplanares, e o cliente foi reaberto para conferir a correção.
+- HUD conferido em sobrevivência: barra preta/dourada legível, valores de 15, 30 e 45 sincronizados durante exposição e desaparecimento após a decadência. O cenário visual usou Resistência V para permitir observação sem morte; a letalidade e o totem foram verificados separadamente pelos Game Tests.
+- Conferidos no cliente o recuo ao equipar tocha das almas na mão secundária e a retomada dos saltos/sopro após removê-la. A névoa gerada pelo ataque apresentou partículas de fumaça, tinta e fagulhas douradas, sem erro de renderização.
+- Evidências locais: `build/basilisk-preview/screenshots/2026-10-27_19.43.32.png` (Bestiário), `2026-10-27_19.45.19.png` (modelo corrigido) e `2026-10-27_19.46.02.png` (HUD). São arquivos da execução descartável, ignorados pelo Git.
+- As texturas do Basilisco são reproduzíveis com `python tools/generate_basilisk_assets.py` (Pillow). Esse comando não é necessário para compilar ou jogar.
+
+Os testes de servidor não medem frequência de geração em uma campanha de sobrevivência, nem substituem avaliação de balanceamento pelo jogador.

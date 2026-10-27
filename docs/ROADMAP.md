@@ -34,7 +34,7 @@ Estado da fundação, verificações realizadas e pendências. Não contém esco
 
 ## Pendências
 
-1. **Loopback no sandbox do agente.** O Gradle não executa pelo shell do agente (ver `docs/DEVELOPMENT.md`). O build foi validado fora dele. Causa não identificada.
+1. ~~**Loopback no sandbox do agente.**~~ Falha histórica do ambiente anterior; `build`, `runBasiliskTest` e cliente de inspeção executados pelo agente no workspace atual em 2026-10-27. Causa original não identificada.
 2. **Autorização para o JDK 25.** O plugin foojay baixa o JDK 25 para `%USERPROFILE%\.gradle\jdks`. Isso depende de acesso a `api.adoptium.net`/`foojay` e foi autorizado pelo usuário.
 3. ~~**Execução em jogo.**~~ Concluída em 2026-10-27: `runClient` e `runServer` executados com o mod carregado (ver verificações).
 4. **Licença.** Definir a licença real antes de publicação aberta (provisório: All Rights Reserved).
@@ -60,5 +60,14 @@ Estado da fundação, verificações realizadas e pendências. Não contém esco
    - Ainda não verificado em jogo: o modelo da touca na cabeça, o Bestiário (layout, quebra de linhas, botões, desenhos), os drops, a touca (amizade, ajuda, fúria), as cores por idade, o comportamento em grupo, a mira das pedrinhas, as novas animações, os sons e o golpe atrasado (testar em modo sobrevivência).
    - Pendente, opcional: voz de goblin original em `.ogg` no lugar dos áudios do jogo base (exige encoder OGG).
    - Não incluído na fatia: emboscada (escalar ruínas e arremessar pedras), mecânica do gorro de sangue, banimento sagrado, spawn e spawn egg, drops.
-7. **Testes automatizados.** Nenhum framework escolhido (ver D-005).
-8. **Push do commit `54252a1`** (nota de VS Code em `docs/DEVELOPMENT.md`). Aguarda confirmação explícita do usuário.
+7. **Testes automatizados.** Game Tests nativos adotados para o Basilisco (D-017). Executar `.\gradlew.bat runBasiliskTest`.
+8. ~~**Push do commit `54252a1`.**~~ Incluído no histórico de `origin/main`.
+
+## Basilisco da Praga — 2026-10-27
+
+- Implementado a partir do Markdown fornecido: modelo, texturas, olhos emissivos, animações procedurais, sons, IA de saltos e sopro, repulsão por itens das almas, acúmulo/decadência/cura de praga, HUD, dano com suporte ao totem, geração subterrânea e drops.
+- Implementados os usos das recompensas: lírio para golem/visão espiritual, flechas de podridão, frasco arremessável e amuleto segurado em uma mão. Capítulo adicionado ao Bestiário em ambos os idiomas.
+- Adaptações e limites: [design/basilisk.md](design/basilisk.md).
+- Build e Game Tests passaram: 11 testes próprios e um teste do framework, 12 obrigatórios aprovados. Cobertura e revisão visual em [DEVELOPMENT.md](DEVELOPMENT.md).
+- Revisão no cliente identificou e corrigiu acentos substituídos por `?` nos novos textos em português e faces coplanares nos olhos. A correção foi compilada e a suíte de servidor passou novamente.
+- Revisão visual concluída: modelo corrigido, ícones, sete páginas do capítulo em português, barra de praga sincronizada, decadência, salto/sopro e repulsão pela tocha das almas. Evidências e limites da verificação em `docs/DEVELOPMENT.md`.

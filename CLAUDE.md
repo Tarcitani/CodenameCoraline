@@ -1,13 +1,13 @@
 # CLAUDE.md — Manual operacional do CodenameCoraline
 
-Mod de Minecraft Java (NeoForge). Nome interno: `CodenameCoraline`. Mod ID: `codenamecoraline`. Nome provisório. Nenhuma funcionalidade de gameplay existe ainda.
+Mod de Minecraft Java (NeoForge). Nome interno: `CodenameCoraline`. Mod ID: `codenamecoraline`. Nome provisório. Contém Redcap, Basilisco da Praga e Bestiário; estrutura atual em `docs/ARCHITECTURE.md`.
 
 ## Stack (versões verificadas)
 - Minecraft 26.1.2 · NeoForge 26.1.2.124 · Java 25 (toolchain Gradle) · Gradle Wrapper 9.2.1 · plugin `net.neoforged.moddev` 2.0.148.
 - Detalhes e motivos: `docs/DECISIONS.md`. Versões em `gradle.properties` e `build.gradle`.
 
 ## Isolamento e segurança (obrigatório)
-- Trabalhe somente em `C:\MinecraftDev\CodenameCoraline`.
+- Trabalhe no workspace atual `C:\Users\Venti\CodenameCoraline`.
 - Nunca leia para modificar, mova, renomeie, exclua ou reutilize arquivos de `C:\MinecraftDev\MeuPrimeiroMod`.
 - Não altere configurações globais (Git, Claude Code, Java, Gradle, OMC). Use configuração local ao projeto.
 - Não instale ferramentas globais sem autorização explícita.
@@ -40,7 +40,7 @@ Executados na raiz do projeto (Git Bash ou PowerShell):
 - Instância de desenvolvimento cliente: `./gradlew runClient`
 - Servidor de desenvolvimento: `./gradlew runServer`
 
-`./gradlew build` está validado (2026-10-27, fora do sandbox do agente). Pelo shell do agente o Gradle falha com `Unable to establish loopback connection`; nesse caso, peça ao usuário para rodar o comando no terminal dele. Diagnóstico e status em `docs/DEVELOPMENT.md`. Não afirme que um comando funciona sem tê-lo executado com sucesso.
+`./gradlew build` está validado (2026-10-27), inclusive pelo shell do agente no workspace atual. `.\gradlew.bat runBasiliskTest` executa a suíte de integração em `build/basilisk-gametest/`. Uma falha histórica de loopback está documentada em `docs/DEVELOPMENT.md`. Não afirme que um comando funciona sem tê-lo executado com sucesso.
 
 ## Procedimento de implementação e verificação
 1. Leia este arquivo e `docs/ROADMAP.md` (estado atual e pendências).

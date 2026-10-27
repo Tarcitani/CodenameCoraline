@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "codenamecoraline:catacomb_lily",
+    "minecraft:glow_ink_sac",
+    "minecraft:glass_bottle"
+  ],
+  "result": {
+    "id": "minecraft:potion",
+    "components": {
+      "minecraft:item_name": {
+        "translate": "item.codenamecoraline.spirit_sight"
+      },
+      "minecraft:potion_contents": {
+        "custom_color": 11257240,
+        "custom_effects": [
+          {
+            "id": "minecraft:night_vision",
+            "duration": 1200,
+            "amplifier": 0
+          }
+        ]
+      }
+    }
+  }
+}

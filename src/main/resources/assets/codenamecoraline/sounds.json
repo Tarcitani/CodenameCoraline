@@ -194,5 +194,59 @@
         "name": "minecraft:dig/stone4"
       }
     ]
+  },
+  "entity.basilisk.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.basilisk.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:entity.frog.ambient",
+        "type": "event"
+      }
+    ]
+  },
+  "entity.basilisk.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.basilisk.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:entity.frog.hurt",
+        "type": "event"
+      }
+    ]
+  },
+  "entity.basilisk.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.basilisk.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.frog.death",
+        "type": "event"
+      }
+    ]
+  },
+  "entity.basilisk.hop": {
+    "subtitle": "subtitles.codenamecoraline.entity.basilisk.hop",
+    "sounds": [
+      {
+        "name": "minecraft:entity.frog.step",
+        "type": "event"
+      }
+    ]
+  },
+  "entity.basilisk.inhale": {
+    "subtitle": "subtitles.codenamecoraline.entity.basilisk.inhale",
+    "sounds": [
+      {
+        "name": "minecraft:entity.breeze.inhale",
+        "type": "event"
+      }
+    ]
+  },
+  "entity.basilisk.exhale": {
+    "subtitle": "subtitles.codenamecoraline.entity.basilisk.exhale",
+    "sounds": [
+      {
+        "name": "minecraft:entity.breeze.shoot",
+        "type": "event"
+      }
+    ]
   }
 }

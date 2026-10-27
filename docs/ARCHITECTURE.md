@@ -65,7 +65,7 @@ Pacotes existem somente quando há conteúdo real: `registry`, `entity` e `clien
 - **Ataque:** `Redcap.WeaponAttackGoal` (um `MeleeAttackGoal` com `followingTargetEvenIfNotSeen = true`) inicia o golpe, envia o evento de entidade (101 melee, 102 garra esquerda, 103 arremesso) e aplica o dano `windupTicks` depois, no quadro do golpe, se o alvo estiver a até `strikeReach` da hitbox. Uma mão por golpe: lança e adaga usam o braço esquerdo, as garras alternam os braços.
 - **Pedrinha:** `Redcap.RockThrowGoal` (só `CLAWS`, alvo entre 5 e 16 blocos com linha de visão) para, faz a animação e lança `RedcapRock` em `ROCK_RELEASE_TICKS`. A mira (`RockAim`) simula o movimento do projétil (gravidade, inércia 0,99, deslocamento) para achar o ângulo que passa pelo centro do alvo e adianta o alvo pelo tempo de voo. A pedrinha é o item `redcap_pebble` com textura animada (8 quadros girando), desenhada pela `ThrownItemRenderer` na metade do tamanho; causa 8 de dano, repulsão e Lentidão II por 2 s e atravessa outros Redcaps (sem fogo amigo).
 - **Piscar:** `RedcapEyesLayer` deixa de desenhar os olhos brilhantes por 3 ticks a cada 110.
-- Itens, blocos e outros registros ainda não existem.
+- Itens e abas criativas são registrados em `ModItems` e `ModCreativeTabs`; o livro usa `Bestiary.ENTRIES`.
 
 ## Metadados
 
@@ -132,3 +132,15 @@ Item `codenamecoraline:bestiary` (`item/BestiaryItem`): usar abre `client/bestia
 - **Dados:** `bestiary/Bestiary.ENTRIES` lista os capítulos (`BestiaryEntry`: id e páginas); cada `BestiaryPage` é só texto ou tem um desenho. Todos os textos são chaves de tradução `bestiary.codenamecoraline.<mob>.<página>.title|caption|body` (`.name` do capítulo) nos arquivos `lang`.
 - **Arte:** fundo `textures/gui/bestiary_book.png` (300x190) e desenhos em `textures/gui/bestiary/*.png`.
 - **Obtenção:** aba Ferramentas do criativo e receita sem forma: livro + corante vermelho + pena (`data/codenamecoraline/recipe/bestiary.json`).
+
+## Basilisco da Praga
+
+- **Servidor:** `entity/basilisk/Basilisk` contém atributos, imunidades, fraquezas, geração, drops, memória do agressor e os objetivos de combate, repulsão e espreita. A navegação anfíbia escolhe os caminhos; `HopMoveControl` executa os saltos.
+- **Névoa:** `DeathBlightCloud` estende `AreaEffectCloud`, verifica distância e oclusão por blocos e marca a exposição de cada criatura. `DeathBlight` processa acúmulo, cura, dano e raízes no evento de tick do servidor. `DeathBlightMeter` controla os pulsos por vítima, independentemente do número de nuvens.
+- **Dados:** `registry/ModAttachments` registra a barra persistente com sincronização somente para o próprio jogador e o estado transitório de exposição/raízes. O ponto de entrada registra esse novo `DeferredRegister`.
+- **Cliente:** `client/basilisk/` contém modelo, renderizador, estado de renderização, olhos emissivos e `DeathBlightHud`. O estado da entidade e a inflação do papo são dados sincronizados; a lógica de combate permanece no servidor.
+- **Itens:** `CatacombLilyItem` interage com golens. `MistFlaskItem` lança `MistFlask`, que cria a mesma névoa ao colidir. O amuleto é conferido na mão principal/secundária pelos eventos de praga e dano de Decomposição.
+- **Recursos:** `neoforge/biome_modifier/basilisk_spawns.json`, receitas, tipo de dano e tags de dano. Os drops usam código e uma tabela de saque vazia. O capítulo do livro está em `Bestiary.BASILISK` e nos dois arquivos de idioma.
+- **Verificação:** `verification/BasiliskGameTests` registra funções e testes somente quando a propriedade `coraline.basiliskTests` está habilitada. A execução Gradle `basiliskTest` usa `build/basilisk-gametest/`.
+
+Valores, receitas e adaptações da referência: [design/basilisk.md](design/basilisk.md).
