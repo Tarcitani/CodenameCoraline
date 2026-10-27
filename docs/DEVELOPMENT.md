@@ -33,6 +33,7 @@ Diretórios de execução: `run/` (ignorado pelo Git). Esses comandos são caros
 - Logs: `run/logs/latest.log` (cliente e servidor).
 - Procure a linha `codenamecoraline loaded` para confirmar que o mod carregou.
 - Para depurar no IDE: importe o projeto como Gradle, aguarde a sincronização e use as run configurations geradas pelo plugin.
+- VS Code: `.vscode/settings.json` (local, ignorado pelo Git) aponta o Java language server e a importação do Gradle para o JDK 25 em `%USERPROFILE%\.gradle\jdks\eclipse_adoptium-25-amd64-windows.2`. Status: **NÃO VALIDADO**; confirme na IDE que o Java de projeto é 25 e que não há erros falsos. O `java` do PATH é 21 e não deve ser alterado.
 
 ## Diagnóstico de erros comuns
 
