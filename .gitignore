@@ -1,0 +1,41 @@
+### Gradle ###
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+### VS Code ###
+.vscode/
+
+### Windows ###
+Thumbs.db
+Desktop.ini
+
+### Minecraft modding ###
+run/
+runs/
+**/src/generated/**/.cache/
+
+### Local tooling ###
+.omc/
+.claude/settings.local.json
+
+### Secrets and credentials (never commit) ###
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.token
+
+### Logs ###
+*.log
