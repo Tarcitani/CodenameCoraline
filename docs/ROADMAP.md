@@ -11,7 +11,7 @@ Estado da fundação, verificações realizadas e pendências. Não contém esco
 - [x] Documentação: `README.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md`, `docs/DEVELOPMENT.md`, `docs/DECISIONS.md`, `docs/ROADMAP.md`.
 - [x] Repositório Git local inicializado (branch `main`), sem commit.
 - [x] Repositório remoto privado criado e vazio: `https://github.com/Tarcitani/CodenameCoraline` (`origin` configurado; nada enviado).
-- [ ] Compilação `./gradlew build` executada com sucesso — ver verificações abaixo.
+- [x] Compilação `./gradlew build` executada com sucesso em 2026-10-27 — ver verificações abaixo.
 
 ## Verificações realizadas
 
@@ -27,12 +27,12 @@ Estado da fundação, verificações realizadas e pendências. Não contém esco
 | 2026-10-27 | `gradlew.bat build` via PowerShell/cmd | Falhou com a mesma causa |
 | 2026-10-27 | `gradlew compileJava --stacktrace` com `JAVA_TOOL_OPTIONS=-Djava.net.preferIPv4Stack=true` | Falhou; causa raiz: `Pipe` do JVM (`Invalid argument: connect`) |
 | 2026-10-27 | `java.nio.channels.Pipe.open()` em programa Java simples (JDK 21, mesmo shell) | Funciona |
-| 2026-10-27 | Compilação do projeto | **Não validada.** Nenhum código foi compilado com sucesso. |
+| 2026-10-27 | `./gradlew build` no terminal do usuário (fora do sandbox do agente) | **Sucesso**: `BUILD SUCCESSFUL` em `build.log`; jar gerado às 15:47; classe em Java 25; JDK 25 provisionado em `%USERPROFILE%\.gradle\jdks` |
 | 2026-10-27 | Auditoria Git (`git add -n`, varredura por padrões de segredo) | Nenhum segredo encontrado; `.omc/` ignorado; `gradle-wrapper.jar` versionável |
 
 ## Pendências
 
-1. **Compilação não validada.** O Gradle não executa neste ambiente (loopback, ver `docs/DEVELOPMENT.md`). Validar com `gradlew build` fora do sandbox ou após resolver a causa.
+1. **Loopback no sandbox do agente.** O Gradle não executa pelo shell do agente (ver `docs/DEVELOPMENT.md`). O build foi validado fora dele. Causa não identificada.
 2. **Autorização para o JDK 25.** O plugin foojay baixa o JDK 25 para `%USERPROFILE%\.gradle\jdks`. Isso depende de acesso a `api.adoptium.net`/`foojay` e foi autorizado pelo usuário.
 3. **Execução em jogo.** `runClient` e `runServer` não foram executados.
 4. **Licença.** Definir a licença real antes de publicação aberta (provisório: All Rights Reserved).

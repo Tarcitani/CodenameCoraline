@@ -40,7 +40,7 @@ Executados na raiz do projeto (Git Bash ou PowerShell):
 - Instância de desenvolvimento cliente: `./gradlew runClient`
 - Servidor de desenvolvimento: `./gradlew runServer`
 
-**Nenhum comando está validado neste ambiente ainda.** O Gradle falha com `Unable to establish loopback connection` (Git Bash e PowerShell). Diagnóstico e status em `docs/DEVELOPMENT.md`. Não afirme que um comando funciona sem tê-lo executado com sucesso.
+`./gradlew build` está validado (2026-10-27, fora do sandbox do agente). Pelo shell do agente o Gradle falha com `Unable to establish loopback connection`; nesse caso, peça ao usuário para rodar o comando no terminal dele. Diagnóstico e status em `docs/DEVELOPMENT.md`. Não afirme que um comando funciona sem tê-lo executado com sucesso.
 
 ## Procedimento de implementação e verificação
 1. Leia este arquivo e `docs/ROADMAP.md` (estado atual e pendências).

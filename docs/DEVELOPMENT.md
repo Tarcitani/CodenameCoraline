@@ -6,8 +6,10 @@ Procedimentos de compilação, execução, testes e diagnóstico. Cada comando t
 
 | Comando | Função | Status |
 |---|---|---|
-| `./gradlew build` (PowerShell: `.\gradlew.bat build`) | Compila, executa verificações e gera `build/libs/codenamecoraline-<versão>.jar` | FALHOU no ambiente de 2026-10-27 (`Unable to establish loopback connection`, ver diagnóstico abaixo) |
-| `./gradlew compileJava` | Compila apenas o código Java | FALHOU no mesmo diagnóstico |
+| `./gradlew build` (PowerShell: `.\gradlew.bat build`) | Compila, executa verificações e gera `build/libs/codenamecoraline-<versão>.jar` | VALIDADO em 2026-10-27: `BUILD SUCCESSFUL` em `build.log`; jar `codenamecoraline-0.1.0-SNAPSHOT.jar` gerado com `neoforge.mods.toml` expandido e classe compilada em Java 25 |
+| `./gradlew compileJava` | Compila apenas o código Java | VALIDADO em 2026-10-27 (incluído no `build`) |
+
+Observação: o shell do agente de IA não consegue executar o Gradle (`Unable to establish loopback connection`). A validação acima foi feita fora dele, no terminal do usuário.
 
 Primeira execução: baixa a distribuição do Gradle 9.2.1, o JDK 25 (se ausente), o Minecraft 26.1.2 e o NeoForge. Pode levar vários minutos e vários GB.
 
