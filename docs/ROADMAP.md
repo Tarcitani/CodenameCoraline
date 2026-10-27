@@ -28,13 +28,15 @@ Estado da fundação, verificações realizadas e pendências. Não contém esco
 | 2026-10-27 | `gradlew compileJava --stacktrace` com `JAVA_TOOL_OPTIONS=-Djava.net.preferIPv4Stack=true` | Falhou; causa raiz: `Pipe` do JVM (`Invalid argument: connect`) |
 | 2026-10-27 | `java.nio.channels.Pipe.open()` em programa Java simples (JDK 21, mesmo shell) | Funciona |
 | 2026-10-27 | `./gradlew build` no terminal do usuário (fora do sandbox do agente) | **Sucesso**: `BUILD SUCCESSFUL` em `build.log`; jar gerado às 15:47; classe em Java 25; JDK 25 provisionado em `%USERPROFILE%\.gradle\jdks` |
+| 2026-10-27 | `./gradlew runClient` (executado pelo usuário) | **Sucesso**: janela abriu; `codenamecoraline loaded`; encerramento limpo |
+| 2026-10-27 | `./gradlew runServer` (executado pelo usuário) | **Sucesso**: `codenamecoraline loaded`; `Done (2.315s)` |
 | 2026-10-27 | Auditoria Git (`git add -n`, varredura por padrões de segredo) | Nenhum segredo encontrado; `.omc/` ignorado; `gradle-wrapper.jar` versionável |
 
 ## Pendências
 
 1. **Loopback no sandbox do agente.** O Gradle não executa pelo shell do agente (ver `docs/DEVELOPMENT.md`). O build foi validado fora dele. Causa não identificada.
 2. **Autorização para o JDK 25.** O plugin foojay baixa o JDK 25 para `%USERPROFILE%\.gradle\jdks`. Isso depende de acesso a `api.adoptium.net`/`foojay` e foi autorizado pelo usuário.
-3. **Execução em jogo.** `runClient` e `runServer` não foram executados.
+3. ~~**Execução em jogo.**~~ Concluída em 2026-10-27: `runClient` e `runServer` executados com o mod carregado (ver verificações).
 4. **Licença.** Definir a licença real antes de publicação aberta (provisório: All Rights Reserved).
 5. **Group ID e nome do pacote.** `com.codenamecoraline` é provisório. Confirmar se deve usar outro domínio.
 6. **Escopo criativo.** Não definido. Nenhum sistema de gameplay foi iniciado.
