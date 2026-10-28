@@ -4,7 +4,7 @@ import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.entity.redcap.Redcap;
 import com.codenamecoraline.entity.redcap.RedcapRock;
 import com.codenamecoraline.entity.basilisk.Basilisk;
-import com.codenamecoraline.entity.basilisk.DeathBlightCloud;
+import com.codenamecoraline.entity.basilisk.WitherMistCloud;
 import com.codenamecoraline.entity.basilisk.MistFlask;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -40,8 +40,9 @@ public final class ModEntities {
                     .sized(1.3F, 0.85F).eyeHeight(0.35F).clientTrackingRange(8)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
-    public static final DeferredHolder<EntityType<?>, EntityType<DeathBlightCloud>> DEATH_BLIGHT_CLOUD = ENTITY_TYPES.register("death_blight_cloud",
-            id -> EntityType.Builder.<DeathBlightCloud>of(DeathBlightCloud::new, MobCategory.MISC)
+    // Legacy entity ID preserves clouds already saved in worlds.
+    public static final DeferredHolder<EntityType<?>, EntityType<WitherMistCloud>> WITHER_MIST_CLOUD = ENTITY_TYPES.register("death_blight_cloud",
+            id -> EntityType.Builder.<WitherMistCloud>of(WitherMistCloud::new, MobCategory.MISC)
                     .sized(7, 0.5F).clientTrackingRange(8).updateInterval(10)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 

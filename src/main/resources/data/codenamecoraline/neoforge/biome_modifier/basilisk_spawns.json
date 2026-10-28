@@ -1,16 +1,12 @@
 {
   "type": "neoforge:add_spawns",
-  "biomes": [
-    "minecraft:deep_dark",
-    "minecraft:lush_caves",
-    "minecraft:mangrove_swamp"
-  ],
+  "biomes": "#minecraft:is_overworld",
   "spawners": [
     {
       "type": "codenamecoraline:basilisk",
-      "weight": 25,
-      "minCount": 2,
-      "maxCount": 4
+      "weight": 100,
+      "minCount": 4,
+      "maxCount": 8
     }
   ]
 }

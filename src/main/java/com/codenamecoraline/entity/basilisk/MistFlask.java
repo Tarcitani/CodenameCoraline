@@ -22,7 +22,7 @@ public final class MistFlask extends ThrowableItemProjectile {
     @Override protected void onHit(HitResult hit) {
         super.onHit(hit);
         if (this.level() instanceof ServerLevel server) {
-            server.addFreshEntity(DeathBlightCloud.create(server, this.position(),
+            server.addFreshEntity(WitherMistCloud.create(server, this.position(),
                     this.getOwner() instanceof LivingEntity owner ? owner : null));
             this.playSound(SoundEvents.SPLASH_POTION_BREAK, 0.9F, 0.7F);
             this.discard();

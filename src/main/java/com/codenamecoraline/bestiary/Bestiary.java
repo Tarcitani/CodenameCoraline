@@ -20,12 +20,12 @@ public final class Bestiary {
             BestiaryPage.text("drops")));
 
     public static final BestiaryEntry BASILISK = new BestiaryEntry("basilisk", List.of(
-            BestiaryPage.text("anatomy"),
+            BestiaryPage.sketch("anatomy", "basilisk_anatomy", 112, 80),
             BestiaryPage.text("habitat"),
-            BestiaryPage.text("mist"),
+            BestiaryPage.sketch("mist", "basilisk_breath", 112, 72),
             BestiaryPage.text("survive"),
             BestiaryPage.text("light"),
-            BestiaryPage.text("spoils"),
+            BestiaryPage.sketch("spoils", "basilisk_parts", 112, 64),
             BestiaryPage.text("cyst")));
 
     public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK);

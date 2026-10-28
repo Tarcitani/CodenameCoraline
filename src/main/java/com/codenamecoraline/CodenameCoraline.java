@@ -1,7 +1,8 @@
 package com.codenamecoraline;
 
 import com.codenamecoraline.registry.ModCreativeTabs;
-import com.codenamecoraline.registry.ModAttachments;
+import com.codenamecoraline.registry.ModEffects;
+import com.codenamecoraline.registry.ModPotions;
 import com.codenamecoraline.registry.ModEntities;
 import com.codenamecoraline.registry.ModItems;
 import com.codenamecoraline.registry.ModSounds;
@@ -23,7 +24,8 @@ public final class CodenameCoraline {
 
     public CodenameCoraline(IEventBus modEventBus) {
         ModSounds.register(modEventBus);
-        ModAttachments.register(modEventBus);
+        ModEffects.register(modEventBus);
+        ModPotions.register(modEventBus);
         ModEntities.register(modEventBus);
         ModItems.register(modEventBus);
         ModCreativeTabs.register(modEventBus);

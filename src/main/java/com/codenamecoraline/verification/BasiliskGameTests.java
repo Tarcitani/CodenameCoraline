@@ -2,13 +2,14 @@ package com.codenamecoraline.verification;
 
 import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.entity.basilisk.Basilisk;
-import com.codenamecoraline.entity.basilisk.DeathBlight;
-import com.codenamecoraline.entity.basilisk.DeathBlightCloud;
-import com.codenamecoraline.entity.basilisk.DeathBlightMeter;
-import com.codenamecoraline.registry.ModAttachments;
+import com.codenamecoraline.entity.basilisk.WitherMistCloud;
+import com.codenamecoraline.registry.ModEffects;
+import com.codenamecoraline.registry.ModPotions;
 import com.codenamecoraline.registry.ModEntities;
 import com.codenamecoraline.registry.ModItems;
 import java.util.Map;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.level.block.Blocks;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -21,35 +22,48 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Item;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.block.entity.BrewingStandBlockEntity;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 /** Opt-in server integration tests. Never registered during normal client or server runs. */
 @EventBusSubscriber(modid = CodenameCoraline.MOD_ID)
 public final class BasiliskGameTests {
     private static final Map<String, Consumer<GameTestHelper>> TESTS = Map.ofEntries(
-            Map.entry("meter_timing", BasiliskGameTests::meterTiming),
             Map.entry("immunities_and_weaknesses", BasiliskGameTests::immunitiesAndWeaknesses),
             Map.entry("soul_light_and_provocation", BasiliskGameTests::soulLight),
-            Map.entry("cloud_buildup_no_direct_damage", h -> cloud(h, false, false)),
-            Map.entry("overlapping_clouds_do_not_stack", h -> cloud(h, true, false)),
-            Map.entry("death_blight_pierces_armor", BasiliskGameTests::lethal),
-            Map.entry("totem_survives_blight", h -> cloud(h, false, true)),
-            Map.entry("consumables_clear_blight", BasiliskGameTests::consumables),
-            Map.entry("ward_halves_blight", BasiliskGameTests::ward),
+            Map.entry("cloud_applies_vanilla_wither", BasiliskGameTests::cloud),
+            Map.entry("overlapping_clouds_do_not_stack", BasiliskGameTests::overlap),
+            Map.entry("walls_block_wither_mist", BasiliskGameTests::wall),
+            Map.entry("potion_cures_and_blocks_wither", BasiliskGameTests::potion),
+            Map.entry("resistance_expires", BasiliskGameTests::expiry),
+            Map.entry("milk_removes_resistance", BasiliskGameTests::milk),
+            Map.entry("vanilla_brewing_stand_chain", BasiliskGameTests::brewingStand),
+            Map.entry("brewing_rejects_wrong_order", BasiliskGameTests::brewingOrder),
+            Map.entry("vanilla_potion_variants", BasiliskGameTests::potionVariants),
+            Map.entry("mist_upgrades_weaker_wither", BasiliskGameTests::witherStrength),
+            Map.entry("only_basilisk_parts_drop", BasiliskGameTests::drops),
             Map.entry("ai_hops_inhales_and_exhales", BasiliskGameTests::combatAi),
-            Map.entry("lily_strengthens_golem", BasiliskGameTests::lily));
+            Map.entry("common_hostile_spawn_tables", BasiliskGameTests::spawnTables),
+            Map.entry("swamp_and_underground_spawn_rules", BasiliskGameTests::spawnHabitats));
 
     private BasiliskGameTests() {}
     private static Identifier id(String name) { return Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, name); }
@@ -67,23 +81,6 @@ public final class BasiliskGameTests {
         TESTS.forEach((name, function) -> event.registerTest(id(name),
                 new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(name)),
                         new TestData<>(environment, id("basilisk_test_arena"), 180, 0, true))));
-    }
-
-    private static void meterTiming(GameTestHelper helper) {
-        DeathBlightMeter meter = new DeathBlightMeter();
-        int amount = 0;
-        for (int tick = 1; tick <= 69; tick++) amount = meter.tick(amount, true, false);
-        helper.assertValueEqual(amount, 90, "buildup before the seventh pulse");
-        helper.assertValueEqual(meter.tick(amount, true, false), 100, "threshold at 3.5 seconds");
-        meter.reset();
-        amount = 60;
-        for (int tick = 0; tick < 20; tick++) amount = meter.tick(amount, false, false);
-        helper.assertValueEqual(amount, 55, "one second outside the mist");
-        meter.reset();
-        amount = 0;
-        for (int tick = 0; tick < 60; tick++) amount = meter.tick(amount, true, true);
-        helper.assertValueEqual(amount, 45, "ward halves buildup");
-        helper.succeed();
     }
 
     private static Basilisk basilisk(GameTestHelper helper, int x) {
@@ -128,81 +125,280 @@ public final class BasiliskGameTests {
     private static LivingEntity victim(GameTestHelper helper) {
         var pig = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(5, 1, 5));
         pig.setNoGravity(true);
+        pig.getAttribute(Attributes.MAX_HEALTH).setBaseValue(40);
+        pig.setHealth(40);
         return pig;
     }
 
-    private static DeathBlightCloud mist(GameTestHelper helper, LivingEntity target) {
-        DeathBlightCloud cloud = DeathBlightCloud.create(helper.getLevel(), target.position().add(0, 0.1, 0), null);
+    private static WitherMistCloud mist(GameTestHelper helper, LivingEntity target) {
+        WitherMistCloud cloud = WitherMistCloud.create(helper.getLevel(), target.position().add(0, 0.1, 0), null);
         helper.getLevel().addFreshEntity(cloud);
         return cloud;
     }
 
-    private static void cloud(GameTestHelper helper, boolean overlap, boolean totem) {
+    private static void cloud(GameTestHelper helper) {
         LivingEntity target = victim(helper);
-        if (totem) target.setItemSlot(EquipmentSlot.OFFHAND, new ItemStack(Items.TOTEM_OF_UNDYING));
-        DeathBlightCloud cloud = mist(helper, target);
-        if (overlap) mist(helper, target);
+        WitherMistCloud cloud = mist(helper, target);
         float health = target.getHealth();
-        helper.runAfterDelay(35, () -> {
-            helper.assertValueEqual(DeathBlight.buildup(target), 45, "three half-second buildup pulses");
-            helper.assertValueEqual(target.getHealth(), health, "mist has no direct damage");
+        helper.runAfterDelay(5, () -> {
+            helper.assertTrue(target.hasEffect(MobEffects.WITHER), "mist applies vanilla Wither immediately");
+            helper.assertValueEqual(target.getEffect(MobEffects.WITHER).getAmplifier(), 2, "Wither III");
+            helper.assertValueEqual(target.getHealth(), health - 1, "only the first vanilla damage tick, without an instant lethal proc");
         });
-        helper.runAfterDelay(80, () -> {
-            if (totem) {
-                helper.assertTrue(target.isAlive(), "totem must protect against death blight");
-                helper.assertTrue(target.getOffhandItem().isEmpty(), "totem must be consumed");
-            } else helper.assertTrue(!target.isAlive(), "100 buildup must trigger lethal damage");
+        helper.runAfterDelay(75, () -> {
+            helper.assertValueEqual(target.getHealth(), health - 8, "vanilla Wither III keeps ticking inside the mist");
+            helper.assertTrue(target.isAlive(), "mist no longer triggers instant death");
         });
-        helper.runAfterDelay(105, () -> {
-            helper.assertTrue(cloud.isRemoved(), "cloud must expire after five seconds");
+        helper.runAfterDelay(110, () -> {
+            helper.assertTrue(cloud.isRemoved(), "mist expires after five seconds");
+            helper.assertTrue(!target.hasEffect(MobEffects.WITHER), "Wither expires naturally");
             helper.succeed();
         });
     }
 
-    private static void lethal(GameTestHelper helper) {
+    private static void overlap(GameTestHelper helper) {
         LivingEntity target = victim(helper);
-        target.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200);
-        target.getAttribute(Attributes.ARMOR).setBaseValue(30);
-        target.setHealth(200);
         mist(helper, target);
-        helper.runAfterDelay(80, () -> {
-            helper.assertValueEqual(target.getHealth(), 100.0F, "blight deals 100 damage through armor");
-            helper.assertTrue(target.getData(ModAttachments.BLIGHT_EXPOSURE).rootedTicks > 0, "root lasts one second");
+        helper.runAfterDelay(12, () -> mist(helper, target));
+        helper.runAfterDelay(75, () -> {
+            helper.assertValueEqual(target.getHealth(), target.getMaxHealth() - 8, "overlap neither stacks nor delays Wither damage");
+            helper.assertValueEqual(target.getEffect(MobEffects.WITHER).getAmplifier(), 2, "overlap preserves Wither III");
             helper.succeed();
         });
     }
 
-    private static void consumables(GameTestHelper helper) {
+    private static void wall(GameTestHelper helper) {
         LivingEntity target = victim(helper);
-        for (var item : java.util.List.of(Items.MILK_BUCKET, Items.HONEY_BOTTLE, Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE)) {
-            target.setData(ModAttachments.DEATH_BLIGHT, 90);
-            DeathBlight.expose(target, null);
-            NeoForge.EVENT_BUS.post(new LivingEntityUseItemEvent.Finish(target, new ItemStack(item), 0, ItemStack.EMPTY));
-            helper.assertValueEqual(DeathBlight.buildup(target), 0, "consumed cure clears buildup");
+        helper.setBlock(new BlockPos(4, 1, 5), Blocks.STONE);
+        helper.setBlock(new BlockPos(4, 2, 5), Blocks.STONE);
+        var cloud = WitherMistCloud.create(helper.getLevel(), helper.absoluteVec(new Vec3(3, 1.1, 5.5)), null);
+        helper.getLevel().addFreshEntity(cloud);
+        helper.runAfterDelay(25, () -> {
+            helper.assertTrue(!target.hasEffect(MobEffects.WITHER), "solid wall blocks exposure");
+            helper.assertValueEqual(target.getHealth(), target.getMaxHealth(), "wall protects health");
+            helper.succeed();
+        });
+    }
+
+    private static void potion(GameTestHelper helper) {
+        LivingEntity target = victim(helper);
+        target.addEffect(new MobEffectInstance(MobEffects.WITHER, 200));
+        ItemStack remainder = ModPotions.resistancePotion().finishUsingItem(helper.getLevel(), target);
+        helper.assertTrue(remainder.is(Items.GLASS_BOTTLE), "drinking returns a glass bottle");
+        helper.assertTrue(target.hasEffect(ModEffects.WITHER_RESISTANCE), "drinking grants resistance");
+        helper.assertValueEqual(target.getEffect(ModEffects.WITHER_RESISTANCE).getDuration(), 3600, "three-minute duration");
+        helper.assertTrue(!target.hasEffect(MobEffects.WITHER), "potion cures existing Wither");
+        helper.assertTrue(!target.addEffect(new MobEffectInstance(MobEffects.WITHER, 200, 2)), "protection rejects Wither from any source");
+        mist(helper, target);
+        helper.runAfterDelay(75, () -> {
+            helper.assertTrue(!target.hasEffect(MobEffects.WITHER), "potion blocks Basilisk mist");
+            helper.assertValueEqual(target.getHealth(), target.getMaxHealth(), "protected victim takes no Wither damage");
+            helper.succeed();
+        });
+    }
+
+    private static void expiry(GameTestHelper helper) {
+        LivingEntity target = victim(helper);
+        target.addEffect(new MobEffectInstance(ModEffects.WITHER_RESISTANCE, 20));
+        helper.assertTrue(!target.addEffect(new MobEffectInstance(MobEffects.WITHER, 100)), "resistance initially blocks Wither");
+        helper.runAfterDelay(25, () -> {
+            helper.assertTrue(!target.hasEffect(ModEffects.WITHER_RESISTANCE), "protection expires");
+            helper.assertTrue(target.addEffect(new MobEffectInstance(MobEffects.WITHER, 100)), "Wither applies again after expiry");
+            helper.succeed();
+        });
+    }
+
+    private static void milk(GameTestHelper helper) {
+        LivingEntity target = victim(helper);
+        ModPotions.resistancePotion().finishUsingItem(helper.getLevel(), target);
+        new ItemStack(Items.MILK_BUCKET).finishUsingItem(helper.getLevel(), target);
+        helper.assertTrue(!target.hasEffect(ModEffects.WITHER_RESISTANCE), "vanilla milk removes protection");
+        helper.assertTrue(target.addEffect(new MobEffectInstance(MobEffects.WITHER, 100)), "Wither applies after milk");
+        helper.succeed();
+    }
+
+    private static ItemStack potionStack(Holder<Potion> potion) {
+        return PotionContents.createItemStack(Items.POTION, potion);
+    }
+
+    private static void assertPotion(GameTestHelper helper, ItemStack stack, Holder<Potion> expected) {
+        helper.assertTrue(stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).is(expected),
+                "expected native potion " + expected.unwrapKey().orElseThrow().identifier());
+    }
+
+    private static void brewStage(GameTestHelper helper, BrewingStandBlockEntity stand,
+                                  Item ingredient, Holder<Potion> expected) {
+        stand.setItem(3, new ItemStack(ingredient, 2));
+        ItemStack before = stand.getItem(0).copy();
+        var level = helper.getLevel();
+        for (int tick = 0; tick < 400; tick++) {
+            BrewingStandBlockEntity.serverTick(level, stand.getBlockPos(), level.getBlockState(stand.getBlockPos()), stand);
         }
+        helper.assertTrue(ItemStack.isSameItemSameComponents(stand.getItem(0), before), "brewing waits the full vanilla 400 ticks");
+        helper.assertValueEqual(stand.getItem(3).getCount(), 2, "ingredient is not consumed before brewing finishes");
+        BrewingStandBlockEntity.serverTick(level, stand.getBlockPos(), level.getBlockState(stand.getBlockPos()), stand);
+        for (int slot = 0; slot < 3; slot++) assertPotion(helper, stand.getItem(slot), expected);
+        helper.assertValueEqual(stand.getItem(3).getCount(), 1, "one ingredient brews all three bottles");
+        stand.setItem(3, ItemStack.EMPTY);
+    }
+
+    private static void brewingStand(GameTestHelper helper) {
+        var pos = new BlockPos(3, 1, 3);
+        helper.setBlock(pos, Blocks.BREWING_STAND);
+        var level = helper.getLevel();
+        var stand = (BrewingStandBlockEntity) level.getBlockEntity(helper.absolutePos(pos));
+        for (int slot = 0; slot < 3; slot++) stand.setItem(slot, potionStack(Potions.WATER));
+        stand.setItem(3, new ItemStack(Items.NETHER_WART));
+        for (int tick = 0; tick < 405; tick++) {
+            BrewingStandBlockEntity.serverTick(level, stand.getBlockPos(), level.getBlockState(stand.getBlockPos()), stand);
+        }
+        assertPotion(helper, stand.getItem(0), Potions.WATER);
+        helper.assertValueEqual(stand.getItem(3).getCount(), 1, "no brewing without blaze powder fuel");
+        stand.setItem(4, new ItemStack(Items.BLAZE_POWDER));
+        brewStage(helper, stand, Items.NETHER_WART, Potions.AWKWARD);
+        helper.assertTrue(stand.getItem(4).isEmpty(), "stand consumes blaze powder");
+        brewStage(helper, stand, ModItems.BASILISK_LEG.get(), ModPotions.BASILISK_LEG_INFUSION);
+        brewStage(helper, stand, ModItems.BASILISK_EYE.get(), ModPotions.BASILISK_EYE_INFUSION);
+        brewStage(helper, stand, ModItems.BASILISK_TAIL.get(), ModPotions.WITHER_RESISTANCE);
+        helper.assertTrue(ItemStack.isSameItemSameComponents(stand.getItem(0), ModPotions.resistancePotion()), "brewed potion uses the registered native type");
+        ItemStack drink = stand.getItem(0).copy();
+        LivingEntity target = victim(helper);
+        target.addEffect(new MobEffectInstance(MobEffects.WITHER, 100, 2));
+        drink.finishUsingItem(level, target);
+        helper.assertTrue(!target.hasEffect(MobEffects.WITHER), "brewed potion cures Wither III");
+        helper.assertTrue(target.hasEffect(ModEffects.WITHER_RESISTANCE), "brewed potion grants resistance");
+        helper.assertValueEqual(target.getEffect(ModEffects.WITHER_RESISTANCE).getDuration(), 3600, "brewed duration is three minutes");
+        brewStage(helper, stand, Items.REDSTONE, ModPotions.LONG_WITHER_RESISTANCE);
+        stand.getItem(0).copy().finishUsingItem(level, target);
+        helper.assertValueEqual(target.getEffect(ModEffects.WITHER_RESISTANCE).getDuration(), 9600, "redstone extends resistance to eight minutes");
         helper.succeed();
     }
 
-    private static void ward(GameTestHelper helper) {
+    private static void brewingOrder(GameTestHelper helper) {
+        var brewing = helper.getLevel().potionBrewing();
+        helper.assertTrue(!brewing.hasMix(potionStack(Potions.WATER), new ItemStack(ModItems.BASILISK_LEG.get())), "water requires nether wart first");
+        helper.assertTrue(!brewing.hasMix(potionStack(Potions.AWKWARD), new ItemStack(ModItems.BASILISK_EYE.get())), "eye cannot skip the leg");
+        helper.assertTrue(!brewing.hasMix(potionStack(Potions.AWKWARD), new ItemStack(ModItems.BASILISK_TAIL.get())), "tail cannot skip previous steps");
+        helper.assertTrue(!brewing.hasMix(potionStack(ModPotions.BASILISK_LEG_INFUSION), new ItemStack(ModItems.BASILISK_TAIL.get())), "tail requires the eye infusion");
+        helper.assertTrue(!brewing.hasMix(potionStack(ModPotions.BASILISK_EYE_INFUSION), new ItemStack(Items.REDSTONE)), "redstone cannot finish an intermediate infusion");
+        helper.succeed();
+    }
+
+    private static void potionVariants(GameTestHelper helper) {
+        var brewing = helper.getLevel().potionBrewing();
+        ItemStack splash = brewing.mix(new ItemStack(Items.GUNPOWDER), ModPotions.resistancePotion());
+        helper.assertTrue(splash.is(Items.SPLASH_POTION), "gunpowder makes a splash potion");
+        assertPotion(helper, splash, ModPotions.WITHER_RESISTANCE);
+        ItemStack lingering = brewing.mix(new ItemStack(Items.DRAGON_BREATH), splash);
+        helper.assertTrue(lingering.is(Items.LINGERING_POTION), "dragon breath makes a lingering potion");
+        assertPotion(helper, lingering, ModPotions.WITHER_RESISTANCE);
+        ItemStack extended = brewing.mix(new ItemStack(Items.REDSTONE), lingering);
+        helper.assertTrue(extended.is(Items.LINGERING_POTION), "extension preserves the potion container");
+        assertPotion(helper, extended, ModPotions.LONG_WITHER_RESISTANCE);
+        helper.succeed();
+    }
+
+    private static void witherStrength(GameTestHelper helper) {
         LivingEntity target = victim(helper);
-        target.setItemSlot(EquipmentSlot.OFFHAND, new ItemStack(ModItems.BASILISK_WARD.get()));
-        mist(helper, target);
-        helper.runAfterDelay(65, () -> {
-            helper.assertValueEqual(DeathBlight.buildup(target), 45, "ward halves exposure in a real cloud");
-            helper.assertTrue(target.isAlive(), "ward extends the escape window");
+        target.addEffect(new MobEffectInstance(MobEffects.WITHER, 100, 0));
+        WitherMistCloud cloud = mist(helper, target);
+        helper.runAfterDelay(5, () -> {
+            helper.assertValueEqual(target.getEffect(MobEffects.WITHER).getAmplifier(), 2, "mist upgrades existing Wither I to III");
+            target.addEffect(new MobEffectInstance(MobEffects.WITHER, 100, 3));
+        });
+        helper.runAfterDelay(15, () -> {
+            helper.assertValueEqual(target.getEffect(MobEffects.WITHER).getAmplifier(), 3, "mist preserves stronger Wither IV");
+            cloud.discard();
             helper.succeed();
         });
     }
 
-    private static void lily(GameTestHelper helper) {
-        var golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new BlockPos(5, 1, 5));
-        golem.setHealth(50);
-        var stack = new ItemStack(ModItems.CATACOMB_LILY.get());
-        stack.interactLivingEntity(helper.makeMockPlayer(GameType.SURVIVAL), golem, InteractionHand.MAIN_HAND);
-        helper.assertValueEqual(golem.getHealth(), 62.0F, "lily heals twelve health");
-        helper.assertTrue(golem.hasEffect(MobEffects.RESISTANCE), "lily grants resistance");
-        helper.assertTrue(stack.isEmpty(), "offered lily is consumed");
+    private static void drops(GameTestHelper helper) {
+        for (int i = 0; i < 24; i++) {
+            Basilisk mob = basilisk(helper, 5);
+            mob.getRandom().setSeed(1729L + i * 7919L);
+            mob.hurtServer(helper.getLevel(), mob.damageSources().genericKill(), 1000);
+        }
+        helper.runAfterDelay(25, () -> {
+            var items = helper.getLevel().getEntitiesOfClass(ItemEntity.class,
+                    helper.absoluteAABB(new net.minecraft.world.phys.AABB(0, 0, 0, 10, 5, 10)).inflate(1));
+            helper.assertTrue(items.stream().anyMatch(item -> item.getItem().is(ModItems.BASILISK_LEG.get())), "legs drop");
+            helper.assertTrue(items.stream().anyMatch(item -> item.getItem().is(ModItems.BASILISK_EYE.get())), "eyes drop");
+            helper.assertTrue(items.stream().anyMatch(item -> item.getItem().is(ModItems.BASILISK_TAIL.get())), "tails drop");
+            helper.assertTrue(items.stream().allMatch(item -> item.getItem().is(ModItems.BASILISK_LEG.get())
+                    || item.getItem().is(ModItems.BASILISK_EYE.get())
+                    || item.getItem().is(ModItems.BASILISK_TAIL.get())), "retired rewards never drop");
+            helper.succeed();
+        });
+    }
+
+    private static void spawnTables(GameTestHelper helper) {
+        var biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
+        for (var key : java.util.List.of(Biomes.SWAMP, Biomes.MANGROVE_SWAMP, Biomes.PLAINS,
+                Biomes.LUSH_CAVES, Biomes.DRIPSTONE_CAVES, Biomes.DEEP_DARK)) {
+            var entries = biomes.getOrThrow(key).value().getMobSettings().getMobs(MobCategory.MONSTER).unwrap();
+            var basilisk = entries.stream().filter(entry -> entry.value().type() == ModEntities.BASILISK.get()).toList();
+            helper.assertValueEqual(basilisk.size(), 1, "one Basilisk spawn entry per Overworld biome");
+            helper.assertValueEqual(basilisk.getFirst().weight(), 100, "common monster spawn weight");
+            helper.assertValueEqual(basilisk.getFirst().value().minCount(), 4, "minimum group of four");
+            helper.assertValueEqual(basilisk.getFirst().value().maxCount(), 8, "maximum group of eight");
+        }
+        helper.assertValueEqual(ModEntities.BASILISK.get().getCategory(), MobCategory.MONSTER, "Basilisk remains hostile");
+        helper.assertValueEqual(basilisk(helper, 3).getMaxSpawnClusterSize(), 8, "entity permits full groups of eight");
         helper.succeed();
+    }
+
+    private static void testBiome(GameTestHelper helper, BlockPos pos, ResourceKey<Biome> key) {
+        var level = helper.getLevel();
+        var biome = level.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(key);
+        level.getChunkAt(pos).fillBiomesFromNoise((x, y, z, sampler) -> biome,
+                level.getChunkSource().randomState().sampler());
+    }
+
+    private static boolean naturalSpawn(GameTestHelper helper, BlockPos pos) {
+        return Basilisk.checkSpawnRules(ModEntities.BASILISK.get(), helper.getLevel(),
+                EntitySpawnReason.NATURAL, pos, helper.getLevel().getRandom());
+    }
+
+    private static void spawnHabitats(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var relative = new BlockPos(5, 1, 5);
+        var pos = helper.absolutePos(relative);
+        level.getServer().clockManager().setTotalTicks(level.dimensionTypeRegistration().value().defaultClock().orElseThrow(), 6000);
+        helper.setBlock(relative.below(), Blocks.STONE);
+        helper.assertTrue(level.canSeeSky(pos), "surface fixture has open sky");
+        testBiome(helper, pos, Biomes.PLAINS);
+        helper.assertTrue(!naturalSpawn(helper, pos), "ordinary open plains are not a habitat");
+        testBiome(helper, pos, Biomes.SWAMP);
+        helper.assertTrue(naturalSpawn(helper, pos), "swamps allow surface spawning in daylight");
+        testBiome(helper, pos, Biomes.MANGROVE_SWAMP);
+        helper.assertTrue(naturalSpawn(helper, pos), "mangroves allow surface spawning in daylight");
+        helper.setBlock(relative.below(), Blocks.AIR);
+        helper.assertTrue(!naturalSpawn(helper, pos), "swamp spawning still requires valid ground");
+        helper.setBlock(relative.below(), Blocks.STONE);
+        testBiome(helper, pos, Biomes.PLAINS);
+        // A closed stone chamber gives the lighting engine an unambiguous dark cave.
+        for (int x = 2; x <= 8; x++) {
+            for (int z = 2; z <= 8; z++) {
+                for (int y = 1; y <= 5; y++) {
+                    if (x == 2 || x == 8 || z == 2 || z == 8 || y == 5) {
+                        helper.setBlock(new BlockPos(x, y, z), Blocks.STONE);
+                    }
+                }
+            }
+        }
+        helper.runAfterDelay(15, () -> {
+            helper.assertTrue(!level.canSeeSky(pos), "cave fixture has no open sky");
+            helper.assertTrue(naturalSpawn(helper, pos), "dark caves also spawn Basilisks beneath plains");
+            testBiome(helper, pos, Biomes.NETHER_WASTES);
+            helper.assertTrue(!naturalSpawn(helper, pos), "Nether is excluded");
+            testBiome(helper, pos, Biomes.PLAINS);
+            helper.setBlock(relative.east(), Blocks.TORCH);
+        });
+        helper.runAfterDelay(30, () -> {
+            helper.assertTrue(!naturalSpawn(helper, pos), "well-lit caves are excluded");
+            helper.succeed();
+        });
     }
 
     private static void combatAi(GameTestHelper helper) {
@@ -219,7 +415,7 @@ public final class BasiliskGameTests {
             helper.assertTrue(seen[0], "combat AI must leap");
             helper.assertTrue(seen[1], "combat AI must telegraph its breath");
             helper.assertTrue(seen[2], "combat AI must release its breath");
-            helper.assertTrue(!helper.getLevel().getEntitiesOfClass(DeathBlightCloud.class,
+            helper.assertTrue(!helper.getLevel().getEntitiesOfClass(WitherMistCloud.class,
                     mob.getBoundingBox().inflate(10)).isEmpty(), "AI breath must leave a cloud");
             helper.succeed();
         });

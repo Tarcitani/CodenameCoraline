@@ -128,8 +128,39 @@ def ward(d):
     d.point((6, 10), fill="#E3CF7D")
 
 
+def leg(d):
+    d.polygon([(3, 1), (7, 1), (10, 4), (10, 7), (7, 10), (10, 12), (13, 12),
+               (15, 14), (12, 15), (8, 14), (4, 11), (4, 8), (6, 5), (2, 4)], fill="#222B23")
+    d.polygon([(4, 2), (7, 2), (9, 4), (9, 6), (6, 9), (6, 11), (10, 13),
+               (12, 13), (12, 14), (8, 13), (5, 10), (5, 8), (7, 5), (3, 4)], fill="#687955")
+    d.line((5, 3, 7, 4, 7, 6, 5, 9), fill="#93A17A")
+    d.rectangle((3, 1, 5, 2), fill="#AA7771")
+    d.point((4, 1), fill="#E0CFAB")
+    for point in [(11, 14), (13, 14), (14, 13)]:
+        d.point(point, fill="#D9CEA3")
+
+
+def tail(d):
+    d.polygon([(1, 2), (5, 1), (9, 3), (11, 6), (11, 9), (9, 12), (13, 12), (15, 10),
+               (15, 13), (12, 15), (7, 14), (5, 11), (7, 8), (7, 6), (4, 5), (1, 5)], fill="#222B23")
+    d.polygon([(2, 2), (5, 2), (8, 4), (10, 6), (10, 9), (8, 12), (9, 13), (12, 13),
+               (14, 12), (12, 14), (8, 13), (6, 11), (8, 8), (8, 5), (5, 4), (2, 4)], fill="#687955")
+    d.line((4, 2, 7, 4, 9, 6, 9, 9, 7, 11), fill="#93A17A")
+    d.polygon([(8, 3), (11, 2), (10, 5), (13, 5), (11, 8), (13, 9), (10, 11)], fill="#9AA16C")
+    d.line((1, 2, 1, 4), fill="#AA7771")
+    d.point((1, 3), fill="#E0CFAB")
+
+
 for name, draw in [("basilisk_spawn_egg", egg), ("catacomb_lily", lily), ("rotten_butterfly", butterfly),
-                   ("basilisk_eye_cyst", cyst), ("mist_flask", flask), ("basilisk_ward", ward)]:
+                   ("basilisk_eye_cyst", cyst), ("mist_flask", flask), ("basilisk_ward", ward),
+                   ("basilisk_leg", leg), ("basilisk_eye", cyst), ("basilisk_tail", tail)]:
     item(name, draw)
 
-print("Generated 2 entity textures and 6 item sprites.")
+icon = Image.new("RGBA", (18, 18))
+d = ImageDraw.Draw(icon)
+d.polygon([(3, 2), (9, 0), (15, 2), (15, 10), (12, 14), (9, 17), (6, 14), (3, 10)], fill="#344132")
+d.polygon([(5, 3), (9, 2), (13, 3), (13, 10), (9, 14), (5, 10)], fill="#A5B66D")
+d.line((6, 8, 8, 10, 12, 5), fill="#263127", width=2)
+save(icon, "textures/mob_effect/wither_resistance.png")
+
+print("Generated 2 entity textures, 9 item sprites and 1 effect icon.")

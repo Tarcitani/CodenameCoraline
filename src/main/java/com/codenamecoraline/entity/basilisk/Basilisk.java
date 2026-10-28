@@ -12,10 +12,10 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -23,7 +23,6 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
@@ -39,13 +38,13 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.HitResult;
@@ -59,7 +58,6 @@ public final class Basilisk extends Monster {
     private static final EntityDataAccessor<Integer> STATE = SynchedEntityData.defineId(Basilisk.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> INHALE = SynchedEntityData.defineId(Basilisk.class, EntityDataSerializers.INT);
     private @Nullable UUID provokedBy;
-    private boolean dampOrigin;
     private int hopCooldown;
     private int breathCooldown = 30;
     private int clawCooldown;
@@ -187,13 +185,13 @@ public final class Basilisk extends Monster {
         Vec3 desired = mouth.add(forward.scale(2.0));
         var hit = level.clip(new ClipContext(mouth, desired, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
         Vec3 center = hit.getType() == HitResult.Type.MISS ? desired : hit.getLocation().subtract(forward.scale(0.2));
-        level.addFreshEntity(DeathBlightCloud.create(level, new Vec3(center.x, this.getY() + 0.1, center.z), this));
+        level.addFreshEntity(WitherMistCloud.create(level, new Vec3(center.x, this.getY() + 0.1, center.z), this));
         // The release reads as a cone; its lingering area is the 3.5-block-radius cloud.
         for (int step = 1; step <= 6; step++) {
             Vec3 point = mouth.add(forward.scale(step * 0.45));
             level.sendParticles(ParticleTypes.SQUID_INK, point.x, point.y, point.z, 5,
                     step * 0.10, step * 0.05, step * 0.10, 0.015);
-            level.sendParticles(DeathBlight.GOLD, point.x, point.y, point.z, 3,
+            level.sendParticles(WitherMistCloud.GOLD, point.x, point.y, point.z, 3,
                     step * 0.08, step * 0.05, step * 0.08, 0);
         }
         this.playSound(ModSounds.BASILISK_EXHALE.get(), 0.9F, 0.65F);
@@ -330,27 +328,26 @@ public final class Basilisk extends Monster {
 
     public static boolean checkSpawnRules(EntityType<Basilisk> type, ServerLevelAccessor level,
                                          EntitySpawnReason reason, BlockPos pos, RandomSource random) {
-        if (level.getDifficulty() == Difficulty.PEACEFUL || pos.getY() >= 0
-                || level.getMaxLocalRawBrightness(pos) > 5 || level.canSeeSky(pos)) return false;
+        if (level.getDifficulty() == Difficulty.PEACEFUL) return false;
         var biome = level.getBiome(pos);
-        return (biome.is(Biomes.DEEP_DARK) || biome.is(Biomes.LUSH_CAVES) || biome.is(Biomes.MANGROVE_SWAMP))
-                && Mob.checkMobSpawnRules(type, level, reason, pos, random);
+        if (!biome.is(BiomeTags.IS_OVERWORLD)) return false;
+        boolean swamp = biome.is(Biomes.SWAMP) || biome.is(Biomes.MANGROVE_SWAMP);
+        // Ignore leaves so a shaded forest floor does not count as a cave.
+        boolean underground = !level.canSeeSky(pos)
+                && pos.getY() < level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos.getX(), pos.getZ()) - 3
+                && level.getMaxLocalRawBrightness(pos) <= 7;
+        return (swamp || underground) && Mob.checkMobSpawnRules(type, level, reason, pos, random);
     }
 
     @Override
-    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
-                                                  EntitySpawnReason reason, @Nullable SpawnGroupData data) {
-        var biome = level.getBiome(this.blockPosition());
-        this.dampOrigin = biome.is(Biomes.LUSH_CAVES) || biome.is(Biomes.MANGROVE_SWAMP);
-        return super.finalizeSpawn(level, difficulty, reason, data);
-    }
+    public int getMaxSpawnClusterSize() { return 8; }
 
     @Override
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean killedByPlayer) {
         super.dropCustomDeathLoot(level, source, killedByPlayer);
-        if (this.random.nextFloat() < 0.25F) this.spawnAtLocation(level, new ItemStack(ModItems.CATACOMB_LILY.get(), 1 + this.random.nextInt(2)));
-        if (this.dampOrigin && this.random.nextFloat() < 0.08F) this.spawnAtLocation(level, ModItems.ROTTEN_BUTTERFLY.get());
-        if (this.random.nextFloat() < 0.05F) this.spawnAtLocation(level, ModItems.BASILISK_EYE_CYST.get());
+        if (this.random.nextFloat() < 0.50F) this.spawnAtLocation(level, ModItems.BASILISK_LEG.get());
+        if (this.random.nextFloat() < 0.25F) this.spawnAtLocation(level, ModItems.BASILISK_EYE.get());
+        if (this.random.nextFloat() < 0.35F) this.spawnAtLocation(level, ModItems.BASILISK_TAIL.get());
     }
 
     @Override protected SoundEvent getAmbientSound() { return ModSounds.BASILISK_AMBIENT.get(); }
@@ -361,7 +358,6 @@ public final class Basilisk extends Monster {
     @Override
     protected void addAdditionalSaveData(ValueOutput output) {
         super.addAdditionalSaveData(output);
-        output.putBoolean("DampOrigin", this.dampOrigin);
         output.putInt("BreathCooldown", this.breathCooldown);
         if (this.provokedBy != null) output.putString("ProvokedBy", this.provokedBy.toString());
     }
@@ -369,7 +365,6 @@ public final class Basilisk extends Monster {
     @Override
     protected void readAdditionalSaveData(ValueInput input) {
         super.readAdditionalSaveData(input);
-        this.dampOrigin = input.getBooleanOr("DampOrigin", false);
         this.breathCooldown = Math.max(20, input.getIntOr("BreathCooldown", 30));
         String id = input.getStringOr("ProvokedBy", "");
         try { this.provokedBy = id.isEmpty() ? null : UUID.fromString(id); }
