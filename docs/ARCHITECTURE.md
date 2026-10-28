@@ -133,14 +133,14 @@ Item `codenamecoraline:bestiary` (`item/BestiaryItem`): usar abre `client/bestia
 - **Arte:** fundo `textures/gui/bestiary_book.png` (300x190) e desenhos em `textures/gui/bestiary/*.png`.
 - **Obtenção:** aba Ferramentas do criativo e receita sem forma: livro + corante vermelho + pena (`data/codenamecoraline/recipe/bestiary.json`).
 
-## Basilisco da Praga
+## Basilisco
 
-- **Servidor:** `entity/basilisk/Basilisk` contém atributos, imunidades, fraquezas, geração, drops, memória do agressor e os objetivos de combate, repulsão e espreita. A navegação anfíbia escolhe os caminhos; `HopMoveControl` executa os saltos.
-- **Névoa:** `DeathBlightCloud` estende `AreaEffectCloud`, verifica distância e oclusão por blocos e marca a exposição de cada criatura. `DeathBlight` processa acúmulo, cura, dano e raízes no evento de tick do servidor. `DeathBlightMeter` controla os pulsos por vítima, independentemente do número de nuvens.
-- **Dados:** `registry/ModAttachments` registra a barra persistente com sincronização somente para o próprio jogador e o estado transitório de exposição/raízes. O ponto de entrada registra esse novo `DeferredRegister`.
-- **Cliente:** `client/basilisk/` contém modelo, renderizador, estado de renderização, olhos emissivos e `DeathBlightHud`. O estado da entidade e a inflação do papo são dados sincronizados; a lógica de combate permanece no servidor.
-- **Itens:** `CatacombLilyItem` interage com golens. `MistFlaskItem` lança `MistFlask`, que cria a mesma névoa ao colidir. O amuleto é conferido na mão principal/secundária pelos eventos de praga e dano de Decomposição.
-- **Recursos:** `neoforge/biome_modifier/basilisk_spawns.json`, receitas, tipo de dano e tags de dano. Os drops usam código e uma tabela de saque vazia. O capítulo do livro está em `Bestiary.BASILISK` e nos dois arquivos de idioma.
-- **Verificação:** `verification/BasiliskGameTests` registra funções e testes somente quando a propriedade `coraline.basiliskTests` está habilitada. A execução Gradle `basiliskTest` usa `build/basilisk-gametest/`.
+- **Servidor:** `entity/basilisk/Basilisk` contém atributos, imunidades, fraquezas, geração, drops de perna/olho/rabo, memória do agressor e objetivos de combate, repulsão e espreita. A navegação anfíbia escolhe os caminhos; `HopMoveControl` executa os saltos.
+- **Névoa:** `WitherMistCloud` estende `AreaEffectCloud`, verifica distância e oclusão e aplica Decomposição III vanilla. Eleva instâncias mais fracas para III e não renova instâncias III ou superiores, preservando o relógio de dano e evitando acúmulo por sobreposição. O ID antigo da entidade é preservado para carregar nuvens salvas.
+- **Efeito e poção:** `registry/ModEffects` registra o efeito `wither_resistance`; `registry/ModPotions` registra os tipos de poção e as misturas sequenciais no suporte vanilla, com dois intermediários e versões finais de três/oito minutos. Ambos usam `DeferredRegister` no ponto de entrada. `WitherResistanceEffect` remove Decomposição existente e o evento `MobEffectEvent.Applicable` impede novas aplicações durante a proteção. As misturas usam `RegisterBrewingRecipesEvent` e `PotionBrewing.Builder.addMix`. O registro nativo também alimenta nomes, conversões arremessável/persistente e abas do criativo, sem inclusão manual duplicada.
+- **Cliente:** `client/basilisk/` contém modelo, renderizador, estado de renderização e olhos emissivos. O estado e a inflação do papo são sincronizados; não há HUD ou attachments de praga.
+- **Compatibilidade:** itens antigos permanecem registrados, mas sem drops, receitas ou entradas no criativo. `CatacombLilyItem` conserva o uso de exemplares existentes em golens; `MistFlask` passa a criar a nova névoa.
+- **Recursos:** modificador de spawn da tag `minecraft:is_overworld` (peso 100, grupos 4–8), com filtro de habitat na entidade: pântanos em qualquer luz ou cavernas escuras sob o terreno. Misturas nativas e ícones de perna, olho, rabo e efeito. Os drops usam código e tabela de saque vazia. O capítulo do Bestiário está em `Bestiary.BASILISK` e nos dois arquivos de idioma, com três desenhos em `textures/gui/bestiary/basilisk_*.png`. `tools/ExportBasiliskModel.java` exporta as poses reais; o script Python de pranchas gera os PNGs em sépia. Os textos longos continuam pela paginação existente.
+- **Verificação:** `verification/BasiliskGameTests` registra testes apenas com `coraline.basiliskTests=true`. A execução Gradle `basiliskTest` usa `build/basilisk-gametest/`.
 
-Valores, receitas e adaptações da referência: [design/basilisk.md](design/basilisk.md).
+Valores e receitas: [design/basilisk.md](design/basilisk.md).

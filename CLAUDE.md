@@ -1,6 +1,6 @@
 # CLAUDE.md — Manual operacional do CodenameCoraline
 
-Mod de Minecraft Java (NeoForge). Nome interno: `CodenameCoraline`. Mod ID: `codenamecoraline`. Nome provisório. Contém Redcap, Basilisco da Praga e Bestiário; estrutura atual em `docs/ARCHITECTURE.md`.
+Mod de Minecraft Java (NeoForge). Nome interno: `CodenameCoraline`. Mod ID: `codenamecoraline`. Nome provisório. Contém Redcap, Basilisco e Bestiário; estrutura atual em `docs/ARCHITECTURE.md`.
 
 ## Stack (versões verificadas)
 - Minecraft 26.1.2 · NeoForge 26.1.2.124 · Java 25 (toolchain Gradle) · Gradle Wrapper 9.2.1 · plugin `net.neoforged.moddev` 2.0.148.

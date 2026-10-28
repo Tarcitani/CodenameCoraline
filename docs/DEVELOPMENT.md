@@ -81,3 +81,33 @@ Verificado pela ferramenta: nenhuma sobreposição de UV entre cubos diferentes;
 - As texturas do Basilisco são reproduzíveis com `python tools/generate_basilisk_assets.py` (Pillow). Esse comando não é necessário para compilar ou jogar.
 
 Os testes de servidor não medem frequência de geração em uma campanha de sobrevivência, nem substituem avaliação de balanceamento pelo jogador.
+
+## Revisão do Basilisco — 2026-10-28
+
+- `.\gradlew.bat build runBasiliskTest`: **VALIDADO**, `BUILD SUCCESSFUL`; todos os 12 testes obrigatórios aprovados (11 próprios e um do framework). A primeira compilação apontou uma assinatura incorreta no teste de drops; corrigida antes da execução bem-sucedida.
+- Cobertura atual substitui os testes da praga: aplicação de Decomposição I e dano gradual real enquanto permanece na névoa; ausência de dano instantâneo; duração da névoa/efeito; sobreposição sem amplificação ou reinício do relógio de dano; bloqueio por parede; receita de perna/olho; consumo devolvendo frasco; cura e proteção contra Decomposição, inclusive amplificador maior; expiração e remoção por leite; drops exclusivamente de perna/olho; imunidades, fraquezas, luz das almas e sequência da IA.
+- Log da execução: `%TEMP%/coraline-wither-validation.log`. Avisos de API obsoleta e de terminal sem recursos avançados; nenhum erro de registro, receita ou teste. O PowerShell classificou a nota de API obsoleta emitida no stderr como `NativeCommandError`, apesar do Gradle concluir com sucesso.
+- Novos ícones gerados pelo script existente e inspecionados em `build/basilisk-item-review.png`. A geração não alterou as texturas existentes do corpo ou do ovo.
+- Ainda não conferidos no cliente: novos itens e ícone de efeito, apresentação dos corações pretos e paginação dos textos atualizados. A revisão visual de 2026-10-27 documenta o estado anterior.
+
+## Decomposição III e suporte vanilla — 2026-10-28
+
+- `.\gradlew.bat build runBasiliskTest`: **VALIDADO**, `BUILD SUCCESSFUL`; 15 testes obrigatórios aprovados (14 próprios e um do framework). Log: `%TEMP%/coraline-brewing-validation.log`.
+- O teste do bloco real percorre água → estranha → infusão de perna → infusão ocular → resistência → versão estendida. Confere que sem pó de blaze nada é preparado, o combustível é consumido, cada mistura aguarda os 400 ticks vanilla e um ingrediente transforma três frascos. A poção produzida cura Decomposição III e concede proteção por 3600 ticks; redstone produz 9600 ticks.
+- Testes adicionais verificam rejeição de ordem incorreta; conversões de pólvora/bafo de dragão; extensão mantendo recipiente; amplificador 2 e dano real da névoa; promoção de efeito fraco e preservação de efeito mais forte; drop de rabo e ausência dos drops antigos. Mantidas verificações de paredes, sobreposição, proteção, expiração, leite, atributos, luz das almas e IA.
+- Ícone de rabo reproduzível pelo gerador existente. Textos atualizados em português e inglês, com nomes dos tipos nativos e variantes. A apresentação no cliente ainda não foi inspecionada nesta revisão.
+
+## Bestiário ilustrado e spawn comum — 2026-10-28
+
+- `.\gradlew.bat build runBasiliskTest`: **VALIDADO**, `BUILD SUCCESSFUL`; todos os 17 testes obrigatórios passaram (16 próprios e um do framework). Log: `%TEMP%/coraline-bestiary-spawns-validation.log`.
+- Cobertura nova: tabelas de spawn reais de pântano, manguezal, planícies, cavernas verdejantes, cavernas de espeleotemas e escuridão profunda; peso 100, grupos 4–8 e categoria hostil. Um cenário real verifica superfície de pântanos em horário diurno, rejeição de superfície comum e solo inválido, câmara subterrânea escura, exclusão do Nether e rejeição após iluminação com tocha.
+- Cliente executado com init script temporário, diretório `build/basilisk-preview` e quick play do mundo descartável `BasiliskInspection`. As três imagens carregaram; todas as páginas 13–22 do capítulo em português foram inspecionadas. Título de preparo foi encurtado e o texto compactado; `processResources` e recarga com F3+T permitiram conferir o resultado final. Recursos não apresentaram erros de carregamento.
+- Evidências no diretório de screenshots da inspeção: `2026-10-28_17.46.03.png` (anatomia), `2026-10-28_17.46.26.png` (habitat/sopro), `2026-10-28_17.46.41.png` (partes), `2026-10-28_17.48.53.png` (preparo após a correção de texto).
+- Ao carregar o mundo de inspeção antigo, NeoForge registrou e descartou um attachment salvo `death_blight_buildup` do sistema de praga removido. A execução continuou normalmente e o cliente encerrou com `BUILD SUCCESSFUL`; não houve erro de carregamento das novas imagens.
+- A regra subterrânea usa altura sem folhas e cobertura de pelo menos quatro blocos, sem exigir Y negativo. A frequência prática depende de terreno, limite e competição de monstros; não foi medida em campanha. Traduções em inglês foram atualizadas, sem revisão visual dessa língua.
+
+### Regenerar as pranchas do Basilisco
+
+1. `.\gradlew.bat -I tools/basilisk-sketches.gradle exportBasiliskSketchModel` — **VALIDADO**. Compila a ferramenta opcional e exporta o modelo e poses reais para `build/basilisk-sketches/model.json`, usando o toolchain Java 25 e as dependências existentes.
+2. `python tools/generate_basilisk_sketches.py` — **VALIDADO**. Requer Pillow, já usado pelo gerador de texturas, e escreve três PNGs transparentes de 112 pixels de largura em `textures/gui/bestiary/`. Anatomia tem altura 80, sopro 72 e partes 64. Prancha de revisão: `build/basilisk-sketches/review.png`.
+3. Os arquivos de geração são opcionais: builds normais usam os PNGs versionados, sem executar essas ferramentas. Se os sprites de partes forem alterados, execute antes `python tools/generate_basilisk_assets.py`.

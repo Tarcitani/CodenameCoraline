@@ -95,7 +95,7 @@ Registro apenas de decisões relevantes: contexto, decisão e consequências. N�
 - **Decisão:** uma tela própria (`BestiaryScreen`) alimentada por dados (`Bestiary.ENTRIES` e chaves de tradução), em vez de um livro escrito do jogo, porque este só mostra texto. O índice e as páginas são montados a partir da lista de capítulos.
 - **Consequências:** acrescentar um mob é acrescentar dados e textos, sem mexer na tela. Todo o texto fica nos arquivos `lang`. A paginação depende da fonte do jogo, então o ajuste fino da quebra de linha só se confirma no jogo.
 
-## D-016 — Praga do Basilisco controlada por vítima no servidor
+## D-016 — Praga do Basilisco controlada por vítima no servidor (substituída por D-018)
 
 - **Contexto:** a referência fornecida pede nuvens de cinco segundos, uma barra de 0–100 e dano letal ao completar o acúmulo. Várias nuvens podem se sobrepor e o HUD precisa acompanhar o servidor.
 - **Decisão:** usar uma subclasse de `AreaEffectCloud` para detecção/partículas, um temporizador por vítima e attachments NeoForge para dados. O valor persistente é sincronizado somente com o jogador afetado; temporizadores e referências ao autor da névoa são transitórios. Um tipo de dano próprio ignora armadura/escudo, conservando o comportamento do totem.
@@ -106,3 +106,21 @@ Registro apenas de decisões relevantes: contexto, decisão e consequências. N�
 - **Contexto:** compilação não comprova o dano, a sobrevivência com totem, o acúmulo de nuvens ou a sequência de IA. O projeto já possui o framework de Game Tests do Minecraft/NeoForge no ambiente de desenvolvimento.
 - **Decisão:** registrar testes somente na execução optativa `runBasiliskTest`, com `coraline.basiliskTests=true`, em um mundo separado dentro de `build/`. Não adicionar JUnit ou outra biblioteca.
 - **Consequências:** os testes exercitam entidades e eventos reais do servidor e podem ser repetidos sem os mundos do usuário. Renderização, HUD, sons e paginação continuam exigindo revisão no cliente. Referências de API: [Game Tests](https://docs.neoforged.net/docs/misc/gametest/) e [Data Attachments](https://docs.neoforged.net/docs/datastorage/attachments/).
+
+## D-018 — Decomposição vanilla e poção de resistência do Basilisco
+
+- **Contexto:** o usuário removeu a praga e pediu o efeito de corações pretos do Wither no sopro, com perna e olho como drops para fabricar uma poção de resistência.
+- **Decisão:** manter a forma e a antecipação do sopro, aplicar `MobEffects.WITHER` e remover barra, attachments, raízes e dano próprio. Registrar somente o efeito benéfico de resistência; a receita gera uma poção vanilla com componentes. A resistência limpa Decomposição atual e impede novas aplicações por três minutos.
+- **Consequências:** a névoa não renova efeitos ativos, pois isso reiniciaria o relógio de dano vanilla. Sobreposição não amplifica dano. Drops antigos e suas receitas são substituídos; registros de itens e o ID da nuvem permanecem para compatibilidade com mundos existentes. Sem bibliotecas novas.
+
+## D-019 — Poções do Basilisco no suporte vanilla
+
+- **Contexto:** o usuário elevou o sopro para Decomposição III e pediu fabricação como no Minecraft vanilla, acrescentando rabo aos ingredientes.
+- **Decisão:** registrar tipos nativos de poção e misturas sequenciais: estranha → perna → olho → rabo → resistência por três minutos. Redstone estende para oito minutos. A receita anterior de bancada é removida; a parte de preparo da D-018 fica substituída.
+- **Consequências:** suporte, combustível, tempo por etapa e processamento de até três frascos são vanilla. Os tipos registrados participam das conversões de recipiente e das abas do criativo automaticamente. Intermediários não concedem efeitos; misturas rejeitam etapas fora de ordem. Testes exercitam o bloco real, além do registro de misturas. Nenhuma dependência adicional.
+
+## D-020 — Basilisco comum em pântanos e cavernas
+
+- **Contexto:** o usuário quer o Basilisco como criatura hostil comum, encontrada com frequência nos pântanos e no subterrâneo, e imagens no Bestiário.
+- **Decisão:** adicionar spawn à tag de biomas do Overworld com peso 100 e grupos 4–8; filtrar na entidade para pântanos/manguezais em qualquer luz ou cavernas sem céu, com luz ≤ 7 e cobertura de pelo menos quatro blocos. A categoria continua `MONSTER`, com agrupamento máximo oito. Removidas restrições antigas de três biomas e Y < 0.
+- **Consequências:** participa do spawn natural e dos limites de monstros. Peso alto e grupos maiores tornam o mob comum sem um spawner paralelo; não garantem uma contagem fixa por área. Folhas são ignoradas na altura de cobertura. Ilustrações em sépia usam o modelo/poses reais, preservando o estilo do Bestiário, com ferramentas opcionais que não participam dos builds normais.

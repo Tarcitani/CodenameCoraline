@@ -71,3 +71,27 @@ Estado da fundação, verificações realizadas e pendências. Não contém esco
 - Build e Game Tests passaram: 11 testes próprios e um teste do framework, 12 obrigatórios aprovados. Cobertura e revisão visual em [DEVELOPMENT.md](DEVELOPMENT.md).
 - Revisão no cliente identificou e corrigiu acentos substituídos por `?` nos novos textos em português e faces coplanares nos olhos. A correção foi compilada e a suíte de servidor passou novamente.
 - Revisão visual concluída: modelo corrigido, ícones, sete páginas do capítulo em português, barra de praga sincronizada, decadência, salto/sopro e repulsão pela tocha das almas. Evidências e limites da verificação em `docs/DEVELOPMENT.md`.
+
+## Revisão do Basilisco — 2026-10-28
+
+- Praga substituída por Decomposição I vanilla no sopro; removidos barra, acúmulo, raízes, attachments e dano próprio. Antecipação, área, duração da névoa, movimento e demais regras do mob preservados.
+- Drops atuais: perna (50%) e olho (25%), independentes do bioma. Receita sem forma com ambos e frasco de vidro produz poção de resistência por três minutos, curando Decomposição existente e bloqueando novas aplicações.
+- Receitas e entradas do criativo das recompensas anteriores removidas; registros antigos preservados para inventários existentes. Bestiário atualizado em português e inglês, com novos ícones de itens e efeito.
+- `.\gradlew.bat build runBasiliskTest`: **VALIDADO**, 11 testes do mod e um do framework aprovados (12 obrigatórios). Receita, consumo, cura/proteção, expiração, leite, dano vanilla, sobreposição, paredes, drops e IA exercitados no servidor.
+- Pendente: revisão dos novos ícones, efeito de corações pretos e textos do Bestiário no cliente, além de avaliação de balanceamento pelo jogador. Ícones inspecionados fora do jogo.
+
+## Decomposição III e preparo vanilla — 2026-10-28
+
+- Sopro elevado para Decomposição III (amplificador 2) por cinco segundos; eleva efeitos mais fracos e preserva os mais fortes, sem renovar continuamente o relógio de dano.
+- Rabo adicionado com chance de 35%, independente de perna (50%) e olho (25%). Ícone próprio, registro, tradução e entrada em Ingredientes.
+- Receita de bancada substituída por suporte vanilla: água + fungo do Nether → estranha → perna → olho → rabo → resistência por três minutos. Redstone estende para oito; pólvora e bafo de dragão usam conversões vanilla.
+- `.\gradlew.bat build runBasiliskTest`: **VALIDADO**, 15 testes obrigatórios aprovados (14 do mod e um do framework). O suporte real foi exercitado, incluindo ausência de combustível, vinte segundos por etapa, consumo de ingrediente e até três frascos, preparo completo, consumo e extensão. Também verificados ordem das misturas, conversões de recipiente, força III, efeitos mais fracos/fortes e os três drops.
+- Bestiário e documentação atualizados. Ainda pendente de inspeção visual no cliente: apresentação dos novos itens, nomes de poções e paginação dos textos; testes de servidor não substituem revisão visual ou avaliação de balanceamento.
+
+## Bestiário ilustrado e spawn comum — 2026-10-28
+
+- Três pranchas em sépia adicionadas ao capítulo do Basilisco: anatomia, sopro e partes. As duas primeiras usam geometria e poses do modelo real; a terceira usa os ícones dos drops. Ferramentas opcionais de geração versionadas em `tools/`.
+- Spawn natural ampliado a pântanos/manguezais em qualquer luz e cavernas escuras em todo o Overworld; removido limite de Y < 0. Peso 100, grupos 4–8 e limite de agrupamento oito. Mantida categoria hostil `MONSTER` e seus limites vanilla.
+- `.\gradlew.bat build runBasiliskTest`: **VALIDADO**, 17 testes obrigatórios aprovados (16 próprios e um do framework). Novos testes exercitam tabelas reais de seis biomas, peso/grupos, pântanos de dia, solo válido, subterrâneo sob planícies, exclusão do Nether e de cavernas iluminadas.
+- Cliente de inspeção em `build/basilisk-preview`: três imagens e todas as dez páginas do capítulo em português (13–22) conferidas no jogo. Título de preparo encurtado e texto compactado após revisão, com recursos recarregados e conferidos novamente. Nenhum mundo de `run/saves/` foi usado.
+- Pendente: avaliação da densidade em campanha de sobrevivência; os testes confirmam regras e tabelas, sem prometer quantidade fixa por área. A versão inglesa recebeu traduções/captions, mas não foi inspecionada visualmente nesta revisão.
