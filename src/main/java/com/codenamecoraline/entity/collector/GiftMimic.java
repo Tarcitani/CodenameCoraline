@@ -104,12 +104,47 @@ public class GiftMimic extends Monster {
         return Math.min(1.0F, this.entityData.get(DATA_FUSE) / (float) this.fuseLimit());
     }
 
-    /** Whether {@code target} is something an allied mimic should fight: hostile, not its owner's side. */
-    private boolean isEnemyOfAlly(LivingEntity target) {
-        if (target instanceof GiftMimic other) {
-            return !other.isAllied();
+    /** Never a target for an allied mimic: its owner, any player, its own side, and the owner's tamed pets. */
+    private boolean isProtected(LivingEntity target) {
+        if (target instanceof Player || target.getUUID().equals(this.ownerId)) {
+            return true;
         }
-        return target instanceof Enemy && !target.getUUID().equals(this.ownerId);
+        if (target instanceof GiftMimic other) {
+            return other.isAllied();
+        }
+        return target instanceof net.minecraft.world.entity.TamableAnimal pet && pet.getOwnerReference() != null
+                && this.ownerId != null && this.ownerId.equals(pet.getOwnerReference().getUUID());
+    }
+
+    /** Hostile things an ally attacks on its own initiative. */
+    private boolean isEnemyOfAlly(LivingEntity target) {
+        return target instanceof Enemy && !this.isProtected(target);
+    }
+
+    /** What the owner is fighting right now: whoever hurt them, otherwise whatever they last hit (animals included). */
+    private @Nullable LivingEntity ownerFocus(Player owner) {
+        LivingEntity attacker = owner.getLastHurtByMob();
+        if (attacker != null && attacker.isAlive() && owner.tickCount - owner.getLastHurtByMobTimestamp() < 160
+                && !this.isProtected(attacker)) {
+            return attacker;
+        }
+        LivingEntity hit = owner.getLastHurtMob();
+        if (hit != null && hit.isAlive() && owner.tickCount - owner.getLastHurtMobTimestamp() < 160
+                && !this.isProtected(hit)) {
+            return hit;
+        }
+        return null;
+    }
+
+    private void assistOwner(ServerLevel level) {
+        Player owner = this.ownerId != null ? level.getPlayerByUUID(this.ownerId) : null;
+        if (owner == null) {
+            return;
+        }
+        LivingEntity focus = this.ownerFocus(owner);
+        if (focus != null && focus != this.getTarget() && this.distanceToSqr(focus) < 48.0D * 48.0D) {
+            this.setTarget(focus);
+        }
     }
 
     @Override
@@ -134,7 +169,7 @@ public class GiftMimic extends Monster {
             return this.isAllied() && super.canAttack(target);
         }
         if (this.isAllied()) {
-            return this.isEnemyOfAlly(target) && super.canAttack(target);
+            return !this.isProtected(target) && super.canAttack(target);
         }
         return super.canAttack(target);
     }
@@ -159,6 +194,9 @@ public class GiftMimic extends Monster {
         if (this.level() instanceof ServerLevel level) {
             int fuse = this.entityData.get(DATA_FUSE) + 1;
             this.entityData.set(DATA_FUSE, fuse);
+            if (this.isAllied() && fuse % 8 == 0) {
+                this.assistOwner(level);
+            }
             if (fuse % 6 == 0) {
                 level.sendParticles(fuse % 12 == 0 ? GOLD_RIBBON : RED_WRAP,
                         this.getX(), this.getY() + 0.9D, this.getZ(), 3, 0.3D, 0.3D, 0.3D, 0.01D);
@@ -182,7 +220,8 @@ public class GiftMimic extends Monster {
             Player owner = this.ownerId != null ? level.getPlayerByUUID(this.ownerId) : null;
             DamageSource source = owner != null ? this.damageSources().playerAttack(owner) : this.damageSources().mobAttack(this);
             for (LivingEntity victim : level.getEntitiesOfClass(LivingEntity.class, box,
-                    e -> e != this && e.isAlive() && this.isEnemyOfAlly(e)
+                    e -> e != this && e.isAlive() && !this.isProtected(e)
+                            && (this.isEnemyOfAlly(e) || e == this.getTarget() || (owner != null && e == this.ownerFocus(owner)))
                             && e.distanceToSqr(this) <= BURST_RADIUS * BURST_RADIUS)) {
                 victim.hurtServer(level, source, ALLY_BURST_DAMAGE);
             }

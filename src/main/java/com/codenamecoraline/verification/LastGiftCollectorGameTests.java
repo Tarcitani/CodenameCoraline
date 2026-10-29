@@ -72,6 +72,8 @@ public final class LastGiftCollectorGameTests {
                     LastGiftCollectorGameTests::chasesAndNeverSwingsAtAir),
             Map.entry("collector_greataxe_allied_mimics",
                     LastGiftCollectorGameTests::greataxeAlliedMimics),
+            Map.entry("collector_allies_help_owner_against_anything",
+                    LastGiftCollectorGameTests::alliesHelpOwner),
             Map.entry("collector_spell_bolts_with_trails",
                     LastGiftCollectorGameTests::spellBolts),
             Map.entry("collector_gift_rain_and_crescent",
@@ -543,6 +545,32 @@ public final class LastGiftCollectorGameTests {
         boss.setBossState(LastGiftCollector.BossState.PHASE_TWO);
     }
 
+    /** Test 7j: summoned mimics fight whatever their owner fights (an animal included) and never the owner. */
+    private static void alliesHelpOwner(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        net.minecraft.server.level.ServerPlayer owner = helper.makeMockServerPlayerInLevel();
+        owner.setPos(helper.absoluteVec(new net.minecraft.world.phys.Vec3(8.5D, 1.0D, 8.5D)));
+        int made = com.codenamecoraline.item.RenegadeGreataxeItem.summonAllies(level, owner, 3);
+        helper.assertValueEqual(made, 3, "The greataxe call summons 3 allied mimics");
+        var allies = level.getEntitiesOfClass(com.codenamecoraline.entity.collector.GiftMimic.class,
+                owner.getBoundingBox().inflate(12.0D), m -> m.isAllied());
+        helper.assertTrue(allies.size() >= 3, "Allied mimics exist");
+
+        LivingEntity cow = helper.spawnWithNoFreeWill(EntityType.COW, new BlockPos(12, 1, 8));
+        helper.assertTrue(allies.get(0).canAttack(cow), "Allies may fight an animal");
+        helper.assertTrue(!allies.get(0).canAttack(owner), "Allies never fight their owner");
+        owner.attack(cow);
+
+        helper.runAfterDelay(40, () -> {
+            boolean anyTargets = allies.stream().anyMatch(m -> m.getTarget() == cow) || cow.getHealth() < cow.getMaxHealth();
+            helper.assertTrue(anyTargets, "Allied mimics join the owner's fight against the animal");
+            helper.assertTrue(allies.stream().noneMatch(m -> m.getTarget() == owner), "No ally ever targets the owner");
+            allies.forEach(m -> m.discard());
+            cow.discard();
+            helper.succeed();
+        });
+    }
+
     /** Test 7i: the Renegade's Greataxe wears out when it calls gifts; its mimics fight for the owner, not against. */
     private static void greataxeAlliedMimics(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
@@ -562,7 +590,7 @@ public final class LastGiftCollectorGameTests {
         LivingEntity zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new BlockPos(9, 1, 8));
         LivingEntity pig = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(7, 1, 8));
         helper.assertTrue(ally.canAttack(zombie), "An allied mimic fights hostile mobs");
-        helper.assertTrue(!ally.canAttack(pig), "An allied mimic leaves peaceful animals alone");
+        helper.assertTrue(ally.canAttack(pig), "An allied mimic may fight any animal its owner is fighting");
         helper.assertTrue(ally.canAttack(boss), "An allied mimic fights the Collector");
         helper.assertTrue(ally.canAttack(hostile) && hostile.canAttack(ally), "Allied and hostile mimics fight each other");
         helper.assertTrue(boss.canAttack(ally) && !boss.canAttack(hostile), "The Collector fights allied mimics but not his own");
@@ -573,7 +601,7 @@ public final class LastGiftCollectorGameTests {
         ally.burst(level);
         helper.assertTrue(ally.isRemoved(), "The ally bursts when called");
         helper.assertTrue(zombie.getHealth() < zombieBefore || !zombie.isAlive(), "The burst hurts hostile mobs");
-        helper.assertValueEqual(pig.getHealth(), pigBefore, "The burst spares peaceful animals");
+        helper.assertValueEqual(pig.getHealth(), pigBefore, "The burst spares animals nobody is fighting");
 
         zombie.discard();
         pig.discard();
