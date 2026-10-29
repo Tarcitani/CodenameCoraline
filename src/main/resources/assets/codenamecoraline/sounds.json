@@ -383,5 +383,163 @@
         "pitch": 0.6
       }
     ]
+  },
+  "entity.last_gift_collector.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.last_gift_collector.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:block.bell.resonate",
+        "type": "event",
+        "pitch": 0.55,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:block.chain.step",
+        "type": "event",
+        "pitch": 0.65,
+        "volume": 0.8
+      }
+    ]
+  },
+  "entity.last_gift_collector.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.last_gift_collector.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:entity.iron_golem.hurt",
+        "type": "event",
+        "pitch": 0.6
+      },
+      {
+        "name": "minecraft:block.chain.hit",
+        "type": "event",
+        "pitch": 0.7
+      }
+    ]
+  },
+  "entity.last_gift_collector.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.last_gift_collector.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.wither.death",
+        "type": "event",
+        "pitch": 0.65,
+        "volume": 0.9
+      },
+      {
+        "name": "minecraft:block.bell.resonate",
+        "type": "event",
+        "pitch": 0.5
+      }
+    ]
+  },
+  "entity.last_gift_collector.step": {
+    "subtitle": "subtitles.codenamecoraline.entity.last_gift_collector.step",
+    "sounds": [
+      {
+        "name": "minecraft:entity.iron_golem.step",
+        "type": "event",
+        "pitch": 0.65,
+        "volume": 0.9
+      },
+      {
+        "name": "minecraft:block.chain.step",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 0.75
+      }
+    ]
+  },
+  "entity.last_gift_collector.lightning": {
+    "subtitle": "subtitles.codenamecoraline.entity.last_gift_collector.lightning",
+    "sounds": [
+      {
+        "name": "minecraft:entity.lightning_bolt.thunder",
+        "type": "event",
+        "pitch": 0.65
+      },
+      {
+        "name": "minecraft:entity.lightning_bolt.impact",
+        "type": "event",
+        "pitch": 0.75
+      }
+    ]
+  },
+  "entity.last_gift_collector.sleigh_bells": {
+    "subtitle": "subtitles.codenamecoraline.entity.last_gift_collector.sleigh_bells",
+    "sounds": [
+      {
+        "name": "minecraft:block.note_block.chime",
+        "type": "event",
+        "pitch": 0.75,
+        "volume": 1.2
+      },
+      {
+        "name": "minecraft:block.amethyst_block.chime",
+        "type": "event",
+        "pitch": 0.65,
+        "volume": 1.1
+      }
+    ]
+  },
+  "entity.last_gift_collector.bell_prep": {
+    "subtitle": "subtitles.codenamecoraline.entity.last_gift_collector.bell_prep",
+    "sounds": [
+      {
+        "name": "minecraft:block.bell.use",
+        "type": "event",
+        "pitch": 0.55
+      },
+      {
+        "name": "minecraft:block.bell.resonate",
+        "type": "event",
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.last_gift_collector.scythe_slash": {
+    "subtitle": "subtitles.codenamecoraline.entity.last_gift_collector.scythe_slash",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.sweep",
+        "type": "event",
+        "pitch": 0.55
+      },
+      {
+        "name": "minecraft:entity.iron_golem.attack",
+        "type": "event",
+        "pitch": 0.7
+      }
+    ]
+  },
+  "entity.last_gift_collector.frost_shatter": {
+    "subtitle": "subtitles.codenamecoraline.entity.last_gift_collector.frost_shatter",
+    "sounds": [
+      {
+        "name": "minecraft:block.glass.break",
+        "type": "event",
+        "pitch": 0.6
+      },
+      {
+        "name": "minecraft:block.amethyst_cluster.break",
+        "type": "event",
+        "pitch": 0.65
+      }
+    ]
+  },
+  "entity.last_gift_collector.phase_transition": {
+    "subtitle": "subtitles.codenamecoraline.entity.last_gift_collector.phase_transition",
+    "sounds": [
+      {
+        "name": "minecraft:block.bell.resonate",
+        "type": "event",
+        "pitch": 0.5
+      },
+      {
+        "name": "minecraft:entity.warden.roar",
+        "type": "event",
+        "pitch": 0.75,
+        "volume": 0.85
+      }
+    ]
   }
 }

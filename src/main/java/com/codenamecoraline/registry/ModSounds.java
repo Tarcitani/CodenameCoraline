@@ -40,6 +40,17 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> LITHOPHAGE_HURT = register("entity.lithophage.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> LITHOPHAGE_DEATH = register("entity.lithophage.death");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> COLLECTOR_AMBIENT = register("entity.last_gift_collector.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> COLLECTOR_HURT = register("entity.last_gift_collector.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> COLLECTOR_DEATH = register("entity.last_gift_collector.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> COLLECTOR_STEP = register("entity.last_gift_collector.step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> COLLECTOR_LIGHTNING = register("entity.last_gift_collector.lightning");
+    public static final DeferredHolder<SoundEvent, SoundEvent> COLLECTOR_SLEIGH_BELLS = register("entity.last_gift_collector.sleigh_bells");
+    public static final DeferredHolder<SoundEvent, SoundEvent> COLLECTOR_BELL_PREP = register("entity.last_gift_collector.bell_prep");
+    public static final DeferredHolder<SoundEvent, SoundEvent> COLLECTOR_SCYTHE_SLASH = register("entity.last_gift_collector.scythe_slash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> COLLECTOR_FROST_SHATTER = register("entity.last_gift_collector.frost_shatter");
+    public static final DeferredHolder<SoundEvent, SoundEvent> COLLECTOR_PHASE_TRANSITION = register("entity.last_gift_collector.phase_transition");
+
     private ModSounds() {}
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {

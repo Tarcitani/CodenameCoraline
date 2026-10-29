@@ -8,6 +8,10 @@ import com.codenamecoraline.entity.basilisk.WitherMistCloud;
 import com.codenamecoraline.entity.basilisk.MistFlask;
 import com.codenamecoraline.entity.lithophage.AmberShard;
 import com.codenamecoraline.entity.lithophage.Lithophage;
+import com.codenamecoraline.entity.collector.CollectorGift;
+import com.codenamecoraline.entity.collector.CollectorSleigh;
+import com.codenamecoraline.entity.collector.GiftMimic;
+import com.codenamecoraline.entity.collector.LastGiftCollector;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
@@ -63,6 +67,33 @@ public final class ModEntities {
                     .sized(0.3F, 0.3F).clientTrackingRange(4).updateInterval(10)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<LastGiftCollector>> LAST_GIFT_COLLECTOR = ENTITY_TYPES.register("last_gift_collector",
+            id -> EntityType.Builder.of(LastGiftCollector::new, MobCategory.MONSTER)
+                    .sized(LastGiftCollector.COLLISION_WIDTH, LastGiftCollector.COLLISION_HEIGHT)
+                    .eyeHeight(LastGiftCollector.EYE_HEIGHT)
+                    .clientTrackingRange(10)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<CollectorSleigh>> COLLECTOR_SLEIGH = ENTITY_TYPES.register("collector_sleigh",
+            id -> EntityType.Builder.<CollectorSleigh>of(CollectorSleigh::new, MobCategory.MISC)
+                    .sized(3.5F, 2.2F)
+                    .clientTrackingRange(10)
+                    .updateInterval(1)
+                    .noSave()
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<GiftMimic>> GIFT_MIMIC = ENTITY_TYPES.register("gift_mimic",
+            id -> EntityType.Builder.of(GiftMimic::new, MobCategory.MONSTER)
+                    .sized(0.9F, 1.1F).eyeHeight(0.8F).clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<CollectorGift>> COLLECTOR_GIFT = ENTITY_TYPES.register("collector_gift",
+            id -> EntityType.Builder.<CollectorGift>of(CollectorGift::new, MobCategory.MISC)
+                    .sized(1.4F, 1.3F)
+                    .clientTrackingRange(10)
+                    .noSave()
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
     private ModEntities() {}
 
     public static void register(IEventBus modEventBus) {
@@ -75,6 +106,8 @@ public final class ModEntities {
         event.put(REDCAP.get(), Redcap.createAttributes().build());
         event.put(BASILISK.get(), Basilisk.createAttributes().build());
         event.put(LITHOPHAGE.get(), Lithophage.createAttributes().build());
+        event.put(LAST_GIFT_COLLECTOR.get(), LastGiftCollector.createAttributes().build());
+        event.put(GIFT_MIMIC.get(), GiftMimic.createAttributes().build());
     }
 
     private static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {

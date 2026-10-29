@@ -4,11 +4,13 @@ import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.item.BestiaryItem;
 import com.codenamecoraline.item.CatacombLilyItem;
 import com.codenamecoraline.item.MistFlaskItem;
+import com.codenamecoraline.item.SilentBellItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.equipment.Equippable;
@@ -19,6 +21,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 /** Items registered by this mod. */
 public final class ModItems {
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(CodenameCoraline.MOD_ID);
+
+    /** Renegade steel: the greataxe the Collector of the Last Gift carried. */
+    private static final ToolMaterial RENEGADE_STEEL = new ToolMaterial(
+            BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 2200, 8.0F, 4.0F, 16, ItemTags.NETHERITE_TOOL_MATERIALS);
 
     /** Rusted iron: a worse iron. Used by the weapons a Redcap drops. */
     private static final ToolMaterial RUSTED_IRON = new ToolMaterial(
@@ -69,6 +75,21 @@ public final class ModItems {
     public static final DeferredItem<Item> MINERAL_AMBER_CORE = ITEMS.registerSimpleItem("mineral_amber_core");
     /** Sprite item rendered for the Lithophage's AmberShard projectile. */
     public static final DeferredItem<Item> AMBER_SHARD = ITEMS.registerSimpleItem("amber_shard");
+
+    public static final DeferredItem<Item> LAST_GIFT_COLLECTOR_SPAWN_EGG = ITEMS.registerItem("last_gift_collector_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.LAST_GIFT_COLLECTOR.get()));
+    public static final DeferredItem<Item> SILENT_BELL = ITEMS.registerItem("silent_bell", SilentBellItem::new,
+            properties -> properties.stacksTo(1));
+    public static final DeferredItem<Item> CRACKED_BELL = ITEMS.registerSimpleItem("cracked_bell",
+            () -> new Item.Properties().stacksTo(16));
+    public static final DeferredItem<Item> RENEGADE_GREATAXE = ITEMS.registerSimpleItem("renegade_greataxe",
+            () -> new Item.Properties().axe(RENEGADE_STEEL, 7.0F, -3.2F).rarity(Rarity.EPIC));
+    /** The Collector's face, used only as the icon of his story advancements (not in the creative tab). */
+    public static final DeferredItem<Item> COLLECTOR_PORTRAIT = ITEMS.registerSimpleItem("collector_portrait",
+            () -> new Item.Properties().stacksTo(1));
+    public static final DeferredItem<Item> FROSTBOUND_THREAD = ITEMS.registerSimpleItem("frostbound_thread");
+    public static final DeferredItem<Item> SOLSTICE_SEAL = ITEMS.registerSimpleItem("solstice_seal",
+            () -> new Item.Properties().stacksTo(16));
 
     // Retired rewards stay registered to preserve items in existing worlds; no drops or recipes.
     public static final DeferredItem<Item> CATACOMB_LILY = ITEMS.registerItem("catacomb_lily", CatacombLilyItem::new);

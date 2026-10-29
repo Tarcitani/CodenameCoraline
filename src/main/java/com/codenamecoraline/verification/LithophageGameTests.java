@@ -304,8 +304,12 @@ public final class LithophageGameTests {
     private static void setBiome(GameTestHelper helper, BlockPos absPos, ResourceKey<Biome> key) {
         var level = helper.getLevel();
         var biome = level.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(key);
-        level.getChunkAt(absPos).fillBiomesFromNoise((x, y, z, sampler) -> biome,
-                level.getChunkSource().randomState().sampler());
+        for (int dx = -16; dx <= 16; dx += 16) {
+            for (int dz = -16; dz <= 16; dz += 16) {
+                level.getChunkAt(absPos.offset(dx, 0, dz)).fillBiomesFromNoise((x, y, z, sampler) -> biome,
+                        level.getChunkSource().randomState().sampler());
+            }
+        }
     }
 
     private static void spawnTablesAndCaveRules(GameTestHelper helper) {

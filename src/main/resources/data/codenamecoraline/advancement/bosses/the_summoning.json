@@ -1,0 +1,47 @@
+{
+  "parent": "codenamecoraline:bosses/silent_bell",
+  "criteria": {
+    "rang_the_bell": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "codenamecoraline:silent_bell"
+            }
+          },
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "minecraft:packed_ice"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.the_summoning.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:collector_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.the_summoning.title"
+    }
+  },
+  "requirements": [
+    [
+      "rang_the_bell"
+    ]
+  ]
+}

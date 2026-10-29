@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "codenamecoraline:item/last_gift_collector_spawn_egg"
+  }
+}
+

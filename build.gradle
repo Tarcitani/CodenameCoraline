@@ -45,6 +45,12 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
             systemProperty 'coraline.lithophageTests', 'true'
         }
+        lastGiftCollectorTest {
+            type = 'gameTestServer'
+            gameDirectory = file('build/collector-gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'coraline.collectorTests', 'true'
+        }
         // Applies to all run configurations above.
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'

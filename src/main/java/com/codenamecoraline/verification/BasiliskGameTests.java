@@ -351,8 +351,12 @@ public final class BasiliskGameTests {
     private static void testBiome(GameTestHelper helper, BlockPos pos, ResourceKey<Biome> key) {
         var level = helper.getLevel();
         var biome = level.registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(key);
-        level.getChunkAt(pos).fillBiomesFromNoise((x, y, z, sampler) -> biome,
-                level.getChunkSource().randomState().sampler());
+        for (int dx = -16; dx <= 16; dx += 16) {
+            for (int dz = -16; dz <= 16; dz += 16) {
+                level.getChunkAt(pos.offset(dx, 0, dz)).fillBiomesFromNoise((x, y, z, sampler) -> biome,
+                        level.getChunkSource().randomState().sampler());
+            }
+        }
     }
 
     private static boolean naturalSpawn(GameTestHelper helper, BlockPos pos) {

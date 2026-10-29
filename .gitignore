@@ -26,6 +26,13 @@ runs/
 .omc/
 .claude/settings.local.json
 
+### Eclipse ###
+.eclipse/
+.metadata/
+.project
+.classpath
+.settings/
+
 ### Secrets and credentials (never commit) ###
 .env
 .env.*

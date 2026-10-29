@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "minecraft:packed_ice",
+    "B": "minecraft:bell",
+    "S": "minecraft:soul_lantern"
+  },
+  "pattern": [
+    "I I",
+    " B ",
+    "ISI"
+  ],
+  "result": {
+    "count": 1,
+    "id": "codenamecoraline:silent_bell"
+  }
+}
+
