@@ -373,6 +373,8 @@ public class LastGiftCollector extends Monster {
     private int stuckTicks = 0;
     private Vec3 stuckAnchor = Vec3.ZERO;
     private int blinkCooldown = 0;
+    private int unreachableTicks = 0;
+    private int hopCooldown = 0;
     private @Nullable DamageSource deathSource;
     private boolean giftSpawned = false;
     private int pendingStage = 1;
@@ -588,7 +590,8 @@ public class LastGiftCollector extends Monster {
                 || this.getBossState() == BossState.DEAD) {
             return false;
         }
-        return !(target instanceof LastGiftCollector) && !(target instanceof GiftMimic) && super.canAttack(target);
+        return !(target instanceof LastGiftCollector) && !(target instanceof GiftMimic mimic && !mimic.isAllied())
+                && super.canAttack(target);
     }
 
     /** The Renegade is a creature of the winter: powder snow neither freezes nor swallows him. */
@@ -922,6 +925,7 @@ public class LastGiftCollector extends Monster {
         this.dashCooldown = Math.max(0, this.dashCooldown - rate);
         this.legendCooldown = Math.max(0, this.legendCooldown - rate);
         this.blinkCooldown = Math.max(0, this.blinkCooldown - 1);
+        this.hopCooldown = Math.max(0, this.hopCooldown - 1);
         this.scytheCooldown = Math.max(0, this.scytheCooldown - (rate - 1));
         this.hollowBellCooldown = Math.max(0, this.hollowBellCooldown - (rate - 1));
         this.pawnCooldown = Math.max(0, this.pawnCooldown - (rate - 1));
@@ -1555,7 +1559,7 @@ public class LastGiftCollector extends Monster {
         if (target != null) {
             Vec3 toward = target.position().subtract(this.position()).multiply(1.0D, 0.0D, 1.0D);
             if (toward.lengthSqr() > 4.0D) {
-                Vec3 step = toward.normalize().scale(this.getStage() >= 5 ? 0.20D : 0.14D);
+                Vec3 step = toward.normalize().scale(this.getStage() >= 5 ? 0.30D : 0.22D);
                 this.setDeltaMovement(step.x, this.getDeltaMovement().y, step.z);
             }
         }
@@ -1640,24 +1644,28 @@ public class LastGiftCollector extends Monster {
     private AttackType pickAttack(LivingEntity target) {
         double distSqr = this.distanceToSqr(target);
         int stage = this.getStage();
-        boolean elevated = target.getY() - this.getY() > 2.3D && distSqr < 169.0D; // pillar / ledge: melee cannot reach
-        boolean kiting = this.farTicks > 50;
-        boolean melee = !elevated && this.isWithinScytheBox(target, SCYTHE_START_REACH);
+        double dy = target.getY() - this.getY();
+        boolean elevated = dy > 2.0D && distSqr < 169.0D;   // pillar / ledge above: the axe cannot reach
+        boolean lowered = dy < -3.0D;                         // pit below: do not chop the air above it
+        boolean sight = this.getSensing().hasLineOfSight(target);
+        boolean cannotMelee = elevated || lowered || !sight || this.unreachableTicks > 24;
+        boolean kiting = this.farTicks > 50 || this.unreachableTicks > 24;
+        boolean melee = !cannotMelee && this.isWithinScytheBox(target, SCYTHE_START_REACH);
         List<AttackType> options = new ArrayList<>();
         List<Integer> weights = new ArrayList<>();
         if (melee) {
             options.add(AttackType.WINTER_SCYTHE);
             weights.add(this.scytheCooldown <= 0 ? 6 : 2);
         }
-        if (!elevated && this.cooldowns[AttackType.STOMP.ordinal()] <= 0 && distSqr <= 42.0D) {
+        if (!cannotMelee && this.cooldowns[AttackType.STOMP.ordinal()] <= 0 && distSqr <= 30.0D) {
             options.add(AttackType.STOMP);
             weights.add(5);
         }
-        if (!elevated && stage >= 2 && this.cooldowns[AttackType.WHIRLWIND.ordinal()] <= 0 && distSqr <= 64.0D) {
+        if (!cannotMelee && stage >= 2 && this.cooldowns[AttackType.WHIRLWIND.ordinal()] <= 0 && distSqr <= 49.0D) {
             options.add(AttackType.WHIRLWIND);
             weights.add(stage >= 4 ? 6 : 4);
         }
-        if (this.hollowBellCooldown <= 0 && distSqr >= 9.0D && distSqr <= 144.0D) {
+        if (this.hollowBellCooldown <= 0 && distSqr >= 9.0D && distSqr <= 144.0D && sight && Math.abs(dy) <= 2.5D) {
             options.add(AttackType.HOLLOW_BELL);
             weights.add(4);
         }
@@ -1669,25 +1677,26 @@ public class LastGiftCollector extends Monster {
             options.add(AttackType.SOLSTICE_JUMP);
             weights.add(elevated ? 8 : 5);
         }
-        if (stage >= 2 && this.cooldowns[AttackType.CRESCENT_WAVE.ordinal()] <= 0 && distSqr >= 9.0D && distSqr <= 400.0D) {
+        if (stage >= 2 && this.cooldowns[AttackType.CRESCENT_WAVE.ordinal()] <= 0 && distSqr >= 9.0D && distSqr <= 400.0D
+                && sight && Math.abs(dy) <= 2.5D) {
             options.add(AttackType.CRESCENT_WAVE);
             weights.add(kiting ? 14 : 4);
         }
         if (stage >= 3 && this.cooldowns[AttackType.COMET_BARRAGE.ordinal()] <= 0 && distSqr >= 16.0D && distSqr <= 900.0D
                 && this.getSensing().hasLineOfSight(target)) {
             options.add(AttackType.COMET_BARRAGE);
-            weights.add(kiting || elevated ? 16 : 5);
+            weights.add(kiting || elevated || lowered ? 16 : 5);
         }
         if (stage >= 3 && this.cooldowns[AttackType.GIFT_RAIN.ordinal()] <= 0 && distSqr >= 9.0D && distSqr <= 900.0D) {
             options.add(AttackType.GIFT_RAIN);
-            weights.add(kiting || elevated ? 14 : 4);
+            weights.add(kiting || elevated || lowered ? 14 : 4);
         }
         if (stage >= 2 && this.cooldowns[AttackType.HYPNOTIC_GAZE.ordinal()] <= 0
                 && distSqr <= GAZE_RANGE * GAZE_RANGE && this.getSensing().hasLineOfSight(target)) {
             options.add(AttackType.HYPNOTIC_GAZE);
             weights.add(3);
         }
-        if (!elevated && stage >= 4 && this.cooldowns[AttackType.FROST_CONE.ordinal()] <= 0 && distSqr >= 9.0D && distSqr <= 90.0D) {
+        if (!cannotMelee && stage >= 4 && this.cooldowns[AttackType.FROST_CONE.ordinal()] <= 0 && distSqr >= 9.0D && distSqr <= 72.0D) {
             options.add(AttackType.FROST_CONE);
             weights.add(5);
         }
@@ -1817,37 +1826,132 @@ public class LastGiftCollector extends Monster {
         }
     }
 
-    /** Spacing and pressure between attacks: close the gap, circle-strafe, and back off when crowded. */
+    /**
+     * Chasing and positioning between attacks. He plans a real path to where the target is going, closes in when an
+     * axe attack is ready (instead of hovering out of reach), circles when everything is on cooldown, hops up ledges
+     * and steps, and never walks into the open air above a pit.
+     */
     private void moveTactically(ServerLevel level, LivingEntity target, double distSqr) {
         double dist = Math.sqrt(distSqr);
-        double speed = 1.0D + (this.getStage() >= 5 ? 0.15D : 0.0D);
+        double dy = target.getY() - this.getY();
+        double speed = 1.05D + (this.getStage() >= 5 ? 0.2D : 0.0D);
         if (this.strafeTicks-- <= 0) {
             this.strafeTicks = 30 + this.random.nextInt(40);
             this.strafeDir = this.random.nextBoolean() ? 1 : -1;
         }
-        boolean elevated = target.getY() - this.getY() > 2.3D;
-        if (dist > 7.5D || elevated && dist > 4.0D) {
+
+        // Terrain: step up when something blocks the way, hop onto a ledge the player stands on.
+        if (this.onGround() && this.horizontalCollision && this.getNavigation().isInProgress()) {
+            this.getJumpControl().jump();
+        }
+        if (this.hopCooldown <= 0 && this.onGround() && dy > 1.1D && dy <= 3.4D && dist < 5.5D) {
+            Vec3 toward = target.position().subtract(this.position()).multiply(1.0D, 0.0D, 1.0D);
+            if (toward.lengthSqr() > 1.0E-4D) {
+                toward = toward.normalize();
+                this.setDeltaMovement(toward.x * 0.42D, 0.66D, toward.z * 0.42D);
+                this.hopCooldown = 30;
+                this.playSound(ModSounds.COLLECTOR_STEP.get(), 1.4F, 0.6F);
+            }
+        }
+
+        boolean axeReady = this.scytheCooldown <= 0 || this.cooldowns[AttackType.STOMP.ordinal()] <= 0;
+        boolean pit = dy < -3.0D;
+        Vec3 goal = this.predict(target, Math.min(12, (int) (dist * 1.4D)));
+        double standOff = pit ? 5.5D : axeReady ? 2.3D : 4.4D;
+
+        if (dist > standOff + 0.8D && !(pit && dist < 6.5D)) {
+            // Chase: a full path to the predicted spot, refreshed often; judge reachability from it.
             if (this.pathRecalcTicks <= 0 || this.getNavigation().isDone()) {
-                this.getNavigation().moveTo(target, speed);
-                this.pathRecalcTicks = 8;
+                var path = this.getNavigation().createPath(goal.x, goal.y, goal.z, 1);
+                if (path != null && path.canReach()) {
+                    this.unreachableTicks = 0;
+                    this.getNavigation().moveTo(path, speed);
+                } else {
+                    this.unreachableTicks += 6;
+                    this.getNavigation().moveTo(target, speed); // get as close as the terrain allows
+                }
+                this.pathRecalcTicks = 6;
             }
             return;
         }
+        this.unreachableTicks = Math.max(0, this.unreachableTicks - 2);
+        if (axeReady && !pit) {
+            return; // in position: pickAttack decides within a tick, no wandering off
+        }
+        // Everything on cooldown: circle around the target at a fighting distance, never backing into ledges.
         Vec3 away = this.position().subtract(target.position()).multiply(1.0D, 0.0D, 1.0D);
         if (away.lengthSqr() < 1.0E-4D) {
             away = Vec3.directionFromRotation(0.0F, this.getYRot());
         }
         away = away.normalize();
-        double wanted = dist < 3.4D ? 5.2D : Math.max(dist, 4.6D);
-        double angle = Math.toRadians(24.0D) * this.strafeDir;
+        double wanted = Math.max(dist < 3.2D ? 4.8D : dist, 4.2D);
+        double angle = Math.toRadians(26.0D) * this.strafeDir;
         double cos = Math.cos(angle);
         double sin = Math.sin(angle);
         Vec3 rotated = new Vec3(away.x * cos - away.z * sin, 0.0D, away.x * sin + away.z * cos);
         Vec3 spot = target.position().add(rotated.scale(wanted));
-        if (this.pathRecalcTicks <= 0 || this.getNavigation().isDone()) {
-            this.getNavigation().moveTo(spot.x, spot.y, spot.z, speed);
+        if ((this.pathRecalcTicks <= 0 || this.getNavigation().isDone()) && this.isSafeToStand(level, spot)) {
+            this.getNavigation().moveTo(spot.x, this.getY(), spot.z, speed);
             this.pathRecalcTicks = 8;
         }
+    }
+
+    /** True when {@code spot} has ground within a short step: no walking off cliffs while strafing. */
+    private boolean isSafeToStand(ServerLevel level, Vec3 spot) {
+        BlockPos base = BlockPos.containing(spot.x, this.getY(), spot.z);
+        for (int dy = 0; dy >= -3; dy--) {
+            BlockPos below = base.offset(0, dy - 1, 0);
+            if (!level.getBlockState(below).getCollisionShape(level, below).isEmpty() || !level.getFluidState(below).isEmpty()) {
+                return level.getFluidState(below).isEmpty();
+            }
+        }
+        return false;
+    }
+
+    private void lungeToward(LivingEntity target, double speed) {
+        Vec3 dir = target.position().subtract(this.position()).multiply(1.0D, 0.0D, 1.0D);
+        if (dir.lengthSqr() > 1.0E-4D) {
+            dir = dir.normalize();
+            this.setDeltaMovement(dir.x * speed, 0.12D, dir.z * speed);
+            this.playSound(ModSounds.COLLECTOR_STEP.get(), 1.3F, 0.7F);
+        }
+    }
+
+    /** Whether the planned attack can still land on the target as it stands now (movement during wind-up, height, walls). */
+    private boolean attackStillUseful(AttackType type, @Nullable LivingEntity target) {
+        if (target == null || !target.isAlive()) {
+            return type == AttackType.GIFT_RAIN || type == AttackType.FEY_SUMMON;
+        }
+        Vec3 d = target.position().subtract(this.position());
+        double horizontal = Math.sqrt(d.x * d.x + d.z * d.z);
+        boolean sameLevel = d.y <= 2.6D && d.y >= -3.2D;
+        return switch (type) {
+            case WINTER_SCYTHE -> sameLevel && this.isWithinScytheBox(target, SCYTHE_STRIKE_REACH + 2.6D);
+            case STOMP -> sameLevel && horizontal <= STOMP_RADIUS + 1.4D;
+            case WHIRLWIND -> sameLevel && horizontal <= WHIRL_RADIUS + 3.5D;
+            case FROST_CONE -> sameLevel && horizontal <= CONE_LENGTH + 1.0D;
+            case CRESCENT_WAVE -> Math.abs(d.y) <= 3.5D && horizontal >= 2.5D;
+            case COMET_BARRAGE -> horizontal <= 32.0D; // they arc down from above, no line of sight needed
+            default -> true;
+        };
+    }
+
+    /** Cancels a wind-up whose target slipped away: no swinging at the air; he re-plans and chases instead. */
+    private void abortAttack(ServerLevel level, AttackType type) {
+        switch (type) {
+            case WINTER_SCYTHE -> this.scytheCooldown = Math.max(this.scytheCooldown, 10);
+            case HOLLOW_BELL -> this.hollowBellCooldown = Math.max(this.hollowBellCooldown, 20);
+            case PAWN_PROCESSION -> this.pawnCooldown = Math.max(this.pawnCooldown, 20);
+            default -> this.cooldowns[type.ordinal()] = Math.max(this.cooldowns[type.ordinal()], 25);
+        }
+        this.setActiveAttack(AttackType.NONE);
+        this.actionTimer = 0;
+        this.recoveryTicks = 4;
+        this.chainNext = false;
+        this.activeFrostWaveDirs.clear();
+        this.activePawnZones.clear();
+        this.setBossState(this.isPhaseTwo() ? BossState.PHASE_TWO : BossState.PHASE_ONE);
+        level.broadcastEntityEvent(this, EVENT_INTRO_COMPLETE); // cuts the wind-up animation
     }
 
     // ---------- Axe and spell effects: arcs, bolts with trails, falling presents ----------
@@ -1911,6 +2015,17 @@ public class LastGiftCollector extends Monster {
         }
         level.sendParticles(ParticleTypes.SWEEP_ATTACK, this.getX() + f.x * radius * 0.6D, this.getY() + 1.4D, this.getZ() + f.z * radius * 0.6D,
                 1, 0.0D, 0.0D, 0.0D, 0.0D);
+    }
+
+    /** The Renegade's Greataxe calls the gifts: its frost runes flare at the head of the axe, in his right hand. */
+    private void axeSummonFlash(ServerLevel level) {
+        Vec3 f = Vec3.directionFromRotation(0.0F, this.getYRot()).multiply(1.0D, 0.0D, 1.0D).normalize();
+        Vec3 right = new Vec3(f.z, 0.0D, -f.x);
+        Vec3 head = this.position().add(right.scale(1.6D)).add(f.scale(0.4D)).add(0.0D, 3.6D, 0.0D);
+        level.sendParticles(ParticleTypes.END_ROD, head.x, head.y, head.z, 26, 0.5D, 0.6D, 0.5D, 0.12D);
+        level.sendParticles(COMET_DUST, head.x, head.y, head.z, 18, 0.4D, 0.5D, 0.4D, 0.05D);
+        level.sendParticles(PRESENT_GOLD, head.x, head.y, head.z, 14, 0.6D, 0.6D, 0.6D, 0.1D);
+        this.playSound(ModSounds.COLLECTOR_BELL_PREP.get(), 1.6F, 1.3F);
     }
 
     private void launchCrescents(ServerLevel level) {
@@ -2208,9 +2323,6 @@ public class LastGiftCollector extends Monster {
 
         private void tickAttackPreparation(ServerLevel level, LastGiftCollector boss, @Nullable LivingEntity target) {
             boss.getNavigation().stop();
-            if (target != null && boss.getActiveAttack() == AttackType.WINTER_SCYTHE) {
-                boss.getLookControl().setLookAt(target, 25.0F, 25.0F);
-            }
             boss.actionTimer++;
             AttackType attack = boss.getActiveAttack();
 
@@ -2295,6 +2407,27 @@ public class LastGiftCollector extends Monster {
             }
             prepDuration = Math.max(6, prepDuration + boss.prepJitter);
 
+            // Wind-up of a melee/ground attack: keep facing the target and keep closing in, until the last
+            // few ticks, when the blow is committed.
+            boolean trackedAttack = attack == AttackType.WINTER_SCYTHE || attack == AttackType.STOMP
+                    || attack == AttackType.WHIRLWIND || attack == AttackType.FROST_CONE
+                    || attack == AttackType.CRESCENT_WAVE || attack == AttackType.COMET_BARRAGE;
+            if (target != null && trackedAttack && boss.actionTimer < prepDuration - 4) {
+                boss.faceTarget(target);
+                boolean closeIn = attack == AttackType.WINTER_SCYTHE || attack == AttackType.STOMP || attack == AttackType.WHIRLWIND;
+                if (closeIn && boss.onGround() && !boss.isWithinScytheBox(target, 1.6D)) {
+                    Vec3 step = target.position().subtract(boss.position()).multiply(1.0D, 0.0D, 1.0D);
+                    if (step.lengthSqr() > 1.0E-4D) {
+                        step = step.normalize().scale(boss.getStage() >= 5 ? 0.2D : 0.15D);
+                        boss.setDeltaMovement(step.x, boss.getDeltaMovement().y, step.z);
+                    }
+                }
+            }
+
+            if (boss.actionTimer >= prepDuration && !boss.attackStillUseful(attack, target)) {
+                boss.abortAttack(level, attack);
+                return;
+            }
             if (boss.actionTimer >= prepDuration) {
                 boss.actionTimer = 0;
                 boss.setBossState(BossState.ATTACK_EXECUTION);
@@ -2320,6 +2453,9 @@ public class LastGiftCollector extends Monster {
 
             switch (attack) {
                 case WINTER_SCYTHE -> {
+                    if (boss.actionTimer == 1 && target != null && !boss.isWithinScytheBox(target, SCYTHE_STRIKE_REACH - 0.8D)) {
+                        boss.lungeToward(target, 0.85D); // the target backed off during the wind-up: lunge after it
+                    }
                     if (boss.actionTimer == 3) {
                         boss.executeWinterScytheSweep(level);
                     }
@@ -2404,6 +2540,7 @@ public class LastGiftCollector extends Monster {
                 }
                 case FEY_SUMMON -> {
                     if (boss.actionTimer == 2) {
+                        boss.axeSummonFlash(level);
                         boss.summonFey(level, boss.getStage() >= 5 ? 3 : 2);
                     }
                     if (boss.actionTimer >= SUMMON_EXEC_TICKS) {

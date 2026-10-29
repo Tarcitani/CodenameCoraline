@@ -199,13 +199,23 @@ public final class LastGiftCollectorModel extends EntityModel<LastGiftCollectorR
                         .texOffs(32, 164).addBox(-3.0F, 0.0F, -3.0F, 6.0F, 14.0F, 6.0F),
                 PartPose.offset(-2.0F, 12.0F, 0.0F));
 
-        // Greataxe (part kept as "scythe" for the shared animations): haft, iron collar, broad blade and back spike.
+        // The Renegade's Greataxe (part kept as "scythe" for the shared animations). Same parts as the item's held model,
+        // scaled 1.8x: haft, grip wrap, pommel, gold collar, blade, bevelled edge, toe, horn, spike, tip and frost runes.
+        // Blade faces forward (-z), spike backward (+z); hand grip at the part origin.
         rightForearm.addOrReplaceChild("scythe",
                 CubeListBuilder.create()
-                        .texOffs(124, 164).addBox(-1.0F, -34.0F, -1.0F, 2.0F, 54.0F, 2.0F)
-                        .texOffs(136, 164).addBox(-2.0F, -36.0F, -2.5F, 4.0F, 6.0F, 5.0F)
-                        .texOffs(156, 164).addBox(-1.0F, -40.0F, -17.0F, 2.0F, 16.0F, 14.0F)
-                        .texOffs(156, 204).addBox(-1.0F, -37.0F, 1.0F, 2.0F, 8.0F, 8.0F),
+                        .texOffs(124, 164).addBox(-1.5F, -34.0F, -1.5F, 3.0F, 54.0F, 3.0F)
+                        .texOffs(138, 164).addBox(-2.0F, 2.0F, -2.0F, 4.0F, 11.0F, 4.0F)
+                        .texOffs(138, 180).addBox(-2.5F, 18.0F, -2.5F, 5.0F, 5.0F, 5.0F)
+                        .texOffs(138, 192).addBox(-2.5F, -35.0F, -2.5F, 5.0F, 9.0F, 5.0F)
+                        .texOffs(158, 164).addBox(-1.5F, -39.5F, -14.0F, 3.0F, 20.0F, 12.0F)
+                        .texOffs(190, 164).addBox(-1.0F, -37.0F, -19.0F, 2.0F, 16.0F, 5.0F)
+                        .texOffs(206, 164).addBox(-1.0F, -20.0F, -13.0F, 2.0F, 6.0F, 7.0F)
+                        .texOffs(226, 164).addBox(-1.0F, -43.0F, -11.5F, 2.0F, 4.0F, 7.0F)
+                        .texOffs(158, 204).addBox(-1.0F, -35.0F, 2.0F, 2.0F, 8.0F, 8.0F)
+                        .texOffs(180, 204).addBox(-1.0F, -33.0F, 10.0F, 2.0F, 4.0F, 4.0F)
+                        .texOffs(190, 190).addBox(1.5F, -33.0F, -10.5F, 1.0F, 4.0F, 4.0F)
+                        .texOffs(206, 190).addBox(-2.5F, -33.0F, -10.5F, 1.0F, 4.0F, 4.0F),
                 PartPose.offset(0.0F, 11.0F, -1.0F));
 
         // Left arm and forearm for bell-tolling and pawn-invocation gestures.

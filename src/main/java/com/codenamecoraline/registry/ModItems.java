@@ -4,8 +4,11 @@ import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.item.BestiaryItem;
 import com.codenamecoraline.item.CatacombLilyItem;
 import com.codenamecoraline.item.MistFlaskItem;
+import com.codenamecoraline.item.RenegadeGreataxeItem;
 import com.codenamecoraline.item.SilentBellItem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -13,7 +16,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.item.component.ItemLore;
 import net.minecraft.world.item.equipment.Equippable;
+import java.util.List;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -82,8 +87,11 @@ public final class ModItems {
             properties -> properties.stacksTo(1));
     public static final DeferredItem<Item> CRACKED_BELL = ITEMS.registerSimpleItem("cracked_bell",
             () -> new Item.Properties().stacksTo(16));
-    public static final DeferredItem<Item> RENEGADE_GREATAXE = ITEMS.registerSimpleItem("renegade_greataxe",
-            () -> new Item.Properties().axe(RENEGADE_STEEL, 7.0F, -3.2F).rarity(Rarity.EPIC));
+    public static final DeferredItem<Item> RENEGADE_GREATAXE = ITEMS.registerItem("renegade_greataxe", RenegadeGreataxeItem::new,
+            properties -> properties.axe(RENEGADE_STEEL, 7.0F, -3.2F).rarity(Rarity.EPIC)
+                    .component(DataComponents.LORE, new ItemLore(List.of(
+                            Component.translatable("item.codenamecoraline.renegade_greataxe.lore1").withStyle(ChatFormatting.AQUA),
+                            Component.translatable("item.codenamecoraline.renegade_greataxe.lore2").withStyle(ChatFormatting.GRAY)))));
     /** The Collector's face, used only as the icon of his story advancements (not in the creative tab). */
     public static final DeferredItem<Item> COLLECTOR_PORTRAIT = ITEMS.registerSimpleItem("collector_portrait",
             () -> new Item.Properties().stacksTo(1));

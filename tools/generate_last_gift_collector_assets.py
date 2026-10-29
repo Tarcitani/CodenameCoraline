@@ -275,11 +275,22 @@ def generate_collector_entity_textures() -> None:
         band(img, u, 164, 6, 14, 6, 7, 9, TRIM_MAIN, TRIM_DARK, TRIM_LIGHT, seed=seed + 5)
         band(img, u, 164, 6, 14, 6, 10, 13, SKIN_MAIN, SKIN_DARK, SKIN_LIGHT, seed=seed + 7)
 
-    # Greataxe: haft, iron collar, blade (156,164,2,16,14), back spike (156,204,2,8,8)
-    fill_box_faces(img, 124, 164, 2, 54, 2, LEATHER_LIGHT, LEATHER, BURLAP_DARK, seed=70)
-    fill_box_faces(img, 136, 164, 4, 6, 5, STEEL_DARK, LEATHER, STEEL_MAIN, seed=71)
-    fill_box_faces(img, 156, 164, 2, 16, 14, STEEL_MAIN, STEEL_DARK, STEEL_LIGHT, seed=72)
-    fill_box_faces(img, 156, 204, 2, 8, 8, STEEL_DARK, LEATHER, STEEL_MAIN, seed=73)
+    # The Renegade's Greataxe (same materials as the item): haft, wrap, pommel, collar, blade, edge, toe, horn, spike, runes
+    fill_box_faces(img, 124, 164, 3, 54, 3, (110, 74, 44, 255), (72, 46, 30, 255), (150, 106, 64, 255), seed=70)
+    fill_box_faces(img, 138, 164, 4, 11, 4, LEATHER, LEATHER, LEATHER_LIGHT, seed=71)
+    fill_box_faces(img, 138, 180, 5, 5, 5, GOLD, (150, 110, 34, 255), (255, 226, 120, 255), seed=72)
+    fill_box_faces(img, 138, 192, 5, 9, 5, GOLD, (150, 110, 34, 255), (255, 226, 120, 255), seed=73)
+    fill_box_faces(img, 158, 164, 3, 20, 12, STEEL_MAIN, STEEL_DARK, STEEL_LIGHT, seed=74)
+    fill_box_faces(img, 190, 164, 2, 16, 5, STEEL_LIGHT, STEEL_MAIN, (255, 255, 255, 255), seed=75)
+    fill_box_faces(img, 206, 164, 2, 6, 7, STEEL_DARK, LEATHER, STEEL_MAIN, seed=76)
+    fill_box_faces(img, 226, 164, 2, 4, 7, STEEL_DARK, LEATHER, STEEL_MAIN, seed=77)
+    fill_box_faces(img, 158, 204, 2, 8, 8, STEEL_MAIN, STEEL_DARK, STEEL_LIGHT, seed=78)
+    fill_box_faces(img, 180, 204, 2, 4, 4, STEEL_DARK, LEATHER, STEEL_MAIN, seed=79)
+    for (ru, rv) in ((190, 190), (206, 190)):
+        fill_box_faces(img, ru, rv, 1, 4, 4, (90, 190, 240, 255), (60, 140, 200, 255), (190, 240, 255, 255), seed=80)
+        for yy in range(rv, rv + 8):
+            for xx in range(ru, ru + 10):
+                epx[xx, yy] = (120, 210, 255, 255)
 
     # Legs: burgundy trousers; boots black with fur cuffs
     for (u, seed) in ((0, 80), (60, 82)):
@@ -569,34 +580,6 @@ def generate_collector_gift_texture() -> None:
 
 def generate_greataxe_and_portrait() -> None:
     ITEM_DIR.mkdir(parents=True, exist_ok=True)
-    axe = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    axe_pattern = [
-        "........DDDDD...",
-        ".......DSssSSD..",
-        "......DSssSSSsD.",
-        ".....DSsSSSSsSD.",
-        ".....DSSSSSsSSD.",
-        "....DHDSSSSSSD..",
-        "...DHhDSSSSsD...",
-        "...DHhhDDDDD....",
-        "..DHhhD.........",
-        "..DHhD..........",
-        ".DHhD...........",
-        ".DhHD...........",
-        "DHhD............",
-        "DhHD............",
-        "DDD.............",
-        "................",
-    ]
-    put_pattern(axe, axe_pattern, {
-        "D": INK,
-        "H": (92, 62, 38, 255),
-        "h": (130, 92, 58, 255),
-        "S": STEEL_MAIN,
-        "s": STEEL_LIGHT,
-    })
-    axe.save(ITEM_DIR / "renegade_greataxe.png")
-
     face = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
     face_pattern = [
         "......RRRR.W....",

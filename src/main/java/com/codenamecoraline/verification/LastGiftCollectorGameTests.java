@@ -68,6 +68,10 @@ public final class LastGiftCollectorGameTests {
                     LastGiftCollectorGameTests::stompAndStageGating),
             Map.entry("collector_late_stage_attacks_deal_damage",
                     LastGiftCollectorGameTests::lateStageAttacksDealDamage),
+            Map.entry("collector_chases_and_never_swings_at_air",
+                    LastGiftCollectorGameTests::chasesAndNeverSwingsAtAir),
+            Map.entry("collector_greataxe_allied_mimics",
+                    LastGiftCollectorGameTests::greataxeAlliedMimics),
             Map.entry("collector_spell_bolts_with_trails",
                     LastGiftCollectorGameTests::spellBolts),
             Map.entry("collector_gift_rain_and_crescent",
@@ -539,6 +543,77 @@ public final class LastGiftCollectorGameTests {
         boss.setBossState(LastGiftCollector.BossState.PHASE_TWO);
     }
 
+    /** Test 7i: the Renegade's Greataxe wears out when it calls gifts; its mimics fight for the owner, not against. */
+    private static void greataxeAlliedMimics(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        ItemStack axe = new ItemStack(ModItems.RENEGADE_GREATAXE.get());
+        helper.assertValueEqual(axe.getMaxDamage(), 2200, "The greataxe has 2200 durability");
+        helper.assertTrue(axe.has(net.minecraft.core.component.DataComponents.LORE), "The greataxe explains its power in its tooltip");
+        helper.assertTrue(com.codenamecoraline.item.RenegadeGreataxeItem.SUMMON_DURABILITY_COST > 0
+                        && com.codenamecoraline.item.RenegadeGreataxeItem.SUMMON_COUNT == 3,
+                "Each call summons 3 mimics and costs durability");
+
+        LastGiftCollector boss = helper.spawnWithNoFreeWill(ModEntities.LAST_GIFT_COLLECTOR.get(), new BlockPos(2, 1, 2));
+        var ally = helper.spawnWithNoFreeWill(ModEntities.GIFT_MIMIC.get(), new BlockPos(8, 1, 8));
+        var hostile = helper.spawnWithNoFreeWill(ModEntities.GIFT_MIMIC.get(), new BlockPos(14, 1, 14));
+        ally.setOwner(java.util.UUID.randomUUID());
+        helper.assertTrue(ally.isAllied() && !hostile.isAllied(), "Owner marks a mimic as allied");
+
+        LivingEntity zombie = helper.spawnWithNoFreeWill(EntityType.ZOMBIE, new BlockPos(9, 1, 8));
+        LivingEntity pig = helper.spawnWithNoFreeWill(EntityType.PIG, new BlockPos(7, 1, 8));
+        helper.assertTrue(ally.canAttack(zombie), "An allied mimic fights hostile mobs");
+        helper.assertTrue(!ally.canAttack(pig), "An allied mimic leaves peaceful animals alone");
+        helper.assertTrue(ally.canAttack(boss), "An allied mimic fights the Collector");
+        helper.assertTrue(ally.canAttack(hostile) && hostile.canAttack(ally), "Allied and hostile mimics fight each other");
+        helper.assertTrue(boss.canAttack(ally) && !boss.canAttack(hostile), "The Collector fights allied mimics but not his own");
+        helper.assertTrue(!hostile.canAttack(boss), "A hostile mimic never turns on the Collector");
+
+        float zombieBefore = zombie.getHealth();
+        float pigBefore = pig.getHealth();
+        ally.burst(level);
+        helper.assertTrue(ally.isRemoved(), "The ally bursts when called");
+        helper.assertTrue(zombie.getHealth() < zombieBefore || !zombie.isAlive(), "The burst hurts hostile mobs");
+        helper.assertValueEqual(pig.getHealth(), pigBefore, "The burst spares peaceful animals");
+
+        zombie.discard();
+        pig.discard();
+        hostile.discard();
+        boss.discard();
+        helper.succeed();
+    }
+
+    /** Test 7h: he walks after a distant target, and a wind-up whose target slipped away is cancelled, not swung. */
+    private static void chasesAndNeverSwingsAtAir(GameTestHelper helper) {
+        LastGiftCollector boss = helper.spawn(ModEntities.LAST_GIFT_COLLECTOR.get(), new BlockPos(8, 1, 1));
+        LivingEntity runner = dummyTarget(helper, new BlockPos(8, 1, 14));
+        boss.setTarget(runner);
+        double startDist = boss.distanceTo(runner);
+
+        helper.runAfterDelay(60, () -> {
+            helper.assertTrue(boss.distanceTo(runner) < startDist - 5.0D || runner.getHealth() < 100.0F,
+                    "The Collector closes in on a distant target instead of standing still");
+
+            // Now a wind-up whose target leaves: it must be cancelled before any blow lands.
+            runner.setHealth(100.0F);
+            boss.setTarget(null);
+            boss.cancelCombatAction();
+            boss.setBossState(LastGiftCollector.BossState.PHASE_ONE);
+            runner.setPos(boss.getX(), boss.getY(), boss.getZ() + 2.5D);
+            runner.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+            helper.assertTrue(boss.startAttack(LastGiftCollector.AttackType.WINTER_SCYTHE, runner), "Cleave starts at close range");
+            helper.runAfterDelay(8, () -> runner.setPos(boss.getX(), boss.getY() + 6.0D, boss.getZ() + 14.0D)); // gone, and above
+            helper.runAfterDelay(LastGiftCollector.SCYTHE_PREP_TICKS + 6, () -> {
+                helper.assertTrue(boss.getBossState() != LastGiftCollector.BossState.ATTACK_EXECUTION
+                                && boss.getActiveAttack() != LastGiftCollector.AttackType.WINTER_SCYTHE,
+                        "A wind-up with no target left is cancelled instead of swinging at the air");
+                helper.assertValueEqual(runner.getHealth(), 100.0F, "Nothing was hit");
+                runner.discard();
+                boss.discard();
+                helper.succeed();
+            });
+        });
+    }
+
     /** Test 7e: the comet barrage launches homing bolts that leave the boss, fly with trails and hit the target. */
     private static void spellBolts(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
@@ -576,7 +651,7 @@ public final class LastGiftCollectorGameTests {
             helper.assertTrue(boss.getPendingRainCount() > 0, "The ground is marked before any present falls");
             helper.assertValueEqual(target.getHealth(), 100.0F, "No damage during the warning");
         });
-        int landed = LastGiftCollector.RAIN_PREP_TICKS + 1 + LastGiftCollector.RAIN_WARNING_TICKS + 24;
+        int landed = LastGiftCollector.RAIN_PREP_TICKS + 1 + LastGiftCollector.RAIN_WARNING_TICKS + 60; // the last staggered present has landed by then (they would grant the dummy hurt immunity)
         helper.runAfterDelay(landed, () -> {
             helper.assertTrue(target.getHealth() < 100.0F, "A falling present bursts on the marked spot");
             // Next: the axe's crescent wave

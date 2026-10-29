@@ -33,6 +33,11 @@ docs/                                              # ARCHITECTURE, DEVELOPMENT, 
 - Código e comentários em inglês; documentação em português.
 - Nenhuma biblioteca/dependência sem finalidade concreta registrada em `docs/DECISIONS.md`.
 
+## Regras de bosses
+- Todo boss tem **barra de vida própria e temática** (moldura, preenchimento, enfeites e nome), no estilo das barras ornamentadas de referência do usuário: nunca a barra padrão do Minecraft.
+- Como: estilo em `client/bossbar/` implementando `ThemedBossBars.Style` e registrado em `ThemedBossBars` pela chave de tradução do nome da entidade; textura `textures/gui/boss_bar/<id>.png` gerada por script em `tools/` (geometria do script e do estilo devem coincidir); o preenchimento acompanha a cor da barra que o servidor define por estágio; marcas na trilha indicam onde cada estágio começa.
+- Um boss novo só está pronto com: barra temática, conquistas de história, Bestiário, testes de GameTest e docs. Visual de barra, animações e partículas só se declaram validados após `runClient`.
+
 ## Comandos de desenvolvimento
 Executados na raiz do projeto (Git Bash ou PowerShell):
 - Compilar e verificar: `./gradlew build` (Windows: `gradlew.bat build`)
