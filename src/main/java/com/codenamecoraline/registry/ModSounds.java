@@ -30,6 +30,16 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> BASILISK_INHALE = register("entity.basilisk.inhale");
     public static final DeferredHolder<SoundEvent, SoundEvent> BASILISK_EXHALE = register("entity.basilisk.exhale");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> LITHOPHAGE_AMBIENT = register("entity.lithophage.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LITHOPHAGE_AWAKEN = register("entity.lithophage.awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LITHOPHAGE_STEP = register("entity.lithophage.step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LITHOPHAGE_SLAM = register("entity.lithophage.slam");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LITHOPHAGE_SWEEP = register("entity.lithophage.sweep");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LITHOPHAGE_SHARD_SHOOT = register("entity.lithophage.shard_shoot");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LITHOPHAGE_SHARD_HIT = register("entity.lithophage.shard_hit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LITHOPHAGE_HURT = register("entity.lithophage.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LITHOPHAGE_DEATH = register("entity.lithophage.death");
+
     private ModSounds() {}
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {

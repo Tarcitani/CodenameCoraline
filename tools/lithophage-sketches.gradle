@@ -1,0 +1,22 @@
+// Optional asset tooling for Lithophage bestiary plates; does not participate in normal builds.
+allprojects {
+    afterEvaluate {
+        def exporterClasses = layout.buildDirectory.dir('lithophage-sketches/classes')
+        def compileExporter = tasks.register('compileLithophageSketchExporter', JavaCompile) {
+            dependsOn tasks.named('classes')
+            source = files('tools/ExportLithophageModel.java')
+            classpath = sourceSets.main.runtimeClasspath
+            destinationDirectory = exporterClasses
+            javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }
+            options.encoding = 'UTF-8'
+        }
+        tasks.register('exportLithophageSketchModel', JavaExec) {
+            dependsOn compileExporter
+            classpath = sourceSets.main.runtimeClasspath + files(exporterClasses)
+            javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+            mainClass = 'ExportLithophageModel'
+            args layout.buildDirectory.file('lithophage-sketches/model.json').get().asFile.absolutePath
+        }
+    }
+}
+

@@ -1,6 +1,6 @@
 # Codename Coraline
 
-Mod de Minecraft Java para NeoForge. Nome provisório. Contém o Redcap, o Basilisco e um Bestiário com capítulos em português e inglês.
+Mod de Minecraft Java para NeoForge. Nome provisório. Contém o Redcap, o Basilisco, o Litófago e um Bestiário com capítulos em português e inglês.
 
 ## Versões
 
@@ -51,9 +51,10 @@ Resumo em [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Instruções para sessõ
 - Build configurado com NeoForge 26.1.2 e Java 25.
 - Redcap com variantes, coordenação em grupo, itens e touca de disfarce.
 - Basilisco hostil e comum em pântanos e cavernas, com grupos de 4–8, saltos, sopro antecipado, névoa de Decomposição III, repulsão por luz das almas e drops de perna/olho/rabo usados no suporte vanilla para preparar resistência ao efeito. Detalhes em [docs/design/basilisk.md](docs/design/basilisk.md).
-- Bestiário ilustrado com informações de combate, habitat e recompensas dos dois mobs.
+- Litófago (Lithophage) hostil e incomum em Lush Caves e Dripstone Caves (`Y = -20` a `20`), com 7 estados de IA, 3 ataques sincronizados (Golpe de Escória, Varredura Tectônica, Estilhaço de Âmbar), 12 animações, ovo personalizado e drops minerais. Detalhes em [docs/design/lithophage.md](docs/design/lithophage.md).
+- Bestiário ilustrado com informações de combate, habitat e recompensas dos três mobs.
 - Metadados `neoforge.mods.toml` gerados a partir de `gradle.properties`.
-- Testes de integração do Basilisco: `.\gradlew.bat runBasiliskTest`, em mundo descartável dentro de `build/`.
+- Testes de integração: `.\gradlew.bat runBasiliskTest` e `.\gradlew.bat runLithophageTest`, em mundos descartáveis dentro de `build/`.
 - Status de validação por comando: ver [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) e [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Licença

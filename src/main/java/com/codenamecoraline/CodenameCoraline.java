@@ -29,6 +29,6 @@ public final class CodenameCoraline {
         ModEntities.register(modEventBus);
         ModItems.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
-        LOGGER.info("{} loaded (Redcap, Basilisk and Bestiary registered)", MOD_ID);
+        LOGGER.info("{} loaded (Redcap, Basilisk, Lithophage and Bestiary registered)", MOD_ID);
     }
 }

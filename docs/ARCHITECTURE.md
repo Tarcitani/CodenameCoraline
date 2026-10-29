@@ -144,3 +144,11 @@ Item `codenamecoraline:bestiary` (`item/BestiaryItem`): usar abre `client/bestia
 - **Verificação:** `verification/BasiliskGameTests` registra testes apenas com `coraline.basiliskTests=true`. A execução Gradle `basiliskTest` usa `build/basilisk-gametest/`.
 
 Valores e receitas: [design/basilisk.md](design/basilisk.md).
+
+## Litófago (Lithophage)
+
+- **Servidor:** `entity/lithophage/Lithophage` implementa atributos (36 HP, 6 de armadura, velocidade 0,22, resistência a empurrão 0,55, alcance de detecção 12 e limite territorial de perseguição de 20 blocos a partir de `homePos`), regras de geração subterrânea (`checkSpawnRules`) e máquina de 7 estados (`DORMANT`, `AWAKENING`, `VIGILANT`, `PURSUING`, `COMBAT`, `RECOVERY`, `DYING`) com 3 ataques (`SLAM`, `SWEEP`, `SHARD`).
+- **Projétil:** `entity/lithophage/AmberShard` estende `ThrowableItemProjectile`, causa 4 HP de dano com alcance máximo de 15 blocos (40 ticks), colide com blocos e entidades e ignora outros Litófagos.
+- **Cliente:** `client/lithophage/` contém `LithophageModel`, `LithophageAnimations` (12 animações por keyframe somadas ao controle procedural), `LithophageRenderState`, `LithophageEyesLayer` (brilho âmbar nas fendas da máscara e cristais quando desperto) e `LithophageRenderer`.
+- **Recursos e Bestiário:** modificadores de bioma `lithophage_lush_spawns.json` (Lush Caves, peso 28, grupos 1–3) e `lithophage_dripstone_spawns.json` (Dripstone Caves, peso 16, grupos 1–2); tabela de saque `loot_table/entities/lithophage.json` (`ancient_clay_fragment` e `mineral_amber_core`); ovo `lithophage_spawn_egg`; capítulo `Bestiary.LITHOPHAGE` com três pranchas em `textures/gui/bestiary/lithophage_*.png`.
+- **Verificação:** `verification/LithophageGameTests` registra testes na execução `runLithophageTest` (`coraline.lithophageTests=true`) em `build/lithophage-gametest/`. Detalhes em [design/lithophage.md](design/lithophage.md).

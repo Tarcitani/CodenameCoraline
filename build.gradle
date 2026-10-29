@@ -39,6 +39,12 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
             systemProperty 'coraline.basiliskTests', 'true'
         }
+        lithophageTest {
+            type = 'gameTestServer'
+            gameDirectory = file('build/lithophage-gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'coraline.lithophageTests', 'true'
+        }
         // Applies to all run configurations above.
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'

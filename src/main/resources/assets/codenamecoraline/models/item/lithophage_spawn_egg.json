@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "codenamecoraline:item/lithophage_spawn_egg"
+  }
+}
+

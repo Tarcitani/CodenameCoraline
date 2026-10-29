@@ -63,6 +63,13 @@ public final class ModItems {
     public static final DeferredItem<Item> BASILISK_EYE = ITEMS.registerSimpleItem("basilisk_eye");
     public static final DeferredItem<Item> BASILISK_TAIL = ITEMS.registerSimpleItem("basilisk_tail");
 
+    public static final DeferredItem<Item> LITHOPHAGE_SPAWN_EGG = ITEMS.registerItem("lithophage_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.LITHOPHAGE.get()));
+    public static final DeferredItem<Item> ANCIENT_CLAY_FRAGMENT = ITEMS.registerSimpleItem("ancient_clay_fragment");
+    public static final DeferredItem<Item> MINERAL_AMBER_CORE = ITEMS.registerSimpleItem("mineral_amber_core");
+    /** Sprite item rendered for the Lithophage's AmberShard projectile. */
+    public static final DeferredItem<Item> AMBER_SHARD = ITEMS.registerSimpleItem("amber_shard");
+
     // Retired rewards stay registered to preserve items in existing worlds; no drops or recipes.
     public static final DeferredItem<Item> CATACOMB_LILY = ITEMS.registerItem("catacomb_lily", CatacombLilyItem::new);
     public static final DeferredItem<Item> ROTTEN_BUTTERFLY = ITEMS.registerSimpleItem("rotten_butterfly");

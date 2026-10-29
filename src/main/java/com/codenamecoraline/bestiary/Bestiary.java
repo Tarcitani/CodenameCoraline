@@ -28,7 +28,15 @@ public final class Bestiary {
             BestiaryPage.sketch("spoils", "basilisk_parts", 112, 64),
             BestiaryPage.text("cyst")));
 
-    public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK);
+    public static final BestiaryEntry LITHOPHAGE = new BestiaryEntry("lithophage", List.of(
+            BestiaryPage.sketch("anatomy", "lithophage_anatomy", 112, 80),
+            BestiaryPage.text("habitat"),
+            BestiaryPage.text("attributes"),
+            BestiaryPage.sketch("combat", "lithophage_combat", 112, 72),
+            BestiaryPage.text("tactics"),
+            BestiaryPage.sketch("spoils", "lithophage_spoils", 112, 64)));
+
+    public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK, LITHOPHAGE);
 
     private Bestiary() {}
 }

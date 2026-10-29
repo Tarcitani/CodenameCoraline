@@ -24,12 +24,13 @@ public final class ModCreativeTabs {
                     .displayItems((parameters, output) -> {
                         output.accept(ModItems.REDCAP_SPAWN_EGG.get());
                         output.accept(ModItems.BASILISK_SPAWN_EGG.get());
+                        output.accept(ModItems.LITHOPHAGE_SPAWN_EGG.get());
                     })
                     .build());
 
     private ModCreativeTabs() {}
 
-    /** Weapons and the cap go to Combat, the mob parts to Ingredients. */
+    /** Weapons and the cap go to Combat, the mob parts to Ingredients, and spawn eggs also to vanilla Spawn Eggs. */
     private static void addToVanillaTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(ModItems.REDCAP_DAGGER.get());
@@ -43,6 +44,10 @@ public final class ModCreativeTabs {
             event.accept(ModItems.BASILISK_LEG.get());
             event.accept(ModItems.BASILISK_EYE.get());
             event.accept(ModItems.BASILISK_TAIL.get());
+            event.accept(ModItems.ANCIENT_CLAY_FRAGMENT.get());
+            event.accept(ModItems.MINERAL_AMBER_CORE.get());
+        } else if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
+            event.accept(ModItems.LITHOPHAGE_SPAWN_EGG.get());
         }
     }
 

@@ -111,3 +111,12 @@ Os testes de servidor não medem frequência de geração em uma campanha de sob
 1. `.\gradlew.bat -I tools/basilisk-sketches.gradle exportBasiliskSketchModel` — **VALIDADO**. Compila a ferramenta opcional e exporta o modelo e poses reais para `build/basilisk-sketches/model.json`, usando o toolchain Java 25 e as dependências existentes.
 2. `python tools/generate_basilisk_sketches.py` — **VALIDADO**. Requer Pillow, já usado pelo gerador de texturas, e escreve três PNGs transparentes de 112 pixels de largura em `textures/gui/bestiary/`. Anatomia tem altura 80, sopro 72 e partes 64. Prancha de revisão: `build/basilisk-sketches/review.png`.
 3. Os arquivos de geração são opcionais: builds normais usam os PNGs versionados, sem executar essas ferramentas. Se os sprites de partes forem alterados, execute antes `python tools/generate_basilisk_assets.py`.
+
+## Litófago (Lithophage) — 2026-10-29
+
+- `.\gradlew.bat build runLithophageTest`: **VALIDADO** em 2026-10-29, `BUILD SUCCESSFUL`; todos os 10 testes obrigatórios passaram (9 testes do Litófago e 1 do framework).
+- `.\gradlew.bat runBasiliskTest`: **VALIDADO** em 2026-10-29, `BUILD SUCCESSFUL`; todos os 17 testes obrigatórios do Basilisco continuam passando sem regressões.
+- Cobertura de `LithophageGameTests`: atributos e bake das 12 animações no modelo real; ciclo `DORMANT -> AWAKENING -> VIGILANT -> PURSUING` e retorno a `DORMANT`; limite territorial de 20 blocos; Golpe de Escória (5 HP no tick 12 e janela `RECOVERY`); Varredura Tectônica (4 HP restrita ao arco frontal); Estilhaço de Âmbar (4 HP, bloqueio por parede e ausência de fogo amigo); cancelamento de golpe ao morrer e drops da tabela de saque (`ancient_clay_fragment` e `mineral_amber_core`); tabelas de bioma (`lush_caves` e `dripstone_caves`) e regras de altura (`Y = -20` a `20`), luz e colisão; ovo `lithophage_spawn_egg` e capítulo `Bestiary.LITHOPHAGE`.
+- Geração reprodutível de recursos:
+  1. `python tools/generate_lithophage_assets.py` — gera `lithophage.png`, `lithophage_eyes.png` e os 4 ícones de itens (`lithophage_spawn_egg`, `ancient_clay_fragment`, `mineral_amber_core`, `amber_shard`).
+  2. `.\gradlew.bat -I tools/lithophage-sketches.gradle exportLithophageSketchModel` e `python tools/generate_lithophage_sketches.py` — exportam a geometria/poses reais e geram as 3 pranchas do Bestiário (`lithophage_anatomy.png`, `lithophage_combat.png`, `lithophage_spoils.png`).

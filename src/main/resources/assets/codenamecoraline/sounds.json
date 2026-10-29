@@ -248,5 +248,140 @@
         "type": "event"
       }
     ]
+  },
+  "entity.lithophage.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.lithophage.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:block.deepslate.step",
+        "type": "event",
+        "pitch": 0.65,
+        "volume": 0.55
+      },
+      {
+        "name": "minecraft:block.tuff.step",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 0.55
+      }
+    ]
+  },
+  "entity.lithophage.awaken": {
+    "subtitle": "subtitles.codenamecoraline.entity.lithophage.awaken",
+    "sounds": [
+      {
+        "name": "minecraft:block.deepslate.break",
+        "type": "event",
+        "pitch": 0.7
+      },
+      {
+        "name": "minecraft:block.amethyst_cluster.place",
+        "type": "event",
+        "pitch": 0.65
+      }
+    ]
+  },
+  "entity.lithophage.step": {
+    "subtitle": "subtitles.codenamecoraline.entity.lithophage.step",
+    "sounds": [
+      {
+        "name": "minecraft:block.deepslate.step",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 0.85
+      },
+      {
+        "name": "minecraft:block.mud_bricks.step",
+        "type": "event",
+        "pitch": 0.65,
+        "volume": 0.85
+      }
+    ]
+  },
+  "entity.lithophage.slam": {
+    "subtitle": "subtitles.codenamecoraline.entity.lithophage.slam",
+    "sounds": [
+      {
+        "name": "minecraft:entity.iron_golem.attack",
+        "type": "event",
+        "pitch": 0.75
+      },
+      {
+        "name": "minecraft:block.deepslate.fall",
+        "type": "event",
+        "pitch": 0.65
+      }
+    ]
+  },
+  "entity.lithophage.sweep": {
+    "subtitle": "subtitles.codenamecoraline.entity.lithophage.sweep",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.sweep",
+        "type": "event",
+        "pitch": 0.65
+      },
+      {
+        "name": "minecraft:entity.iron_golem.attack",
+        "type": "event",
+        "pitch": 0.85
+      }
+    ]
+  },
+  "entity.lithophage.shard_shoot": {
+    "subtitle": "subtitles.codenamecoraline.entity.lithophage.shard_shoot",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.chime",
+        "type": "event",
+        "pitch": 0.75
+      },
+      {
+        "name": "minecraft:entity.breeze.shoot",
+        "type": "event",
+        "pitch": 1.35,
+        "volume": 0.75
+      }
+    ]
+  },
+  "entity.lithophage.shard_hit": {
+    "subtitle": "subtitles.codenamecoraline.entity.lithophage.shard_hit",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_cluster.break",
+        "type": "event",
+        "pitch": 0.85
+      }
+    ]
+  },
+  "entity.lithophage.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.lithophage.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:block.deepslate.hit",
+        "type": "event",
+        "pitch": 0.7
+      },
+      {
+        "name": "minecraft:entity.iron_golem.hurt",
+        "type": "event",
+        "pitch": 0.65
+      }
+    ]
+  },
+  "entity.lithophage.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.lithophage.death",
+    "sounds": [
+      {
+        "name": "minecraft:block.deepslate.break",
+        "type": "event",
+        "pitch": 0.55
+      },
+      {
+        "name": "minecraft:entity.iron_golem.death",
+        "type": "event",
+        "pitch": 0.6
+      }
+    ]
   }
 }

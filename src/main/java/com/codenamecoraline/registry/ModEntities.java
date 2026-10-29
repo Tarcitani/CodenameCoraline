@@ -6,6 +6,8 @@ import com.codenamecoraline.entity.redcap.RedcapRock;
 import com.codenamecoraline.entity.basilisk.Basilisk;
 import com.codenamecoraline.entity.basilisk.WitherMistCloud;
 import com.codenamecoraline.entity.basilisk.MistFlask;
+import com.codenamecoraline.entity.lithophage.AmberShard;
+import com.codenamecoraline.entity.lithophage.Lithophage;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
@@ -51,6 +53,16 @@ public final class ModEntities {
                     .sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(10)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<Lithophage>> LITHOPHAGE = ENTITY_TYPES.register("lithophage",
+            id -> EntityType.Builder.of(Lithophage::new, MobCategory.MONSTER)
+                    .sized(0.85F, 2.1F).eyeHeight(1.8F).clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<AmberShard>> AMBER_SHARD = ENTITY_TYPES.register("amber_shard",
+            id -> EntityType.Builder.<AmberShard>of(AmberShard::new, MobCategory.MISC)
+                    .sized(0.3F, 0.3F).clientTrackingRange(4).updateInterval(10)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
     private ModEntities() {}
 
     public static void register(IEventBus modEventBus) {
@@ -62,10 +74,13 @@ public final class ModEntities {
     private static void onEntityAttributeCreation(EntityAttributeCreationEvent event) {
         event.put(REDCAP.get(), Redcap.createAttributes().build());
         event.put(BASILISK.get(), Basilisk.createAttributes().build());
+        event.put(LITHOPHAGE.get(), Lithophage.createAttributes().build());
     }
 
     private static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {
         event.register(BASILISK.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 Basilisk::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(LITHOPHAGE.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                Lithophage::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 }
