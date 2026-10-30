@@ -46,3 +46,10 @@ runs/
 
 ### Logs ###
 *.log
+
+### Gradle ###
+.gradle/
+build/
+bin/
+out/
+!gradle/wrapper/gradle-wrapper.jar
