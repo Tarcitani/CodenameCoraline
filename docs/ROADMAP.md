@@ -107,3 +107,30 @@ Estado da fundação, verificações realizadas e pendências. Não contém esco
 - Segunda revisão (D-024): animações de machado, Presente Faminto, magia com rastro, IA, Fúria, presente final com baú e Machado Enorme, conquistas de história. GameTestServer direto: Cobrador 15/15, Basilisco 17/17, Litófago 11/11 em 2026-10-29; Gradle e `runClient` pendentes.
 - Revisão pós-feedback (D-023): 5 estágios, 5 novos ataques, imprevisibilidade e visual renegado. Validado sem Gradle (GameTestServer direto): Cobrador 12/12, Basilisco 17/17, Litófago 11/11 em 2026-10-29; `gradlew build`/`runXTest` ainda a rodar no terminal do usuário; qualidade visual/cinemática pendente de `runClient`.
 - `.\gradlew.bat runLastGiftCollectorTest` (versão anterior à D-023): **VALIDADO** em 2026-10-29 (9 testes obrigatórios aprovados, 8 próprios e 1 do framework). `.\gradlew.bat build runLithophageTest runBasiliskTest`: **VALIDADO** em 2026-10-29 sem regressões.
+
+## O Quebra-Copas (The Canopy Breaker) — 2026-10-29
+
+- Implementado o boss opcional `codenamecoraline:canopy_breaker`: modelo e textura próprios (37 caixas, atlas 256×256, olhos emissivos), 88 animações por keyframe sincronizadas pelo servidor, três estágios (60% e 25%, uma vez cada), seis ataques com preparo, execução e recuperação, mobilidade arbórea real (escalada com apoio verificado, saltos balísticos entre copas, Queda da Copa, perda de apoio com recuperação, cancelamento de saltos inválidos, volta ao chão), Ídolo do Tronco Oco (6 condições), ovo, Porrete de Raiz-Morta, Resina da Copa e Estilhaço de Cerne, barra de vida temática, Bestiário de 6 páginas com três gravuras, quatro conquistas e documentação (`docs/design/canopy_breaker.md`, D-028).
+- GameTestServer direto: Quebra-Copas 18/18 aprovados em 10 execuções seguidas em 2026-10-29. Regressão no mesmo dia: Basilisco 17/17, Litófago 11/11, Cobrador 18/18. Pendentes, rodar no terminal do usuário: `.\gradlew.bat build`, `.\gradlew.bat runCanopyBreakerTest`, as demais tarefas de teste e `.\gradlew.bat runClient`.
+- **Não verificado no jogo:** leitura das animações em movimento, sons, barra de vida e gravuras no Bestiário, desempenho do planejamento de saltos em florestas reais e balanceamento da luta. As poses foram inspecionadas apenas em renderizações offline do modelo real.
+
+## Porrete de Raiz-Morta: Golpe Descendente em Salto — 2026-10-29
+
+- Implementada a habilidade do `deadroot_club`: salto no chão (clique direito), mergulho e golpe no solo com dano em área (100% sob o impacto, 60% no anel externo) e dano crescente com a altura da queda. Recarga de 12 s e durabilidade por uso. Traduções pt/en e descrição no item.
+- Revisão em 2026-10-29: carga do salto (segurar o clique direito), dano que cresce com a altura da queda (1,5 por bloco, até 16 blocos) e invocação de Micos de Casca com Shift + clique direito (cap de 4, custo de durabilidade, recarga). Salto mais horizontal (apex de cerca de 1 a 4 blocos, alcance de cerca de 4 a 11) para servir de locomoção; impacto no chão com martelada pesada, poeira, pedra, e dois anéis de onda de choque.
+- GameTestServer direto: `DeadrootClubGameTests` 7/7 de habilidade aprovados em 3 execuções seguidas. Pendentes: `.\gradlew.bat runDeadrootClubTest` e `runClient`.
+- **Não verificado no jogo:** a curva do salto, a sensação do mergulho, os sons e as partículas do impacto, e o alcance da área frente ao terreno real.
+
+## Lacaios do Quebra-Copas: Micos de Casca — 2026-10-29
+
+- Implementado `codenamecoraline:bark_macaque` (modelo, textura, 12 animações, salto balístico com mordida, subida de tronco, escalada de paredes), ovo, sons e traduções, e a integração no boss: chamado de abertura (com e sem ídolo), um reforço por estágio, limite de quatro, vínculo, saída com a morte do boss e remoção de órfãos (D-029).
+- GameTestServer direto: 26/26 em 12 execuções seguidas; regressões sem falhas. Pendentes: Gradle, `runClient`.
+- **Não verificado no jogo:** animações em movimento, sons, balanceamento. **Não implementado:** Javali de Raiz (adiado por decisão, D-029).
+
+## Invocações, voo do porrete, intro e espíritos — 2026-10-29
+
+- Invocações de jogador (Micos e Presentes aliados) não se atacam nem se ferem; o golpe do porrete as poupa.
+- Porrete: voo na direção do olhar com empuxo sustentado (como um martelo arremessado), mergulho com Shift no ar.
+- Quebra-Copas: intro de 6 s (olhar, bater no peito com tambor, rugido, título) com câmera, tarjas e tremor no padrão do Cobrador.
+- Morte do Quebra-Copas e do Cobrador: espírito translúcido e azul subindo do corpo.
+- GameTestServer direto: ver `docs/DEVELOPMENT.md`. **Não verificado no jogo:** câmera e título da intro, transparência e cor do espírito, sensação do voo.

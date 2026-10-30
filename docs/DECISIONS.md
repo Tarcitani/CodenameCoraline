@@ -174,3 +174,30 @@ Registro apenas de decisões relevantes: contexto, decisão e consequências. N�
 **Consequências.** Um boss com nome personalizado (etiqueta) perde o estilo e volta à barra padrão, porque o nome deixa de ser a chave de tradução. O visual só pode ser validado com `runClient`; a prévia foi feita offline.
 
 **Ajuste D-025 (aliados ajudam o dono contra qualquer coisa).** Os Presentes Famintos aliados só atacavam mobs hostis, então ignoravam animais mesmo quando o dono os atacava. Agora, a cada 8 ticks, eles adotam como alvo quem feriu o dono e, senão, o que o dono acertou por último (até 8 s atrás, qualquer criatura, animais incluídos), além de continuarem atacando mobs hostis por iniciativa própria. Continuam fora de alvo: o dono, qualquer jogador, outros aliados e os pets domesticados do dono. O estouro final fere hostis e o alvo atual/foco do dono. Teste: `collector_allies_help_owner_against_anything`.
+
+## D-028 — O Quebra-Copas: mobilidade arbórea executada pelo servidor e animação decidida no servidor
+
+**Contexto.** O boss precisava escalar, atravessar copas e atacar de cima sem parecer um mob que "voa" ou se teletransporta, e com animações que sempre correspondam ao que a mecânica faz.
+
+**Decisão.** (1) A animação é escolhida no servidor e sincronizada (`DATA_ANIM`); o cliente só a toca. Cada estado de jogo tem animação própria (88 no total, catalogadas em `CanopyAnim` com estado, evento, interrupção e próxima). (2) A escalada usa `noPhysics` com hitbox reduzida (`Pose.CROUCHING`, 1,0 × 2,2) e **cada passo é validado** contra blocos sólidos (folhas passam, troncos não); a cada tick o tronco ao lado precisa existir, senão o boss perde o apoio, cai e se recupera. (3) Os saltos são balísticos: `TreeNav.planJump` procura o menor tempo de voo cuja velocidade é permitida e cuja trajetória, em meios ticks e com a caixa real, está livre; o plano é refeito durante a preparação e um destino inválido cancela o salto e faz o boss descer pelo tronco. Em voo a velocidade horizontal é corrigida rumo ao pouso. (4) Não usamos biblioteca de animação nem sons externos (`.ogg`): os sons são eventos vanilla mapeados em `sounds.json`. (5) A barra de vida temática, as gravuras do Bestiário e os ícones são gerados por scripts versionados em `tools/`.
+
+**Consequências.** Saltos práticos de até cerca de 10 a 12 blocos; copas muito densas ao redor do pouso podem impedir o plano (o boss luta no chão). Os GameTests constroem os próprios terrenos e precisam forçar o carregamento de todos os chunks do terreno: mobs só executam IA em chunks que processam entidades, e uma arena maior que os 12 × 12 do modelo deixava o boss parado em chunks vizinhos. A aparência e a leitura das animações em movimento só podem ser julgadas com `runClient`.
+
+
+**Ajuste D-029 (Quebra-Copas mais duro e mais movel; porrete 3D).** O chefe era facil e parado demais. Vida 92 -> 200 (acima dos 128 de Noel), armadura 5 -> 8, resistencia a repulsao 0,75, velocidade 0,29 -> 0,33, recargas de ataque menores e movimento continuo no chao: galope em campo aberto, arco largo de 55 graus ao redor do alvo entre golpes (lado alterna a cada ~2,5 s) e pressao constante quando o golpe esta pronto mas fora da janela. O modelo 3D do porrete nao carregava ('to' specifier exceeds the allowed boundaries: a caixa chegava a y = 36,5, e o limite do Minecraft e [-16, 32]); agora cabe nos limites e a escala de exibicao em terceira pessoa e 1,2, igual a escala do modelo do chefe, para ter o mesmo tamanho.
+
+## D-029 — Lacaios do Quebra-Copas: Micos de Casca como extensão do boss
+
+**Contexto.** O boss ganha aliados que controlam o terreno e criam aberturas, sem virar uma luta de vários bosses nem deixar mobs agressivos órfãos.
+
+**Decisão.** (1) Primeiro só o **Mico de Casca**, por reforçar a mobilidade entre árvores; o Javali de Raiz fica como segunda camada, adiada até haver evidência de jogo de que a luta precisa de pressão terrestre. (2) O lacaio é um mob comum com vínculo explícito (UUID do boss), só tem jogadores como alvo e é imune aos golpes do boss e dos irmãos; o boss exclui lacaios dos seus golpes. (3) O boss decide os chamados: dois na abertura, um por transição de estágio, limite duro de quatro simultâneos contando os vivos e os pendentes, sem reaparecimento. (4) Cada chamado é anunciado (folhas, grito, rugido) antes de entrar. (5) Os lacaios saem com a morte ou a remoção do boss; uma regra de órfão cobre os demais casos. (6) Mobilidade física: salto balístico de velocidade única, rota de tronco com passos validados e escalada de paredes do jogo; sem teletransporte.
+
+**Consequências.** O reforço do estágio 2 é hoje um Mico, não um Javali. O limite de quatro, a vida (14), a mordida (3) e as recargas são valores iniciais a calibrar jogando. Os GameTests precisam de um jogador mock danificável (`makeMockPlayer(GameType.SURVIVAL)`), porque o jogador de servidor mock é invulnerável até o cliente carregar.
+
+## D-030 — Invocações que não se atacam, voo do porrete, intro do Quebra-Copas e espírito na morte
+
+**Contexto.** Micos e Presentes aliados do mesmo jogador brigavam entre si (os dois são `Enemy`). O porrete não avançava: o mergulho automático cortava 75% do embalo assim que o jogador começava a cair. O Quebra-Copas não tinha intro no padrão do Cobrador, e as mortes dos bosses não tinham um fecho visual.
+
+**Decisão.** (1) Interface `PlayerSummon`: invocações de jogador formam um lado só; nunca se miram, nunca se ferem, e o golpe do porrete as poupa. (2) O porrete puxa na direção exata do olhar com empuxo sustentado (estilo martelo arremessado); o mergulho passou a ser opcional, com Shift no ar. (3) Intro de 6 s com batida no peito, rugido e diretor de câmera próprio, reaproveitando a tecla e o formato do Cobrador. (4) A morte libera um espírito: o modelo do boss translúcido e azul subindo e se apagando, como entidade visual com renderizador próprio por boss.
+
+**Consequências.** O espírito é desenhado com `entityTranslucent` e só pode ser julgado no `runClient`, assim como a câmera e os tremores da intro. Os GameTests da intro do Quebra-Copas e dos lacaios aguardam o fim da intro de 120 ticks.

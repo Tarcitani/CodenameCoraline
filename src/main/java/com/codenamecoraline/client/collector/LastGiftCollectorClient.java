@@ -31,6 +31,7 @@ public final class LastGiftCollectorClient {
     @SubscribeEvent
     static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.LAST_GIFT_COLLECTOR.get(), LastGiftCollectorRenderer::new);
+        event.registerEntityRenderer(ModEntities.LAST_GIFT_COLLECTOR_SPIRIT.get(), LastGiftCollectorSpiritRenderer::new);
         event.registerEntityRenderer(ModEntities.COLLECTOR_SLEIGH.get(), CollectorSleighRenderer::new);
         event.registerEntityRenderer(ModEntities.GIFT_MIMIC.get(), GiftMimicRenderer::new);
         event.registerEntityRenderer(ModEntities.COLLECTOR_GIFT.get(), CollectorGiftRenderer::new);

@@ -31,6 +31,8 @@ Verificado pela ferramenta: nenhuma sobreposição de UV entre cubos diferentes;
 ## Testes
 
 - `.\gradlew.bat runBasiliskTest` executa os Game Tests do Basilisco em `build/basilisk-gametest/`, sem abrir os mundos do usuário. Não exige um framework externo (D-017).
+- `.\gradlew.bat runDeadrootClubTest` executa os 7 testes da habilidade do Porrete de Raiz-Morta (carga, dano por altura, invocação com cap, aliados) em `build/deadroot-gametest/` (propriedade `coraline.deadrootTests=true`).
+- `.\gradlew.bat runCanopyBreakerTest` executa os 17 testes do Quebra-Copas em `build/canopy-gametest/` (propriedade `coraline.canopyTests=true`). O terreno é construído por cada teste a Y relativo 100 e todos os chunks dele são forçados.
 - Os testes só são registrados com `coraline.basiliskTests=true`, configurado nessa execução Gradle. Não são ativados por `runClient` ou `runServer` comuns.
 - A compilação (`build`) verifica o código e gera o JAR; os Game Tests verificam o comportamento no servidor. A aparência, o HUD e a paginação do Bestiário precisam também de revisão no cliente.
 
@@ -129,3 +131,21 @@ Os testes de servidor não medem frequência de geração em uma campanha de sob
 - Geração reprodutível de recursos:
   1. `python tools/generate_last_gift_collector_assets.py` — gera `last_gift_collector.png` (256×256), `last_gift_collector_eyes.png` (256×256), `collector_sleigh.png` (128×128) e os 5 ícones de itens 16×16 (`last_gift_collector_spawn_egg`, `silent_bell`, `cracked_bell`, `frostbound_thread`, `solstice_seal`).
   2. `.\gradlew.bat -I tools/last-gift-collector-sketches.gradle exportLastGiftCollectorSketchModel` e `python tools/generate_last_gift_collector_sketches.py` — exportam a geometria 3D real e geram as 3 pranchas do Bestiário (`last_gift_collector_anatomy.png`, `last_gift_collector_combat.png`, `last_gift_collector_spoils.png`).
+
+## Quebra-Copas — 2026-10-29
+
+- GameTestServer direto (mesmo carregador e classpath do Gradle, classes compiladas com `javac`, recursos copiados e `neoforge.mods.toml` expandido à mão; o Gradle não consegue criar a JVM de build no shell do agente): **VALIDADO**, 18 testes obrigatórios aprovados (17 do mod e um do framework); suíte repetida 10 vezes seguidas. Regressão: Basilisco 17/17, Litófago 11/11 e Cobrador 18/18 aprovados pelo mesmo lançador.
+- `.\gradlew.bat build` e `.\gradlew.bat runCanopyBreakerTest`: **não executados pelo agente**; rode no terminal. `runClient` também pendente: aparência, animações em movimento, sons e barra de vida não foram vistos no jogo.
+- Ferramentas de ativos: `python tools/generate_canopy_breaker_assets.py` (modelo, textura, ícones), `.\gradlew.bat -I tools/canopy-breaker-sketches.gradle exportCanopyBreakerSketchModel` seguido de `python tools/generate_canopy_breaker_sketches.py` (gravuras), `python tools/generate_boss_bar_canopy_breaker.py` (barra) e `python tools/generate_canopy_animation_bible.py` (tabela da Animation Bible em `docs/design/canopy_breaker.md`).
+
+## Micos de Casca (lacaios do Quebra-Copas) — 2026-10-29
+
+- GameTestServer direto: `CanopyBreakerGameTests` agora com 26 testes obrigatórios (17 do boss, 8 dos lacaios, 1 do framework), **VALIDADO** em 12 execuções seguidas. Regressão: Basilisco 17/17, Litófago 11/11, Cobrador 18/18, Porrete 4/4.
+- Gradle (`build`, `runCanopyBreakerTest`) e `runClient` não executados pelo agente. Ferramenta: `python tools/generate_bark_macaque_assets.py` (modelo, textura, ovo).
+- Instabilidades de teste corrigidas pela raiz: chunks do terreno (e vizinhos do ídolo) precisam estar forçados para que os mobs processem IA; o jogador de servidor mock é invulnerável.
+
+## Invocações, voo do porrete, intro e espíritos — 2026-10-29
+
+- GameTestServer direto: Quebra-Copas 27/27 em 8 execuções seguidas (inclui intro com batida no peito e espírito na morte); Porrete 9/9 em 3 (voo na direção do olhar, empuxo sustentado, invocações que não se atacam); Cobrador 18/18 em 3 (espírito na morte); Basilisco 17/17; Litófago 11/11.
+- Gradle e `runClient` não executados pelo agente: câmera/título da intro, transparência do espírito e sensação do voo pendentes de inspeção no jogo.
+

@@ -3,6 +3,8 @@ package com.codenamecoraline.registry;
 import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.item.BestiaryItem;
 import com.codenamecoraline.item.CatacombLilyItem;
+import com.codenamecoraline.item.DeadrootClubItem;
+import com.codenamecoraline.item.HollowTrunkIdolItem;
 import com.codenamecoraline.item.MistFlaskItem;
 import com.codenamecoraline.item.RenegadeGreataxeItem;
 import com.codenamecoraline.item.SilentBellItem;
@@ -30,6 +32,10 @@ public final class ModItems {
     /** Renegade steel: the greataxe the Collector of the Last Gift carried. */
     private static final ToolMaterial RENEGADE_STEEL = new ToolMaterial(
             BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 2200, 8.0F, 4.0F, 16, ItemTags.NETHERITE_TOOL_MATERIALS);
+
+    /** Deadroot: a heavy club of dead wood. */
+    private static final ToolMaterial DEADROOT = new ToolMaterial(
+            BlockTags.INCORRECT_FOR_IRON_TOOL, 720, 5.0F, 2.0F, 10, ItemTags.LOGS);
 
     /** Rusted iron: a worse iron. Used by the weapons a Redcap drops. */
     private static final ToolMaterial RUSTED_IRON = new ToolMaterial(
@@ -95,6 +101,22 @@ public final class ModItems {
     /** The Collector's face, used only as the icon of his story advancements (not in the creative tab). */
     public static final DeferredItem<Item> COLLECTOR_PORTRAIT = ITEMS.registerSimpleItem("collector_portrait",
             () -> new Item.Properties().stacksTo(1));
+    public static final DeferredItem<Item> HOLLOW_TRUNK_IDOL = ITEMS.registerItem("hollow_trunk_idol", HollowTrunkIdolItem::new,
+            properties -> properties.stacksTo(1));
+    public static final DeferredItem<Item> DEADROOT_CLUB = ITEMS.registerItem("deadroot_club", DeadrootClubItem::new,
+            properties -> properties.sword(DEADROOT, 8.0F, -3.0F).rarity(Rarity.RARE)
+                    .component(DataComponents.LORE, new ItemLore(List.of(
+                            Component.translatable("item.codenamecoraline.deadroot_club.lore1").withStyle(ChatFormatting.AQUA),
+                            Component.translatable("item.codenamecoraline.deadroot_club.lore2").withStyle(ChatFormatting.GRAY)))));
+    public static final DeferredItem<Item> CANOPY_RESIN = ITEMS.registerSimpleItem("canopy_resin");
+    public static final DeferredItem<Item> HEARTWOOD_SPLINTER = ITEMS.registerSimpleItem("heartwood_splinter");
+    /** The Canopy Breaker's face, used only as the icon of its advancements. */
+    public static final DeferredItem<Item> CANOPY_BREAKER_PORTRAIT = ITEMS.registerSimpleItem("canopy_breaker_portrait",
+            () -> new Item.Properties().stacksTo(1));
+    public static final DeferredItem<Item> BARK_MACAQUE_SPAWN_EGG = ITEMS.registerItem("bark_macaque_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.BARK_MACAQUE.get()));
+    public static final DeferredItem<Item> CANOPY_BREAKER_SPAWN_EGG = ITEMS.registerItem("canopy_breaker_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.CANOPY_BREAKER.get()));
     public static final DeferredItem<Item> FROSTBOUND_THREAD = ITEMS.registerSimpleItem("frostbound_thread");
     public static final DeferredItem<Item> SOLSTICE_SEAL = ITEMS.registerSimpleItem("solstice_seal",
             () -> new Item.Properties().stacksTo(16));

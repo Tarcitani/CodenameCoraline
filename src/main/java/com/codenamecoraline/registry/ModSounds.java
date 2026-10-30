@@ -51,7 +51,32 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> COLLECTOR_FROST_SHATTER = register("entity.last_gift_collector.frost_shatter");
     public static final DeferredHolder<SoundEvent, SoundEvent> COLLECTOR_PHASE_TRANSITION = register("entity.last_gift_collector.phase_transition");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_AMBIENT = register("entity.canopy_breaker.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_HURT = register("entity.canopy_breaker.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_DEATH = register("entity.canopy_breaker.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_STEP = register("entity.canopy_breaker.step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_ROAR_ALERT = register("entity.canopy_breaker.roar_alert");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_ROAR_ATTACK = register("entity.canopy_breaker.roar_attack");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_ROAR_FURY = register("entity.canopy_breaker.roar_fury");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_CLUB_DRAW = register("entity.canopy_breaker.club_draw");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_CLUB_SWING = register("entity.canopy_breaker.club_swing");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_CLUB_IMPACT = register("entity.canopy_breaker.club_impact");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_CLIMB = register("entity.canopy_breaker.climb");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_JUMP = register("entity.canopy_breaker.jump");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_LAND_LIGHT = register("entity.canopy_breaker.land_light");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_LAND_HEAVY = register("entity.canopy_breaker.land_heavy");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_PANT = register("entity.canopy_breaker.pant");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_CHEST_BEAT = register("entity.canopy_breaker.chest_beat");
+
     private ModSounds() {}
+
+    public static final DeferredHolder<SoundEvent, SoundEvent> MACAQUE_AMBIENT = register("entity.bark_macaque.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MACAQUE_HURT = register("entity.bark_macaque.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MACAQUE_DEATH = register("entity.bark_macaque.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MACAQUE_SCREECH = register("entity.bark_macaque.screech");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MACAQUE_BITE = register("entity.bark_macaque.bite");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MACAQUE_LEAP = register("entity.bark_macaque.leap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MACAQUE_STEP = register("entity.bark_macaque.step");
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUND_EVENTS.register(name, SoundEvent::createVariableRangeEvent);

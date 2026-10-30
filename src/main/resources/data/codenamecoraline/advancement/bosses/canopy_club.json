@@ -1,0 +1,36 @@
+{
+  "parent": "codenamecoraline:bosses/canopy_defeat",
+  "criteria": {
+    "has_club": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "codenamecoraline:deadroot_club"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.canopy_club.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:canopy_breaker_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.canopy_club.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_club"
+    ]
+  ]
+}

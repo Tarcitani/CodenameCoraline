@@ -162,6 +162,43 @@ Valores e receitas: [design/basilisk.md](design/basilisk.md).
 - **Recursos, Conquista e Bestiário:** receita `recipe/silent_bell.json`, tabela de saque `loot_table/entities/last_gift_collector.json` (`cracked_bell`, `frostbound_thread`, `solstice_seal`), conquista `advancement/bosses/the_final_delivery.json` (*A Última Entrega* / *The Final Delivery*, 100 XP) e capítulo `Bestiary.LAST_GIFT_COLLECTOR` com três pranchas geradas a partir do modelo 3D real (`last_gift_collector_anatomy.png`, `last_gift_collector_combat.png`, `last_gift_collector_spoils.png`).
 - **Verificação:** `verification/LastGiftCollectorGameTests` registra testes na execução `runLastGiftCollectorTest` (`coraline.collectorTests=true`) em `build/collector-gametest/`. Detalhes em [design/last_gift_collector.md](design/last_gift_collector.md).
 
+## O Quebra-Copas (`canopy_breaker`)
+
+- **Servidor:** `entity/canopy/CanopyBreaker` (92 PV, armadura 5, velocidade 0,29, 1,8 × 3,1; 1,0 × 2,2 ao escalar) concentra a máquina de estados (`Activity`), os seis ataques (`Attack`, fases preparar/executar/recuperar), os três estágios, a introdução, a morte e as rotas de árvore. O estado visual é escolhido no servidor e sincronizado (`DATA_ANIM`, `DATA_OVERLAY`, `DATA_CLUB`, `DATA_STAGE`, `DATA_ACTIVITY`). `entity/canopy/CanopyAnim` lista as 88 animações com estado ativador, evento, interrupção e próxima (fonte da Animation Bible).
+- **Árvores:** `entity/canopy/TreeNav` detecta troncos, pontos de aproximação, poleiros e pousos e planeja saltos balísticos (arrasto horizontal 0,91, vertical 0,98, gravidade do atributo; velocidade horizontal até 1,15, vertical de 0,3 a 1,1, voo de 8 a 44 ticks, trajetória conferida em meios ticks com a caixa real). Subir usa `noPhysics` com cada passo validado contra blocos sólidos; falhas caem em `FALL_RECOVERY` ou descem pelo tronco, sem teleporte.
+- **Item de invocação:** `item/HollowTrunkIdolItem` (`hollow_trunk_idol`) avalia seis condições sem consumir o item na falha.
+- **Cliente:** `client/canopy/` contém `CanopyBreakerModel` (hierarquia pélvis → peito → cabeça e braços, pernas e porrete guardado), `CanopyBreakerParts` (gerado por `tools/generate_canopy_breaker_assets.py`), `CanopyBreakerAnimations` (poses absolutas convertidas para deslocamentos da postura de repouso), `CanopyBreakerRenderState`, `CanopyBreakerRenderer` (escala 1,2), `CanopyBreakerEyesLayer` e `CanopyBreakerClient`.
+- **Recursos, Conquistas e Bestiário:** receita `recipe/hollow_trunk_idol.json`, saque `loot_table/entities/canopy_breaker.json`, conquistas `advancement/bosses/canopy_{idol,summon,defeat,club}.json`, sons vanilla mapeados em `sounds.json` (`ModSounds.CANOPY_*`), entrada `Bestiary.CANOPY_BREAKER` (6 páginas) e gravuras em `textures/gui/bestiary/canopy_breaker_*.png`.
+- **Verificação:** `verification/CanopyBreakerGameTests` registra 17 testes na execução `runCanopyBreakerTest` (`coraline.canopyTests=true`) em `build/canopy-gametest/`. Detalhes em [design/canopy_breaker.md](design/canopy_breaker.md).
+
+## Porrete de Raiz-Morta: Golpe Descendente em Salto (`deadroot_club`)
+
+- **Item:** `item/DeadrootClubItem` (espada de `DEADROOT`, raridade rara). Segurar o clique direito no chão carrega o salto (até 1,5 s, `MAX_CHARGE_TICKS`); soltar salta com altura e distância proporcionais à carga (`releaseUsing`). Shift + clique direito invoca Micos de Casca (`summon`), como o Machado do Renegado. Salto gasta 4 de durabilidade, invocação 120; a recarga de 12 s (salto) e 20 s (invocação) é compartilhada pelo item.
+- **Habilidade:** `item/DeadrootLeapSlam` guarda o estado do salto por jogador (mapa no servidor, limpo ao sair). O salto é vertical com leve impulso para a frente; ao passar do ápice o jogador mergulha para baixo (`DIVE_SPEED`) e, ao tocar o solo, o porrete bate: dano em área de raio 3,5 (100% a até 1,5 bloco do impacto, 60% no anel externo, só em `Enemy`), com O voo é no estilo de um martelo arremessado: o porrete puxa o jogador na direção exata do olhar (velocidade de 0,9 a 2,0 conforme a carga, mais um leve impulso de 0,22 para cima) e mantém o empuxo por 3 a 10 ticks; depois o jogador plana no embalo. Segurar Shift no ar faz o mergulho. Uma parede interrompe o empuxo. O impacto toca `MACE_SMASH_GROUND_HEAVY`, solta poeira, pedra e dois anéis de partículas. Dano base 6 mais 1,5 por bloco de queda (máximo +16 blocos, ou seja, até 30). Sem dano de queda para o jogador.
+- **Eventos:** `PlayerTickEvent.Post` avança o salto; `PlayerLoggedOutEvent` descarta o estado.
+- **Verificação:** `verification/DeadrootClubGameTests` (execução `runDeadrootClubTest`, `coraline.deadrootTests=true`).
+
+## Micos de Casca (`bark_macaque`)
+
+- **Servidor:** `entity/macaque/BarkMacaque` (Monster; 14 PV, armadura 2, velocidade 0,32) com máquina de estados `Activity` (`ARRIVE, GROUND, TRUNK_APPROACH, TRUNK_CLIMB, LEAP_PREPARE, AIRBORNE, LAND, RETREAT, DYING`), alvo apenas jogador, salto balístico com mordida única, rota de tronco com `TreeNav` e `WallClimberNavigation`. `MacaqueAnim` lista as 12 animações (sincronizadas por `DATA_ANIM`).
+- **Boss:** `CanopyBreaker` guarda os chamados pendentes, aplica o limite de 4 lacaios, chama 2 na abertura e 1 em cada transição de estágio e os dispensa na morte/remoção (`callMinions`, `getMinions`, `dismissMinions`).
+- **Cliente:** `client/macaque/` com `BarkMacaqueModel`, `BarkMacaqueAnimations`, `BarkMacaqueRenderState`, `BarkMacaqueRenderer`, `BarkMacaqueEyesLayer`, `BarkMacaqueClient` e o `BarkMacaqueParts` gerado por `tools/generate_bark_macaque_assets.py`.
+- **Recursos:** ovo `bark_macaque_spawn_egg`, sons vanilla mapeados em `sounds.json` (`ModSounds.MACAQUE_*`), traduções pt/en. Testes em `CanopyBreakerGameTests`.
+
 ## Barras de vida de bosses (`client/bossbar`)
 
 Regra do projeto (ver `CLAUDE.md`): cada boss desenha a própria barra. `ThemedBossBars` cancela a barra padrão (`CustomizeGuiOverlayEvent.BossEventProgress`) para bosses com estilo registrado e delega a um `Style`. Nicolas Noel, o Renegado usa `LastGiftCollectorBossBar`: moldura 288×44 de galhadas palmadas, trilha com pelo e pingentes de gelo, machados cruzados e o rosto dele (gorro, olhos âmbar, nariz longo, barba enorme), com o slot de vida transparente (fundo e preenchimento são desenhados antes da moldura); o nome é dividido em dois e fica sob a trilha, de cada lado da barba (`tools/generate_boss_bar_last_gift_collector.py`); o preenchimento muda de cor por estágio (vermelho, vinho, gelo, ouro e, na Fúria, fogo pulsante) e a trilha marca onde cada estágio começa.
+
+O Quebra-Copas usa `CanopyBreakerBossBar` (moldura `textures/gui/boss_bar/canopy_breaker.png`, gerada por `tools/generate_boss_bar_canopy_breaker.py`): casca rachada com marcas de garra, raízes com agulhas e musgo, o rosto da fera sobre o meio, entalhes nas marcas de 60% e 25%, nome centralizado sob a barra e cor do preenchimento por estágio (verde-musgo, âmbar, brasa pulsante).
+
+## Invocações do jogador (`entity/PlayerSummon`)
+
+Interface comum às criaturas invocadas por armas (Presentes Famintos aliados do Machado do Renegado, Micos de Casca aliados do Porrete de Raiz-Morta). Uma invocação de jogador nunca mira nem fere outra (de qualquer arma), e o golpe em área do porrete as poupa. Os lacaios do boss da mesma espécie respondem `false` e continuam inimigos.
+
+## Espíritos dos bosses (`entity/spirit/BossSpirit`)
+
+Entidade visual (LivingEntity sem colisão, sem dano, sem salvar) que sobe a 0,045 bloco por tick por 90 ticks a partir do corpo do boss. Cada boss tem seu tipo (`canopy_breaker_spirit`, `last_gift_collector_spirit`) para o cliente desenhar com o modelo dele: `CanopyBreakerSpiritRenderer` e `LastGiftCollectorSpiritRenderer` usam `RenderTypes.entityTranslucent`, cor azul-pálida com alfa que entra e some (`BossSpirit.visibility`) e luz cheia. O Quebra-Copas o libera no impacto da queda da morte (tick 48), o Cobrador quando os olhos apagam (tick 45).
+
+## Intro do Quebra-Copas (`client/canopy/CanopyCinematicDirector`)
+
+No padrão do Cobrador: enquanto o boss está em `INTRO` (120 ticks), a câmera do jogador próximo vira para ele (primeiro a copa, depois o peito, depois o rosto), o FOV fecha, tarjas de cinema entram, cada golpe no peito e o rugido tremem a câmera, e o título aparece com o rugido. A mesma tecla de pular (V) ou levar dano libera a câmera. O roteiro do servidor (`tickIntro`): olhar em volta (0 a 24), `INTRO_CHEST_BEAT` com um tambor por golpe (24 a 72), `ROAR_AGGRO` e a chegada dos dois Micos (72 a 104).

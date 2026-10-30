@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "codenamecoraline:item/bark_macaque_spawn_egg"
+  }
+}

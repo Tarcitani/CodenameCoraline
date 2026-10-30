@@ -1,0 +1,41 @@
+{
+  "parent": "codenamecoraline:bosses/canopy_summon",
+  "criteria": {
+    "killed_canopy_breaker": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "codenamecoraline:canopy_breaker"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.canopy_defeat.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:canopy_breaker_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.canopy_defeat.title"
+    }
+  },
+  "requirements": [
+    [
+      "killed_canopy_breaker"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

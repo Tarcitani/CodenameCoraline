@@ -1,0 +1,47 @@
+{
+  "parent": "codenamecoraline:bosses/canopy_idol",
+  "criteria": {
+    "set_the_idol": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "codenamecoraline:hollow_trunk_idol"
+            }
+          },
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "#minecraft:logs"
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.canopy_summon.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:canopy_breaker_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.canopy_summon.title"
+    }
+  },
+  "requirements": [
+    [
+      "set_the_idol"
+    ]
+  ]
+}

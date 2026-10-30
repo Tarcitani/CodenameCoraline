@@ -39,7 +39,7 @@ import java.util.UUID;
  * confetti-shrapnel when its fuse runs out. Called by a player with the Renegade's Greataxe it is an <em>ally</em>:
  * it follows its owner, attacks hostile mobs (and the Collector), never touches players, and bursts on enemies.
  */
-public class GiftMimic extends Monster {
+public class GiftMimic extends Monster implements com.codenamecoraline.entity.PlayerSummon {
     public static final int FUSE_TICKS = 240;
     public static final int ALLY_FUSE_TICKS = 600;
     public static final float BURST_DAMAGE = 7.0F;
@@ -104,9 +104,20 @@ public class GiftMimic extends Monster {
         return Math.min(1.0F, this.entityData.get(DATA_FUSE) / (float) this.fuseLimit());
     }
 
-    /** Never a target for an allied mimic: its owner, any player, its own side, and the owner's tamed pets. */
+    @Override
+    public boolean isPlayerSummon() {
+        return this.isAllied();
+    }
+
+    /**
+     * Never a target for an allied mimic: its owner, any player, its own side, every other player summon (such as the
+     * Deadroot Club's macaques) and the owner's tamed pets.
+     */
     private boolean isProtected(LivingEntity target) {
         if (target instanceof Player || target.getUUID().equals(this.ownerId)) {
+            return true;
+        }
+        if (target instanceof com.codenamecoraline.entity.PlayerSummon summon && summon.isPlayerSummon()) {
             return true;
         }
         if (target instanceof GiftMimic other) {
@@ -181,8 +192,12 @@ public class GiftMimic extends Monster {
                 && (source.getEntity() instanceof LastGiftCollector || source.getDirectEntity() instanceof LastGiftCollector)) {
             return false;
         }
-        // An ally is never hurt by its owner.
+        // An ally is never hurt by its owner, nor by another player summon.
         if (this.isAllied() && source.getEntity() != null && source.getEntity().getUUID().equals(this.ownerId)) {
+            return false;
+        }
+        if (this.isAllied() && source.getEntity() instanceof com.codenamecoraline.entity.PlayerSummon summon
+                && summon.isPlayerSummon()) {
             return false;
         }
         return super.hurtServer(level, source, amount);

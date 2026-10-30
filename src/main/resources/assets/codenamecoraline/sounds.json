@@ -541,5 +541,354 @@
         "volume": 0.85
       }
     ]
+  },
+  "entity.canopy_breaker.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ravager.ambient",
+        "type": "event",
+        "pitch": 0.75,
+        "volume": 0.8
+      },
+      {
+        "name": "minecraft:entity.polar_bear.ambient",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 0.8
+      }
+    ]
+  },
+  "entity.canopy_breaker.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ravager.hurt",
+        "type": "event",
+        "pitch": 0.8,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:entity.polar_bear.hurt",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 1.0
+      }
+    ]
+  },
+  "entity.canopy_breaker.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ravager.death",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:entity.polar_bear.death",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 1.0
+      }
+    ]
+  },
+  "entity.canopy_breaker.step": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.step",
+    "sounds": [
+      {
+        "name": "minecraft:block.wood.step",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:entity.ravager.step",
+        "type": "event",
+        "pitch": 0.8,
+        "volume": 0.7
+      }
+    ]
+  },
+  "entity.canopy_breaker.roar_alert": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.roar_alert",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ravager.roar",
+        "type": "event",
+        "pitch": 0.8,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:entity.polar_bear.warning",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 1.0
+      }
+    ]
+  },
+  "entity.canopy_breaker.roar_attack": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.roar_attack",
+    "sounds": [
+      {
+        "name": "minecraft:entity.polar_bear.warning",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:entity.ravager.attack",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 0.9
+      }
+    ]
+  },
+  "entity.canopy_breaker.roar_fury": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.roar_fury",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ravager.roar",
+        "type": "event",
+        "pitch": 0.55,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:entity.polar_bear.warning",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 1.0
+      }
+    ]
+  },
+  "entity.canopy_breaker.club_draw": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.club_draw",
+    "sounds": [
+      {
+        "name": "minecraft:block.wood.hit",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:block.bamboo_wood.hit",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 0.9
+      }
+    ]
+  },
+  "entity.canopy_breaker.club_swing": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.club_swing",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.sweep",
+        "type": "event",
+        "pitch": 0.55,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:entity.player.attack.strong",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 0.8
+      }
+    ]
+  },
+  "entity.canopy_breaker.club_impact": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.club_impact",
+    "sounds": [
+      {
+        "name": "minecraft:block.wood.break",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:entity.player.attack.knockback",
+        "type": "event",
+        "pitch": 0.55,
+        "volume": 1.0
+      }
+    ]
+  },
+  "entity.canopy_breaker.climb": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.climb",
+    "sounds": [
+      {
+        "name": "minecraft:block.wood.hit",
+        "type": "event",
+        "pitch": 0.9,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:block.grass.step",
+        "type": "event",
+        "pitch": 0.8,
+        "volume": 0.8
+      }
+    ]
+  },
+  "entity.canopy_breaker.jump": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.jump",
+    "sounds": [
+      {
+        "name": "minecraft:block.azalea_leaves.break",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:entity.hoglin.attack",
+        "type": "event",
+        "pitch": 0.9,
+        "volume": 0.7
+      }
+    ]
+  },
+  "entity.canopy_breaker.land_light": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.land_light",
+    "sounds": [
+      {
+        "name": "minecraft:block.azalea_leaves.step",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:block.wood.fall",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 1.0
+      }
+    ]
+  },
+  "entity.canopy_breaker.land_heavy": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.land_heavy",
+    "sounds": [
+      {
+        "name": "minecraft:entity.generic.big_fall",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:block.wood.break",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 0.9
+      }
+    ]
+  },
+  "entity.canopy_breaker.pant": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.pant",
+    "sounds": [
+      {
+        "name": "minecraft:entity.polar_bear.ambient",
+        "type": "event",
+        "pitch": 0.45,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:entity.ravager.ambient",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 0.6
+      }
+    ]
+  },
+  "entity.bark_macaque.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.bark_macaque.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:entity.fox.ambient",
+        "type": "event",
+        "pitch": 1.5,
+        "volume": 0.6
+      }
+    ]
+  },
+  "entity.bark_macaque.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.bark_macaque.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:entity.fox.hurt",
+        "type": "event",
+        "pitch": 1.55,
+        "volume": 0.9
+      }
+    ]
+  },
+  "entity.bark_macaque.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.bark_macaque.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.fox.death",
+        "type": "event",
+        "pitch": 1.45,
+        "volume": 0.9
+      }
+    ]
+  },
+  "entity.bark_macaque.screech": {
+    "subtitle": "subtitles.codenamecoraline.entity.bark_macaque.screech",
+    "sounds": [
+      {
+        "name": "minecraft:entity.fox.screech",
+        "type": "event",
+        "pitch": 1.25,
+        "volume": 1.1
+      }
+    ]
+  },
+  "entity.bark_macaque.bite": {
+    "subtitle": "subtitles.codenamecoraline.entity.bark_macaque.bite",
+    "sounds": [
+      {
+        "name": "minecraft:entity.fox.bite",
+        "type": "event",
+        "pitch": 1.3,
+        "volume": 0.9
+      }
+    ]
+  },
+  "entity.bark_macaque.leap": {
+    "subtitle": "subtitles.codenamecoraline.entity.bark_macaque.leap",
+    "sounds": [
+      {
+        "name": "minecraft:block.azalea_leaves.break",
+        "type": "event",
+        "pitch": 1.2,
+        "volume": 0.8
+      }
+    ]
+  },
+  "entity.bark_macaque.step": {
+    "subtitle": "subtitles.codenamecoraline.entity.bark_macaque.step",
+    "sounds": [
+      {
+        "name": "minecraft:block.wood.step",
+        "type": "event",
+        "pitch": 1.5,
+        "volume": 0.5
+      }
+    ]
+  },
+  "entity.canopy_breaker.chest_beat": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.chest_beat",
+    "sounds": [
+      {
+        "name": "minecraft:block.note_block.basedrum",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 1.6
+      },
+      {
+        "name": "minecraft:entity.ravager.step",
+        "type": "event",
+        "pitch": 0.55,
+        "volume": 1.4
+      }
+    ]
   }
 }

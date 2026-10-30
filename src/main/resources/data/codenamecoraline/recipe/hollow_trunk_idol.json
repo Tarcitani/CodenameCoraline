@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "L": "minecraft:dark_oak_log",
+    "B": "minecraft:bone_block",
+    "R": "minecraft:moss_block"
+  },
+  "pattern": [
+    " L ",
+    "LBL",
+    " R "
+  ],
+  "result": {
+    "count": 1,
+    "id": "codenamecoraline:hollow_trunk_idol"
+  }
+}

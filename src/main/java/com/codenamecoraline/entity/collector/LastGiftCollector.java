@@ -787,6 +787,10 @@ public class LastGiftCollector extends Monster {
     protected void tickDeath() {
         this.deathCinematicTicks++;
         if (this.level() instanceof ServerLevel serverLevel) {
+            if (this.deathCinematicTicks == 45) { // as his eyes go dark, his spirit leaves the body
+                com.codenamecoraline.entity.spirit.BossSpirit.rise(serverLevel,
+                        com.codenamecoraline.registry.ModEntities.LAST_GIFT_COLLECTOR_SPIRIT.get(), this);
+            }
             if (this.deathCinematicTicks % 8 == 0) {
                 serverLevel.sendParticles(ParticleTypes.SNOWFLAKE,
                         this.getX(), this.getY() + 1.2D, this.getZ(), 8, 0.9D, 0.5D, 0.9D, 0.02D);

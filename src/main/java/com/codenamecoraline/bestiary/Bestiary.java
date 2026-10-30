@@ -44,7 +44,15 @@ public final class Bestiary {
             BestiaryPage.sketch("combat", "last_gift_collector_combat", 112, 72),
             BestiaryPage.sketch("spoils", "last_gift_collector_spoils", 112, 64)));
 
-    public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK, LITHOPHAGE, LAST_GIFT_COLLECTOR);
+    public static final BestiaryEntry CANOPY_BREAKER = new BestiaryEntry("canopy_breaker", List.of(
+            BestiaryPage.sketch("anatomy", "canopy_breaker_anatomy", 112, 80),
+            BestiaryPage.text("lore"),
+            BestiaryPage.text("stats"),
+            BestiaryPage.text("strategy"),
+            BestiaryPage.sketch("combat", "canopy_breaker_combat", 112, 72),
+            BestiaryPage.sketch("spoils", "canopy_breaker_spoils", 112, 64)));
+
+    public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK, LITHOPHAGE, LAST_GIFT_COLLECTOR, CANOPY_BREAKER);
 
     private Bestiary() {}
 }

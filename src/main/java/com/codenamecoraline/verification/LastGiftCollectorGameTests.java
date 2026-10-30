@@ -835,6 +835,10 @@ public final class LastGiftCollectorGameTests {
         helper.assertValueEqual(boss.getBossState(), LastGiftCollector.BossState.DEAD,
                 "Reaches DEAD state at end of 70-tick death cinematic");
         helper.assertTrue(boss.isRemoved(), "Boss entity is removed cleanly after death cinematic");
+        var spirits = level.getEntitiesOfClass(com.codenamecoraline.entity.spirit.BossSpirit.class, dropBox.inflate(4.0D),
+                s -> s.getType() == ModEntities.LAST_GIFT_COLLECTOR_SPIRIT.get());
+        helper.assertValueEqual(spirits.size(), 1, "His spirit rises from the body, once");
+        helper.assertTrue(!spirits.getFirst().isPickable(), "The spirit is only a vision: it cannot be hit");
 
         // The gift: a chest with the whole haul (always the greataxe) and a wrapping present entity on top.
         ChestBlockEntity chest = null;

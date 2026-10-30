@@ -51,6 +51,18 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
             systemProperty 'coraline.collectorTests', 'true'
         }
+        canopyBreakerTest {
+            type = 'gameTestServer'
+            gameDirectory = file('build/canopy-gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'coraline.canopyTests', 'true'
+        }
+        deadrootClubTest {
+            type = 'gameTestServer'
+            gameDirectory = file('build/deadroot-gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'coraline.deadrootTests', 'true'
+        }
         // Applies to all run configurations above.
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'

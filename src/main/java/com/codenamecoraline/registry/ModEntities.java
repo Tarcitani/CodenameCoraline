@@ -8,6 +8,9 @@ import com.codenamecoraline.entity.basilisk.WitherMistCloud;
 import com.codenamecoraline.entity.basilisk.MistFlask;
 import com.codenamecoraline.entity.lithophage.AmberShard;
 import com.codenamecoraline.entity.lithophage.Lithophage;
+import com.codenamecoraline.entity.canopy.CanopyBreaker;
+import com.codenamecoraline.entity.macaque.BarkMacaque;
+import com.codenamecoraline.entity.spirit.BossSpirit;
 import com.codenamecoraline.entity.collector.CollectorGift;
 import com.codenamecoraline.entity.collector.CollectorSleigh;
 import com.codenamecoraline.entity.collector.GiftMimic;
@@ -94,6 +97,30 @@ public final class ModEntities {
                     .noSave()
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<CanopyBreaker>> CANOPY_BREAKER = ENTITY_TYPES.register("canopy_breaker",
+            id -> EntityType.Builder.of(CanopyBreaker::new, MobCategory.MONSTER)
+                    .sized(CanopyBreaker.WIDTH, CanopyBreaker.HEIGHT).eyeHeight(CanopyBreaker.EYE_HEIGHT)
+                    .clientTrackingRange(10)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<BarkMacaque>> BARK_MACAQUE = ENTITY_TYPES.register("bark_macaque",
+            id -> EntityType.Builder.of(BarkMacaque::new, MobCategory.MONSTER)
+                    .sized(BarkMacaque.WIDTH, BarkMacaque.HEIGHT).eyeHeight(0.6F)
+                    .clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    /** The ghosts the bosses leave when they die (visual only, never saved). */
+    public static final DeferredHolder<EntityType<?>, EntityType<BossSpirit>> CANOPY_BREAKER_SPIRIT = ENTITY_TYPES.register("canopy_breaker_spirit",
+            id -> EntityType.Builder.<BossSpirit>of(BossSpirit::new, MobCategory.MISC)
+                    .sized(CanopyBreaker.WIDTH, CanopyBreaker.HEIGHT).noSave().fireImmune()
+                    .clientTrackingRange(10)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+    public static final DeferredHolder<EntityType<?>, EntityType<BossSpirit>> LAST_GIFT_COLLECTOR_SPIRIT = ENTITY_TYPES.register("last_gift_collector_spirit",
+            id -> EntityType.Builder.<BossSpirit>of(BossSpirit::new, MobCategory.MISC)
+                    .sized(LastGiftCollector.COLLISION_WIDTH, LastGiftCollector.COLLISION_HEIGHT).noSave().fireImmune()
+                    .clientTrackingRange(10)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
     private ModEntities() {}
 
     public static void register(IEventBus modEventBus) {
@@ -108,6 +135,10 @@ public final class ModEntities {
         event.put(LITHOPHAGE.get(), Lithophage.createAttributes().build());
         event.put(LAST_GIFT_COLLECTOR.get(), LastGiftCollector.createAttributes().build());
         event.put(GIFT_MIMIC.get(), GiftMimic.createAttributes().build());
+        event.put(CANOPY_BREAKER.get(), CanopyBreaker.createAttributes().build());
+        event.put(BARK_MACAQUE.get(), BarkMacaque.createAttributes().build());
+        event.put(CANOPY_BREAKER_SPIRIT.get(), BossSpirit.createAttributes().build());
+        event.put(LAST_GIFT_COLLECTOR_SPIRIT.get(), BossSpirit.createAttributes().build());
     }
 
     private static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {
