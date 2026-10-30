@@ -63,6 +63,12 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
             systemProperty 'coraline.deadrootTests', 'true'
         }
+        babyDragonTest {
+            type = 'gameTestServer'
+            gameDirectory = file('build/baby-dragon-gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'coraline.babyDragonTests', 'true'
+        }
         // Applies to all run configurations above.
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'

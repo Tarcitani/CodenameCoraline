@@ -1,0 +1,12 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#codenamecoraline:baby_dragon_habitat",
+  "spawners": [
+    {
+      "type": "codenamecoraline:baby_dragon",
+      "weight": 6,
+      "minCount": 1,
+      "maxCount": 2
+    }
+  ]
+}

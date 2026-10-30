@@ -134,3 +134,21 @@ Estado da fundação, verificações realizadas e pendências. Não contém esco
 - Quebra-Copas: intro de 6 s (olhar, bater no peito com tambor, rugido, título) com câmera, tarjas e tremor no padrão do Cobrador.
 - Morte do Quebra-Copas e do Cobrador: espírito translúcido e azul subindo do corpo.
 - GameTestServer direto: ver `docs/DEVELOPMENT.md`. **Não verificado no jogo:** câmera e título da intro, transparência e cor do espírito, sensação do voo.
+
+## Cegueira do Basilisco — 2026-10-29
+
+- Névoa aplica Cegueira por cinco segundos junto de Decomposição III. A poção existente cura e bloqueia ambos durante os mesmos três/oito minutos; nomes e Bestiário atualizados em português e inglês.
+- `.\gradlew.bat build runBasiliskTest`: **VALIDADO**, todos os testes obrigatórios aprovados, incluindo Cegueira na névoa, paredes, cura, proteção, expiração e leite.
+
+## Dragão Bebê Companheiro — 2026-10-29
+
+- Implementados `baby_dragon`, domesticação/cura por salmão, comandos de ficar/seguir/defesa, navegação terrestre/aérea, órbita variável, ombro preservando a entidade original, saída segura, persistência e centelhas defensivas sem fogo amigo, incêndios ou destruição. Spawn raro em florestas/montanhas/taigas/bosques e ovo nas abas criativas.
+- Modelo original com quatro patas, mandíbula, olhos, chifres, asas membranosas articuladas, cauda e atlas detalhado. Doze animações nativas, oito sons com eventos vanilla, capítulo de seis páginas-base em pt-BR/en-US e três gravuras exportadas da geometria real. Índice do Bestiário ajustado para o sexto capítulo.
+- Gradle `build` e `runBabyDragonTest`: **VALIDADOS**, suíte final **31/31 em três execuções consecutivas**. Regressões: Basilisco 17/17, Litófago 11/11, Cobrador 18/18, Quebra-Copas 27/27 e Porrete 9/9, com pelo menos duas aprovações de cada suíte. Falhas intermitentes anteriores registradas no relatório; testes antigos preservados.
+- Duas sessões reais de `runClient` em mundo descartável: modelo/textura, voo, domesticação, felicidade, ombro e permanência ao reabrir, primeira pessoa desobstruída e capítulo completo nos dois idiomas conferidos. Prévias estáticas e animadas geradas. **Ainda dependem de avaliação:** áudio, combate prolongado/balanceamento, terreno florestal denso e multijogador sob latência. A expansão do peito no carregamento foi validada offline após a inspeção.
+- Especificação: [design/baby_dragon.md](design/baby_dragon.md). Matriz de conformidade, testes, decisões, arquivos e evidências: [design/baby_dragon_validation.md](design/baby_dragon_validation.md).
+
+
+- Correcao posterior do Dragao Bebe: removido impulso lateral no ombro e conflito do disparo com o evento vanilla do Sniffer; dois testes reproduziram os defeitos e a versao corrigida passou **33/33 GameTests e build**. Detalhes em [relatorio](design/baby_dragon_validation.md).
+
+- Dragao Bebe agora auxilia contra mobs pacificos atingidos pelo dono, incluindo galinhas, vacas e porcos, preservando aliados e animais sem envolvimento. Build e **38/38 GameTests aprovados**.

@@ -68,6 +68,15 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_PANT = register("entity.canopy_breaker.pant");
     public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_CHEST_BEAT = register("entity.canopy_breaker.chest_beat");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> DRAGON_AMBIENT = register("entity.baby_dragon.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DRAGON_HAPPY = register("entity.baby_dragon.happy");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DRAGON_HURT = register("entity.baby_dragon.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DRAGON_DEATH = register("entity.baby_dragon.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DRAGON_FLAP = register("entity.baby_dragon.flap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DRAGON_LAND = register("entity.baby_dragon.land");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DRAGON_CHARGE = register("entity.baby_dragon.charge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> DRAGON_SHOOT = register("entity.baby_dragon.shoot");
+
     private ModSounds() {}
 
     public static final DeferredHolder<SoundEvent, SoundEvent> MACAQUE_AMBIENT = register("entity.bark_macaque.ambient");

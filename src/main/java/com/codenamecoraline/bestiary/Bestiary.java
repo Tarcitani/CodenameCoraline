@@ -52,7 +52,13 @@ public final class Bestiary {
             BestiaryPage.sketch("combat", "canopy_breaker_combat", 112, 72),
             BestiaryPage.sketch("spoils", "canopy_breaker_spoils", 112, 64)));
 
-    public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK, LITHOPHAGE, LAST_GIFT_COLLECTOR, CANOPY_BREAKER);
+    public static final BestiaryEntry BABY_DRAGON = new BestiaryEntry("baby_dragon", List.of(
+            BestiaryPage.sketch("intro", "baby_dragon_anatomy", 112, 80),
+            BestiaryPage.text("habitat"), BestiaryPage.text("behavior"), BestiaryPage.text("taming"),
+            BestiaryPage.sketch("companion", "baby_dragon_flight", 112, 72),
+            BestiaryPage.sketch("defense", "baby_dragon_defense", 112, 72)));
+
+    public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK, LITHOPHAGE, LAST_GIFT_COLLECTOR, CANOPY_BREAKER, BABY_DRAGON);
 
     private Bestiary() {}
 }

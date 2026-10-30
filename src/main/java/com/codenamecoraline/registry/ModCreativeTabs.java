@@ -28,6 +28,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.LAST_GIFT_COLLECTOR_SPAWN_EGG.get());
                         output.accept(ModItems.CANOPY_BREAKER_SPAWN_EGG.get());
                         output.accept(ModItems.BARK_MACAQUE_SPAWN_EGG.get());
+                        output.accept(ModItems.BABY_DRAGON_SPAWN_EGG.get());
                     })
                     .build());
 
@@ -63,6 +64,7 @@ public final class ModCreativeTabs {
             event.accept(ModItems.LAST_GIFT_COLLECTOR_SPAWN_EGG.get());
             event.accept(ModItems.CANOPY_BREAKER_SPAWN_EGG.get());
             event.accept(ModItems.BARK_MACAQUE_SPAWN_EGG.get());
+            event.accept(ModItems.BABY_DRAGON_SPAWN_EGG.get());
         }
     }
 

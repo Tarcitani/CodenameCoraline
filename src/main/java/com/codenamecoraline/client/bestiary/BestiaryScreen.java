@@ -61,10 +61,11 @@ public final class BestiaryScreen extends Screen {
         int left = this.left();
         int top = this.top();
         this.indexButtons.clear();
+        int indexStep = Math.min(24, (BOOK_HEIGHT - 24 - 48 - 18) / Math.max(1, Bestiary.ENTRIES.size() - 1));
         for (int i = 0; i < Bestiary.ENTRIES.size(); i++) {
             int entry = i;
             Button button = Button.builder(Component.translatable(Bestiary.ENTRIES.get(i).nameKey()), b -> this.openEntry(entry))
-                    .pos(left + RIGHT_PAGE_X, top + 54 + i * 24).size(PAGE_WIDTH, 20).build();
+                    .pos(left + RIGHT_PAGE_X, top + 48 + i * indexStep).size(PAGE_WIDTH, 18).build();
             this.indexButtons.add(this.addRenderableWidget(button));
         }
         this.forwardButton = this.addRenderableWidget(new PageButton(left + BOOK_WIDTH - 44, top + BOOK_HEIGHT - 20, true, b -> this.turn(1), true));
