@@ -142,6 +142,7 @@ public final class BasiliskGameTests {
         float health = target.getHealth();
         helper.runAfterDelay(5, () -> {
             helper.assertTrue(target.hasEffect(MobEffects.WITHER), "mist applies vanilla Wither immediately");
+            helper.assertTrue(target.hasEffect(MobEffects.BLINDNESS), "mist applies Blindness");
             helper.assertValueEqual(target.getEffect(MobEffects.WITHER).getAmplifier(), 2, "Wither III");
             helper.assertValueEqual(target.getHealth(), health - 1, "only the first vanilla damage tick, without an instant lethal proc");
         });
@@ -175,6 +176,7 @@ public final class BasiliskGameTests {
         helper.getLevel().addFreshEntity(cloud);
         helper.runAfterDelay(25, () -> {
             helper.assertTrue(!target.hasEffect(MobEffects.WITHER), "solid wall blocks exposure");
+            helper.assertTrue(!target.hasEffect(MobEffects.BLINDNESS), "solid wall blocks Blindness");
             helper.assertValueEqual(target.getHealth(), target.getMaxHealth(), "wall protects health");
             helper.succeed();
         });
@@ -183,15 +185,19 @@ public final class BasiliskGameTests {
     private static void potion(GameTestHelper helper) {
         LivingEntity target = victim(helper);
         target.addEffect(new MobEffectInstance(MobEffects.WITHER, 200));
+        target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200));
         ItemStack remainder = ModPotions.resistancePotion().finishUsingItem(helper.getLevel(), target);
         helper.assertTrue(remainder.is(Items.GLASS_BOTTLE), "drinking returns a glass bottle");
         helper.assertTrue(target.hasEffect(ModEffects.WITHER_RESISTANCE), "drinking grants resistance");
         helper.assertValueEqual(target.getEffect(ModEffects.WITHER_RESISTANCE).getDuration(), 3600, "three-minute duration");
         helper.assertTrue(!target.hasEffect(MobEffects.WITHER), "potion cures existing Wither");
+        helper.assertTrue(!target.hasEffect(MobEffects.BLINDNESS), "potion cures existing Blindness");
+        helper.assertTrue(!target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 200)), "protection rejects Blindness from any source");
         helper.assertTrue(!target.addEffect(new MobEffectInstance(MobEffects.WITHER, 200, 2)), "protection rejects Wither from any source");
         mist(helper, target);
         helper.runAfterDelay(75, () -> {
             helper.assertTrue(!target.hasEffect(MobEffects.WITHER), "potion blocks Basilisk mist");
+            helper.assertTrue(!target.hasEffect(MobEffects.BLINDNESS), "potion blocks mist Blindness");
             helper.assertValueEqual(target.getHealth(), target.getMaxHealth(), "protected victim takes no Wither damage");
             helper.succeed();
         });
@@ -201,9 +207,11 @@ public final class BasiliskGameTests {
         LivingEntity target = victim(helper);
         target.addEffect(new MobEffectInstance(ModEffects.WITHER_RESISTANCE, 20));
         helper.assertTrue(!target.addEffect(new MobEffectInstance(MobEffects.WITHER, 100)), "resistance initially blocks Wither");
+        helper.assertTrue(!target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100)), "resistance initially blocks Blindness");
         helper.runAfterDelay(25, () -> {
             helper.assertTrue(!target.hasEffect(ModEffects.WITHER_RESISTANCE), "protection expires");
             helper.assertTrue(target.addEffect(new MobEffectInstance(MobEffects.WITHER, 100)), "Wither applies again after expiry");
+            helper.assertTrue(target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100)), "Blindness applies again after expiry");
             helper.succeed();
         });
     }
@@ -214,6 +222,7 @@ public final class BasiliskGameTests {
         new ItemStack(Items.MILK_BUCKET).finishUsingItem(helper.getLevel(), target);
         helper.assertTrue(!target.hasEffect(ModEffects.WITHER_RESISTANCE), "vanilla milk removes protection");
         helper.assertTrue(target.addEffect(new MobEffectInstance(MobEffects.WITHER, 100)), "Wither applies after milk");
+        helper.assertTrue(target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 100)), "Blindness applies after milk");
         helper.succeed();
     }
 

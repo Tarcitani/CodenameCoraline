@@ -16,10 +16,11 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
-/** Lingering breath applies vanilla Wither; solid walls block exposure. */
+/** Lingering breath applies vanilla Wither and Blindness; solid walls block exposure. */
 public final class WitherMistCloud extends AreaEffectCloud {
     public static final DustParticleOptions GOLD = new DustParticleOptions(0xC59B27, 0.8F);
     public static final int WITHER_DURATION = 100;
+    public static final int BLINDNESS_DURATION = 100;
     public static final int WITHER_AMPLIFIER = 2; // Zero-based: Wither III.
     public WitherMistCloud(EntityType<? extends WitherMistCloud> type, Level level) {
         super(type, level);
@@ -58,6 +59,7 @@ public final class WitherMistCloud extends AreaEffectCloud {
                 Vec3 to = entity.position().add(0, Math.min(0.5, entity.getBbHeight() * 0.5), 0);
                 if (level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER,
                         ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, BLINDNESS_DURATION), this.getOwner());
                     // Repeated refreshes would reset vanilla Wither's duration-based damage clock.
                     // Let the current instance run, including stronger Wither from other sources.
                     MobEffectInstance current = entity.getEffect(MobEffects.WITHER);

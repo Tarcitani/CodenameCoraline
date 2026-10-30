@@ -27,7 +27,7 @@ O mob escolhe jogadores a menos de dez blocos, salta para atacar e circula a ví
 
 O sopro tem antecipação audível de 24 ticks (1,2 segundo). Ao terminar, emite um cone de partículas e deixa uma `WitherMistCloud` de raio 3,5 por 100 ticks (cinco segundos).
 
-- A névoa aplica **Decomposição III (Wither) por 100 ticks**, o efeito vanilla que escurece os corações e causa dano ao longo do tempo, podendo matar.
+- A névoa aplica **Cegueira e Decomposição III (Wither) por 100 ticks**, o efeito vanilla que escurece os corações e causa dano ao longo do tempo, podendo matar.
 - A detecção ocorre na entrada e a cada dez ticks; paredes sólidas bloqueiam a exposição. Basiliscos e jogadores em criativo/espectador são excluídos.
 - Instâncias de Decomposição III ou superior terminam antes de nova aplicação; instâncias mais fracas são elevadas para III. Isso preserva o relógio de dano vanilla, que depende da duração restante: renovar a duração continuamente impediria o dano. Nuvens sobrepostas não aumentam a intensidade nem atrasam o dano; efeitos mais fortes de outras fontes são preservados.
 - Sair da névoa não remove uma Decomposição já aplicada. Ela termina naturalmente ou pode ser removida com leite. Mel e maçãs douradas seguem suas regras vanilla, sem cura especial deste mod.
@@ -69,7 +69,7 @@ Preparo no **suporte de poções vanilla**, abastecido com pó de blaze:
 - Não há receita de bancada. Tipos registrados em `Registries.POTION` e misturas via `RegisterBrewingRecipesEvent`/`PotionBrewing.Builder.addMix` usam o sistema nativo.
 - Pólvora e bafo de dragão seguem as conversões vanilla para versões arremessável e persistente. A extensão por redstone preserva o recipiente.
 - A poção concede `codenamecoraline:wither_resistance` por **3600 ticks (três minutos)** ou **9600 ticks (oito minutos)** na versão estendida; beber devolve frasco de vidro.
-- Remove Decomposição existente ao beber e bloqueia novas aplicações enquanto durar, inclusive Decomposição III e efeitos de outras fontes como o Wither. Não concede Resistência genérica a outros danos.
+- Remove Decomposição e Cegueira existentes ao beber e bloqueia novas aplicações de ambos os efeitos enquanto durar, inclusive Decomposição III e efeitos de outras fontes como o Wither. Não concede Resistência genérica a outros danos.
 - Leite remove a proteção; após expirar, Decomposição volta a ser aplicável.
 - Perna, olho e rabo aparecem em Ingredientes do criativo. As poções são listadas automaticamente na aba vanilla de consumíveis a partir do registro nativo, com nomes nos dois idiomas.
 
