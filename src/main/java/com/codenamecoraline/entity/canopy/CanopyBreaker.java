@@ -120,6 +120,14 @@ public class CanopyBreaker extends Monster {
     public static final float BACKHAND_DAMAGE = 4.0F;
     public static final double BACKHAND_REACH = 3.2D;
 
+    public static final int SHIELD_BREAK_PREP = 16;
+    public static final int SHIELD_BREAK_EXEC = 14;
+    public static final int SHIELD_BREAK_HIT_TICK = 8;
+    public static final int SHIELD_BREAK_RECOVER = 20;
+    public static final float SHIELD_BREAK_DAMAGE = 12.0F;
+    public static final double SHIELD_BREAK_REACH = 3.8D;
+    public static final double SHIELD_BREAK_KNOCKBACK = 1.2D;
+
     public static final int DROP_PREP = 14;
     public static final int DROP_RECOVER = 26;
     public static final float DROP_DAMAGE = 8.0F;
@@ -143,7 +151,7 @@ public class CanopyBreaker extends Monster {
         JUMP_PREPARATION, AIRBORNE, LANDING, LAND_RECOVERY, FALL_RECOVERY, STAGGER, TRANSITION, DYING, DEAD
     }
 
-    public enum Attack { NONE, TRUNK_SLAM, CANOPY_SWEEP, BRUTE_LUNGE, CANOPY_DROP, BACKHAND, INTIMIDATE }
+    public enum Attack { NONE, TRUNK_SLAM, CANOPY_SWEEP, BRUTE_LUNGE, CANOPY_DROP, BACKHAND, SHIELD_BREAK, INTIMIDATE }
 
     public enum Phase { PREPARE, EXECUTE, RECOVER }
 
@@ -1181,6 +1189,7 @@ public class CanopyBreaker extends Monster {
             case CANOPY_SWEEP -> 32;
             case BRUTE_LUNGE -> 64;
             case BACKHAND -> 42;
+            case SHIELD_BREAK -> 48;
             case INTIMIDATE -> 480;
             case CANOPY_DROP -> 200;
             case NONE -> 0;
@@ -1264,6 +1273,7 @@ public class CanopyBreaker extends Monster {
             case CANOPY_SWEEP -> this.setAnim(this.sweepLeft ? CanopyAnim.ATTACK_CANOPY_SWEEP_PREPARE_LEFT : CanopyAnim.ATTACK_CANOPY_SWEEP_PREPARE_RIGHT);
             case BRUTE_LUNGE -> this.setAnim(CanopyAnim.ATTACK_BRUTE_LUNGE_PREPARE);
             case BACKHAND -> this.setAnim(CanopyAnim.ATTACK_BACKHAND_PREPARE);
+            case SHIELD_BREAK -> this.setAnim(CanopyAnim.ATTACK_BACKHAND_PREPARE);  // Use same prepare as backhand
             case INTIMIDATE -> {
                 this.setAnim(CanopyAnim.INTIMIDATE_ROAR);
                 this.playSound(ModSounds.CANOPY_ROAR_ALERT.get(), 2.4F, 0.7F);
@@ -1271,7 +1281,7 @@ public class CanopyBreaker extends Monster {
             default -> {
             }
         }
-        if (type != Attack.INTIMIDATE && type != Attack.BACKHAND && this.roarCooldown <= 0) {
+        if (type != Attack.INTIMIDATE && type != Attack.BACKHAND && type != Attack.SHIELD_BREAK && this.roarCooldown <= 0) {
             this.roarCooldown = 100;
             this.playSound(ModSounds.CANOPY_ROAR_ATTACK.get(), 1.7F, 0.9F);
         }
@@ -1290,6 +1300,7 @@ public class CanopyBreaker extends Monster {
             case CANOPY_SWEEP -> SWEEP_PREP;
             case BRUTE_LUNGE -> LUNGE_PREP;
             case BACKHAND -> BACKHAND_PREP;
+            case SHIELD_BREAK -> SHIELD_BREAK_PREP;
             case INTIMIDATE -> INTIMIDATE_TICKS;
             default -> 1;
         };
@@ -1301,6 +1312,7 @@ public class CanopyBreaker extends Monster {
             case CANOPY_SWEEP -> SWEEP_EXEC;
             case BRUTE_LUNGE -> LUNGE_EXEC;
             case BACKHAND -> BACKHAND_EXEC;
+            case SHIELD_BREAK -> SHIELD_BREAK_EXEC;
             default -> 1;
         };
     }
@@ -1311,6 +1323,7 @@ public class CanopyBreaker extends Monster {
             case CANOPY_SWEEP -> SWEEP_RECOVER;
             case BRUTE_LUNGE -> LUNGE_RECOVER;
             case BACKHAND -> BACKHAND_RECOVER;
+            case SHIELD_BREAK -> SHIELD_BREAK_RECOVER;
             default -> 1;
         };
     }
@@ -1328,6 +1341,7 @@ public class CanopyBreaker extends Monster {
             case CANOPY_SWEEP -> sameLevel && horizontal <= SWEEP_REACH + 2.2D;
             case BRUTE_LUNGE -> sameLevel && horizontal <= 12.5D && this.getSensing().hasLineOfSight(target);
             case BACKHAND -> sameLevel && horizontal <= BACKHAND_REACH + 1.6D;
+            case SHIELD_BREAK -> sameLevel && horizontal <= SHIELD_BREAK_REACH + 1.8D;
             case INTIMIDATE -> horizontal <= 20.0D;
             default -> true;
         };
