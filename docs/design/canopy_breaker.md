@@ -66,9 +66,13 @@ Todo golpe tem **preparação** (telegráfica), **execução** e **recuperação
 | Bote Bruto (`BRUTE_LUNGE`) | 6 | 10 | 12 | 18 | avanço a 0,85 b/tick, de 4,5 a 10 blocos, exige linha de visão |
 | Revés (`BACKHAND`) | 4 | 10 | 6 (golpe no tick 3) | 10 | alcance 3,2, para quem chega perto demais |
 | Queda da Copa (`CANOPY_DROP`) | 8 | 14 | salto balístico | 26 | só após descida real, círculo de raio 3,4 marcado no chão; uma vez por subida |
+| Agarrar e Arremessar (`GRAB_THROW`) | 3 + 8 | 18 | 40 (a mão fecha no tick 6, o arremesso no tick 24) | 26 | alcance 3,6, arco de 120°; **nenhum escudo bloqueia a mão**. A vítima vira passageira dele, é erguida acima da cabeça e lançada para frente (velocidade 1,7, subida 1,1: sobe vários blocos e cai longe). Sem ninguém ao alcance quando a mão fecha, ele vai direto para a recuperação aberta. Um golpe pesado que o cambaleie ou uma transição o fazem soltar |
+| Soco no Chão (`POUND`) | 9 | 22 | 14 (impacto no tick 6) | 22 | onda de choque de raio 4,0 a 1,5 bloco à frente; todos ao redor levam o dano e são **jogados para o alto** (subida 0,9) |
 | Rugido Intimidador (`INTIMIDATE`) | 0 | 30 | - | - | rugido e partículas; **não retira o controle do jogador** |
 
-- Escolha ponderada (`pickAttack`): respeita alcance, altura, linha de visão, recargas (50, 44, 90, 60, 200 e 480 ticks) e evita repetir o ataque anterior. Pesos: Revés 5 (7 na fúria), Pancada 6, Varredura 5, Bote 5, Rugido 1.
+- Escolha ponderada (`pickAttack`): respeita alcance, altura, linha de visão, recargas (Pancada 50, Varredura 44, Bote 90, Revés 60, Agarrão 110, Soco 90, Queda 200 e Rugido 480 ticks) e evita repetir o ataque anterior. Pesos: Revés 5 (7 na fúria), Agarrão 4 (6 a partir do estágio 2; **triplicado contra quem bloqueia com escudo**), Pancada 6, Varredura 5, Soco 3 (6 na fúria), Bote 5, Rugido 1.
+- **Escudos.** Todo golpe dele que acerta quem está bloqueando **quebra a guarda**: o escudo entra em recarga de 5 s, o jogador é abaixado (animação e som vanilla de escudo quebrado) e o golpe acerta por inteiro (`CanopyBreaker.breakGuard`). O Agarrão ignora o escudo.
+- **Pegada do porrete.** A mão segura a **ponta do cabo** (empunhadura de casca) e o porrete aponta para fora do corpo, com a cabeça na outra extremidade; o ângulo de uma pose é a direção da cabeça. Na guarda ele o segura para fora e para frente.
 - Alvo (`chooseTarget`): o último jogador que o feriu (por 100 ticks); senão o mais próximo; mantém o alvo atual com histerese de 4 blocos.
 - O porrete é sacado (`DRAW_CLUB_*`, 32 ticks) quando o alvo está a menos de 24 blocos ou quando ele é ferido; o porrete só troca de mão no meio da animação.
 
@@ -84,6 +88,8 @@ O corpo tem uma máquina de estados (`Activity`): `INTRO, GROUND, DRAW_CLUB, ATT
 6. **Salto balístico.** O plano (`planJump`) procura o menor tempo de voo (8 a 44 ticks) cuja velocidade horizontal (até 1,15) e vertical (0,3 a 1,1) são permitidas e cuja trajetória inteira, em meios ticks e com a caixa real do corpo, está livre de blocos sólidos. A cada tick de preparação o plano é recalculado; **se o destino ficou inválido, o salto é cancelado** e o boss desce pelo tronco. Em voo a velocidade horizontal é corrigida suavemente rumo ao pouso.
 7. **Pouso.** `LANDING` decide por distância e altura: leve (copa), pesado (chão) ou impacto da Queda da Copa (dano em área uma única vez). Um salto que não saiu do poleiro conta como falho: uma nova tentativa e, na segunda falha, desce pelo tronco.
 8. **Retorno ao chão.** Cancelar a rota no alto reagarra o tronco e usa `CLIMB_DOWN` (`abortRoute`); nunca há reaparição em outro lugar.
+
+9. **Salto de chão.** Sem árvore nenhuma, ele também salta: o mesmo plano balístico, mas partindo do chão (`startGroundLeap`). Em terreno aberto, de 6,5 a 15 blocos de distância, e **contra um alvo em um pilar ou saliência** (2,4 a 6 blocos acima, onde ele não alcança nem sobe), ele agacha, voa e pousa com a mesma pancada da Queda da Copa. Nunca sem trajetória livre, nunca com teletransporte. O flanco por árvores vale desde o estágio 1.
 
 Limites medidos: saltos práticos de até cerca de 10 a 12 blocos horizontais. Em florestas com copas muito densas ao redor do pouso o plano pode não achar trajetória livre; nesse caso o boss luta no chão.
 
@@ -216,6 +222,13 @@ Gerada por `tools/generate_canopy_animation_bible.py` a partir de `CanopyAnim` e
 | `attack_backhand_prepare` | não | 0.50 | ATTACK prepare: Backhand | grunt | target lost (cancel) | attack_backhand_execute |
 | `attack_backhand_execute` | não | 0.30 | ATTACK execute: Backhand | DAMAGE at contact tick | hurt does not cancel | attack_backhand_recovery |
 | `attack_backhand_recovery` | não | 0.50 | ATTACK recover: Backhand | none | none | club_guard_idle |
+| `attack_grab_prepare` | não | 0.90 | ATTACK prepare: Grab and Throw (crouches, free hand reaching) | none (telegraphed, cannot be blocked) | target leaves reach, hurt stagger | attack_grab_lift |
+| `attack_grab_lift` | não | 1.20 | ATTACK execute: Grab and Throw (the hand closes and lifts the target overhead) | grab roar, squeeze damage, the target is carried | heavy hit staggers him and he lets go | attack_grab_throw, attack_grab_recovery |
+| `attack_grab_throw` | não | 0.80 | ATTACK execute: Grab and Throw (the target is hurled) | throw sound, thrown damage and a long launch | none | attack_grab_recovery |
+| `attack_grab_recovery` | não | 1.30 | ATTACK recover: Grab and Throw (panting, open) | none | heavy hit staggers him | club_guard_idle |
+| `attack_pound_prepare` | não | 1.10 | ATTACK prepare: Fist Pound (rears up, both fists and the club high) | none (telegraphed) | target leaves reach, hurt stagger | attack_pound_execute |
+| `attack_pound_execute` | não | 0.70 | ATTACK execute: Fist Pound (both fists drive into the ground) | heavy thud, shockwave, everyone around is thrown up | none | attack_pound_recovery |
+| `attack_pound_recovery` | não | 1.10 | ATTACK recover: Fist Pound (leaning on his fists, open) | none | heavy hit staggers him | club_guard_idle |
 
 #### G. roars
 
@@ -223,6 +236,7 @@ Gerada por `tools/generate_canopy_animation_bible.py` a partir de `CanopyAnim` e
 |---|---|---|---|---|---|---|
 | `roar_idle` | não | 1.20 | GROUND, distant short roar | roar sound | any action | idle_breathing |
 | `roar_aggro` | não | 1.60 | target sighted / intro | roar sound (cooldown) | death | club_guard_idle |
+| `intro_chest_beat` | não | 2.40 | INTRO: upright, beating his chest like a gorilla | a chest-beat drum on every blow | none (invulnerable) | roar_aggro |
 | `roar_attack` | não | 0.50 | start of a heavy attack | roar sound (cooldown) | death | attack prepare |
 | `roar_phase_two` | não | 2.00 | stage 2 transition | roar sound | death | club_guard_idle |
 | `roar_hurt` | não | 0.50 | heavy damage taken | roar sound (cooldown) | death | club_guard_idle |
@@ -257,7 +271,7 @@ Gerada por `tools/generate_canopy_animation_bible.py` a partir de `CanopyAnim` e
 | `death_impact` | não | 0.50 | DYING 3 | heavy thud, leaves | none | death_final |
 | `death_final` | não | 1.00 | DYING 4 / DEAD | none | none | removed |
 
-Total: **88 animações**, todas com keyframes definidos.
+Total: **96 animações**, todas com keyframes definidos.
 
 <!-- ANIMATION-BIBLE:END -->
 
@@ -292,3 +306,17 @@ Renderizações offline do modelo real (poses estáticas, sem movimento) usadas 
 Os 8 testes dos lacaios (`macaque_*` e `minions_*`) cobrem registro e animações, salto e mordida única sem teletransporte, subida de tronco até um alvo alto, vínculo (boss e lacaios nunca se ferem), chamado de abertura com e sem ídolo, reforços por estágio com o limite de quatro, saída dos lacaios com a morte do boss e remoção de órfãos.
 
 Como o Gradle não executa no shell do agente (ver `docs/DEVELOPMENT.md`), os testes foram rodados pelo GameTestServer direto. Rode no terminal: `.\gradlew.bat build`, `.\gradlew.bat runCanopyBreakerTest` e as demais tarefas de teste.
+
+### Golpes de gorila e pegada (testes)
+
+| Teste | O que prova |
+|---|---|
+| `canopy_club_is_held_by_the_handle_end` | a geometria do porrete: cabeça longe da mão (<= -24) e cabo terminando junto da mão (<= 6) |
+| `canopy_club_blows_break_the_guard` | `breakGuard` desarma um escudo levantado (recarga, jogador abaixado) e não faz nada sem guarda |
+| `canopy_grab_holds_and_throws_far` | a vítima é carregada acima dos pés dele, depois arremessada rápido e subindo, termina a mais de 7 blocos, leva aperto e arremesso, e as animações tocam em ordem |
+| `canopy_grab_missing_leaves_him_open` | sem alvo ao alcance o agarrão vai direto à recuperação, sem segurar nada |
+| `canopy_pound_throws_everyone_around` | o soco fere e joga para o alto os alvos ao redor e poupa o de fora |
+| `canopy_ground_leap_crosses_open_ground` | salto de 13 blocos de chão aberto: voa, pousa com pancada sobre o alvo, nunca teleporta |
+| `canopy_ground_leap_reaches_a_pillar` | salto para cima até o topo de um pilar de 3 blocos |
+
+Não coberto por teste: o caminho completo "golpe do boss encontra um jogador que bloqueia", porque o jogador de teste não entra nas buscas de entidades do nível.

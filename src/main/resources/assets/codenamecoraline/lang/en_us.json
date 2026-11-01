@@ -235,10 +235,10 @@
   "bestiary.codenamecoraline.canopy_breaker.stats.title": "Attributes and Stages",
   "bestiary.codenamecoraline.canopy_breaker.stats.body": "200 HP, 8 armor, speed 0.33 on the ground, 3.1 blocks tall. Stage 1 guards the forest floor. At 60% health he becomes the Canopy Hunter and takes to the trees: climbing trunks, crossing between canopies in real jumps and dropping on you. At 25% he becomes the Fury of the Timber: faster, with shorter pauses. Each change happens once.",
   "bestiary.codenamecoraline.canopy_breaker.strategy.title": "Fighting a Climber",
-  "bestiary.codenamecoraline.canopy_breaker.strategy.body": "He never swings at empty air: watch the club. Step out of the circle before a Trunk Slam lands, leave the arc of a Canopy Sweep, and stay out of reach of the lunge when his shoulders drop. When he climbs, he is committed: you can break the trunk he is on or wait for the Canopy Drop marker on the ground and leave it. The Intimidating Roar does not take control from you.",
+  "bestiary.codenamecoraline.canopy_breaker.strategy.body": "He never swings at empty air: watch the club. A shield will not save you: every blow of the club breaks the guard, and his free hand seizes whoever stays close, lifts them overhead and hurls them across the clearing. When he rears up with both fists, get away: the pound throws everyone around him into the air. He bounds across open ground and springs up at anyone on a pillar, so height is no refuge. When he climbs, he is committed: break the trunk he is on, or leave the mark of the Canopy Drop.",
   "bestiary.codenamecoraline.canopy_breaker.combat.title": "The Club in Motion",
   "bestiary.codenamecoraline.canopy_breaker.combat.caption": "Overhead slam and the mark on the ground.",
-  "bestiary.codenamecoraline.canopy_breaker.combat.body": "Trunk Slam 7, Canopy Sweep 5, Brute Lunge 6, Backhand 4, Canopy Drop 8 (once per climb, only after a real descent). Every blow has a visible wind-up and a recovery window in which he can be staggered by a heavy hit.",
+  "bestiary.codenamecoraline.canopy_breaker.combat.body": "Trunk Slam 7, Canopy Sweep 5, Brute Lunge 6, Backhand 4, Canopy Drop 8, Fist Pound 9 (throws you up), Grab and Throw 3 and 8 (a hand no shield can stop). Every blow has a visible wind-up and a recovery window in which he can be staggered by a heavy hit; a missed grab leaves him open.",
   "bestiary.codenamecoraline.canopy_breaker.spoils.title": "What the Canopy Gives",
   "bestiary.codenamecoraline.canopy_breaker.spoils.caption": "I: Club. II: Resin. III: Heartwood.",
   "bestiary.codenamecoraline.canopy_breaker.spoils.body": "On defeat, once: 60 XP, 2 to 4 Canopy Resin, 50% for a Heartwood Splinter and 30% for the Deadroot Club. The advancements Hollow Trunk, Something Answers, Felled Beast and Dead Root keep the rest of the story.",
@@ -301,5 +301,7 @@
   "subtitles.codenamecoraline.baby_dragon.flap": "Dragon flaps",
   "subtitles.codenamecoraline.baby_dragon.land": "Dragon lands",
   "subtitles.codenamecoraline.baby_dragon.charge": "Dragon draws fire",
-  "subtitles.codenamecoraline.baby_dragon.shoot": "Dragon shoots an ember"
+  "subtitles.codenamecoraline.baby_dragon.shoot": "Dragon shoots an ember",
+  "subtitles.codenamecoraline.entity.canopy_breaker.grab": "Canopy Breaker seizes prey",
+  "subtitles.codenamecoraline.entity.canopy_breaker.throw": "Canopy Breaker hurls something"
 }

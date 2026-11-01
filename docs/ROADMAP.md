@@ -152,3 +152,8 @@ Estado da fundação, verificações realizadas e pendências. Não contém esco
 - Correcao posterior do Dragao Bebe: removido impulso lateral no ombro e conflito do disparo com o evento vanilla do Sniffer; dois testes reproduziram os defeitos e a versao corrigida passou **33/33 GameTests e build**. Detalhes em [relatorio](design/baby_dragon_validation.md).
 
 - Dragao Bebe agora auxilia contra mobs pacificos atingidos pelo dono, incluindo galinhas, vacas e porcos, preservando aliados e animais sem envolvimento. Build e **38/38 GameTests aprovados**.
+
+## Quebra-Copas: golpes de gorila, guarda quebrada e salto de chão — 2026-10-31
+
+- Porrete segurado pela ponta do cabo, cabeça para fora (geometria, não só pose); golpes quebram a guarda do escudo; Agarrar e Arremessar e Soco no Chão com animações próprias; salto de chão (inclusive contra alvos em pilares) e flanco por árvores desde o estágio 1. Ver D-031.
+- GameTestServer direto: ver `docs/DEVELOPMENT.md`. **Não verificado no jogo:** animações em movimento, sensação do arremesso, comportamento em florestas reais, o caminho completo golpe -> escudo de jogador real.

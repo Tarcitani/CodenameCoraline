@@ -67,6 +67,8 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_LAND_HEAVY = register("entity.canopy_breaker.land_heavy");
     public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_PANT = register("entity.canopy_breaker.pant");
     public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_CHEST_BEAT = register("entity.canopy_breaker.chest_beat");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_GRAB = register("entity.canopy_breaker.grab");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CANOPY_THROW = register("entity.canopy_breaker.throw");
 
     public static final DeferredHolder<SoundEvent, SoundEvent> DRAGON_AMBIENT = register("entity.baby_dragon.ambient");
     public static final DeferredHolder<SoundEvent, SoundEvent> DRAGON_HAPPY = register("entity.baby_dragon.happy");

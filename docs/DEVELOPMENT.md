@@ -158,3 +158,14 @@ Os testes de servidor não medem frequência de geração em uma campanha de sob
 - `runClient`: **EXECUTADO**, duas sessões no diretório descartável `build/baby-dragon-preview`, com cópia do mundo dos testes. Modelo, textura, voo, felicidade/domesticação, ombro e persistência ao reabrir observados; primeira pessoa e índice corrigidos após inspeção. Capítulo completo nos dois idiomas conferido, com as três gravuras. Screenshots em `build/baby-dragon-preview/screenshots/`. Nenhum mundo de `run/saves/` usado.
 - **Não validados integralmente:** áudio, combate prolongado/balanceamento e sessão multijogador com dois clientes reais. A expansão discreta do peito na preparação foi adicionada após a sessão de cliente, validada pelo bake e prévias offline. Todas essas distinções constam no relatório.
 
+## Quebra-Copas: golpes de gorila e pegada do porrete — 2026-10-31
+
+- GameTestServer direto: Quebra-Copas 34/34 em 7 execuções seguidas (inclui geometria do porrete, guarda quebrada, agarrar e arremessar, soco no chão e salto de chão, também até um pilar); Porrete 9/9, Cobrador 18/18, Basilisco 17/17, Litófago 11/11.
+- Gradle e `runClient` não executados pelo agente; a pegada, as animações novas e a sensação do arremesso foram vistas apenas em renderizações estáticas do modelo real.
+
+## Quebra-Copas: lançamentos — 2026-10-31
+
+- Revés lança o jogador para trás (empuxo 1,0) e para cima (elevação 0,6), no sentido do golpe; Varredura e Pancada também elevam (0,35 e 0,3). Agarrar e Arremessar sobe mais (elevação 1,1); Soco no Chão joga para o alto (0,9).
+- GameTestServer direto: Quebra-Copas 35/35 em 3 execuções seguidas (novo teste: o revés realmente sobe e voa para trás, medido por deslocamento, não por velocidade instantânea, que o atrito do chão corta em um tick).
+- Não verificado no jogo: a altura e a distância reais dos lançamentos com o `runClient`.
+

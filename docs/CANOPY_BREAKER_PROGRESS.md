@@ -1,4 +1,6 @@
 # CanopyBreaker Improvements — Progress Report
+
+> **Correção (2026-10-31).** Este relatório marcou como completas etapas que, ao serem verificadas, estavam pela metade. Em particular: (1) a "correção visual" mudava só a pose CARRY e a geometria do porrete (a mão segurando perto da cabeça, com o cabo para trás) seguia errada; (2) `SHIELD_BREAK` nunca era sorteado e não desarmava escudo algum; (3) `GRAB_THROW` não agarrava, só causava dano com repulsão, e `GRAB_THROW`/`POUND` reaproveitavam animações do Bote e da Pancada; (4) o "pulo periódico" era um pulinho de 1 bloco a cada 12 a 18 ticks, e a probabilidade de flanquear por árvores no estágio 1 não valia porque a condição exigia o estágio 2. O que foi feito de fato: ver `docs/design/canopy_breaker.md`, D-031 em `docs/DECISIONS.md` e `docs/DEVELOPMENT.md`.
 **Date:** 2026-10-29 → 2026-11-01  
 **Session:** ✅ **COMPLETE** — All 4 phases implemented and tested
 

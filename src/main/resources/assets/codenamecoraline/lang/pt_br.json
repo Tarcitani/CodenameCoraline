@@ -235,10 +235,10 @@
   "bestiary.codenamecoraline.canopy_breaker.stats.title": "Atributos e Estágios",
   "bestiary.codenamecoraline.canopy_breaker.stats.body": "200 PV, 8 de armadura, velocidade 0,33 no chão, 3,1 blocos de altura. O estágio 1 guarda o chão da floresta. Com 60% de vida vira o Caçador da Copa e sobe nas árvores: escala troncos, cruza entre copas com saltos reais e despenca sobre você. Com 25% vira a Fúria da Madeira: mais rápido e com pausas curtas. Cada mudança acontece uma vez.",
   "bestiary.codenamecoraline.canopy_breaker.strategy.title": "Lutando contra um Escalador",
-  "bestiary.codenamecoraline.canopy_breaker.strategy.body": "Ele nunca golpeia o ar: observe o porrete. Saia do círculo antes da Pancada de Tronco, deixe o arco da Varredura da Copa e fique fora do alcance do bote quando os ombros dele baixarem. Quando ele sobe, está comprometido: quebre o tronco em que ele está ou espere a marca da Queda da Copa no chão e saia dela. O Rugido Intimidador não tira o seu controle.",
+  "bestiary.codenamecoraline.canopy_breaker.strategy.body": "Ele nunca golpeia o ar: observe o porrete. Escudo não salva: todo golpe do porrete quebra a guarda, e a mão livre agarra quem ficar perto, ergue acima da cabeça e arremessa para longe. Quando ele se erguer com os dois punhos, afaste-se: o soco joga todos ao redor para o alto. Ele salta pelo terreno aberto e pula em quem se esconde num pilar, então altura não é refúgio. Quando ele sobe, está comprometido: quebre o tronco em que ele está ou saia da marca da Queda da Copa.",
   "bestiary.codenamecoraline.canopy_breaker.combat.title": "O Porrete em Movimento",
   "bestiary.codenamecoraline.canopy_breaker.combat.caption": "Pancada por cima e a marca no chão.",
-  "bestiary.codenamecoraline.canopy_breaker.combat.body": "Pancada de Tronco 7, Varredura da Copa 5, Bote Bruto 6, Revés 4, Queda da Copa 8 (uma vez por subida, só após uma descida real). Todo golpe tem preparo visível e uma janela de recuperação em que um golpe pesado pode desequilibrá-lo.",
+  "bestiary.codenamecoraline.canopy_breaker.combat.body": "Pancada de Tronco 7, Varredura da Copa 5, Bote Bruto 6, Revés 4, Queda da Copa 8, Soco no Chão 9 (joga você para cima), Agarrar e Arremessar 3 e 8 (uma mão que nenhum escudo detém). Todo golpe tem preparo visível e uma janela de recuperação em que um golpe pesado pode desequilibrá-lo; um agarrão errado o deixa aberto.",
   "bestiary.codenamecoraline.canopy_breaker.spoils.title": "O que a Copa Entrega",
   "bestiary.codenamecoraline.canopy_breaker.spoils.caption": "I: Porrete. II: Resina. III: Cerne.",
   "bestiary.codenamecoraline.canopy_breaker.spoils.body": "Na derrota, uma vez: 60 XP, 2 a 4 Resinas da Copa, 50% de um Estilhaço de Cerne e 30% do Porrete de Raiz-Morta. As conquistas Tronco Oco, Algo Responde, Fera Derrubada e Raiz Morta guardam o resto da história.",
@@ -301,5 +301,7 @@
   "subtitles.codenamecoraline.baby_dragon.flap": "Dragão bate as asas",
   "subtitles.codenamecoraline.baby_dragon.land": "Dragão pousa",
   "subtitles.codenamecoraline.baby_dragon.charge": "Dragão inspira fogo",
-  "subtitles.codenamecoraline.baby_dragon.shoot": "Dragão lança uma centelha"
+  "subtitles.codenamecoraline.baby_dragon.shoot": "Dragão lança uma centelha",
+  "subtitles.codenamecoraline.entity.canopy_breaker.grab": "Quebra-Copas agarra a presa",
+  "subtitles.codenamecoraline.entity.canopy_breaker.throw": "Quebra-Copas arremessa algo"
 }

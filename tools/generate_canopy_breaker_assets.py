@@ -89,15 +89,20 @@ BOXES = [
     ("r_shin", "right_shin", -3, 0, -3, 6, 6, 6, "fur"),
     ("r_foot", "right_foot", -3.5, 0, -7, 7, 2, 10, "skin_foot"),
     # club in the hand (shaft + head + knots) and stowed on the back
-    ("club_shaft", "club_hand", -2, -6, -2, 4, 26, 4, "club"),
-    ("club_head", "club_hand", -4.5, -22, -4.5, 9, 16, 9, "club_head"),
-    ("club_knot_a", "club_hand", -6.5, -19, -1.5, 2, 3, 3, "club"),
-    ("club_knot_b", "club_hand", 4.5, -14, -2, 2, 3, 4, "club"),
-    ("club_root_a", "club_hand", -1, -26, -1, 2, 4, 2, "club"),
-    ("club_root_b", "club_hand", -4.5, -24, 2, 2, 3, 2, "club"),
-    ("back_shaft", "club_back", -2, -6, -2, 4, 26, 4, "club"),
-    ("back_head", "club_back", -4.5, -22, -4.5, 9, 16, 9, "club_head"),
-    ("back_knot", "club_back", -6.5, -19, -1.5, 2, 3, 3, "club"),
+    # The club points along -y from the hand (a pose's club angle is the direction of its head). The hand grips the butt
+    # end of the handle (wrapped in bark); the long handle and the head extend AWAY from the body, as a gorilla holds a branch.
+    ("club_grip", "club_hand", -2.5, -3, -2.5, 5, 6, 5, "bark"),
+    ("club_shaft", "club_hand", -2, -12, -2, 4, 16, 4, "club"),
+    ("club_head", "club_hand", -4.5, -26, -4.5, 9, 14, 9, "club_head"),
+    ("club_knot_a", "club_hand", -6.5, -23, -1.5, 2, 3, 3, "club"),
+    ("club_knot_b", "club_hand", 4.5, -18, -2, 2, 3, 4, "club"),
+    ("club_root_a", "club_hand", -1, -30, -1, 2, 4, 2, "club"),
+    ("club_root_b", "club_hand", -4.5, -28, 2, 2, 3, 2, "club"),
+    # the same club stowed on the back
+    ("back_grip", "club_back", -2.5, -3, -2.5, 5, 6, 5, "bark"),
+    ("back_shaft", "club_back", -2, -12, -2, 4, 16, 4, "club"),
+    ("back_head", "club_back", -4.5, -26, -4.5, 9, 14, 9, "club_head"),
+    ("back_knot", "club_back", -6.5, -23, -1.5, 2, 3, 3, "club"),
 ]
 
 

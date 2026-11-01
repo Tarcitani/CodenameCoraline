@@ -978,5 +978,39 @@
         "pitch": 1.4
       }
     ]
+  },
+  "entity.canopy_breaker.grab": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.grab",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ravager.attack",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 1.4
+      },
+      {
+        "name": "minecraft:entity.iron_golem.damage",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 1.0
+      }
+    ]
+  },
+  "entity.canopy_breaker.throw": {
+    "subtitle": "subtitles.codenamecoraline.entity.canopy_breaker.throw",
+    "sounds": [
+      {
+        "name": "minecraft:entity.iron_golem.attack",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 1.6
+      },
+      {
+        "name": "minecraft:entity.wind_charge.throw",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 1.0
+      }
+    ]
   }
 }

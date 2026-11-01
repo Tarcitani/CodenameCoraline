@@ -41,6 +41,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -92,7 +94,15 @@ public final class CanopyBreakerGameTests {
             Map.entry("minions_leave_with_dead_boss", CanopyBreakerGameTests::minionsLeaveWithDeadBoss),
             Map.entry("macaque_orphan_is_dismissed", CanopyBreakerGameTests::orphanMinionIsDismissed),
             Map.entry("minions_ground_opening_call", CanopyBreakerGameTests::groundOpeningCall),
-            Map.entry("canopy_intro_chest_beat_and_roar", CanopyBreakerGameTests::introChestBeatAndRoar)
+            Map.entry("canopy_intro_chest_beat_and_roar", CanopyBreakerGameTests::introChestBeatAndRoar),
+            Map.entry("canopy_club_is_held_by_the_handle_end", CanopyBreakerGameTests::clubIsHeldByTheHandleEnd),
+            Map.entry("canopy_club_blows_break_the_guard", CanopyBreakerGameTests::clubBlowsBreakTheGuard),
+            Map.entry("canopy_grab_holds_and_throws_far", CanopyBreakerGameTests::grabHoldsAndThrowsFar),
+            Map.entry("canopy_grab_missing_leaves_him_open", CanopyBreakerGameTests::grabIgnoresShieldsAndMissesOpenHim),
+            Map.entry("canopy_pound_throws_everyone_around", CanopyBreakerGameTests::poundThrowsEveryoneAround),
+            Map.entry("canopy_ground_leap_crosses_open_ground", CanopyBreakerGameTests::groundLeapCrossesOpenGround),
+            Map.entry("canopy_ground_leap_reaches_a_pillar", CanopyBreakerGameTests::groundLeapReachesAPillar),
+            Map.entry("canopy_backhand_throws_back_and_up", CanopyBreakerGameTests::backhandThrowsBackAndUp)
     );
 
     private CanopyBreakerGameTests() {}
@@ -471,6 +481,237 @@ public final class CanopyBreakerGameTests {
         helper.runAfterDelay(90, () -> {
             helper.assertValueEqual(b.getMinions(level).size(), 2, "and two arrive");
             helper.assertValueEqual(b.getMinionsSummoned(), 2, "exactly the two of the opening");
+            b.discard();
+            pig.discard();
+            helper.succeed();
+        });
+    }
+
+    // ------------------------------------------------------------------------------------------------ gorilla moves
+    /** A free pig with plenty of health, standing on the floor (gravity on, so a throw really flies). */
+    private static LivingEntity sturdyPig(GameTestHelper h, double x, double y, double z) {
+        var pig = h.spawnWithNoFreeWill(EntityType.PIG, new BlockPos((int) x, (int) y, (int) z));
+        pig.setPos(h.absoluteVec(new Vec3(x + 0.5D, y, z + 0.5D)));
+        pig.getAttribute(Attributes.MAX_HEALTH).setBaseValue(200.0D);
+        pig.setHealth(200.0F);
+        return pig;
+    }
+
+    private static void clubIsHeldByTheHandleEnd(GameTestHelper helper) {
+        var root = CanopyBreakerModel.createBodyLayer().bakeRoot();
+        float[] range = {Float.MAX_VALUE, -Float.MAX_VALUE};
+        root.visit(new PoseStack(), (pose, part, index, cube) -> {
+            if (part.contains("club_hand")) {
+                range[0] = Math.min(range[0], cube.minY);
+                range[1] = Math.max(range[1], cube.maxY);
+            }
+        });
+        // the club points along -y from the fist: the head is far out, the handle ends right at the hand
+        helper.assertTrue(range[0] <= -24.0F, "the head is far from the hand (top of the club at " + range[0] + ")");
+        helper.assertTrue(range[1] <= 6.0F, "the hand holds the butt end of the handle, nothing trails behind it (butt at " + range[1] + ")");
+        helper.succeed();
+    }
+
+    private static void clubBlowsBreakTheGuard(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        // a mock player is not in the level's entity lists, so a swing cannot find it: the guard break every club blow
+        // makes (CanopyBreaker.strike calls breakGuard first) is exercised directly
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        ItemStack shield = new ItemStack(Items.SHIELD);
+        player.setItemInHand(InteractionHand.OFF_HAND, shield);
+        helper.assertTrue(!CanopyBreaker.breakGuard(level, player), "a player who is not blocking has no guard to break");
+        player.startUsingItem(InteractionHand.OFF_HAND);
+        for (int i = 0; i < 8; i++) {
+            player.tick(); // the shield needs a few ticks to come up
+        }
+        helper.assertTrue(player.isBlocking(), "the player is blocking with the shield");
+        helper.assertTrue(CanopyBreaker.breakGuard(level, player), "the blow breaks the guard");
+        helper.assertTrue(player.getCooldowns().isOnCooldown(shield), "the shield is on cooldown");
+        helper.assertTrue(!player.isBlocking() && !player.isUsingItem(), "the player is no longer blocking");
+        player.startUsingItem(InteractionHand.OFF_HAND);
+        helper.assertTrue(!CanopyBreaker.breakGuard(level, player), "a second blow finds the shield already down");
+        helper.succeed();
+    }
+
+    private static void grabHoldsAndThrowsFar(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        floor(helper, 0, 0, 30, 30);
+        CanopyBreaker b = boss(helper, 8, 6, 0.0F);
+        LivingEntity pig = sturdyPig(helper, 8, Y + 1, 8);
+        b.setTarget(pig);
+        helper.assertTrue(b.startAttack(Attack.GRAB_THROW, pig), "the grab starts");
+        helper.assertValueEqual(b.getAnim(), CanopyAnim.ATTACK_GRAB_PREPARE, "with its own wind-up animation");
+        List<CanopyAnim> seen = new ArrayList<>();
+        double[] heldHeight = {-1.0D};
+        double[] throwSpeed = {0.0D};
+        double[] throwUp = {0.0D};
+        waitUntil(helper, 160, t -> {
+            if (seen.isEmpty() || seen.getLast() != b.getAnim()) {
+                seen.add(b.getAnim());
+            }
+            if (b.getHeld() == pig && heldHeight[0] < 0.0D) {
+                heldHeight[0] = pig.getY() - b.getY();
+                helper.assertTrue(pig.getVehicle() == b, "the held target is carried by him");
+            }
+            if (b.getThrowsDone() > 0 && throwSpeed[0] == 0.0D) {
+                Vec3 v = pig.getDeltaMovement();
+                throwSpeed[0] = Math.hypot(v.x, v.z);
+                throwUp[0] = v.y;
+            }
+        }, () -> b.getThrowsDone() > 0 && pig.onGround() && b.getActivity() == Activity.GROUND, () -> {
+            helper.assertValueEqual(b.getGrabsLanded(), 1, "one grab landed");
+            helper.assertValueEqual(b.getThrowsDone(), 1, "and one throw");
+            helper.assertTrue(heldHeight[0] > 1.8D, "he lifted the target up (held " + heldHeight[0] + " blocks above his feet)");
+            helper.assertTrue(throwSpeed[0] >= 1.4D && throwUp[0] > 0.9D, "the throw is fast and rising (" + throwSpeed[0] + ", " + throwUp[0] + ")");
+            helper.assertTrue(pig.getVehicle() == null, "it is no longer carried");
+            double flung = Math.hypot(pig.getX() - b.getX(), pig.getZ() - b.getZ());
+            helper.assertTrue(flung > 7.0D, "the target was thrown far away from him (" + flung + " blocks)");
+            helper.assertTrue(pig.getHealth() <= 200.0F - CanopyBreaker.GRAB_SQUEEZE_DAMAGE - CanopyBreaker.GRAB_THROW_DAMAGE + 0.01F,
+                    "squeezed and thrown: both hurt (health " + pig.getHealth() + ")");
+            int lift = seen.indexOf(CanopyAnim.ATTACK_GRAB_LIFT);
+            int hurl = seen.indexOf(CanopyAnim.ATTACK_GRAB_THROW);
+            int rest = seen.indexOf(CanopyAnim.ATTACK_GRAB_RECOVERY);
+            helper.assertTrue(lift >= 0 && hurl > lift && rest > hurl, "prepare, lift, throw and recovery play in order: " + seen);
+            b.discard();
+            pig.discard();
+            helper.succeed();
+        });
+    }
+
+    private static void grabIgnoresShieldsAndMissesOpenHim(GameTestHelper helper) {
+        floor(helper, 0, 0, 30, 30);
+        CanopyBreaker b = boss(helper, 8, 6, 0.0F);
+        LivingEntity pig = sturdyPig(helper, 8, Y + 1, 9);
+        b.setTarget(pig);
+        helper.assertTrue(b.startAttack(Attack.GRAB_THROW, pig), "the grab starts");
+        // it was in reach when the wind-up began; by the time the hand closes it has slipped away
+        helper.runAfterDelay(CanopyBreaker.GRAB_THROW_PREP + 3, () -> pig.setPos(helper.absoluteVec(new Vec3(20.5D, Y + 1, 20.5D))));
+        waitUntil(helper, 100, t -> { }, () -> b.getAnim() == CanopyAnim.ATTACK_GRAB_RECOVERY, () -> {
+            helper.assertTrue(b.getAnim() == CanopyAnim.ATTACK_GRAB_RECOVERY, "with nothing in his hand he goes straight to the open recovery");
+            helper.assertValueEqual(b.getGrabsLanded(), 0, "nothing was grabbed");
+            helper.assertTrue(b.getHeld() == null, "and nothing is held");
+            helper.assertValueEqual(b.getPhase(), CanopyBreaker.Phase.RECOVER, "he is in the recovery window");
+            b.discard();
+            pig.discard();
+            helper.succeed();
+        });
+    }
+
+    private static void poundThrowsEveryoneAround(GameTestHelper helper) {
+        floor(helper, 0, 0, 30, 30);
+        CanopyBreaker b = boss(helper, 10, 6, 0.0F);
+        LivingEntity near = sturdyPig(helper, 10, Y + 1, 9);
+        LivingEntity side = sturdyPig(helper, 13, Y + 1, 8);
+        LivingEntity far = sturdyPig(helper, 10, Y + 1, 18);
+        b.setTarget(near);
+        helper.assertTrue(b.startAttack(Attack.POUND, near), "the pound starts");
+        helper.assertValueEqual(b.getAnim(), CanopyAnim.ATTACK_POUND_PREPARE, "with its own wind-up animation");
+        double[] popped = {0.0D, 0.0D};
+        waitUntil(helper, 120, t -> {
+            if (b.getPoundsLanded() > 0 && popped[0] == 0.0D) {
+                popped[0] = near.getDeltaMovement().y;
+                popped[1] = side.getDeltaMovement().y;
+            }
+        }, () -> b.getPoundsLanded() > 0, () -> {
+            helper.assertValueEqual(b.getPoundsLanded(), 1, "the fists landed once");
+            helper.assertTrue(near.getHealth() < 200.0F && side.getHealth() < 200.0F, "everyone around him is hurt");
+            helper.assertTrue(far.getHealth() == 200.0F, "the one outside the shockwave is not");
+            helper.assertTrue(popped[0] > 0.3D && popped[1] > 0.3D, "and thrown into the air (" + popped[0] + ", " + popped[1] + ")");
+            b.discard();
+            near.discard();
+            side.discard();
+            far.discard();
+            helper.succeed();
+        });
+    }
+
+    private static void backhandThrowsBackAndUp(GameTestHelper helper) {
+        floor(helper, 0, 0, 30, 30);
+        CanopyBreaker b = boss(helper, 8, 6, 0.0F); // facing +z
+        LivingEntity pig = sturdyPig(helper, 8, Y + 1, 9);
+        double startY = pig.getY();
+        double startX = pig.getX();
+        double startZ = pig.getZ();
+        b.setTarget(pig);
+        helper.assertTrue(b.startAttack(Attack.BACKHAND, pig), "the backhand starts");
+        double[] peak = {startY};
+        waitUntil(helper, 60, t -> peak[0] = Math.max(peak[0], pig.getY()), () -> false, () -> {
+            double flownBack = pig.getZ() - startZ;
+            helper.assertTrue(peak[0] > startY + 0.8D, "the backhand lifts him off the ground (rose " + (peak[0] - startY) + " blocks)");
+            helper.assertTrue(flownBack > 2.0D, "and throws him back, away from the boss (flew " + flownBack + " blocks)");
+            helper.assertTrue(Math.abs(pig.getX() - startX) < 1.0D, "straight back, not sideways (drift " + (pig.getX() - startX) + ")");
+            b.discard();
+            pig.discard();
+            helper.succeed();
+        });
+    }
+
+    private static void groundLeapReachesAPillar(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        floor(helper, 0, 0, 30, 30);
+        for (int x = 14; x <= 16; x++) { // a 3-block pillar: too high to hit, too low for a tree climb
+            for (int z = 11; z <= 13; z++) {
+                for (int y = Y + 1; y <= Y + 3; y++) {
+                    helper.setBlock(new BlockPos(x, y, z), Blocks.STONE);
+                }
+            }
+        }
+        CanopyBreaker b = boss(helper, 8, 12, -90.0F);
+        LivingEntity pig = sturdyPig(helper, 15, Y + 4, 12);
+        b.setTarget(pig);
+        helper.assertTrue(b.startGroundLeap(level, pig), "a leap up onto the pillar is planned: " + b.getRouteFailure());
+        Vec3[] last = {null};
+        double[] maxStep = {0.0D};
+        waitUntil(helper, 160, t -> {
+            if (last[0] != null) {
+                maxStep[0] = Math.max(maxStep[0], b.position().distanceTo(last[0]));
+            }
+            last[0] = b.position();
+        }, () -> b.getDropsLanded() > 0 && b.getActivity() == Activity.GROUND, () -> {
+            helper.assertTrue(b.getDropsLanded() == 1, "he landed (" + b.getActivity() + " at " + b.position() + ")");
+            helper.assertTrue(b.getY() >= helper.absoluteVec(new Vec3(0, Y + 4, 0)).y - 0.3D,
+                    "on top of the pillar, level with the target (y=" + b.getY() + ")");
+            helper.assertTrue(maxStep[0] < 1.45D, "by leaping, never by teleporting (largest step " + maxStep[0] + ")");
+            b.discard();
+            pig.discard();
+            helper.succeed();
+        });
+    }
+
+    private static void groundLeapCrossesOpenGround(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        floor(helper, 0, 0, 40, 30);
+        CanopyBreaker b = boss(helper, 6, 12, -90.0F); // facing +x
+        LivingEntity pig = sturdyPig(helper, 19, Y + 1, 12);
+        b.setTarget(pig);
+        helper.assertTrue(b.startGroundLeap(level, pig), "a bound across 13 open blocks is planned: " + b.getRouteFailure());
+        helper.assertValueEqual(b.getActivity(), Activity.JUMP_PREPARATION, "he crouches first");
+        Vec3[] last = {null};
+        double[] maxStep = {0.0D};
+        boolean[] flew = {false};
+        StringBuilder trace = new StringBuilder();
+        double[] landedAt = {-1.0D};
+        waitUntil(helper, 160, t -> {
+            if (landedAt[0] < 0.0D && b.getDropsLanded() > 0) {
+                landedAt[0] = b.distanceTo(pig); // measured at the slam: the hurt pig then runs off
+            }
+            if (t % 4 == 0 && t < 90) {
+                trace.append(t).append(':').append(b.getActivity().name().charAt(0)).append(String.format("%.1f", b.getX() - helper.absoluteVec(Vec3.ZERO).x)).append(' ');
+            }
+            if (b.getActivity() == Activity.AIRBORNE) {
+                flew[0] = true;
+            }
+            if (last[0] != null) {
+                maxStep[0] = Math.max(maxStep[0], b.position().distanceTo(last[0]));
+            }
+            last[0] = b.position();
+        }, () -> b.getDropsLanded() > 0 && b.getActivity() == Activity.GROUND, () -> {
+            helper.assertTrue(flew[0], "he really flew");
+            helper.assertValueEqual(b.getDropsLanded(), 1, "and landed with a slam");
+            helper.assertTrue(maxStep[0] < 1.45D, "a leap, never a teleport (largest step " + maxStep[0] + ")");
+            helper.assertTrue(landedAt[0] >= 0.0D && landedAt[0] < 3.6D, "he landed on the target (" + landedAt[0] + " blocks away; trace " + trace + ")");
+            helper.assertTrue(pig.getHealth() <= 200.0F - CanopyBreaker.DROP_DAMAGE + 0.01F, "the landing slam hurts it (health " + pig.getHealth() + ")");
+            helper.assertValueEqual(b.getGroundLeapsStarted(), 1, "one leap");
             b.discard();
             pig.discard();
             helper.succeed();

@@ -77,6 +77,13 @@ public enum CanopyAnim {
     ATTACK_BACKHAND_PREPARE(false, "ATTACK prepare: Backhand", "grunt", "target lost (cancel)", "attack_backhand_execute"),
     ATTACK_BACKHAND_EXECUTE(false, "ATTACK execute: Backhand", "DAMAGE at contact tick", "hurt does not cancel", "attack_backhand_recovery"),
     ATTACK_BACKHAND_RECOVERY(false, "ATTACK recover: Backhand", "none", "none", "club_guard_idle"),
+    ATTACK_GRAB_PREPARE(false, "ATTACK prepare: Grab and Throw (crouches, free hand reaching)", "none (telegraphed, cannot be blocked)", "target leaves reach, hurt stagger", "attack_grab_lift"),
+    ATTACK_GRAB_LIFT(false, "ATTACK execute: Grab and Throw (the hand closes and lifts the target overhead)", "grab roar, squeeze damage, the target is carried", "heavy hit staggers him and he lets go", "attack_grab_throw, attack_grab_recovery"),
+    ATTACK_GRAB_THROW(false, "ATTACK execute: Grab and Throw (the target is hurled)", "throw sound, thrown damage and a long launch", "none", "attack_grab_recovery"),
+    ATTACK_GRAB_RECOVERY(false, "ATTACK recover: Grab and Throw (panting, open)", "none", "heavy hit staggers him", "club_guard_idle"),
+    ATTACK_POUND_PREPARE(false, "ATTACK prepare: Fist Pound (rears up, both fists and the club high)", "none (telegraphed)", "target leaves reach, hurt stagger", "attack_pound_execute"),
+    ATTACK_POUND_EXECUTE(false, "ATTACK execute: Fist Pound (both fists drive into the ground)", "heavy thud, shockwave, everyone around is thrown up", "none", "attack_pound_recovery"),
+    ATTACK_POUND_RECOVERY(false, "ATTACK recover: Fist Pound (leaning on his fists, open)", "none", "heavy hit staggers him", "club_guard_idle"),
     // ---- G. roars
     ROAR_IDLE(false, "GROUND, distant short roar", "roar sound", "any action", "idle_breathing"),
     ROAR_AGGRO(false, "target sighted / intro", "roar sound (cooldown)", "death", "club_guard_idle"),

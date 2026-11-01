@@ -16,77 +16,79 @@ public final class CanopyBreakerParts {
         CubeListBuilder b = CubeListBuilder.create();
         switch (part) {
             case "pelvis" -> {
-                b.texOffs(56, 51).addBox(-6F, -3F, -4F, 12F, 6F, 8F); // pelvis
+                b.texOffs(0, 49).addBox(-6F, -3F, -4F, 12F, 6F, 8F); // pelvis
             }
             case "chest" -> {
-                b.texOffs(32, 0).addBox(-12F, -15F, -7F, 24F, 15F, 14F); // chest
-                b.texOffs(0, 30).addBox(-14F, -17F, -8F, 28F, 5F, 16F); // mantle
-                b.texOffs(168, 66).addBox(-7F, -9F, -7.5F, 14F, 8F, 1F); // belly
-                b.texOffs(198, 66).addBox(-9F, -16F, 6F, 8F, 3F, 6F); // moss_back
-                b.texOffs(60, 66).addBox(5F, -18F, -3F, 7F, 3F, 7F); // moss_shoulder
-                b.texOffs(226, 66).addBox(1F, -12F, 7F, 8F, 7F, 2F); // bark_back
+                b.texOffs(0, 0).addBox(-12F, -15F, -7F, 24F, 15F, 14F); // chest
+                b.texOffs(148, 0).addBox(-14F, -17F, -8F, 28F, 5F, 16F); // mantle
+                b.texOffs(148, 63).addBox(-7F, -9F, -7.5F, 14F, 8F, 1F); // belly
+                b.texOffs(178, 63).addBox(-9F, -16F, 6F, 8F, 3F, 6F); // moss_back
+                b.texOffs(40, 63).addBox(5F, -18F, -3F, 7F, 3F, 7F); // moss_shoulder
+                b.texOffs(206, 63).addBox(1F, -12F, 7F, 8F, 7F, 2F); // bark_back
             }
             case "head" -> {
-                b.texOffs(88, 30).addBox(-5.5F, -9F, -5.5F, 11F, 9F, 11F); // head
-                b.texOffs(34, 78).addBox(-6F, -6F, -8F, 12F, 3F, 3F); // brow
-                b.texOffs(0, 78).addBox(-3.5F, -4.5F, -9F, 7F, 4.5F, 4F); // snout
-                b.texOffs(64, 78).addBox(5.5F, -6.5F, -1F, 2F, 3F, 3F); // ear_l
-                b.texOffs(74, 78).addBox(-7.5F, -6.5F, -1F, 2F, 3F, 3F); // ear_r
-                b.texOffs(34, 66).addBox(-2F, -11F, -4F, 4F, 2F, 9F); // crest
+                b.texOffs(0, 29).addBox(-5.5F, -9F, -5.5F, 11F, 9F, 11F); // head
+                b.texOffs(12, 74).addBox(-6F, -6F, -8F, 12F, 3F, 3F); // brow
+                b.texOffs(226, 63).addBox(-3.5F, -4.5F, -9F, 7F, 4.5F, 4F); // snout
+                b.texOffs(42, 74).addBox(5.5F, -6.5F, -1F, 2F, 3F, 3F); // ear_l
+                b.texOffs(52, 74).addBox(-7.5F, -6.5F, -1F, 2F, 3F, 3F); // ear_r
+                b.texOffs(212, 49).addBox(-2F, -11F, -4F, 4F, 2F, 9F); // crest
             }
             case "jaw" -> {
-                b.texOffs(88, 66).addBox(-3.5F, 0F, -6.5F, 7F, 3F, 7F); // jaw
+                b.texOffs(68, 63).addBox(-3.5F, 0F, -6.5F, 7F, 3F, 7F); // jaw
             }
             case "left_upper_arm" -> {
-                b.texOffs(132, 30).addBox(-3.5F, 0F, -3.5F, 7F, 11F, 7F); // l_upper
+                b.texOffs(76, 29).addBox(-3.5F, 0F, -3.5F, 7F, 11F, 7F); // l_upper
             }
             case "left_forearm" -> {
-                b.texOffs(188, 30).addBox(-3F, 0F, -3F, 6F, 11F, 6F); // l_fore
+                b.texOffs(132, 29).addBox(-3F, 0F, -3F, 6F, 11F, 6F); // l_fore
             }
             case "left_hand" -> {
-                b.texOffs(96, 51).addBox(-3.5F, 0F, -3.5F, 7F, 5F, 7F); // l_hand
-                b.texOffs(116, 66).addBox(-3F, 5F, -3.5F, 6F, 3F, 7F); // l_fingers
+                b.texOffs(40, 49).addBox(-3.5F, 0F, -3.5F, 7F, 5F, 7F); // l_hand
+                b.texOffs(96, 63).addBox(-3F, 5F, -3.5F, 6F, 3F, 7F); // l_fingers
             }
             case "right_upper_arm" -> {
-                b.texOffs(160, 30).addBox(-3.5F, 0F, -3.5F, 7F, 11F, 7F); // r_upper
+                b.texOffs(104, 29).addBox(-3.5F, 0F, -3.5F, 7F, 11F, 7F); // r_upper
             }
             case "right_forearm" -> {
-                b.texOffs(212, 30).addBox(-3F, 0F, -3F, 6F, 11F, 6F); // r_fore
+                b.texOffs(156, 29).addBox(-3F, 0F, -3F, 6F, 11F, 6F); // r_fore
             }
             case "right_hand" -> {
-                b.texOffs(124, 51).addBox(-3.5F, 0F, -3.5F, 7F, 5F, 7F); // r_hand
-                b.texOffs(142, 66).addBox(-3F, 5F, -3.5F, 6F, 3F, 7F); // r_fingers
+                b.texOffs(68, 49).addBox(-3.5F, 0F, -3.5F, 7F, 5F, 7F); // r_hand
+                b.texOffs(122, 63).addBox(-3F, 5F, -3.5F, 6F, 3F, 7F); // r_fingers
             }
             case "left_thigh" -> {
-                b.texOffs(0, 51).addBox(-3.5F, 0F, -3.5F, 7F, 8F, 7F); // l_thigh
+                b.texOffs(180, 29).addBox(-3.5F, 0F, -3.5F, 7F, 8F, 7F); // l_thigh
             }
             case "left_shin" -> {
-                b.texOffs(152, 51).addBox(-3F, 0F, -3F, 6F, 6F, 6F); // l_shin
+                b.texOffs(96, 49).addBox(-3F, 0F, -3F, 6F, 6F, 6F); // l_shin
             }
             case "left_foot" -> {
-                b.texOffs(176, 51).addBox(-3.5F, 0F, -7F, 7F, 2F, 10F); // l_foot
+                b.texOffs(120, 49).addBox(-3.5F, 0F, -7F, 7F, 2F, 10F); // l_foot
             }
             case "right_thigh" -> {
-                b.texOffs(28, 51).addBox(-3.5F, 0F, -3.5F, 7F, 8F, 7F); // r_thigh
+                b.texOffs(208, 29).addBox(-3.5F, 0F, -3.5F, 7F, 8F, 7F); // r_thigh
             }
             case "right_shin" -> {
-                b.texOffs(210, 51).addBox(-3F, 0F, -3F, 6F, 6F, 6F); // r_shin
+                b.texOffs(154, 49).addBox(-3F, 0F, -3F, 6F, 6F, 6F); // r_shin
             }
             case "right_foot" -> {
-                b.texOffs(0, 66).addBox(-3.5F, 0F, -7F, 7F, 2F, 10F); // r_foot
+                b.texOffs(178, 49).addBox(-3.5F, 0F, -7F, 7F, 2F, 10F); // r_foot
             }
             case "club_hand" -> {
-                b.texOffs(0, 0).addBox(-2F, -6F, -2F, 4F, 26F, 4F); // club_shaft
-                b.texOffs(108, 0).addBox(-4.5F, -22F, -4.5F, 9F, 16F, 9F); // club_head
-                b.texOffs(84, 78).addBox(-6.5F, -19F, -1.5F, 2F, 3F, 3F); // club_knot_a
-                b.texOffs(22, 78).addBox(4.5F, -14F, -2F, 2F, 3F, 4F); // club_knot_b
-                b.texOffs(94, 78).addBox(-1F, -26F, -1F, 2F, 4F, 2F); // club_root_a
-                b.texOffs(112, 78).addBox(-4.5F, -24F, 2F, 2F, 3F, 2F); // club_root_b
+                b.texOffs(0, 63).addBox(-2.5F, -3F, -2.5F, 5F, 6F, 5F); // club_grip
+                b.texOffs(44, 29).addBox(-2F, -12F, -2F, 4F, 16F, 4F); // club_shaft
+                b.texOffs(76, 0).addBox(-4.5F, -26F, -4.5F, 9F, 14F, 9F); // club_head
+                b.texOffs(62, 74).addBox(-6.5F, -23F, -1.5F, 2F, 3F, 3F); // club_knot_a
+                b.texOffs(0, 74).addBox(4.5F, -18F, -2F, 2F, 3F, 4F); // club_knot_b
+                b.texOffs(72, 74).addBox(-1F, -30F, -1F, 2F, 4F, 2F); // club_root_a
+                b.texOffs(90, 74).addBox(-4.5F, -28F, 2F, 2F, 3F, 2F); // club_root_b
             }
             case "club_back" -> {
-                b.texOffs(16, 0).addBox(-2F, -6F, -2F, 4F, 26F, 4F); // back_shaft
-                b.texOffs(144, 0).addBox(-4.5F, -22F, -4.5F, 9F, 16F, 9F); // back_head
-                b.texOffs(102, 78).addBox(-6.5F, -19F, -1.5F, 2F, 3F, 3F); // back_knot
+                b.texOffs(20, 63).addBox(-2.5F, -3F, -2.5F, 5F, 6F, 5F); // back_grip
+                b.texOffs(60, 29).addBox(-2F, -12F, -2F, 4F, 16F, 4F); // back_shaft
+                b.texOffs(112, 0).addBox(-4.5F, -26F, -4.5F, 9F, 14F, 9F); // back_head
+                b.texOffs(80, 74).addBox(-6.5F, -23F, -1.5F, 2F, 3F, 3F); // back_knot
             }
             default -> throw new IllegalArgumentException("Unknown part " + part);
         }

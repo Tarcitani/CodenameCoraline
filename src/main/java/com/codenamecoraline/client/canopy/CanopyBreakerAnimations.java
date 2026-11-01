@@ -74,8 +74,8 @@ public final class CanopyBreakerAnimations {
     }
 
     private static final Pose STAND = Pose.of();
-    /** Club over the shoulder, free hand relaxed: the combat resting pose. */
-    private static final Pose CARRY = Pose.of("right_upper_arm -62 0 0", "right_forearm -45 0 0", "right_hand -122 0 0",
+    /** Club held out to the right and forward by the end of the handle, head away from the body: the combat resting pose. */
+    private static final Pose CARRY = Pose.of("right_upper_arm -42 0 26", "right_forearm -50 0 0", "right_hand 112 0 0",
             "left_upper_arm 20 0 -6", "left_forearm -30 0 0", "chest 14 0 0", "head -12 0 0");
     private static final Pose WIND = Pose.of("chest -4 0 0", "head -22 0 0", "right_upper_arm -150 0 0", "right_forearm -22 0 0",
             "right_hand 121 0 0", "left_upper_arm -140 12 0", "left_forearm -16 0 0", "jaw 14 0 0",
@@ -252,7 +252,7 @@ public final class CanopyBreakerAnimations {
         def(CanopyAnim.DRAW_CLUB, 0.6f, false, f(0f, Pose.of("chest 12 -22 0", "head -12 -40 0", "right_upper_arm -150 36 24", "right_forearm -60 0 0", "right_hand 30 0 0")),
                 f(0.25f, Pose.of("chest 4 -8 0", "head -16 -14 0", "right_upper_arm -156 12 12", "right_forearm -30 0 0", "right_hand 100 0 0")), f(0.6f, WIND));
         def(CanopyAnim.DRAW_CLUB_FINISH, 0.6f, false, f(0f, WIND), f(0.25f, MID), f(0.6f, CARRY.with("chest 20 0 0", "right_upper_arm -52 0 0", "right_hand 46 0 0")));
-        Pose gi = CARRY.with("chest 20 0 0", "right_upper_arm -52 0 0", "right_forearm -42 0 0", "right_hand 46 0 0", "head -16 0 0");
+        Pose gi = CARRY.with("chest 20 0 0", "right_upper_arm -40 0 26", "right_forearm -50 0 0", "right_hand 120 0 0", "head -16 0 0");
         def(CanopyAnim.CLUB_GUARD_IDLE, 2.4f, true, f(0f, gi), f(1.2f, gi.with("chest 23 0 0", "head -18 3 0", "right_upper_arm -55 0 0", "right_hand 42 0 0", "left_upper_arm 24 0 -8")));
         Pose gwl = gi.with("left_thigh -38 0 0", "left_shin 30 0 0", "right_thigh 6 0 0", "right_shin 22 0 0", "chest 22 -5 0", "left_upper_arm 36 0 -6", "@pelvis 0 0 0");
         Pose gwr = gi.with("right_thigh -38 0 0", "right_shin 30 0 0", "left_thigh 6 0 0", "left_shin 22 0 0", "chest 22 5 0", "left_upper_arm -6 0 -6", "@pelvis 0 0 0");
@@ -312,6 +312,34 @@ public final class CanopyBreakerAnimations {
                 f(0.8f, beatRight), f(1.0f, beatLeft), f(1.2f, beatRight), f(1.4f, beatLeft), f(1.6f, beatRight),
                 f(1.8f, beatLeft), f(2.0f, beatRight), f(2.4f, upright.with("left_upper_arm -120 0 -40", "right_upper_arm -120 0 40",
                         "left_forearm -30 0 0", "right_forearm -30 0 0", "head -36 0 0", "jaw 28 0 0")));
+        // ---- Grab and throw: one hand seizes the prey, lifts it overhead and hurls it, the club trailing low behind him
+        Pose grabClub = Pose.of("right_upper_arm 12 0 20", "right_forearm -22 0 0", "right_hand 128 0 0");
+        Pose grabReach = grabClub.with("chest 40 0 0", "head -24 0 0", "jaw 14 0 0", "@pelvis 0 4 0", "left_thigh -52 0 0",
+                "right_thigh -52 0 0", "left_shin 72 0 0", "right_shin 72 0 0", "left_upper_arm -84 0 -26", "left_forearm -26 0 0");
+        Pose grabClamp = grabReach.with("left_upper_arm -92 0 -4", "left_forearm -70 0 0", "chest 34 0 0");
+        Pose grabOverhead = grabClub.with("chest -6 0 0", "head -26 0 0", "jaw 20 0 0", "@pelvis 0 -1 0", "left_upper_arm -168 0 -6",
+                "left_forearm -10 0 0", "left_thigh -14 0 0", "right_thigh -14 0 0", "left_shin 20 0 0", "right_shin 20 0 0");
+        Pose grabHurl = grabClub.with("chest 42 0 0", "head -4 0 0", "jaw 24 0 0", "@pelvis 0 3 0", "left_upper_arm -52 0 -6",
+                "left_forearm -14 0 0", "left_thigh -34 0 0", "right_thigh -22 0 0", "left_shin 50 0 0", "right_shin 36 0 0");
+        def(CanopyAnim.ATTACK_GRAB_PREPARE, 0.9f, true, f(0f, gi), f(0.45f, grabReach.with("left_upper_arm -60 0 -20")), f(0.9f, grabReach));
+        def(CanopyAnim.ATTACK_GRAB_LIFT, 1.2f, true, f(0f, grabReach), f(0.3f, grabClamp), f(0.75f, grabOverhead),
+                f(1.2f, grabOverhead.with("head -30 0 0", "chest -8 0 0")));
+        def(CanopyAnim.ATTACK_GRAB_THROW, 0.8f, true, f(0f, grabOverhead), f(0.14f, grabOverhead.with("chest -16 0 0", "left_upper_arm -190 0 -4")),
+                f(0.32f, grabHurl), f(0.8f, grabHurl.with("chest 30 0 0", "left_upper_arm 10 0 -8")));
+        def(CanopyAnim.ATTACK_GRAB_RECOVERY, 1.3f, true, f(0f, grabHurl.with("chest 34 0 0", "left_upper_arm 10 0 -8")),
+                f(0.6f, Pose.of("chest 36 0 0", "head -12 0 0", "jaw 10 0 0", "@pelvis 0 2 0", "left_thigh -36 0 0", "right_thigh -36 0 0",
+                        "left_shin 46 0 0", "right_shin 46 0 0", "right_upper_arm 12 0 20", "right_forearm -22 0 0", "right_hand 128 0 0")),
+                f(1.3f, gi));
+        // ---- Fist pound: rears up with both fists and the club high, then drives them into the ground
+        Pose poundUp = Pose.of("chest -8 0 0", "head -32 0 0", "jaw 22 0 0", "@pelvis 0 -1 0", "left_upper_arm -172 0 -22",
+                "right_upper_arm -165 0 22", "left_forearm -14 0 0", "right_forearm -15 0 0", "right_hand 168 0 0",
+                "left_thigh -12 0 0", "right_thigh -12 0 0", "left_shin 16 0 0", "right_shin 16 0 0");
+        Pose poundDown = Pose.of("chest 44 0 0", "head -8 0 0", "jaw 10 0 0", "@pelvis 0 5 0", "left_upper_arm -34 0 -10",
+                "right_upper_arm -50 0 10", "left_forearm -26 0 0", "right_forearm -12 0 0", "right_hand 160 0 0",
+                "left_thigh -44 0 0", "right_thigh -44 0 0", "left_shin 62 0 0", "right_shin 62 0 0");
+        def(CanopyAnim.ATTACK_POUND_PREPARE, 1.1f, true, f(0f, gi), f(0.5f, poundUp.with("chest 4 0 0")), f(1.1f, poundUp.with("head -38 0 0", "jaw 30 0 0")));
+        def(CanopyAnim.ATTACK_POUND_EXECUTE, 0.7f, true, f(0f, poundUp), f(0.12f, poundUp.with("chest 12 0 0")), f(0.3f, poundDown), f(0.7f, poundDown));
+        def(CanopyAnim.ATTACK_POUND_RECOVERY, 1.1f, true, f(0f, poundDown), f(0.5f, poundDown.with("chest 38 0 0", "jaw 14 0 0")), f(1.1f, gi));
         def(CanopyAnim.ROAR_ATTACK, 0.5f, false, f(0f, gi), f(0.15f, gi.with("head -34 0 0", "jaw 26 0 0", "chest 12 0 0")), f(0.5f, gi));
         def(CanopyAnim.ROAR_PHASE_TWO, 2.0f, false, f(0f, gi), f(0.5f, CROUCH.with("chest 44 0 0", "right_upper_arm -50 0 0", "right_hand 120 0 0", "jaw 10 0 0")), f(1.0f, roarUp.with("right_upper_arm -150 0 0", "right_forearm -22 0 0", "right_hand 160 0 0")), f(1.6f, roarUp.with("right_upper_arm -154 0 0", "right_forearm -22 0 0", "right_hand 160 0 0", "head -48 0 0", "jaw 30 0 0")), f(2.0f, gi));
         def(CanopyAnim.ROAR_HURT, 0.5f, false, f(0f, gi), f(0.15f, gi.with("head -30 0 0", "jaw 22 0 0", "chest 8 0 0")), f(0.5f, gi));
