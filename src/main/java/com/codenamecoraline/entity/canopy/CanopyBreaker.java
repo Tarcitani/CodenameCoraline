@@ -128,6 +128,22 @@ public class CanopyBreaker extends Monster {
     public static final double SHIELD_BREAK_REACH = 3.8D;
     public static final double SHIELD_BREAK_KNOCKBACK = 1.2D;
 
+    public static final int GRAB_THROW_PREP = 18;
+    public static final int GRAB_THROW_EXEC = 16;
+    public static final int GRAB_THROW_HIT_TICK = 8;
+    public static final int GRAB_THROW_RECOVER = 24;
+    public static final float GRAB_THROW_DAMAGE = 8.0F;
+    public static final double GRAB_THROW_REACH = 4.0D;
+    public static final double GRAB_THROW_FORCE = 1.8D;
+
+    public static final int POUND_PREP = 20;
+    public static final int POUND_EXEC = 12;
+    public static final int POUND_HIT_TICK = 8;
+    public static final int POUND_RECOVER = 20;
+    public static final float POUND_DAMAGE = 10.0F;
+    public static final double POUND_RADIUS = 4.0D;
+    public static final double POUND_KNOCKBACK = 0.8D;
+
     public static final int DROP_PREP = 14;
     public static final int DROP_RECOVER = 26;
     public static final float DROP_DAMAGE = 8.0F;
@@ -151,7 +167,7 @@ public class CanopyBreaker extends Monster {
         JUMP_PREPARATION, AIRBORNE, LANDING, LAND_RECOVERY, FALL_RECOVERY, STAGGER, TRANSITION, DYING, DEAD
     }
 
-    public enum Attack { NONE, TRUNK_SLAM, CANOPY_SWEEP, BRUTE_LUNGE, CANOPY_DROP, BACKHAND, SHIELD_BREAK, INTIMIDATE }
+    public enum Attack { NONE, TRUNK_SLAM, CANOPY_SWEEP, BRUTE_LUNGE, CANOPY_DROP, BACKHAND, SHIELD_BREAK, GRAB_THROW, POUND, INTIMIDATE }
 
     public enum Phase { PREPARE, EXECUTE, RECOVER }
 
@@ -1120,6 +1136,10 @@ public class CanopyBreaker extends Monster {
         if (this.onGround() && this.horizontalCollision && this.getNavigation().isInProgress()) {
             this.getJumpControl().jump();
         }
+        // New: Periodic jumping while chasing (primate behavior — more energetic in higher stages)
+        if (dist > 6.0D && this.onGround() && this.tickCount % (this.getStage() >= 3 ? 12 : 18) == 0) {
+            this.getJumpControl().jump();
+        }
         if (dist > standOff + 0.8D) {
             if (this.pathRecalc <= 0 || this.getNavigation().isDone()) {
                 Vec3 goal = this.predict(target, Math.min(10, (int) (dist * 1.2D)));
@@ -1190,6 +1210,8 @@ public class CanopyBreaker extends Monster {
             case BRUTE_LUNGE -> 64;
             case BACKHAND -> 42;
             case SHIELD_BREAK -> 48;
+            case GRAB_THROW -> 56;
+            case POUND -> 52;
             case INTIMIDATE -> 480;
             case CANOPY_DROP -> 200;
             case NONE -> 0;
@@ -1210,6 +1232,10 @@ public class CanopyBreaker extends Monster {
                 options.add(Attack.BACKHAND);
                 weights.add(this.getStage() >= 3 ? 7 : 5);
             }
+            if (dist <= 3.5D && this.cooldowns[Attack.GRAB_THROW.ordinal()] <= 0) {
+                options.add(Attack.GRAB_THROW);
+                weights.add(this.getStage() >= 2 ? 6 : 4);  // Gorilla-style grab more likely in later stages
+            }
             if (dist <= 4.2D && this.cooldowns[Attack.TRUNK_SLAM.ordinal()] <= 0) {
                 options.add(Attack.TRUNK_SLAM);
                 weights.add(6);
@@ -1217,6 +1243,10 @@ public class CanopyBreaker extends Monster {
             if (dist <= 4.4D && this.cooldowns[Attack.CANOPY_SWEEP.ordinal()] <= 0) {
                 options.add(Attack.CANOPY_SWEEP);
                 weights.add(5);
+            }
+            if (dist <= 4.6D && this.cooldowns[Attack.POUND.ordinal()] <= 0) {
+                options.add(Attack.POUND);
+                weights.add(this.getStage() >= 3 ? 6 : 3);  // Double-fist pound more aggressive in stage 3
             }
             if (dist >= 4.5D && dist <= 10.0D && this.cooldowns[Attack.BRUTE_LUNGE.ordinal()] <= 0) {
                 options.add(Attack.BRUTE_LUNGE);
@@ -1274,6 +1304,8 @@ public class CanopyBreaker extends Monster {
             case BRUTE_LUNGE -> this.setAnim(CanopyAnim.ATTACK_BRUTE_LUNGE_PREPARE);
             case BACKHAND -> this.setAnim(CanopyAnim.ATTACK_BACKHAND_PREPARE);
             case SHIELD_BREAK -> this.setAnim(CanopyAnim.ATTACK_BACKHAND_PREPARE);  // Use same prepare as backhand
+            case GRAB_THROW -> this.setAnim(CanopyAnim.ATTACK_BRUTE_LUNGE_PREPARE);  // Reuse lunge animation for grab prep
+            case POUND -> this.setAnim(CanopyAnim.ATTACK_TRUNK_SLAM_PREPARE);  // Reuse slam animation for double-fist pound
             case INTIMIDATE -> {
                 this.setAnim(CanopyAnim.INTIMIDATE_ROAR);
                 this.playSound(ModSounds.CANOPY_ROAR_ALERT.get(), 2.4F, 0.7F);
@@ -1281,7 +1313,7 @@ public class CanopyBreaker extends Monster {
             default -> {
             }
         }
-        if (type != Attack.INTIMIDATE && type != Attack.BACKHAND && type != Attack.SHIELD_BREAK && this.roarCooldown <= 0) {
+        if (type != Attack.INTIMIDATE && type != Attack.BACKHAND && type != Attack.SHIELD_BREAK && type != Attack.GRAB_THROW && type != Attack.POUND && this.roarCooldown <= 0) {
             this.roarCooldown = 100;
             this.playSound(ModSounds.CANOPY_ROAR_ATTACK.get(), 1.7F, 0.9F);
         }
@@ -1301,6 +1333,8 @@ public class CanopyBreaker extends Monster {
             case BRUTE_LUNGE -> LUNGE_PREP;
             case BACKHAND -> BACKHAND_PREP;
             case SHIELD_BREAK -> SHIELD_BREAK_PREP;
+            case GRAB_THROW -> GRAB_THROW_PREP;
+            case POUND -> POUND_PREP;
             case INTIMIDATE -> INTIMIDATE_TICKS;
             default -> 1;
         };
@@ -1313,6 +1347,8 @@ public class CanopyBreaker extends Monster {
             case BRUTE_LUNGE -> LUNGE_EXEC;
             case BACKHAND -> BACKHAND_EXEC;
             case SHIELD_BREAK -> SHIELD_BREAK_EXEC;
+            case GRAB_THROW -> GRAB_THROW_EXEC;
+            case POUND -> POUND_EXEC;
             default -> 1;
         };
     }
@@ -1324,6 +1360,8 @@ public class CanopyBreaker extends Monster {
             case BRUTE_LUNGE -> LUNGE_RECOVER;
             case BACKHAND -> BACKHAND_RECOVER;
             case SHIELD_BREAK -> SHIELD_BREAK_RECOVER;
+            case GRAB_THROW -> GRAB_THROW_RECOVER;
+            case POUND -> POUND_RECOVER;
             default -> 1;
         };
     }
@@ -1342,6 +1380,8 @@ public class CanopyBreaker extends Monster {
             case BRUTE_LUNGE -> sameLevel && horizontal <= 12.5D && this.getSensing().hasLineOfSight(target);
             case BACKHAND -> sameLevel && horizontal <= BACKHAND_REACH + 1.6D;
             case SHIELD_BREAK -> sameLevel && horizontal <= SHIELD_BREAK_REACH + 1.8D;
+            case GRAB_THROW -> sameLevel && horizontal <= GRAB_THROW_REACH + 1.6D;
+            case POUND -> sameLevel && horizontal <= POUND_RADIUS + 1.6D;
             case INTIMIDATE -> horizontal <= 20.0D;
             default -> true;
         };
@@ -1469,6 +1509,18 @@ public class CanopyBreaker extends Monster {
                 this.setAnim(CanopyAnim.ATTACK_BACKHAND_EXECUTE);
                 this.playSound(ModSounds.CANOPY_CLUB_SWING.get(), 1.3F, 1.0F);
             }
+            case SHIELD_BREAK -> {
+                this.setAnim(CanopyAnim.ATTACK_BACKHAND_EXECUTE);
+                this.playSound(ModSounds.CANOPY_CLUB_SWING.get(), 1.5F, 1.2F);  // Louder, more aggressive
+            }
+            case GRAB_THROW -> {
+                this.setAnim(CanopyAnim.ATTACK_BRUTE_LUNGE_EXECUTE);  // Reuse lunge animation
+                this.playSound(ModSounds.CANOPY_ROAR_ATTACK.get(), 1.8F, 0.7F);  // Guttural grab sound
+            }
+            case POUND -> {
+                this.setAnim(CanopyAnim.ATTACK_TRUNK_SLAM_EXECUTE);  // Reuse slam animation
+                this.playSound(ModSounds.CANOPY_CLUB_SWING.get(), 1.8F, 0.6F);  // Heavy thud
+            }
             default -> {
             }
         }
@@ -1506,6 +1558,32 @@ public class CanopyBreaker extends Monster {
                         this.strike(level, v, BACKHAND_DAMAGE, 0.7D);
                     }
                     this.playSound(ModSounds.CANOPY_CLUB_IMPACT.get(), 1.2F, 1.1F);
+                }
+            }
+            case SHIELD_BREAK -> {
+                if (this.phaseTimer == SHIELD_BREAK_HIT_TICK) {
+                    for (LivingEntity v : this.victimsInFront(level, SHIELD_BREAK_REACH, 200.0D)) {
+                        this.strike(level, v, SHIELD_BREAK_DAMAGE, SHIELD_BREAK_KNOCKBACK);
+                    }
+                    this.playSound(ModSounds.CANOPY_CLUB_IMPACT.get(), 1.6F, 0.8F);  // Impacts heavily
+                }
+            }
+            case GRAB_THROW -> {
+                if (this.phaseTimer == GRAB_THROW_HIT_TICK) {
+                    for (LivingEntity v : this.victimsInFront(level, GRAB_THROW_REACH, 180.0D)) {
+                        this.strike(level, v, GRAB_THROW_DAMAGE, GRAB_THROW_FORCE);  // Massive knockback
+                        this.playSound(ModSounds.CANOPY_CLUB_IMPACT.get(), 1.4F, 0.6F);
+                    }
+                }
+            }
+            case POUND -> {
+                if (this.phaseTimer == POUND_HIT_TICK) {
+                    Vec3 c = this.position();
+                    this.playSound(ModSounds.CANOPY_CLUB_IMPACT.get(), 2.2F, 0.5F);  // Very heavy thud
+                    level.sendParticles(ParticleTypes.POOF, c.x, c.y, c.z, 20, 1.0D, 0.3D, 1.0D, 0.1D);
+                    for (LivingEntity v : this.victimsAround(level, c, POUND_RADIUS)) {
+                        this.strike(level, v, POUND_DAMAGE, POUND_KNOCKBACK);
+                    }
                 }
             }
             default -> {
@@ -1604,8 +1682,10 @@ public class CanopyBreaker extends Monster {
     /** Decides whether a tree route is worth it now; if so plans it and starts the approach. */
     private boolean considerRoute(ServerLevel level, LivingEntity target, double dist, double dy) {
         boolean elevated = dy >= 3.5D;
-        boolean flank = this.getStage() >= 2 && this.cooldowns[Attack.CANOPY_DROP.ordinal()] <= 0 && dist >= 6.0D && dist <= 20.0D && dy < 3.5D && this.random.nextInt(this.getStage() >= 3 ? 40 : 70) == 0;
-        boolean stuck = this.stuckTicks >= 60;
+        // Increased climbing frequency: Stage 1: 1/70 → 1/50, Stage 2: 1/40 → 1/25, Stage 3: 1/40 → 1/15
+        boolean flank = this.getStage() >= 2 && this.cooldowns[Attack.CANOPY_DROP.ordinal()] <= 0 && dist >= 6.0D && dist <= 20.0D && dy < 3.5D && this.random.nextInt(this.getStage() >= 3 ? 15 : 25) == 0;
+        // New: General climbing opportunity when stuck (aggressive repositioning)
+        boolean stuck = this.stuckTicks >= 60 || (this.getStage() >= 3 && this.stuckTicks >= 40);
         if (!elevated && !flank && !stuck) {
             return false;
         }
