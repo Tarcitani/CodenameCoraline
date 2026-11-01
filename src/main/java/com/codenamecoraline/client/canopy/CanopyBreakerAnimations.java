@@ -75,7 +75,7 @@ public final class CanopyBreakerAnimations {
 
     private static final Pose STAND = Pose.of();
     /** Club over the shoulder, free hand relaxed: the combat resting pose. */
-    private static final Pose CARRY = Pose.of("right_upper_arm -62 0 0", "right_forearm -45 0 0", "right_hand 58 0 0",
+    private static final Pose CARRY = Pose.of("right_upper_arm -62 0 0", "right_forearm -45 0 0", "right_hand -122 0 0",
             "left_upper_arm 20 0 -6", "left_forearm -30 0 0", "chest 14 0 0", "head -12 0 0");
     private static final Pose WIND = Pose.of("chest -4 0 0", "head -22 0 0", "right_upper_arm -150 0 0", "right_forearm -22 0 0",
             "right_hand 121 0 0", "left_upper_arm -140 12 0", "left_forearm -16 0 0", "jaw 14 0 0",
