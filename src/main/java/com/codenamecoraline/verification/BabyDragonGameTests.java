@@ -113,7 +113,7 @@ public final class BabyDragonGameTests {
         h.assertTrue(ModItems.BABY_DRAGON_SPAWN_EGG.get() instanceof SpawnEggItem,"registered spawn egg");h.succeed();
     }
     private static void attributes(GameTestHelper h){
-        var d=dragon(h,false);h.assertValueEqual(d.getMaxHealth(),20F,"health");h.assertValueEqual(d.getAttributeValue(Attributes.ARMOR),2D,"armor");
+        var d=dragon(h,false);h.assertValueEqual(d.getMaxHealth(),30F,"updated hatchling health");h.assertValueEqual(d.getAttributeValue(Attributes.ARMOR),2D,"armor");
         h.assertValueEqual(d.getAttributeValue(Attributes.MOVEMENT_SPEED),.22D,"ground speed");h.assertTrue(d.getAttributeValue(Attributes.FLYING_SPEED)>0,"flight attribute configurable");h.assertTrue(!d.isTame(),"wild initially");h.succeed();
     }
     private static void spawn(GameTestHelper h){
@@ -167,7 +167,7 @@ public final class BabyDragonGameTests {
         h.runAfterDelay(20,()->{h.assertTrue(d.getTarget()==target&&d.getDragonState()==DragonState.DEFENDING,"reacts to owner being attacked");h.succeed();});
     }
     private static void launch(GameTestHelper h,BabyDragon d,Vec3 pos,Vec3 direction){var e=new DragonEmber(h.getLevel(),d);e.setPos(pos);e.shoot(direction.x,direction.y,direction.z,.8F,0);h.getLevel().addFreshEntity(e);}
-    private static void emberDamage(GameTestHelper h){var d=dragon(h,false);var pig=h.spawnWithNoFreeWill(EntityType.PIG,new BlockPos(8,Y+1,6));pig.setNoGravity(true);float health=pig.getHealth();launch(h,d,pig.position().add(-2,.4,0),new Vec3(1,0,0));h.runAfterDelay(8,()->{h.assertValueEqual(pig.getHealth(),health-3,"ember hit deals three HP");h.assertTrue(!pig.isOnFire(),"no lingering fire damage");h.succeed();});}
+    private static void emberDamage(GameTestHelper h){var d=dragon(h,false);var pig=h.spawnWithNoFreeWill(EntityType.PIG,new BlockPos(8,Y+1,6));pig.setNoGravity(true);float health=pig.getHealth();launch(h,d,pig.position().add(-2,.4,0),new Vec3(1,0,0));h.runAfterDelay(8,()->{h.assertValueEqual(pig.getHealth(),health-6,"updated hatchling ember deals six HP");h.assertTrue(!pig.isOnFire(),"no lingering fire damage");h.succeed();});}
     private static void ownerSafe(GameTestHelper h){var d=dragon(h,false);var p=owner(h,d,6);h.assertTrue(d.isProtected(p)&&!d.canAttack(p),"owner immune to targeting");h.assertTrue(!d.validDefensiveTarget(h.spawnWithNoFreeWill(EntityType.PIG,new BlockPos(8,Y+1,6))),"uninvolved peaceful animals are not targeted");h.succeed();}
     private static void alliesSafe(GameTestHelper h){
         var d=dragon(h,false);var p=owner(h,d,5);var pet=h.spawnWithNoFreeWill(EntityType.WOLF,new BlockPos(7,Y+1,6));pet.tame(p);pet.setNoGravity(true);float health=pet.getHealth();
@@ -181,7 +181,7 @@ public final class BabyDragonGameTests {
         for(int t=0;t<29;t++)d.getDragonBrain().tick();h.assertValueEqual(d.getChargeTicks(),0,"no early next shot");
         d.getDragonBrain().tick();h.assertValueEqual(d.getChargeTicks(),12,"next preparation after thirty ticks");h.succeed();
     }
-    private static void immunity(GameTestHelper h){var d=dragon(h,false);h.assertTrue(!d.hurtServer(h.getLevel(),d.damageSources().lava(),8),"fire immune");h.assertTrue(!d.causeFallDamage(40,1,d.damageSources().fall()),"fall immune");h.assertValueEqual(d.getHealth(),20F,"health intact");h.succeed();}
+    private static void immunity(GameTestHelper h){var d=dragon(h,false);h.assertTrue(!d.hurtServer(h.getLevel(),d.damageSources().lava(),8),"fire immune");h.assertTrue(!d.causeFallDamage(40,1,d.damageSources().fall()),"fall immune");h.assertValueEqual(d.getHealth(),30F,"updated hatchling health intact");h.succeed();}
     private static void teleport(GameTestHelper h){
         var d=dragon(h,false);var p=owner(h,d,6);Vec3 original=d.position();d.setPos(original.add(30,0,0));h.assertTrue(d.teleportNearOwner(),"distant companion teleports to safe ground");h.assertTrue(d.safeGround(d.position())&&d.distanceToSqr(p)<36,"safe solid destination near owner");
         for(int x=1;x<=11;x++)for(int z=1;z<=11;z++)h.setBlock(new BlockPos(x,Y,z),Blocks.LAVA);
@@ -196,7 +196,7 @@ public final class BabyDragonGameTests {
     private static void bestiary(GameTestHelper h){h.assertTrue(Bestiary.ENTRIES.contains(Bestiary.BABY_DRAGON)&&Bestiary.BABY_DRAGON.pages().size()>=6,"six-page chapter registered");h.succeed();}
     private static void resources(GameTestHelper h){
         var model=new BabyDragonModel(BabyDragonModel.createBodyLayer().bakeRoot());
-        h.assertValueEqual(BabyDragonAnimations.ALL.size(),12,"all twelve animations bake against real skeleton");
+        h.assertValueEqual(BabyDragonAnimations.ALL.size(),17,"all previous and new animations bake against real skeleton");
         for(var pose:BabyDragon.Pose.values()){var state=new BabyDragonRenderState();state.ageInTicks=8;state.animations.get(pose).start(0);model.setupAnim(state);}
         for(String path:List.of("textures/entity/baby_dragon.png","textures/item/dragon_ember.png","textures/gui/bestiary/baby_dragon_anatomy.png","textures/gui/bestiary/baby_dragon_flight.png","textures/gui/bestiary/baby_dragon_defense.png"))h.assertTrue(h.getLevel().getServer().getResourceManager().getResource(id(path)).isPresent()||BabyDragonGameTests.class.getResource("/assets/codenamecoraline/"+path)!=null,"packaged asset: "+path);
         h.succeed();

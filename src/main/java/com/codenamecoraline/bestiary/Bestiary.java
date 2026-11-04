@@ -56,7 +56,8 @@ public final class Bestiary {
             BestiaryPage.sketch("intro", "baby_dragon_anatomy", 112, 80),
             BestiaryPage.text("habitat"), BestiaryPage.text("behavior"), BestiaryPage.text("taming"),
             BestiaryPage.sketch("companion", "baby_dragon_flight", 112, 72),
-            BestiaryPage.sketch("defense", "baby_dragon_defense", 112, 72)));
+            BestiaryPage.sketch("defense", "baby_dragon_defense", 112, 72),
+            BestiaryPage.text("growth"), BestiaryPage.text("inferno"), BestiaryPage.text("riding"), BestiaryPage.text("inventory")));
 
     public static final BestiaryEntry CRIMSON_COMMANDER = new BestiaryEntry("crimson_commander", List.of(
             BestiaryPage.text("kingless"),

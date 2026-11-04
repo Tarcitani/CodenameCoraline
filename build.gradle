@@ -22,6 +22,14 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
+// Existing cache unit tests already use Jupiter; none of these dependencies ship in the mod jar.
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.named('test', Test).configure { useJUnitPlatform() }
+
 neoForge {
     version = project.neo_version
 

@@ -54,7 +54,7 @@ public final class ModEntities {
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
     public static final DeferredHolder<EntityType<?>, EntityType<BabyDragon>> BABY_DRAGON = ENTITY_TYPES.register("baby_dragon",
-            id -> EntityType.Builder.of(BabyDragon::new, MobCategory.CREATURE).sized(0.45F, 0.65F).eyeHeight(0.48F)
+            id -> EntityType.Builder.of(BabyDragon::new, MobCategory.CREATURE).sized(0.45F, 0.72F).eyeHeight(0.53F)
                     .fireImmune().clientTrackingRange(10).updateInterval(1).build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
     public static final DeferredHolder<EntityType<?>, EntityType<DragonEmber>> DRAGON_EMBER = ENTITY_TYPES.register("dragon_ember",
             id -> EntityType.Builder.<DragonEmber>of(DragonEmber::new, MobCategory.MISC).sized(0.15F, 0.15F)

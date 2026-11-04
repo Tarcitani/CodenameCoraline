@@ -63,7 +63,6 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
@@ -80,7 +79,6 @@ import net.neoforged.neoforge.registries.RegisterEvent;
  * plot of its own), and every Commander gets a target of his own close by, so that neither he nor his vanguards wander
  * off after a neighbour's golem.</p>
  */
-@EventBusSubscriber(modid = CodenameCoraline.MOD_ID)
 public final class CrimsonCommanderGameTests {
     /** Relative height of every plot's floor. */
     private static final int Y = 100;

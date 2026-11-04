@@ -1,0 +1,10 @@
+// Local second-client inspection; no account or campaign world is used.
+allprojects {
+    afterEvaluate {
+        neoForge.runs.create('dragonObserver') {
+            client()
+            gameDirectory = file('build/dragon-observer-preview')
+            programArguments.addAll('--username', 'DragonObserver', '--quickPlayMultiplayer', '127.0.0.1:25565')
+        }
+    }
+}

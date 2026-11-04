@@ -10,5 +10,8 @@ public final class BabyDragonRenderState extends LivingEntityRenderState {
     public boolean shoulder, sleeping;
     public float flightBlend;
     public int blinkSeed;
+    public float growthScale = 1;
+    public int stage;
+    public int chargeTicks, shotTicks, breathTicks, breathClosingTicks;
     public BabyDragonRenderState() { for (Pose pose : Pose.values()) this.animations.put(pose, new AnimationState()); }
 }

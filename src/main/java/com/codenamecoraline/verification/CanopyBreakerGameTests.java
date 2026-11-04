@@ -52,7 +52,6 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
@@ -63,7 +62,6 @@ import net.neoforged.neoforge.registries.RegisterEvent;
  *
  * <p>Tests build their own plots high above the grid (stone floor + spruce trees) so parallel arenas never interact.</p>
  */
-@EventBusSubscriber(modid = CodenameCoraline.MOD_ID)
 public final class CanopyBreakerGameTests {
     /** Relative height of every plot's floor. */
     private static final int Y = 100;

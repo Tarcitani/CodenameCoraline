@@ -208,7 +208,9 @@ class ThreadSafeLruCacheTest {
                             errors.incrementAndGet();
                         }
                         // Also test getOrCompute
-                        cache.getOrCompute(key + 10000, k -> k * 3);
+                        // Keep computed keys disjoint from every thread's explicit put keys.
+                        // An overlapping namespace legitimately races two different values for one key.
+                        cache.getOrCompute(key + threadCount * operationsPerThread, k -> k * 3);
                     }
                 } catch (Exception e) {
                     errors.incrementAndGet();

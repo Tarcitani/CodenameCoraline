@@ -25,11 +25,12 @@ public final class DragonBrain {
         if (this.attackCooldown > 0) this.attackCooldown--;
         if (this.ambientCooldown > 0) this.ambientCooldown--;
         if (this.repath > 0) this.repath--;
+        if (this.dragon.getRider() != null || this.dragon.getEvolutionTicks() > 0) { this.dragon.getNavigation().stop(); return; }
         LivingEntity owner = this.dragon.getOwner();
         this.selectReactiveTarget(owner);
         LivingEntity target = this.dragon.getTarget();
         if (!this.dragon.isDefensive() || this.dragon.isOrderedToSit() || !this.dragon.validDefensiveTarget(target)
-                || (owner != null && target != null && target.distanceToSqr(owner) > 144) || this.combatTicks > 240) {
+                || (owner != null && target != null && target.distanceToSqr(owner) > 1600) || this.combatTicks > 240) {
             this.dragon.setTarget(null); this.dragon.cancelCharge(); target = null; this.combatTicks = 0;
         }
         if (this.dragon.isOnShoulder()) {
@@ -99,6 +100,12 @@ public final class DragonBrain {
             this.hurtStamp = this.dragon.getLastHurtByMobTimestamp();
             if (BabyDragon.recent(this.dragon, this.hurtStamp)) candidate = this.dragon.getLastHurtByMob();
         }
+        // Hatchlings retain reactive-only defence; grown companions also intercept nearby hostiles.
+        if (candidate == null && this.dragon.getDragonStage() != DragonStage.BABY && owner != null && this.dragon.getTarget() == null && this.dragon.tickCount % 20 == 0) {
+            candidate = this.dragon.level().getEntitiesOfClass(net.minecraft.world.entity.Mob.class, owner.getBoundingBox().inflate(12),
+                    e -> e instanceof net.minecraft.world.entity.monster.Enemy && this.dragon.validDefensiveTarget(e) && this.dragon.hasLineOfSight(e))
+                    .stream().min(java.util.Comparator.comparingDouble(this.dragon::distanceToSqr)).orElse(null);
+        }
         if (this.dragon.validDefensiveTarget(candidate) && this.dragon.distanceToSqr(candidate) <= 576) {
             this.dragon.setTarget(candidate); this.combatTicks = 0;
         }
@@ -106,13 +113,18 @@ public final class DragonBrain {
 
     private void defend(LivingEntity target) {
         this.combatTicks++;
+        this.dragon.aimAt(target.getBoundingBox().getCenter());
         this.dragon.setDragonState(DragonState.DEFENDING); this.dragon.setFlying(true);
         this.orbitAngle += 0.025;
         Vec3 point = target.position().add(Math.cos(this.orbitAngle) * 5, 2 + 0.3 * Math.sin(this.orbitAngle * 1.7), Math.sin(this.orbitAngle) * 5);
         this.moveTo(point); this.dragon.getLookControl().setLookAt(target, 30, 30);
-        if (this.dragon.distanceToSqr(target) > 144 || !this.dragon.getSensing().hasLineOfSight(target)) { this.dragon.cancelCharge(); return; }
+        double range = this.dragon.getDragonStage().range;
+        if (this.dragon.distanceToSqr(target) > range * range || !this.dragon.getSensing().hasLineOfSight(target)) { this.dragon.cancelCharge(); this.dragon.cancelBreath(); return; }
+        if (this.dragon.getBreathTicks() > 0 || this.dragon.getRecoveryTicks() > 0) return;
+        if (this.dragon.distanceTo(target) < this.dragon.getBbWidth() + 1.2 && this.dragon.beginMelee(target)) return;
+        if (this.dragon.getDragonStage() == DragonStage.ADULT && this.dragon.distanceToSqr(target) < 225 && this.dragon.beginBreath()) return;
         if (this.dragon.getChargeTicks() > 0) {
-            if (this.dragon.chargeReady()) { this.dragon.shoot(target); this.attackCooldown = ATTACK_COOLDOWN; }
+            if (this.dragon.chargeReady()) { this.dragon.shoot(target); this.attackCooldown = this.dragon.getDragonStage().fireCooldown; }
         } else if (this.attackCooldown == 0) this.dragon.beginCharge();
     }
 

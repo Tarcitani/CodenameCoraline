@@ -44,7 +44,7 @@ def generate():
                     if x%5 in (1,2): atlas.putpixel((ox+x,oy+y),(63,34,37,255))
             d.point((ox+4,oy+3),fill=(255,255,239,255))
             d.point((ox+2,oy+3),fill=(255,255,239,255))
-    target=ASSETS/'textures/entity/baby_dragon.png';target.parent.mkdir(parents=True,exist_ok=True);atlas.save(target)
+    target=ROOT/'build/dragon-remodel/legacy_baby_atlas.png';target.parent.mkdir(parents=True,exist_ok=True);atlas.save(target)
     egg=Image.new('RGBA',(16,16));d=ImageDraw.Draw(egg)
     d.ellipse((3,1,12,14),fill='#A83232',outline='#562D2E')
     d.ellipse((4,3,10,12),fill='#E34B36')
@@ -58,6 +58,8 @@ def generate():
         (ASSETS/f'items/{name}.json').write_text(json.dumps({'model':{'type':'minecraft:model','model':f'codenamecoraline:item/{name}'}},indent=2)+'\n')
         (ASSETS/f'models/item/{name}.json').write_text(json.dumps({'parent':'minecraft:item/generated','textures':{'layer0':f'codenamecoraline:item/{name}'}},indent=2)+'\n')
     print('Generated hatchling atlas, egg and ember sprites.')
+    from generate_dragon_remodel import main as remodel
+    remodel()
 
 
 if __name__ == '__main__':
