@@ -2,6 +2,48 @@
 
 Registro apenas de decisões relevantes: contexto, decisão e consequências. Não é diário de mudanças (isso é o Git).
 
+## D-037 — Verificação de modelos opt-in e câmera de montaria anatômica
+
+**Contexto.** A inspeção no cliente mostrou que a câmera frontal padrão entrava na cabeça longa do Adulto. O primeiro servidor dedicado real também detectou que a reflexão do registro automático das suítes de geometria tentava resolver `PoseStack.Pose`, ausente na distribuição dedicada, mesmo com os testes desabilitados.
+
+**Decisão.** Usar o atributo vanilla sincronizado `CAMERA_DISTANCE` com distância baseada na largura do rig. Um assinante comum, `ModelGameTestRegistration`, delega às suítes de geometria do dragão, Quebra-Copas e Carmesim apenas quando suas propriedades de teste estão habilitadas; as classes que contêm assinaturas gráficas deixam de ser assinantes automáticos.
+
+**Consequências.** A câmera continua usando a proteção vanilla contra paredes. Servidores normais não carregam classes de renderização dos testes, e os testes continuam exercitando os modelos reais no GameTestServer de desenvolvimento. Build, 81 testes do dragão, 35 do Quebra-Copas e 34 do Carmesim aprovados; servidor dedicado iniciado em loopback. Sem alteração dos ataques desses bosses.
+
+## D-036 — Anatomias próprias com rig de ataque comum entre cliente e servidor
+
+**Contexto.** A evolução anterior ampliava a mesma geometria. A nova ficha exige silhuetas, proporções, asas e caudas diferentes, preservando identidade cromática, gameplay e entidade.
+
+**Decisão.** Três modelos nativos e atlas próprios, com hierarquia de nomes comum e 17 animações por estágio. Geometria é reproduzível por Python/Pillow, com paleta extraída da textura Bebê e snapshot de origem com hash. Torso chanfrado por seções, asas com braço/cotovelo/punho/dedos e membranas recortadas, pescoço hierárquico, garras e caudas de 3/4/6 segmentos. O gerador produz também `DragonRig`, única fonte dos pivôs usados por `DragonAnatomy`; as mesmas rotações posicionam a cabeça no modelo e calculam boca/eixo do fogo no servidor. O renderer escolhe a instância por estado no momento de submissão, preservando o desenho de múltiplas idades no mesmo quadro. Máscaras emissivas e uma brasa ocasional complementam o Adulto sem cobrir a pele.
+
+**Consequências.** Sem nova entidade, biblioteca ou alteração de balanceamento. Dimensões físicas e assento passam a seguir anatomias reais, além da escala; preparos e disparo mantêm os tempos de gameplay. A mira usa o pivô articulado, e um teste compara o ponto e o eixo com a matriz da cabeça real. A comparação com a imagem de referência permanece impossível enquanto ela não estiver disponível: o anexo recebido contém só texto. As versões de corpo/UV anteriores são substituídas pelas novas, mas registros, identidade, vínculo e persistência permanecem.
+
+## D-033 — Evolução do companheiro existente, montaria de servidor e inventário vanilla
+
+**Contexto.** Expandir `baby_dragon` para três idades preservando mundos, UUID, dono, modelo, domesticação e comandos anteriores, sem bibliotecas de runtime.
+
+**Decisão.** Estágios e XP próprios sincronizados/persistentes na mesma entidade. Crescimento 1/1,8/3 afeta dimensões, olhos, boca, modelo e assento; a evolução dura 60 ticks e espera espaço livre. Crédito de XP usa dano efetivo contra hostis, teto por vítima e bônus único de participação na morte. Inventário nativo com 18 posições persistentes por índice, ativadas por idade; apenas o dono acessa; morte derruba itens uma vez e downgrade administrativo recusa conteúdo em posições que seriam ocultadas. Montaria usa pacote de intenção validado e física no servidor, sem aceitar coordenadas do cliente; X desce, G desmonta, R dispara e B sopra (V já era usado pelas cinemáticas). Graveto normal preserva ficar/seguir em qualquer idade; agachar com livro abre a tela sem substituir o ombro Bebê.
+
+**Consequências.** O registro e os recursos existentes continuam; não se cria outra entidade de dragão, reprodução ou ressurreição. Transferência automática entre dimensões continua fora do sistema. O ledger guarda até 1024 vítimas, mais que o necessário para alcançar o teto de 2000 XP; após isso recusa novos créditos. Aparência em movimento, sensação de voo e latência exigem validação humana.
+
+## D-034 — Magma temporário sem substituição de terreno
+
+**Contexto.** A bola colossal precisa deixar magma que expire mesmo com chunks descarregados, sem apagar construções ou alterações posteriores.
+
+**Decisão.** Bloco próprio sem item nem loot, aparência do magma vanilla e sem o dano indiscriminado de `MagmaBlock`. Colocação exclusivamente em ar sobre lista curta de terreno natural, atrás do projétil. Diário `SavedData` por dimensão com posição, prazo em tempo de jogo e UUID do dragão. Não forçar chunks; ao voltar, restaurar o ar somente se ainda houver o bloco temporário. Dano usa o filtro de aliados do mestre; se ele não está disponível, não há dano.
+
+**Consequências.** Nenhum bloco existente é substituído. Pausar o servidor pausa o tempo de expiração; chunks descarregados conservam o prazo e são limpos ao carregar. O rastro tem cap de 4096 posições por dimensão. Quebrar ou substituir uma posição invalida sua restauração, preservando mudanças posteriores.
+
+## D-035 — JUnit apenas para os testes unitários existentes
+
+**Contexto.** O build completo falhava em `compileTestJava`: `ThreadSafeLruCacheTest` já importava Jupiter, mas não havia dependência declarada.
+
+**Decisão.** Com autorização explícita do usuário em 2026-11-04, declarar BOM JUnit 5.13.4, Jupiter e launcher somente nas configurações `testImplementation/testRuntimeOnly`, com `useJUnitPlatform`. Os GameTests do mod continuam nativos.
+
+**Consequências.** Os 15 testes unitários passam a executar no `build`; nada do JUnit integra o jar distribuído ou vira dependência de runtime do mod. Nenhum teste existente é desativado ou enfraquecido.
+
+**Correção da fixture.** A execução real expôs colisão entre as chaves `put` (0–15999) e `getOrCompute` (10000–25999) no teste concorrente. Operações legítimas podiam produzir valores diferentes para a mesma chave, contrariando a asserção. A faixa calculada agora começa após todas as chaves de `put`; quantidade de threads/operações, capacidade e asserções foram mantidas.
+
 ## D-001 — Plataforma: NeoForge com Minecraft 26.1.2
 
 - **Contexto:** o projeto é um mod Java para Minecraft. Não havia versão ou loader definidos. O usuário escolheu, entre as opções oferecidas (1.21.1, 1.21.11 e 26.1.2), a linha 26.1.2 com NeoForge.

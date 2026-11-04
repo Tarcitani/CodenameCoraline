@@ -2,6 +2,8 @@
 
 Estado real do código em `src/`. Atualize este arquivo junto com qualquer mudança de estrutura.
 
+`verification/ModelGameTestRegistration` mantém as suítes de geometria do dragão, Quebra-Copas e Carmesim fora do carregamento normal do servidor dedicado. Somente as propriedades opt-in dessas suítes carregam as classes que referenciam renderização; isso evita que a reflexão do barramento resolva classes gráficas ausentes no servidor. O dragão usa o atributo vanilla sincronizado `CAMERA_DISTANCE` para afastar a câmera de montaria conforme sua anatomia (D-037).
+
 ## Estrutura de diretórios
 
 ```
@@ -146,6 +148,21 @@ Item `codenamecoraline:bestiary` (`item/BestiaryItem`): usar abre `client/bestia
 Valores e receitas: [design/basilisk.md](design/basilisk.md).
 
 ## Dragão Bebê (`baby_dragon`)
+
+Remodelagem anatômica (2026-11-04): três camadas independentes (`BabyDragonModel`, `YoungDragonModel`, `AdultDragonModel`) compartilham `DragonModel` e um contrato de nomes, mas têm geometrias diferentes geradas em `DragonGeometry`. O renderer seleciona modelo/textura por estado em `submit`, inclusive quando várias idades são desenhadas no mesmo quadro; culling abrange asas/cauda. `DragonAnimations` fornece 17 definições próprias por idade, somadas a batimentos, piscar e cauda procedural. `DragonGlowLayer` usa máscaras emissivas por idade.
+
+`tools/generate_dragon_remodel.py` usa a paleta extraída da textura original (`tools/dragon_original_palette.json` com SHA-256), gera atlas separados sem UV compartilhado, geometria cliente e `entity/babydragon/DragonRig` comum. `DragonAnatomy` reproduz as mesmas matrizes de pescoço/cabeça no servidor e no cliente; origem e eixo do fogo são verificados contra a cabeça realmente posada. O estado de disparo é sincronizado, e a mandíbula fecha gradualmente após o sopro. Colisão, olhos, assento e sombra acompanham a anatomia, sem alterar XP, inventário, danos ou recargas. Uma parede que atravesse o pescoço impede disparos de nascer do outro lado. Testes em `DragonModelGameTests` complementam os anteriores. Especificação e prévias: [design/dragon_remodel.md](design/dragon_remodel.md).
+
+Atualização evolutiva (2026-11-04): o mesmo tipo passa por `DragonStage.BABY/YOUNG/ADULT`. Estágio, XP, preparação, sopro e relógio de crescimento usam `SynchedEntityData`. `getDefaultDimensions` acompanha a escala física; renderer e proporções do modelo usam os mesmos dados. Atributos e saúde proporcional são atualizados no servidor. O histórico de combate persistente limita XP por vítima a dano real de até uma barra de vida e um bônus de morte. Ataques, montaria e morte passam pelas regras existentes de `PlayerSummon`.
+
+- `DragonEmber` continua sendo o projétil original: estágio capturado no disparo, tamanho/alcance/dano próprios, área com oclusão no Jovem/Adulto. Só o Adulto produz magma e sopro.
+- `DragonMagmaTrail` é `SavedData` por dimensão, com codec e diário de posição/expiração/UUID. Coloca um bloco próprio não obtenível apenas em ar sobre terreno permitido, sem substituir o chão. `DragonEvents` verifica chunks carregados, restaura somente blocos ainda pertencentes ao rastro e aplica dano apenas a inimigos com mestre disponível. Não carrega chunks à força; expiração pendente é processada quando voltam.
+- `DragonRiderPayload` envia somente intenções e orientação. O servidor valida dono, passageiro, estágio, bits e números finitos; determina velocidade, giro, colisão e recargas. Sem passageiro controlador vanilla, não delega coordenadas ao cliente. O cérebro autônomo fica suspenso durante a montaria/evolução. `DragonRiderControls` fornece teclas configuráveis.
+- `inventory/DragonMenu` usa `AbstractContainerMenu`, `Slot`, `ContainerData` e inventário fixo de 18 posições com 0/9/18 posições ativas. `ContainerHelper` salva índices e pilhas; a morte entrega o conteúdo uma vez. Acesso exige dono, entidade viva e proximidade. `client/babydragon/DragonScreen` usa texturas vanilla de baú e barra de XP.
+- `registry/ModDragonSystems` registra bloco e menu via `DeferredRegister`; o ponto de entrada apenas coordena. `DragonCommands` registra `/dragon <entidade única> stage|xp|info` com permissão de operador.
+- `DragonEvolutionGameTests` complementa `BabyDragonGameTests` na mesma tarefa `runBabyDragonTest`. Especificação atual em [design/dragon_evolution.md](design/dragon_evolution.md). O inventário não tem ressurreição nem transporte automático entre dimensões.
+
+Fundação original (os números de combate abaixo foram substituídos pelos valores da atualização):
 
 - **Servidor:** `entity/babydragon/BabyDragon` estende `TamableAnimal` e implementa `PlayerSummon`. O vínculo, vida, nome e ordem de sentar usam persistência vanilla; defesa, ombro e recarga têm dados próprios. `DragonState` define oito atividades. `DragonBrain` arbitra sozinho seguir, voo, órbita, retorno, ombro, descanso e defesa reativa. `DragonFlightControl` acelera gradualmente em rotas de `FlyingPathNavigation`, preservando colisões de `Entity.move`; em terra usa `GroundPathNavigation`.
 - **Ombro:** a mesma entidade permanece no mundo e usa âncora lateral validada no servidor, com acompanhamento visual no cliente. Sem descartar, recriar ou armazenar snapshots no jogador. Um ocupante por dono; saída segura em situações incompatíveis. O renderer reduz a escala e oculta o próprio ocupante em primeira pessoa (D-031).

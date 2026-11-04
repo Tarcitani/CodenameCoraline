@@ -1,5 +1,44 @@
 # Desenvolvimento
 
+## Remodelagem anatômica do dragão — 2026-11-04
+
+Verificação complementar: cliente real nos três estágios, evolução, inventário e persistência; montaria, câmera, asas/cauda, bola colossal/magma, sopro e deslocamento em servidor dedicado local. A câmera agora usa `CAMERA_DISTANCE` conforme o rig. O registro gráfico dos testes é delegado por `ModelGameTestRegistration` somente quando solicitado (D-037); build e suítes 81/35/34 aprovados em `%TEMP%/coraline-dragon-server-compatibility-tests.log`. Servidor dedicado iniciou em `127.0.0.1`. Os dois perfis conectaram, mas a alternância de janelas provocou duas falhas nativas de GLFW; inspeção simultânea e latência não aprovadas. Evidências e comandos em [design/dragon_remodel.md](design/dragon_remodel.md).
+
+`build` com os 15 unitários aprovado. `runBabyDragonTest`: **81 testes obrigatórios, seis execuções consecutivas aprovadas**, logs `%TEMP%/coraline-dragon-remodel-isolated-1..6.log`. As fixtures de evolução/mecânica usam `setNoAi(true)` explicitamente: `spawnWithNoFreeWill` remove goals/behaviors vanilla, mas não impede `customServerAiStep` e o cérebro próprio. Montaria real e testes anteriores de perseguição/voo continuam com movimento habilitado. Nenhuma asserção foi removida ou afrouxada.
+
+Regressões: Basilisco 17/17, Litófago 11/11, Cobrador 18/18 (na repetição), Quebra-Copas 35/35, Porrete 9/9 e Carmesim 34/34. O Cobrador teve falha inicial em `collector_late_stage_attacks_deal_damage` (Giro); passou sem alteração na repetição. Logs `%TEMP%/coraline-dragon-remodel-regression-*.log`.
+
+```powershell
+python tools/generate_dragon_remodel.py
+.\gradlew.bat -I tools/baby-dragon-sketches.gradle exportBabyDragonSketchModel
+python tools/generate_baby_dragon_sketches.py
+.\gradlew.bat --no-parallel --max-workers=1 build runBabyDragonTest
+```
+
+Gerador, exportador e rasterizador executados. Paleta de referência em `tools/dragon_original_palette.json`; geometrias e `DragonRig` gerados juntos; atlas 512×512 por idade e máscaras emissivas. O gerador antigo de assets chama o novo para não restaurar um atlas incompatível com os modelos atuais.
+
+Prévias: `build/baby-dragon-sketches/{baby_views,young_views,adult_views,anatomy_clay,evolution,adult_attacks}.png` e `animations.gif`. `runClient` de inspeção usa `-I tools/dragon-evolution-preview.gradle` e só o mundo descartável em `build/dragon-evolution-preview`. Evidências/limites em [design/dragon_remodel.md](design/dragon_remodel.md). Comparação com a imagem ausente e avaliação humana de movimento/combate continuam pendentes.
+
+## Evolução do dragão — 2026-11-04
+
+- `build runBabyDragonTest --rerun-tasks`, com `--no-parallel --max-workers=1`: **VALIDADO em seis rodadas consecutivas**, 15 unitários e 71 GameTests por rodada. Logs `%TEMP%/coraline-dragon-evolution-verified-1.log` a `-6.log`. O JUnit 5.13.4 foi autorizado pelo usuário e é exclusivo de testes; o jar do mod não o incorpora.
+- Regressões executadas isoladamente em seis rodadas: Basilisco 17, Litófago 11, Cobrador 18, Quebra-Copas 35, Porrete 9 e Carmesim 34 testes por suíte. Basilisco e Cobrador tiveram uma falha isolada cada e passaram numa sétima tentativa, acumulando seis aprovações; ver relatório para nomes das falhas. Logs `%TEMP%/coraline-dragon-evolution-regression-run<Suite>Test-<rodada>.log`.
+- Exportação e rasterização: **VALIDADAS**, 612 amostras (3 idades × 17 poses × 12 quadros), PNGs de comparação/ataques e GIF em `build/baby-dragon-sketches/`. Comandos abaixo.
+- Cliente de inspeção: `-I tools/dragon-evolution-preview.gradle runClient`, diretório isolado `build/dragon-evolution-preview`, cópia do mundo descartável anterior. Abertura da tela, movimentação de pilhas, montagem, assento e tecla G observados. Screenshots em `build/dragon-evolution-preview/screenshots/`. **Qualidade final de animações/combate/som permanece não verificada pelo usuário.** Nenhum mundo em `run/saves` foi usado.
+
+```powershell
+.\gradlew.bat --no-parallel --max-workers=1 build runBabyDragonTest
+.\gradlew.bat -I tools/baby-dragon-sketches.gradle exportBabyDragonSketchModel
+python tools/generate_baby_dragon_sketches.py
+.\gradlew.bat runClient
+```
+
+Comandos no jogo: `/dragon <UUID ou seletor de uma entidade> stage baby|young|adult`, `xp add <1..2000>` e `info`. Exemplo: `/dragon @e[type=codenamecoraline:baby_dragon,sort=nearest,limit=1] stage adult`. Exigem operador e mesma dimensão. `stage` posiciona o XP no início da idade, sem animação; `xp add` percorre a evolução normal. Reduções recusam slots ocupados que seriam escondidos.
+
+Controle: salmão doma/cura; graveto normal ficar/seguir; agachar com graveto alterna defesa. Agachar com livro abre GUI em qualquer idade; agachar vazio abre GUI no Jovem/Adulto e mantém ombro no Bebê. Clique vazio no Adulto monta. W/S movem, A/D viram, Espaço sobe, X desce/pousa, G desmonta, R dispara e B sopra. Teclas novas remapeáveis; Shift mantém desmontagem vanilla e V mantém cinemáticas.
+
+Balanceamento e matriz de verificação em [design/dragon_evolution.md](design/dragon_evolution.md) e [design/dragon_evolution_validation.md](design/dragon_evolution_validation.md).
+
 Procedimentos de compilação, execução, testes e diagnóstico. Cada comando tem um status. **Só marque "validado" após executar o comando com sucesso e registrar a data.**
 
 ## Compilação

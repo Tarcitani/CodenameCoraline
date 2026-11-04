@@ -1,6 +1,6 @@
 # Dragão Bebê (`baby_dragon`)
 
-Companheiro original para Minecraft 26.1.2 / NeoForge 26.1.2.124. Sem bibliotecas novas, GeckoLib, reprodução ou crescimento para um dragão adulto. A aparência é a de um filhote permanente, com quatro patas; a categoria é `CREATURE`, inclusive no Pacífico.
+Companheiro original para Minecraft 26.1.2 / NeoForge 26.1.2.124, categoria `CREATURE`, inclusive no Pacífico. **Atualização de 2026-11-04:** o filhote agora evolui para Jovem e Adulto na mesma entidade. Valores, habilidades, montaria, inventário e controles atuais em [dragon_evolution.md](dragon_evolution.md). As seções abaixo descrevem a fundação do companheiro e seu comportamento Bebê; o relatório de 2026-10-29 é histórico.
 
 ## Aparência e recursos
 
@@ -24,10 +24,10 @@ O exportador percorre a geometria real assada após `setupAnim`, incluindo UVs, 
 
 | Propriedade | Valor |
 |---|---|
-| Vida | 20 HP |
+| Vida | 30 HP (Bebê; Jovem 80, Adulto 200) |
 | Armadura | 2 |
 | Velocidade terrestre | 0,22 |
-| Velocidade aérea | 0,34, atributo vanilla `flying_speed` alterável por `/attribute` |
+| Velocidade aérea | 0,25 / 0,35 / 0,45; atributo vanilla `flying_speed` |
 | Detecção/acompanhamento | 16 blocos |
 | Alcance de defesa/disparo | 12 blocos |
 | XP | 2 |
@@ -45,7 +45,7 @@ O exportador percorre a geometria real assada após `setupAnim`, incluindo UVs, 
 | Agachar + graveto no dragão | Alterna a defesa e informa o estado na barra de ação |
 | Segurar agachamento por 20 ticks no ombro | Libera o dragão depois da tolerância inicial de 40 ticks |
 
-Outros jogadores não mudam o dono nem comandam ou alimentam o companheiro. Nomear com etiqueta continua vanilla. UUID do dono, domesticação, vida, nome e ordem de sentar são persistidos pela superclasse `TamableAnimal`; defesa, flag do ombro e recarga são dados adicionais. Não há tela própria.
+Outros jogadores não mudam o dono nem comandam ou alimentam o companheiro. Nomear com etiqueta continua vanilla. UUID do dono, domesticação, vida, nome e ordem de sentar são persistidos pela superclasse `TamableAnimal`; defesa, flag do ombro e recarga são dados adicionais. A atualização acrescenta tela vanilla: agachar com livro em qualquer estágio, ou agachar de mão vazia no Jovem/Adulto. Clique normal com graveto alterna ficar/seguir em qualquer idade; mão vazia no Adulto monta.
 
 ## Máquina de estados e movimento
 
@@ -78,7 +78,7 @@ O servidor valida a âncora; o cliente acompanha sua posição para reduzir atra
 
 Pode reagir a um hostil que feriu o dono, a um agressor próprio ou a um alvo válido atacado pelo dono nos últimos cinco segundos. Criaturas neutras só entram quando envolvidas nesse combate. Animais pacíficos e aldeões podem ser alvos quando o dono os ataca; sem envolvimento, são ignorados. Aliados de equipe, companheiros do mesmo dono, invocações de jogador e o dono continuam protegidos. Jogadores respeitam `Player.canHarmPlayer` (incluindo regras de PvP do `ServerPlayer`). `PlayerSummon` integra a proteção recíproca já existente com Micos e Presentes aliados.
 
-Durante a defesa mantém movimento orbital a cerca de cinco blocos do alvo. Com linha de visão e alvo a até 12 blocos, prepara durante 12 ticks, dispara e entra em recarga de 30 ticks. Perda de alvo/visão cancela a preparação. A centelha nasce na boca, velocidade 1,2 (`DragonEmber.SPEED`), gravidade zero, percurso de até 12 blocos e vida limitada. Usa `ThrowableItemProjectile` com sprite de 16 × 16 e renderer reduzido com luz própria. Dano direto: 3 HP antes da armadura. Partículas de chama pequena no carregamento, rastro e impacto. Sem dano periódico de fogo.
+Durante a defesa Bebê mantém movimento orbital a cerca de cinco blocos do alvo. Com linha de visão e alvo a até 12 blocos, prepara durante 12 ticks, dispara e entra em recarga de 30 ticks. Perda de alvo/visão cancela a preparação. A centelha nasce na boca, velocidade 1,2 (`DragonEmber.SPEED`), gravidade zero, percurso de até 12 blocos e vida limitada. Usa `ThrowableItemProjectile` com sprite de 16 × 16 e renderer reduzido com luz própria. Dano direto atualizado: 6 HP antes da armadura. Jovem e Adulto ampliam dano, alcance e efeitos, documentados em `dragon_evolution.md`.
 
 O projétil ignora aliados na colisão e confere a proteção novamente no impacto. Colide com blocos. Não usa as rotinas de explosão, ignição, transformação de blocos ou `SmallFireball`; portanto não causa incêndios no cenário nem depende de `mobGriefing`.
 
