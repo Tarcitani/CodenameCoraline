@@ -69,6 +69,12 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
             systemProperty 'coraline.babyDragonTests', 'true'
         }
+        crimsonCommanderTest {
+            type = 'gameTestServer'
+            gameDirectory = file('build/crimson-gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'coraline.crimsonTests', 'true'
+        }
         // Applies to all run configurations above.
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'

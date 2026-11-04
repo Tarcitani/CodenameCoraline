@@ -1012,5 +1012,183 @@
         "volume": 1.0
       }
     ]
+  },
+  "entity.crimson_commander.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_commander.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:item.armor.equip_netherite",
+        "type": "event",
+        "volume": 0.6,
+        "pitch": 0.65
+      }
+    ]
+  },
+  "entity.crimson_commander.step": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_commander.step",
+    "sounds": [
+      {
+        "name": "minecraft:entity.iron_golem.step",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.75
+      }
+    ]
+  },
+  "entity.crimson_commander.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_commander.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:entity.iron_golem.hurt",
+        "type": "event",
+        "volume": 0.9,
+        "pitch": 0.7
+      }
+    ]
+  },
+  "entity.crimson_commander.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_commander.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.wither_skeleton.death",
+        "type": "event",
+        "volume": 1.2,
+        "pitch": 0.6
+      },
+      {
+        "name": "minecraft:block.beacon.deactivate",
+        "type": "event",
+        "volume": 1.2,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.crimson_commander.crimson_slash": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_commander.crimson_slash",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.sweep",
+        "type": "event",
+        "volume": 1.1,
+        "pitch": 0.7
+      }
+    ]
+  },
+  "entity.crimson_commander.dash_thrust": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_commander.dash_thrust",
+    "sounds": [
+      {
+        "name": "minecraft:entity.breeze.wind_burst",
+        "type": "event",
+        "volume": 1.2,
+        "pitch": 0.8
+      }
+    ]
+  },
+  "entity.crimson_commander.heavy_overhead_slam": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_commander.heavy_overhead_slam",
+    "sounds": [
+      {
+        "name": "minecraft:block.anvil.land",
+        "type": "event",
+        "volume": 1.2,
+        "pitch": 0.65
+      },
+      {
+        "name": "minecraft:entity.generic.explode",
+        "type": "event",
+        "volume": 1.2,
+        "pitch": 0.65
+      }
+    ]
+  },
+  "entity.crimson_commander.defensive_guard": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_commander.defensive_guard",
+    "sounds": [
+      {
+        "name": "minecraft:item.shield.block",
+        "type": "event",
+        "volume": 1.1,
+        "pitch": 1.2
+      }
+    ]
+  },
+  "entity.crimson_commander.blood_crescent_wave": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_commander.blood_crescent_wave",
+    "sounds": [
+      {
+        "name": "minecraft:entity.evoker.cast_spell",
+        "type": "event",
+        "volume": 1.1,
+        "pitch": 0.55
+      }
+    ]
+  },
+  "entity.crimson_commander.awaken": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_commander.awaken",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.activate",
+        "type": "event",
+        "volume": 1.2,
+        "pitch": 0.6
+      },
+      {
+        "name": "minecraft:entity.evoker.prepare_summon",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.crimson_ash_vanguard.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_ash_vanguard.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:entity.skeleton.ambient",
+        "type": "event",
+        "volume": 0.6,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.crimson_ash_vanguard.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_ash_vanguard.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:entity.skeleton.hurt",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.crimson_ash_vanguard.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_ash_vanguard.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.skeleton.death",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.6
+      },
+      {
+        "name": "minecraft:block.soul_sand.break",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.7
+      }
+    ]
+  },
+  "entity.crimson_ash_vanguard.step": {
+    "subtitle": "subtitles.codenamecoraline.entity.crimson_ash_vanguard.step",
+    "sounds": [
+      {
+        "name": "minecraft:entity.skeleton.step",
+        "type": "event",
+        "volume": 0.5,
+        "pitch": 0.7
+      }
+    ]
   }
 }

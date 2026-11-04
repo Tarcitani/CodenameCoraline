@@ -11,6 +11,8 @@ import com.codenamecoraline.entity.basilisk.MistFlask;
 import com.codenamecoraline.entity.lithophage.AmberShard;
 import com.codenamecoraline.entity.lithophage.Lithophage;
 import com.codenamecoraline.entity.canopy.CanopyBreaker;
+import com.codenamecoraline.entity.crimson.CrimsonAshVanguard;
+import com.codenamecoraline.entity.crimson.CrimsonCommander;
 import com.codenamecoraline.entity.macaque.BarkMacaque;
 import com.codenamecoraline.entity.spirit.BossSpirit;
 import com.codenamecoraline.entity.collector.CollectorGift;
@@ -130,6 +132,24 @@ public final class ModEntities {
                     .clientTrackingRange(10)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<CrimsonCommander>> CRIMSON_COMMANDER = ENTITY_TYPES.register("crimson_commander",
+            id -> EntityType.Builder.of(CrimsonCommander::new, MobCategory.MONSTER)
+                    .sized(CrimsonCommander.WIDTH, CrimsonCommander.HEIGHT).eyeHeight(CrimsonCommander.EYE_HEIGHT)
+                    .fireImmune().clientTrackingRange(10)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<CrimsonAshVanguard>> CRIMSON_ASH_VANGUARD = ENTITY_TYPES.register("crimson_ash_vanguard",
+            id -> EntityType.Builder.of(CrimsonAshVanguard::new, MobCategory.MONSTER)
+                    .sized(CrimsonAshVanguard.WIDTH, CrimsonAshVanguard.HEIGHT).eyeHeight(1.7F)
+                    .fireImmune().clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<BossSpirit>> CRIMSON_COMMANDER_SPIRIT = ENTITY_TYPES.register("crimson_commander_spirit",
+            id -> EntityType.Builder.<BossSpirit>of(BossSpirit::new, MobCategory.MISC)
+                    .sized(CrimsonCommander.WIDTH, CrimsonCommander.HEIGHT).noSave().fireImmune()
+                    .clientTrackingRange(10)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
     private ModEntities() {}
 
     public static void register(IEventBus modEventBus) {
@@ -149,6 +169,9 @@ public final class ModEntities {
         event.put(BARK_MACAQUE.get(), BarkMacaque.createAttributes().build());
         event.put(CANOPY_BREAKER_SPIRIT.get(), BossSpirit.createAttributes().build());
         event.put(LAST_GIFT_COLLECTOR_SPIRIT.get(), BossSpirit.createAttributes().build());
+        event.put(CRIMSON_COMMANDER.get(), CrimsonCommander.createAttributes().build());
+        event.put(CRIMSON_ASH_VANGUARD.get(), CrimsonAshVanguard.createAttributes().build());
+        event.put(CRIMSON_COMMANDER_SPIRIT.get(), BossSpirit.createAttributes().build());
     }
 
     private static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {
@@ -158,5 +181,7 @@ public final class ModEntities {
                 Basilisk::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(LITHOPHAGE.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 Lithophage::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(CRIMSON_COMMANDER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                CrimsonCommander::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 }

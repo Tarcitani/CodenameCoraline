@@ -89,6 +89,21 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> MACAQUE_LEAP = register("entity.bark_macaque.leap");
     public static final DeferredHolder<SoundEvent, SoundEvent> MACAQUE_STEP = register("entity.bark_macaque.step");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRIMSON_AMBIENT = register("entity.crimson_commander.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRIMSON_STEP = register("entity.crimson_commander.step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRIMSON_HURT = register("entity.crimson_commander.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRIMSON_DEATH = register("entity.crimson_commander.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRIMSON_SLASH = register("entity.crimson_commander.crimson_slash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRIMSON_DASH = register("entity.crimson_commander.dash_thrust");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRIMSON_SLAM = register("entity.crimson_commander.heavy_overhead_slam");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRIMSON_GUARD = register("entity.crimson_commander.defensive_guard");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRIMSON_WAVE = register("entity.crimson_commander.blood_crescent_wave");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CRIMSON_AWAKEN = register("entity.crimson_commander.awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> VANGUARD_AMBIENT = register("entity.crimson_ash_vanguard.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> VANGUARD_HURT = register("entity.crimson_ash_vanguard.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> VANGUARD_DEATH = register("entity.crimson_ash_vanguard.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> VANGUARD_STEP = register("entity.crimson_ash_vanguard.step");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUND_EVENTS.register(name, SoundEvent::createVariableRangeEvent);
     }

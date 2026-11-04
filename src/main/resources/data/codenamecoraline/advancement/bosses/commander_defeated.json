@@ -1,0 +1,40 @@
+{
+  "parent": "codenamecoraline:bosses/commander_summoned",
+  "criteria": {
+    "killed_crimson_commander": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "codenamecoraline:crimson_commander"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.commander_defeated.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:crimson_commander_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.commander_defeated.title"
+    }
+  },
+  "requirements": [
+    [
+      "killed_crimson_commander"
+    ]
+  ]
+}

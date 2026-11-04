@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "codenamecoraline:item/crimson_oath_greatsword"
+  }
+}

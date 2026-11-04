@@ -36,6 +36,7 @@ public final class ThemedBossBars {
     static {
         register("entity." + CodenameCoraline.MOD_ID + ".last_gift_collector", new LastGiftCollectorBossBar());
         register("entity." + CodenameCoraline.MOD_ID + ".canopy_breaker", new CanopyBreakerBossBar());
+        register("entity." + CodenameCoraline.MOD_ID + ".crimson_commander", new CrimsonCommanderBossBar());
     }
 
     private ThemedBossBars() {}

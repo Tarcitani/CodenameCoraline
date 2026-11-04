@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "codenamecoraline:crimson_plate_shard",
+    "codenamecoraline:crimson_plate_shard",
+    "codenamecoraline:crimson_plate_shard",
+    "codenamecoraline:crimson_plate_shard",
+    "codenamecoraline:stained_oath_crest",
+    "minecraft:netherite_sword"
+  ],
+  "result": {
+    "id": "codenamecoraline:crimson_oath_greatsword"
+  }
+}

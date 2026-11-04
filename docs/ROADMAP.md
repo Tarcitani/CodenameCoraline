@@ -157,3 +157,9 @@ Estado da fundação, verificações realizadas e pendências. Não contém esco
 
 - Porrete segurado pela ponta do cabo, cabeça para fora (geometria, não só pose); golpes quebram a guarda do escudo; Agarrar e Arremessar e Soco no Chão com animações próprias; salto de chão (inclusive contra alvos em pilares) e flanco por árvores desde o estágio 1. Ver D-031.
 - GameTestServer direto: ver `docs/DEVELOPMENT.md`. **Não verificado no jogo:** animações em movimento, sensação do arremesso, comportamento em florestas reais, o caminho completo golpe -> escudo de jogador real.
+
+## Comandante Carmesim — 2026-11-03
+
+- Novo boss `crimson_commander`: cavaleiro carmesim de 3,5 blocos com espada larga; Corte Cruzado, Investida Perfurante, Golpe Pesado Aéreo, Guarda Defensiva com Riposta e Onda de Lâmina Sanguínea; três estágios (60% e 25%) com Sentinelas de Cinza Carmesim no segundo e combo de fúria no terceiro; spawn natural raro abaixo de Y 0 no escuro e invocação com a Insígnia do Juramento Manchada sobre tijolos de ardósia; morte com espírito e a Espada Larga do Juramento Carmesim (Investida Carmesim) entregue uma vez; barra temática, Bestiário de 6 páginas com 3 gravuras do modelo real, 4 conquistas, receita, loot e sons. Ver D-032 e [design/crimson_commander.md](design/crimson_commander.md).
+- Evidência: GameTestServer direto, 32/32 em 8 execuções seguidas com o código final; regressão das outras suítes aprovada (ver `docs/DEVELOPMENT.md`). Poses de referência conferidas em renders offline do modelo real e por teste de geometria.
+- **Pendente / não verificado no jogo:** `.\gradlew.bat build` e `runCrimsonCommanderTest` (o Gradle não roda no shell do agente), `runClient` (aparência, animações em movimento, partículas, sons, barra, gravuras no livro), balanceamento real, comportamento em cavernas reais e contra um jogador real (o jogador de teste não entra nas buscas de entidades). A primeira Insígnia só vem de um Comandante natural (raro) ou do criativo.

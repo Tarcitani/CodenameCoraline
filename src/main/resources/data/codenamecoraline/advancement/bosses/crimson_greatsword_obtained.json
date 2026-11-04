@@ -1,0 +1,36 @@
+{
+  "parent": "codenamecoraline:bosses/commander_defeated",
+  "criteria": {
+    "has_greatsword": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "codenamecoraline:crimson_oath_greatsword"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.crimson_greatsword_obtained.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:crimson_commander_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.crimson_greatsword_obtained.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_greatsword"
+    ]
+  ]
+}

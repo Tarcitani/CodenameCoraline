@@ -3,11 +3,13 @@ package com.codenamecoraline.registry;
 import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.item.BestiaryItem;
 import com.codenamecoraline.item.CatacombLilyItem;
+import com.codenamecoraline.item.CrimsonOathGreatswordItem;
 import com.codenamecoraline.item.DeadrootClubItem;
 import com.codenamecoraline.item.HollowTrunkIdolItem;
 import com.codenamecoraline.item.MistFlaskItem;
 import com.codenamecoraline.item.RenegadeGreataxeItem;
 import com.codenamecoraline.item.SilentBellItem;
+import com.codenamecoraline.item.StainedOathCrestItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -36,6 +38,10 @@ public final class ModItems {
     /** Deadroot: a heavy club of dead wood. */
     private static final ToolMaterial DEADROOT = new ToolMaterial(
             BlockTags.INCORRECT_FOR_IRON_TOOL, 720, 5.0F, 2.0F, 10, ItemTags.LOGS);
+
+    /** Obsidian steel edged with gold: the Crimson Oath Greatsword (10 attack damage in all, a heavy netherite-grade blade). */
+    private static final ToolMaterial CRIMSON_OATH = new ToolMaterial(
+            BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 2100, 8.0F, 4.0F, 15, ItemTags.NETHERITE_TOOL_MATERIALS);
 
     /** Rusted iron: a worse iron. Used by the weapons a Redcap drops. */
     private static final ToolMaterial RUSTED_IRON = new ToolMaterial(
@@ -120,6 +126,23 @@ public final class ModItems {
     public static final DeferredItem<Item> FROSTBOUND_THREAD = ITEMS.registerSimpleItem("frostbound_thread");
     public static final DeferredItem<Item> SOLSTICE_SEAL = ITEMS.registerSimpleItem("solstice_seal",
             () -> new Item.Properties().stacksTo(16));
+
+    public static final DeferredItem<Item> CRIMSON_COMMANDER_SPAWN_EGG = ITEMS.registerItem("crimson_commander_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.CRIMSON_COMMANDER.get()));
+    public static final DeferredItem<Item> CRIMSON_ASH_VANGUARD_SPAWN_EGG = ITEMS.registerItem("crimson_ash_vanguard_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.CRIMSON_ASH_VANGUARD.get()));
+    public static final DeferredItem<Item> CRIMSON_PLATE_SHARD = ITEMS.registerSimpleItem("crimson_plate_shard");
+    /** Calls the Crimson Commander on deepslate bricks; also part of his greatsword recipe. */
+    public static final DeferredItem<Item> STAINED_OATH_CREST = ITEMS.registerItem("stained_oath_crest", StainedOathCrestItem::new,
+            properties -> properties.stacksTo(16).rarity(Rarity.UNCOMMON));
+    public static final DeferredItem<Item> CRIMSON_OATH_GREATSWORD = ITEMS.registerItem("crimson_oath_greatsword", CrimsonOathGreatswordItem::new,
+            properties -> properties.sword(CRIMSON_OATH, 5.0F, -3.0F).rarity(Rarity.EPIC).fireResistant()
+                    .component(DataComponents.LORE, new ItemLore(List.of(
+                            Component.translatable("item.codenamecoraline.crimson_oath_greatsword.lore1").withStyle(ChatFormatting.RED),
+                            Component.translatable("item.codenamecoraline.crimson_oath_greatsword.lore2").withStyle(ChatFormatting.GRAY)))));
+    /** The Crimson Commander helm, used only as the icon of his story advancements. */
+    public static final DeferredItem<Item> CRIMSON_COMMANDER_PORTRAIT = ITEMS.registerSimpleItem("crimson_commander_portrait",
+            () -> new Item.Properties().stacksTo(1));
 
     public static final DeferredItem<Item> BABY_DRAGON_SPAWN_EGG = ITEMS.registerItem("baby_dragon_spawn_egg", SpawnEggItem::new,
             () -> new Item.Properties().spawnEgg(ModEntities.BABY_DRAGON.get()));

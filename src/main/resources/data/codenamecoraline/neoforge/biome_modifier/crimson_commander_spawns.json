@@ -1,0 +1,12 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#codenamecoraline:crimson_commander_habitat",
+  "spawners": [
+    {
+      "type": "codenamecoraline:crimson_commander",
+      "weight": 2,
+      "minCount": 1,
+      "maxCount": 1
+    }
+  ]
+}

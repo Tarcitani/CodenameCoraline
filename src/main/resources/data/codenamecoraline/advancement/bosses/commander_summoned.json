@@ -1,0 +1,50 @@
+{
+  "parent": "codenamecoraline:bosses/oath_discovered",
+  "criteria": {
+    "set_the_crest": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "codenamecoraline:stained_oath_crest"
+            }
+          },
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": [
+                  "minecraft:deepslate_bricks",
+                  "minecraft:polished_deepslate"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.commander_summoned.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:crimson_commander_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.commander_summoned.title"
+    }
+  },
+  "requirements": [
+    [
+      "set_the_crest"
+    ]
+  ]
+}
