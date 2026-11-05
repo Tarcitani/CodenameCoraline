@@ -26,7 +26,13 @@ public final class DragonCommands {
             if (!dragon.setDragonStage(s, false)) throw ERROR.create();
             ctx.getSource().sendSuccess(() -> Component.translatable("command.codenamecoraline.dragon.stage", s.title()), true); return 1;
         }));
-        target.then(stage).then(Commands.literal("xp").then(Commands.literal("add").then(Commands.argument("amount", IntegerArgumentType.integer(1, 2000)).executes(ctx -> {
+        var order = Commands.literal("command");
+        for (BabyDragon.Command c : BabyDragon.Command.values()) order.then(Commands.literal(c.name().toLowerCase(java.util.Locale.ROOT)).executes(ctx -> {
+            BabyDragon dragon = selected(ctx);
+            if (!dragon.issueCommand(c, null)) throw ERROR.create();
+            return info(ctx);
+        }));
+        target.then(stage).then(order).then(Commands.literal("xp").then(Commands.literal("add").then(Commands.argument("amount", IntegerArgumentType.integer(1, 2000)).executes(ctx -> {
             selected(ctx).addDragonXp(IntegerArgumentType.getInteger(ctx, "amount")); return info(ctx);
         })))).then(Commands.literal("info").executes(DragonCommands::info));
         event.getDispatcher().register(Commands.literal("dragon").requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER)).then(target));
