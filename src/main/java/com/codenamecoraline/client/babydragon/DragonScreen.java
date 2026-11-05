@@ -23,7 +23,13 @@ public final class DragonScreen extends AbstractContainerScreen<DragonMenu> {
         graphics.blit(RenderPipelines.GUI_TEXTURED, CHEST, x, y + 125, 0, 126, 176, 96, 256, 256);
         graphics.blit(RenderPipelines.GUI_TEXTURED, CHEST, x, y + 128, 0, 126, 176, 96, 256, 256);
         graphics.fill(x + 7, y + 17, x + 169, y + 128, 0xFFC6C6C6);
-        for (int slot = 0; slot < this.menu.getStage().slots; slot++) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, CHEST, x + 133, y + 17, 7, 17, 18, 18, 256, 256);
+        if (this.menu.isSaddled()) {
+            graphics.blit(RenderPipelines.GUI_TEXTURED, CHEST, x + 151, y + 17, 7, 17, 18, 18, 256, 256);
+        } else {
+            graphics.fill(x + 151, y + 17, x + 169, y + 35, 0xFF9E9E9E);
+        }
+        for (int slot = 0; slot < this.menu.getActiveCargoSlots(); slot++) {
             int sx = x + 7 + slot % 9 * 18, sy = y + 83 + slot / 9 * 18;
             graphics.blit(RenderPipelines.GUI_TEXTURED, CHEST, sx, sy, 7, 17, 18, 18, 256, 256);
         }
@@ -50,11 +56,16 @@ public final class DragonScreen extends AbstractContainerScreen<DragonMenu> {
         graphics.text(this.font, this.playerInventoryTitle, 8, 130, 0xFF404040, false);
     }
     private void line(GuiGraphicsExtractor graphics, Component text, int y) {
-        graphics.text(this.font, this.font.plainSubstrByWidth(text.getString(), 160), 8, y, 0xFF404040, false);
+        graphics.text(this.font, this.font.plainSubstrByWidth(text.getString(), y <= 28 ? 122 : 160), 8, y, 0xFF404040, false);
     }
     @Override protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         super.extractTooltip(graphics, mouseX, mouseY);
-        if (this.isHovering(8, 64, 160, 20, mouseX, mouseY)) {
+        if (this.isHovering(134, 18, 16, 16, mouseX, mouseY) && !this.menu.getSlot(DragonMenu.MENU_SLOT_SADDLE).hasItem()) {
+            graphics.setTooltipForNextFrame(this.font, Component.translatable("gui.codenamecoraline.dragon.slot.saddle"), mouseX, mouseY);
+        } else if (this.isHovering(152, 18, 16, 16, mouseX, mouseY) && !this.menu.getSlot(DragonMenu.MENU_SLOT_TOTEM).hasItem()) {
+            graphics.setTooltipForNextFrame(this.font, Component.translatable(
+                    this.menu.isSaddled() ? "gui.codenamecoraline.dragon.slot.totem" : "gui.codenamecoraline.dragon.slot.totem_locked"), mouseX, mouseY);
+        } else if (this.isHovering(8, 64, 160, 20, mouseX, mouseY)) {
             int index = ((mouseY - this.topPos - 64) / 10) * 2 + Math.min(1, (mouseX - this.leftPos - 8) / 104);
             String key = index == 0 ? "flight" : index == 1 ? "fireball_" + this.menu.getStage().name().toLowerCase(java.util.Locale.ROOT) : index == 2 ? "breath" : "riding";
             graphics.setTooltipForNextFrame(this.font, Component.translatable("gui.codenamecoraline.dragon.help." + key), mouseX, mouseY);
