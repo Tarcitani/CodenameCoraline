@@ -22,5 +22,9 @@ public final class BabyDragonClient {
     @SubscribeEvent public static void screens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) {
         event.register(com.codenamecoraline.registry.ModDragonSystems.DRAGON_MENU.get(), DragonScreen::new);
     }
+    @SubscribeEvent public static void payloads(net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent event) {
+        event.register(com.codenamecoraline.entity.babydragon.DragonNamingPayloads.Prompt.TYPE,
+                (payload, context) -> DragonNameScreen.open(payload.entityId()));
+    }
     private BabyDragonClient() {}
 }
