@@ -104,6 +104,34 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> VANGUARD_DEATH = register("entity.crimson_ash_vanguard.death");
     public static final DeferredHolder<SoundEvent, SoundEvent> VANGUARD_STEP = register("entity.crimson_ash_vanguard.step");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> WITCH_AMBIENT = register("entity.ten_threads_witch.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WITCH_HURT = register("entity.ten_threads_witch.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WITCH_DEATH = register("entity.ten_threads_witch.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WITCH_THREAD_TENSION = register("entity.ten_threads_witch.thread_tension");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WITCH_THREAD_SNAP = register("entity.ten_threads_witch.thread_snap");
+    /** The Matriarch's voice lines (the text is shown on the action bar; see WitchDialogueManager). */
+    public static final DeferredHolder<SoundEvent, SoundEvent> WITCH_VOICE = register("entity.ten_threads_witch.voice");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PUPPET_HURT = register("entity.ten_threads_puppet.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PUPPET_DEATH = register("entity.ten_threads_puppet.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PUPPET_AWAKEN = register("entity.ten_threads_puppet.awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PUPPET_TANGLED = register("entity.ten_threads_puppet.tangled");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PUPPET_CRASH = register("entity.ten_threads_puppet.crash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PUPPET_CRACK = register("entity.ten_threads_puppet.crack");
+
+    /** The signature sound of each puppet (steps and attacks), one event per kind. */
+    private static final java.util.EnumMap<com.codenamecoraline.entity.ten_threads_witch.PuppetKind, DeferredHolder<SoundEvent, SoundEvent>> PUPPET_ACTIONS =
+            new java.util.EnumMap<>(com.codenamecoraline.entity.ten_threads_witch.PuppetKind.class);
+
+    static {
+        for (var kind : com.codenamecoraline.entity.ten_threads_witch.PuppetKind.values()) {
+            PUPPET_ACTIONS.put(kind, register("entity." + kind.id + ".action"));
+        }
+    }
+
+    public static SoundEvent puppetAction(com.codenamecoraline.entity.ten_threads_witch.PuppetKind kind) {
+        return PUPPET_ACTIONS.get(kind).get();
+    }
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUND_EVENTS.register(name, SoundEvent::createVariableRangeEvent);
     }

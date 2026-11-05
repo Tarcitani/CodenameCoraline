@@ -83,6 +83,18 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
             systemProperty 'coraline.crimsonTests', 'true'
         }
+        tenThreadsWitchTest {
+            type = 'gameTestServer'
+            gameDirectory = file('build/ten-threads-gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'coraline.tenThreadsTests', 'true'
+        }
+        matriarchAnimationTest {
+            type = 'gameTestServer'
+            gameDirectory = file('build/matriarch-animation-gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'coraline.matriarchAnimTests', 'true'
+        }
         // Applies to all run configurations above.
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'

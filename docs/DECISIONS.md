@@ -268,3 +268,43 @@ Registro apenas de decisões relevantes: contexto, decisão e consequências. N�
 
 **Consequências.** O boss não depende de entidades auxiliares além das Sentinelas e do espírito. Valores de dano e recarga são os da ficha e podem precisar de calibração jogando. A primeira Insígnia só sai de um Comandante natural (raro) ou do modo criativo. Visual, partículas e sons dependem do `runClient` para validação.
 
+
+## D-033 — Bruxa dos Dez Fios: boss composto sequencial numa só classe de marionete
+
+**Contexto.** A ficha pede um boss que reúne onze criaturas (a Matriarca e dez marionetes com atributos, tamanhos, voo e três ataques cada), lutadas uma por vez, com um fio cortável antes de cada ataque especial, arena própria, anti-cheese e uma arma de recompensa com três posturas. Onze classes de entidade com onze IAs, onze renderizadores e onze animadores seriam cerca de dez vezes o código a testar e a manter.
+
+**Decisão.** (1) Existe **uma** classe `PuppetEntity` para as dez marionetes (dez tipos de entidade registrados sobre ela, `PuppetKind` como tabela) e **um** `AttackRunner` que implementa as fases e os 13 estilos de ataque para as 11 criaturas; um ataque novo é uma linha de dados (`PuppetAttack`), não uma classe. (2) A **Matriarca é o diretor**: só ela decide estágio, quem acorda, invulnerabilidade, arena, puxada e reset; as marionetes só lutam e avisam (`onPuppetDefeated`). (3) Só uma marionete luta por vez e a Matriarca é intocável (`hurtServer` falso) até o estágio 11: o jogador sempre enfrenta uma coisa só, e não há combinação de estados a testar. (4) Aliados nunca se ferem: `TenThreadsEncounterMember` marca todos os membros e `AttackRunner.isFoe` os exclui; os alvos são jogadores (não espectadores) e golems de ferro, o mesmo critério dos bosses anteriores. (5) O fio carmesim e o estado ENROSCADA são a única mecânica de contrajogada comum; os pontos fracos por marionete são multiplicadores num só método (`damageMultiplier`). (6) Os dez corpos pendem dos fios desde o `INTRO` (`suspend`) e são puxados na vez (`awaken`); se uma marionete some, a mesma é recriada, sem pular estágio. (7) A arena só prende quem entrou nela e a limpeza da Matriarca só remove os hitboxes dos **seus** fios: dois encontros (ou dois testes) a menos de 80 blocos não interferem. (8) O anti-pilar tem preferência sobre o anti-buraco quando o alvo está alto e inalcançável (içar a marionete até o pilar anularia a puxada).
+
+**Consequências.** Todas as criaturas compartilham comportamento, bugs e correções; um ajuste no `AttackRunner` vale para as onze (por isso o salto passou a ser guiado até o ponto travado). Mais marionetes custam uma entrada em `PuppetKind`, um modelo e um som. O balanceamento é feito pela tabela. A IA é genérica por estilo: nenhuma marionete tem comportamento único fora de `damageMultiplier` e de poucos casos em `PuppetEntity` (rachadura do cão, cura da Mãe na água, folhas do Cervo, enraizamento).
+
+## D-034 — O fio da marionete é uma camada de render em linhas, sem biblioteca de animação
+
+**Contexto.** O fio que liga cada marionete ao cajado da Matriarca precisa existir no cliente, mudar de cor (prata → carmesim tenso) e acompanhar o corpo animado, sem entidade extra por fio. Um mod de animação (GeckoLib e similares) resolveria ossos e fios, mas traria uma dependência nova.
+
+**Decisão.** O fio é desenhado por `PuppetThreadRenderLayer`, uma `RenderLayer` que, a partir do estado de render (`threadAnchor` da Matriarca e se o fio está carmesim), submete linhas (`RenderTypes.lines()`) ligando as costas da marionete ao ponto de onde os fios saem do cajado. As animações dos modelos usam o `KeyframeAnimation` do próprio jogo, amostrado de uma função por papel da parte (`PuppetAnimations`). Nenhuma dependência nova (regra do projeto: nada sem finalidade concreta registrada aqui).
+
+**Consequências.** O fio é uma reta (ou levemente curva, pela amostragem), não uma corda com física; em contrapartida não custa entidades, não é salvo e sempre sabe a cor do estado. O ponto de partida do fio é o do servidor (`getThreadAnchor`), então o fio do cliente e o hitbox cortável coincidem. A aparência só se confirma no `runClient`.
+
+## D-035 — Animação da Matriarca em camadas compostas por articulação, sobre a animação nativa
+
+**Contexto.** A especificação de animação da Matriarca (2026-11-05) exige animações simultâneas (andar e manipular, flutuar e mexer os dedos), prioridade por articulação, cross-fade, interrupções que liberam só as articulações necessárias, eventos sincronizados e sem duplicação em multiplayer, sem GeckoLib e sem bibliotecas novas. A API 26.1 (`KeyframeAnimation.apply`) só aplica uma animação inteira, somando, com um peso único.
+
+**Decisão.** Os clipes continuam sendo `AnimationDefinition` vanilla (keyframes e interpolações nativas, mais curvas próprias implementadas como `AnimationChannel.Interpolation`). Eles são amostrados com o mesmo algoritmo do vanilla, mas num buffer por camada, e um compositor (`PoseMixer`) resolve cada canal por prioridade (empate pelo rank fixo da camada): substituição ou soma. Cinco camadas são decididas no servidor (`MatriarchAnimDirector`) e sincronizadas por `SynchedEntityData`; locomoção, respiração e as camadas procedurais (olhar, dedos, tecido e cabelo) são derivadas no cliente do que ele já sabe (movimento, estágio, vida). Os eventos ficam no catálogo e só o servidor os dispara.
+
+**Consequências.** Qualquer combinação compatível coexiste sem regra especial; a ordem do código não muda o resultado (testado). O custo é um passo de composição por quadro (≈ 60 articulações × poucas camadas). O sistema é específico da Matriarca; as marionetes continuam em `PuppetAnimations`.
+
+## D-036 — Rig da Matriarca ampliado (dedos, rosto, cabelo, capa em painéis)
+
+**Contexto.** O rig anterior não tinha cotovelo, pulso, dedos, boca, sobrancelhas, mechas nem painéis separados, e quadril e tronco eram a mesma parte. A especificação pede animações dessas articulações e manda propor a alteração mínima quando faltarem.
+
+**Decisão.** No gerador, acrescentar articulações sem mudar silhueta nem materiais: `chest` separado do quadril; braço em ombro, cotovelo e pulso; cinco dedos por mão (caixas de 0,35–0,45 px, curvatura de repouso por rotação de parte); pés; sobrancelhas, boca e cantos da boca como partes (tirados da pintura do rosto); duas mechas de dois segmentos; capa em painel de trás, barra e laterais; ponta do capuz. O cajado continua no antebraço direito e o modelo o mantém em pé (compensação do pulso).
+
+**Consequências.** 56 partes (antes 23); o atlas usa 51/256 linhas. Detalhes de 0,2–0,5 px podem ler pouco à distância (a calibrar no jogo).
+
+## D-037 — A última fase ganha um repertório de golpes e uma regra de derrubada
+
+**Contexto.** O catálogo pede ataques rápido, pesado, de uma e duas mãos, sobrenatural, de alcance, especial, finalização de combo, ataques de fio, defesas, esquivas e quedas; a fúria tinha três ataques e nenhuma defesa ou derrubada. Uma animação sem gatilho no jogo nunca seria vista.
+
+**Decisão.** Sem mexer no `AttackRunner`, a lista `FURY_ATTACKS` passou a ter 20 ataques (`MatriarchMoveset`, seis só por combo ou contra-ataque) e uma tabela de combos com condições do alvo. Na fúria: defesa contra jogador (aparar anula, braços cruzados reduzem à metade, barreira ou esquiva contra projétil; 18 % + 14 % × estranheza, recarga 100 t); salto para trás quando a encurralam; golpe ≥ 12 + 4 × estranheza a derruba (26 t no chão; no máximo uma derrubada a cada 240 t); golpe ≥ 6 na preparação interrompe e ≥ 9 a faz cambalear (recarga comum de 80 t, sem trava de atordoamento); depois de cada sequência de golpes ela respira de 46 t (vida cheia) a 32 t (perto da morte). Nos estágios ela continua intocável; as defesas são só visuais.
+
+**Consequências.** Medido contra um alvo parado: sem a pausa o dano por segundo dobrava (4,1 contra 2,2 da fúria original); com ela fica em 1,1× com vida cheia e 1,35× perto da morte, com mais variedade de golpes (ver `design/matriarch_animation.md` §9). A sensação contra um jogador que se move ainda precisa ser avaliada em jogo. Os testes da Bruxa (30) continuam passando.

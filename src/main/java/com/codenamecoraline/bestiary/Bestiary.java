@@ -67,8 +67,18 @@ public final class Bestiary {
             BestiaryPage.text("oath"),
             BestiaryPage.sketch("spoils", "crimson_commander_spoils", 112, 64)));
 
+    public static final BestiaryEntry TEN_THREADS_WITCH = new BestiaryEntry("ten_threads_witch", List.of(
+            BestiaryPage.text("lore"),
+            BestiaryPage.sketch("anatomy", "ten_threads_witch_anatomy", 112, 80),
+            BestiaryPage.sketch("combat", "ten_threads_witch_combat", 112, 72),
+            BestiaryPage.text("dossier1"),
+            BestiaryPage.text("dossier2"),
+            BestiaryPage.text("dossier3"),
+            BestiaryPage.text("dossier4"),
+            BestiaryPage.sketch("spoils", "ten_threads_witch_spoils", 112, 64)));
+
     public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK, LITHOPHAGE, LAST_GIFT_COLLECTOR, CANOPY_BREAKER, BABY_DRAGON,
-            CRIMSON_COMMANDER);
+            CRIMSON_COMMANDER, TEN_THREADS_WITCH);
 
     private Bestiary() {}
 }

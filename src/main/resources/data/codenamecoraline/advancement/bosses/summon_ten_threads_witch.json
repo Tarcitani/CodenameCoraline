@@ -1,0 +1,39 @@
+{
+  "parent": "codenamecoraline:bosses/craft_cursed_spindle",
+  "criteria": {
+    "set_the_spindle": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "codenamecoraline:cursed_spindle"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.summon_ten_threads_witch.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:ten_threads_witch_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.summon_ten_threads_witch.title"
+    }
+  },
+  "requirements": [
+    [
+      "set_the_spindle"
+    ]
+  ]
+}

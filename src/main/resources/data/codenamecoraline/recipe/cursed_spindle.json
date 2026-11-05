@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:string",
+    "minecraft:string",
+    "minecraft:string",
+    "minecraft:string",
+    "minecraft:bone",
+    "minecraft:bone",
+    "minecraft:wither_skeleton_skull",
+    "minecraft:red_wool",
+    "minecraft:amethyst_shard"
+  ],
+  "result": {
+    "id": "codenamecoraline:cursed_spindle"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "parent": "codenamecoraline:bosses/sever_crimson_thread",
+  "criteria": {
+    "killed_witch": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "codenamecoraline:ten_threads_witch"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.defeat_ten_threads_witch.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:ten_threads_witch_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.defeat_ten_threads_witch.title"
+    }
+  },
+  "requirements": [
+    [
+      "killed_witch"
+    ]
+  ]
+}

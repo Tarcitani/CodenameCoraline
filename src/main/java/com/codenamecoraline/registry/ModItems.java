@@ -4,6 +4,8 @@ import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.item.BestiaryItem;
 import com.codenamecoraline.item.CatacombLilyItem;
 import com.codenamecoraline.item.CrimsonOathGreatswordItem;
+import com.codenamecoraline.item.CursedSpindleItem;
+import com.codenamecoraline.item.TenThreadsStaffItem;
 import com.codenamecoraline.item.DeadrootClubItem;
 import com.codenamecoraline.item.HollowTrunkIdolItem;
 import com.codenamecoraline.item.MistFlaskItem;
@@ -13,7 +15,10 @@ import com.codenamecoraline.item.StainedOathCrestItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
@@ -42,6 +47,13 @@ public final class ModItems {
     /** Obsidian steel edged with gold: the Crimson Oath Greatsword (10 attack damage in all, a heavy netherite-grade blade). */
     private static final ToolMaterial CRIMSON_OATH = new ToolMaterial(
             BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 2100, 8.0F, 4.0F, 15, ItemTags.NETHERITE_TOOL_MATERIALS);
+
+    /** Items that repair the Staff of the Ten Threads (see data/codenamecoraline/tags/item/puppet_remnants.json). */
+    public static final TagKey<Item> PUPPET_REMNANTS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "puppet_remnants"));
+
+    /** Silver thread and carved wood: the Staff of the Ten Threads (7 attack damage in all). */
+    private static final ToolMaterial TEN_THREADS = new ToolMaterial(
+            BlockTags.INCORRECT_FOR_IRON_TOOL, 1561, 6.0F, 2.0F, 14, PUPPET_REMNANTS);
 
     /** Rusted iron: a worse iron. Used by the weapons a Redcap drops. */
     private static final ToolMaterial RUSTED_IRON = new ToolMaterial(
@@ -142,6 +154,24 @@ public final class ModItems {
                             Component.translatable("item.codenamecoraline.crimson_oath_greatsword.lore2").withStyle(ChatFormatting.GRAY)))));
     /** The Crimson Commander helm, used only as the icon of his story advancements. */
     public static final DeferredItem<Item> CRIMSON_COMMANDER_PORTRAIT = ITEMS.registerSimpleItem("crimson_commander_portrait",
+            () -> new Item.Properties().stacksTo(1));
+
+    public static final DeferredItem<Item> TEN_THREADS_WITCH_SPAWN_EGG = ITEMS.registerItem("ten_threads_witch_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.TEN_THREADS_WITCH.get()));
+    /** Summons the Witch of Ten Threads on a solid block in the old forests. */
+    public static final DeferredItem<Item> CURSED_SPINDLE = ITEMS.registerItem("cursed_spindle", CursedSpindleItem::new,
+            properties -> properties.stacksTo(16).rarity(Rarity.UNCOMMON));
+    /** What a defeated puppet leaves: repairs the staff, a trophy and decorative ingredient. */
+    public static final DeferredItem<Item> PUPPET_REMNANT = ITEMS.registerSimpleItem("puppet_remnant");
+    public static final DeferredItem<Item> MATRIARCH_THIMBLE = ITEMS.registerSimpleItem("matriarch_thimble",
+            () -> new Item.Properties().rarity(Rarity.RARE));
+    public static final DeferredItem<Item> TEN_THREADS_STAFF = ITEMS.registerItem("ten_threads_staff", TenThreadsStaffItem::new,
+            properties -> properties.sword(TEN_THREADS, 4.0F, -2.8F).rarity(Rarity.EPIC)
+                    .component(DataComponents.LORE, new ItemLore(List.of(
+                            Component.translatable("item.codenamecoraline.ten_threads_staff.lore1").withStyle(ChatFormatting.LIGHT_PURPLE),
+                            Component.translatable("item.codenamecoraline.ten_threads_staff.lore2").withStyle(ChatFormatting.GRAY)))));
+    /** The Matriarch's face, used only as the icon of her advancements. */
+    public static final DeferredItem<Item> TEN_THREADS_WITCH_PORTRAIT = ITEMS.registerSimpleItem("ten_threads_witch_portrait",
             () -> new Item.Properties().stacksTo(1));
 
     public static final DeferredItem<Item> BABY_DRAGON_SPAWN_EGG = ITEMS.registerItem("baby_dragon_spawn_egg", SpawnEggItem::new,

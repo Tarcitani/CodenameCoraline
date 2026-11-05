@@ -1,0 +1,36 @@
+{
+  "parent": "codenamecoraline:bosses/defeat_ten_threads_witch",
+  "criteria": {
+    "has_staff": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "codenamecoraline:ten_threads_staff"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.obtain_ten_threads_staff.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:ten_threads_witch_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.obtain_ten_threads_staff.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_staff"
+    ]
+  ]
+}

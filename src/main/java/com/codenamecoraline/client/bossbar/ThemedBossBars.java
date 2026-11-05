@@ -37,6 +37,10 @@ public final class ThemedBossBars {
         register("entity." + CodenameCoraline.MOD_ID + ".last_gift_collector", new LastGiftCollectorBossBar());
         register("entity." + CodenameCoraline.MOD_ID + ".canopy_breaker", new CanopyBreakerBossBar());
         register("entity." + CodenameCoraline.MOD_ID + ".crimson_commander", new CrimsonCommanderBossBar());
+        TenThreadsWitchBossBar witchBar = new TenThreadsWitchBossBar();
+        register("entity." + CodenameCoraline.MOD_ID + ".ten_threads_witch", witchBar);
+        register("bossbar." + CodenameCoraline.MOD_ID + ".ten_threads_witch.stage", witchBar);
+        register("bossbar." + CodenameCoraline.MOD_ID + ".ten_threads_witch.fury", witchBar);
     }
 
     private ThemedBossBars() {}

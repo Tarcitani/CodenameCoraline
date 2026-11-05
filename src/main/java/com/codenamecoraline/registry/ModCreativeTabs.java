@@ -31,6 +31,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.BABY_DRAGON_SPAWN_EGG.get());
                         output.accept(ModItems.CRIMSON_COMMANDER_SPAWN_EGG.get());
                         output.accept(ModItems.CRIMSON_ASH_VANGUARD_SPAWN_EGG.get());
+                        output.accept(ModItems.TEN_THREADS_WITCH_SPAWN_EGG.get());
                     })
                     .build());
 
@@ -42,6 +43,7 @@ public final class ModCreativeTabs {
             event.accept(ModItems.RENEGADE_GREATAXE.get());
             event.accept(ModItems.DEADROOT_CLUB.get());
             event.accept(ModItems.CRIMSON_OATH_GREATSWORD.get());
+            event.accept(ModItems.TEN_THREADS_STAFF.get());
             event.accept(ModItems.REDCAP_DAGGER.get());
             event.accept(ModItems.REDCAP_PIKESTAFF.get());
             event.accept(ModItems.REDCAP_CAP.get());
@@ -50,6 +52,7 @@ public final class ModCreativeTabs {
             event.accept(ModItems.SILENT_BELL.get());
             event.accept(ModItems.HOLLOW_TRUNK_IDOL.get());
             event.accept(ModItems.STAINED_OATH_CREST.get());
+            event.accept(ModItems.CURSED_SPINDLE.get());
         } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.REDCAP_NAIL.get());
             event.accept(ModItems.REDCAP_TOOTH.get());
@@ -64,6 +67,8 @@ public final class ModCreativeTabs {
             event.accept(ModItems.FROSTBOUND_THREAD.get());
             event.accept(ModItems.SOLSTICE_SEAL.get());
             event.accept(ModItems.CRIMSON_PLATE_SHARD.get());
+            event.accept(ModItems.PUPPET_REMNANT.get());
+            event.accept(ModItems.MATRIARCH_THIMBLE.get());
         } else if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             event.accept(ModItems.LITHOPHAGE_SPAWN_EGG.get());
             event.accept(ModItems.LAST_GIFT_COLLECTOR_SPAWN_EGG.get());
@@ -72,6 +77,7 @@ public final class ModCreativeTabs {
             event.accept(ModItems.BABY_DRAGON_SPAWN_EGG.get());
             event.accept(ModItems.CRIMSON_COMMANDER_SPAWN_EGG.get());
             event.accept(ModItems.CRIMSON_ASH_VANGUARD_SPAWN_EGG.get());
+            event.accept(ModItems.TEN_THREADS_WITCH_SPAWN_EGG.get());
         }
     }
 

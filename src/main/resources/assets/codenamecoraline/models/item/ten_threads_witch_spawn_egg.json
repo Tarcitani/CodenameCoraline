@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "codenamecoraline:item/ten_threads_witch_spawn_egg"
+  }
+}

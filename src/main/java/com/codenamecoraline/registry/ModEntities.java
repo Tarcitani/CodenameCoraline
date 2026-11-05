@@ -12,6 +12,12 @@ import com.codenamecoraline.entity.lithophage.AmberShard;
 import com.codenamecoraline.entity.lithophage.Lithophage;
 import com.codenamecoraline.entity.canopy.CanopyBreaker;
 import com.codenamecoraline.entity.crimson.CrimsonAshVanguard;
+import com.codenamecoraline.entity.ten_threads_witch.MatriarchWitchEntity;
+import com.codenamecoraline.entity.ten_threads_witch.PuppetEntity;
+import com.codenamecoraline.entity.ten_threads_witch.PuppetKind;
+import com.codenamecoraline.entity.ten_threads_witch.SpoolVitalOrbEntity;
+import com.codenamecoraline.entity.ten_threads_witch.ThreadHitboxEntity;
+import java.util.EnumMap;
 import com.codenamecoraline.entity.crimson.CrimsonCommander;
 import com.codenamecoraline.entity.macaque.BarkMacaque;
 import com.codenamecoraline.entity.spirit.BossSpirit;
@@ -150,7 +156,42 @@ public final class ModEntities {
                     .clientTrackingRange(10)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
+    /** The Witch of Ten Threads (the Matriarch). */
+    public static final DeferredHolder<EntityType<?>, EntityType<MatriarchWitchEntity>> TEN_THREADS_WITCH = ENTITY_TYPES.register("ten_threads_witch",
+            id -> EntityType.Builder.of(MatriarchWitchEntity::new, MobCategory.MONSTER)
+                    .sized(MatriarchWitchEntity.WIDTH, MatriarchWitchEntity.HEIGHT).eyeHeight(MatriarchWitchEntity.EYE_HEIGHT)
+                    .clientTrackingRange(10)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    /** The ten puppets, one entity type each (all of them {@link PuppetEntity}), in the order they fight. */
+    private static final EnumMap<PuppetKind, DeferredHolder<EntityType<?>, EntityType<PuppetEntity>>> PUPPETS = new EnumMap<>(PuppetKind.class);
+
+    static {
+        for (PuppetKind kind : PuppetKind.values()) {
+            PUPPETS.put(kind, ENTITY_TYPES.register(kind.id,
+                    id -> EntityType.Builder.of(PuppetEntity::new, MobCategory.MONSTER)
+                            .sized(kind.width, kind.height).eyeHeight(kind.eyeHeight).clientTrackingRange(10)
+                            .build(ResourceKey.create(Registries.ENTITY_TYPE, id))));
+        }
+    }
+
+    /** The cuttable stretch of a crimson thread (invisible target). */
+    public static final DeferredHolder<EntityType<?>, EntityType<ThreadHitboxEntity>> THREAD_HITBOX = ENTITY_TYPES.register("thread_hitbox",
+            id -> EntityType.Builder.<ThreadHitboxEntity>of(ThreadHitboxEntity::new, MobCategory.MISC)
+                    .sized(0.7F, 1.6F).noSave().clientTrackingRange(8).updateInterval(2)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    /** The orb of recovery a defeated puppet leaves. */
+    public static final DeferredHolder<EntityType<?>, EntityType<SpoolVitalOrbEntity>> SPOOL_VITAL_ORB = ENTITY_TYPES.register("spool_vital_orb",
+            id -> EntityType.Builder.<SpoolVitalOrbEntity>of(SpoolVitalOrbEntity::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F).noSave().clientTrackingRange(8).updateInterval(1)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
     private ModEntities() {}
+
+    public static EntityType<PuppetEntity> puppet(PuppetKind kind) {
+        return PUPPETS.get(kind).get();
+    }
 
     public static void register(IEventBus modEventBus) {
         ENTITY_TYPES.register(modEventBus);
@@ -172,6 +213,10 @@ public final class ModEntities {
         event.put(CRIMSON_COMMANDER.get(), CrimsonCommander.createAttributes().build());
         event.put(CRIMSON_ASH_VANGUARD.get(), CrimsonAshVanguard.createAttributes().build());
         event.put(CRIMSON_COMMANDER_SPIRIT.get(), BossSpirit.createAttributes().build());
+        event.put(TEN_THREADS_WITCH.get(), MatriarchWitchEntity.createAttributes().build());
+        for (PuppetKind kind : PuppetKind.values()) {
+            event.put(puppet(kind), PuppetEntity.createAttributes(kind).build());
+        }
     }
 
     private static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {

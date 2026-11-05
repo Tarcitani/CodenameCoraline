@@ -1,0 +1,29 @@
+{
+  "parent": "codenamecoraline:bosses/summon_ten_threads_witch",
+  "criteria": {
+    "trigger": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.sever_crimson_thread.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:ten_threads_witch_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.sever_crimson_thread.title"
+    }
+  },
+  "requirements": [
+    [
+      "trigger"
+    ]
+  ]
+}
