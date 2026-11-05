@@ -129,9 +129,9 @@
 | 1. Fundação | **concluída** | 2026-11-05 | `.\gradlew.bat compileJava` (OK) + `.\gradlew.bat runFeyRavenTest` (All 3 required tests passed, 2 testes de `fey_raven_test_environment`, BUILD SUCCESSFUL in 13s) |
 | 2. Visual e rigging | **concluída** | 2026-11-05 | `.\gradlew.bat compileJava` (OK) + `python tools/generate_fey_raven_assets.py` (23 boxes, 0 UV overlaps) + `.\gradlew.bat -I tools/fey-raven-sketches.gradle exportFeyRavenSketchModel` (8 poses) + `python tools/generate_fey_raven_sketches.py` (6 poses + 2 pranchas Bestiário) |
 | 2b. Revisão visual (humano) | **concluída** | 2026-11-05 | Poses e texturas aprovadas pelo usuário |
-| 3. IA de Companheiro | pendente | | |
+| 3. IA de Companheiro | **concluída** | 2026-11-05 | `.\gradlew.bat compileJava` (OK) + `.\gradlew.bat runFeyRavenTest` (7 testes de `fey_raven_test_environment`, All 8 required tests passed, BUILD SUCCESSFUL in 11s) |
 | 4. Polimento e docs | pendente | | |
 | 5. Relatório de entrega | pendente | | |
 
-- **Próximo passo:** Iniciar a **Fatia 3 (IA de Companheiro)** executando o prompt [docs/prompts/fatia_3_aliado.md](file:///c:/MinecraftDev/CodenameCoraline/docs/prompts/fatia_3_aliado.md).
+- **Próximo passo:** Iniciar a **Fatia 4 (Polimento e docs)** executando o prompt [docs/prompts/fatia_4_polimento.md](file:///c:/MinecraftDev/CodenameCoraline/docs/prompts/fatia_4_polimento.md).
 
