@@ -20,9 +20,17 @@ Faça:
 - Conquistas de história (boss: em `advancement/bosses/`), textos em `en_us.json` e `pt_br.json`.
 - Documentação: `docs/ARCHITECTURE.md` (seção do mob), `docs/DECISIONS.md` (decisões grandes), `docs/ROADMAP.md`, `docs/CURRENT_STATE.md` (resumo), `docs/DEVELOPMENT.md` (comandos validados).
 - Validação final: 6 rodadas consecutivas.
+Bash:
 ```bash
+mkdir -p build/logs
 ./gradlew build > build/logs/fatia4_build.log 2>&1
 for i in 1 2 3 4 5 6; do ./gradlew run<Mob>Test > build/logs/fatia4_round$i.log 2>&1 || { echo "FALHOU rodada $i"; break; }; done
+```
+PowerShell (o terminal padrão no Windows):
+```powershell
+New-Item -ItemType Directory -Force build/logs | Out-Null
+.\gradlew.bat build *> build/logs/fatia4_build.log
+foreach ($i in 1..6) { .\gradlew.bat run<Mob>Test *> "build/logs/fatia4_round$i.log"; if ($LASTEXITCODE -ne 0) { "FALHOU rodada $i"; break } }
 ```
 Rode também as suítes de regressão dos mobs que dividem código (ex.: `PlayerSummon`, `BossSpirit`, `ThemedBossBars`). Falhou uma rodada: reinicie a contagem depois de corrigir a causa raiz.
 

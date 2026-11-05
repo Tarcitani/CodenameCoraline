@@ -18,12 +18,13 @@ Faça:
 - Máquina de estados explícita; cada ataque com as 4 fases (preparo, validação anti-whiff, impacto, recuperação) e ticks vindos da tabela da ficha, em constantes nomeadas.
 - Servidor autoritativo: nenhuma lógica de dano no cliente. Sincronia visual por `broadcastEntityEvent` na faixa reservada na ficha (≥ 100) e `SynchedEntityData`.
 - Predicados de alvo conforme as tags da ficha; histerese de ameaça; anti-cerco e anti-pillaring; rotina ociosa; idles sorteados a cada 100–200 ticks.
-- Lacaios via `PlayerSummon`; boss: estágios, cinemática (`client/<pkg>/<Mob>CinematicDirector`, tecla `key.codenamecoraline.skip_cinematic`), imunidade temporária e barra temática (`ThemedBossBars` + `tools/generate_boss_bar_<id>.py`).
+- Lacaios via `PlayerSummon`; boss: estágios, cinemática (`client/<pkg>/<Mob>CinematicDirector`, tecla `key.codenamecoraline.skip_cinematic`), imunidade temporária e sincronização do estágio com a barra temática (o script, o PNG e o `Style` já vieram da fatia 2; aqui o servidor só define a cor por estágio).
 - Performance: sem alocação por tick no loop de IA, sem streams, buscas espaciais escalonadas (contrato §6).
 - GameTests de IA e de cada ataque (acerto, fuga/anti-whiff, estágios).
 
 Comando de aceite:
 ```bash
+mkdir -p build/logs
 ./gradlew compileJava > build/logs/fatia3_compile.log 2>&1
 ./gradlew run<Mob>Test > build/logs/fatia3_test.log 2>&1
 ```

@@ -133,7 +133,7 @@ Para evitar degradação de contexto em sessões longas, a implementação de um
 | Fatia | Escopo da Entrega | Critério de Aceite / Validação |
 |---|---|---|
 | **Fatia 1: Fundação** | Tipos de entidade, atributos, registros, ovo de spawn, tags e esqueleto da classe. | `compileJava` aprovado e GameTest de registro/spawn aprovado. |
-| **Fatia 2: Visual & Rigging** | Modelo Java, scripts de textura/UV em `tools/`, poses offline renderizadas e animações. | Script `tools/generate_<mob>_assets.py` executa sem erro; `Export<Mob>Model.java` exporta a geometria; tarefa `*-sketches.gradle` (ver `tools/README.md`) gera as poses; UVs sem colisão; `runClient` não acusa erro de carregamento de camada. |
+| **Fatia 2: Visual & Rigging** | Modelo Java, scripts de textura/UV em `tools/`, poses offline renderizadas e animações. | Script `tools/generate_<mob>_assets.py` executa sem erro; `Export<Mob>Model.java` exporta a geometria; `./gradlew -I tools/<id>-sketches.gradle export<Mob>SketchModel` e `generate_<id>_sketches.py` geram as poses (ver `tools/README.md`); [BOSS] script, PNG e `Style` da barra temática prontos para revisão visual; UVs sem colisão; `runClient` não acusa erro de carregamento de camada. |
 | **Fatia 3: IA & Combate** | Máquina de estados, metas de combate, ataques com 4 fases, anti-whiff, cinemática de boss. | Suíte de GameTests de IA e ataques aprovada no servidor de teste. |
 | **Fatia 4: Polimento & Docs** | Drops, itens especiais, Bestiário (textos e gravuras), sons, avanços, documentação completa. | `./gradlew build` e suítes completas executadas 6 rodadas seguidas sem falhas; docs atualizadas. |
 

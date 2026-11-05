@@ -21,15 +21,19 @@ Faça:
 - `*Animations.java` com **cada animação da Parte A da seção 1.6** (duração em ticks e pose-chave). Você calcula os ângulos e as curvas contra o modelo real e o mob de referência. Em seguida, `*RenderState`, `*Renderer`, `*EyesLayer`, `*Client`.
 - Preencha a **Parte B da seção 1.6** com os ângulos que o código usa de fato (inicial, final, curva) e marque cada linha como `pendente de revisão visual`.
 - `tools/Export<Mob>Model.java` e `tools/generate_<id>_sketches.py` (+ `.gradle`) para gerar as poses offline; renderize idle, andar, preparo/impacto/recuperação de cada ataque.
+- **[BOSS] Barra temática:** `tools/generate_boss_bar_<id>.py`, o PNG em `textures/gui/boss_bar/<id>.png` e o `client/bossbar/<Mob>BossBar.java` (`ThemedBossBars.Style`) registrado em `ThemedBossBars`, com as cores por estágio e as marcas de início de estágio da ficha. Geometria do script e do estilo devem coincidir. Entra aqui para você ver a moldura na revisão 2b; a sincronização do estágio com o servidor fica na fatia 3.
 - Quando um ângulo não funcionar visualmente, ajuste o código **e atualize a Parte B**; a ficha deve continuar igual ao que o código faz.
 - Se o Gradle falhar com `Unable to establish loopback connection`, entregue ao usuário o comando exato para rodar no terminal dele e continue o que não depende dele (scripts Python).
 
 Comando de aceite:
 ```bash
+mkdir -p build/logs
 ./gradlew compileJava > build/logs/fatia2_compile.log 2>&1
 python tools/generate_<id>_assets.py
-./gradlew <tarefa-de-sketches-do-mob> > build/logs/fatia2_sketches.log 2>&1
+./gradlew -I tools/<id>-sketches.gradle export<Mob>SketchModel > build/logs/fatia2_sketches.log 2>&1
+python tools/generate_<id>_sketches.py
 ```
+No PowerShell, troque a primeira linha por `New-Item -ItemType Directory -Force build/logs | Out-Null` e use `.\gradlew.bat`. A tarefa `export<Mob>SketchModel` vive em `tools/<id>-sketches.gradle` (script de inicialização, carregado com `-I`), não em `build.gradle`; o `-b` não existe mais no Gradle 9.
 Confirme que não há sobreposição de UV (o script deve reportar ou ter checagem) e liste os caminhos dos PNG de pose para o usuário abrir.
 
 Ao final: marque "2. Visual e rigging" como **em revisão** (não concluída). Entregue ao usuário a lista de poses e os comandos `/summon` para `runClient`. A fatia só vira "concluída" depois de "2b. Revisão visual" aprovada pelo usuário. PARE. Não commit sem autorização. Após a sua aprovação visual, sugira `feat(<id>): fatia 2 - visual`.

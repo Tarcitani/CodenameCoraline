@@ -2,6 +2,8 @@
 
 Guia operacional do fluxo completo. As regras técnicas ficam em `MOB_CONTRACT.md`; a ficha fica em `docs/design/<mob>.md` (a partir de `docs/design/_TEMPLATE_MOB.md`); os prompts de cada etapa ficam em `docs/prompts/`. Este arquivo só diz **quem faz o quê, em que ordem e com qual modelo**.
 
+Os comandos dos prompts estão em Bash; no PowerShell use `.\gradlew.bat` e os equivalentes indicados em `docs/prompts/fatia_4_polimento.md`.
+
 ## Princípios
 
 1. **O arquivo é a memória, a conversa não.** Cada sessão começa lendo arquivos e termina gravando o estado em `docs/design/<mob>.md`. Nada importante fica só no chat.
@@ -38,7 +40,7 @@ O contexto da sessão é finito e a qualidade cai antes do fim. Regras:
 
 - **Leitura mínima por sessão:** só `AGENTS.md` (seção Memória do projeto), a seção da fatia em `MOB_CONTRACT.md`, `docs/design/<mob>.md` e os arquivos do mob de referência que a fatia exige. Nunca leia `DECISIONS.md`, `ARCHITECTURE.md` ou `ROADMAP.md` inteiros: busque a seção com grep.
 - **Logs em arquivo:** `mkdir -p build/logs` uma vez, depois `./gradlew ... > build/logs/<fatia>.log 2>&1`, e leia só o trecho de erro. Nunca despeje o log de build no chat.
-- **O Gradle não roda no shell do agente** (confirmado em 2026-11-05: `Unable to establish loopback connection` em `compileJava`; histórico em `DEVELOPMENT.md`). O agente não deve improvisar lançador manual. Ele entrega o comando exato; **você** roda no seu terminal e cola só o trecho de erro (ou salva o log em `build/logs/` e diz o caminho). Uma fatia só vira "concluída" com o resultado real, anotado com quem rodou.
+- **O Gradle pode não rodar no shell do agente.** No Claude Code desta máquina falhou em 2026-11-05 (`Unable to establish loopback connection` em `compileJava`); em outro agente/terminal a mesma compilação passou. Depende do ambiente; histórico em `DEVELOPMENT.md`. Se falhar, o agente não deve improvisar lançador manual. Ele entrega o comando exato; **você** roda no seu terminal e cola só o trecho de erro (ou salva o log em `build/logs/` e diz o caminho). Uma fatia só vira "concluída" com o resultado real, anotado com quem rodou.
 - **Uma fatia, uma sessão.** Termine, grave o estado e use `/clear` (ou abra sessão nova). Não encadeie fatias na mesma conversa.
 - **Se a sessão encher no meio da fatia** (muitas idas e voltas, arquivos grandes lidos): grave em "Próximo passo" do arquivo de design o que falta e abra sessão nova. Não confie no resumo automático.
 - **Fichas curtas.** Se a ficha passar de ~300 linhas, mova a animação para `docs/design/<mob>_animation.md` e referencie.

@@ -64,7 +64,9 @@ python tools/generate_crimson_commander_assets.py
 # Gerar moldura da boss bar:
 python tools/generate_boss_bar_crimson_commander.py
 
-# Exportar gravuras do Bestiário via Gradle:
-./gradlew -b tools/crimson-commander-sketches.gradle
+# Exportar a geometria real do modelo (script de inicialização, Gradle 9 não tem mais -b):
+./gradlew -I tools/crimson-commander-sketches.gradle exportCrimsonCommanderSketchModel
+# Gerar as pranchas do Bestiário a partir da geometria exportada:
+python tools/generate_crimson_commander_sketches.py
 ```
 

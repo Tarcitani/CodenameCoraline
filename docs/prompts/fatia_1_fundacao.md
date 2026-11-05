@@ -24,6 +24,7 @@ Faça:
 
 Comando de aceite:
 ```bash
+mkdir -p build/logs
 ./gradlew compileJava > build/logs/fatia1_compile.log 2>&1
 ./gradlew run<Mob>Test > build/logs/fatia1_test.log 2>&1
 ```
