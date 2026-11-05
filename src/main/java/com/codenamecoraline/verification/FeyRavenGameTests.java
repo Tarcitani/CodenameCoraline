@@ -1,6 +1,8 @@
 package com.codenamecoraline.verification;
 
 import com.codenamecoraline.CodenameCoraline;
+import com.codenamecoraline.client.raven.FeyRavenAnimations;
+import com.codenamecoraline.client.raven.FeyRavenModel;
 import com.codenamecoraline.entity.raven.FeyRaven;
 import com.codenamecoraline.registry.ModEntities;
 import com.codenamecoraline.registry.ModItems;
@@ -75,6 +77,22 @@ public final class FeyRavenGameTests {
         helper.assertTrue(raven.isFood(new ItemStack(Items.GLOW_BERRIES)), "Glow berries must be valid food");
         helper.assertTrue(raven.isFood(new ItemStack(Items.SWEET_BERRIES)), "Sweet berries must be valid food");
         helper.assertFalse(raven.isFood(new ItemStack(Items.ROTTEN_FLESH)), "Rotten flesh must not be valid food");
+
+        var root = FeyRavenModel.createBodyLayer().bakeRoot();
+        var model = new FeyRavenModel(root);
+        helper.assertTrue(model != null, "FeyRavenModel bakes all joints and animations cleanly");
+        helper.assertTrue(
+                FeyRavenAnimations.IDLE_BREATHE != null
+                        && FeyRavenAnimations.IDLE_HEAD_TILT != null
+                        && FeyRavenAnimations.IDLE_PREEN != null
+                        && FeyRavenAnimations.IDLE_CAW != null
+                        && FeyRavenAnimations.WALK != null
+                        && FeyRavenAnimations.FLY_FLAP != null
+                        && FeyRavenAnimations.FLY_GLIDE != null
+                        && FeyRavenAnimations.PECK_ATTACK != null
+                        && FeyRavenAnimations.HURT != null
+                        && FeyRavenAnimations.DEATH != null,
+                "All 10 Fey Raven animations must be defined");
         helper.succeed();
     }
 

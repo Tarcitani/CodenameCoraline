@@ -12,6 +12,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.TamableAnimal;
@@ -66,6 +67,16 @@ public final class FeyRaven extends TamableAnimal {
         ALERTING,
         PECKING
     }
+
+    public final AnimationState idleBreatheAnimationState = new AnimationState();
+    public final AnimationState idleHeadTiltAnimationState = new AnimationState();
+    public final AnimationState idlePreenAnimationState = new AnimationState();
+    public final AnimationState idleCawAnimationState = new AnimationState();
+    public final AnimationState flyFlapAnimationState = new AnimationState();
+    public final AnimationState flyGlideAnimationState = new AnimationState();
+    public final AnimationState peckAttackAnimationState = new AnimationState();
+    public final AnimationState hurtAnimationState = new AnimationState();
+    public final AnimationState deathAnimationState = new AnimationState();
 
     public FeyRaven(EntityType<? extends FeyRaven> type, Level level) {
         super(type, level);
@@ -123,6 +134,55 @@ public final class FeyRaven extends TamableAnimal {
 
     public void setScrollItem(ItemStack stack) {
         this.entityData.set(DATA_SCROLL_ITEM, stack.copy());
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (this.level().isClientSide()) {
+            this.updateClientAnimations();
+        }
+    }
+
+    private void updateClientAnimations() {
+        if (this.isDeadOrDying()) {
+            this.deathAnimationState.startIfStopped(this.tickCount);
+            return;
+        }
+        this.idleBreatheAnimationState.startIfStopped(this.tickCount);
+        if (this.isAirborne() || !this.onGround()) {
+            if (this.getDeltaMovement().y < -0.02D && this.getDeltaMovement().horizontalDistanceSqr() > 0.01D) {
+                this.flyFlapAnimationState.stop();
+                this.flyGlideAnimationState.startIfStopped(this.tickCount);
+            } else {
+                this.flyGlideAnimationState.stop();
+                this.flyFlapAnimationState.startIfStopped(this.tickCount);
+            }
+        } else {
+            this.flyFlapAnimationState.stop();
+            this.flyGlideAnimationState.stop();
+        }
+    }
+
+    @Override
+    public void handleEntityEvent(byte id) {
+        if (id == EVENT_BLINK_THIRD_EYE) {
+            this.idleHeadTiltAnimationState.start(this.tickCount);
+            return;
+        }
+        if (id == EVENT_IDLE_CLEAN) {
+            this.idlePreenAnimationState.start(this.tickCount);
+            return;
+        }
+        if (id == EVENT_IDLE_CAW || id == EVENT_MYSTIC_ALERT) {
+            this.idleCawAnimationState.start(this.tickCount);
+            return;
+        }
+        if (id == EVENT_PECK) {
+            this.peckAttackAnimationState.start(this.tickCount);
+            return;
+        }
+        super.handleEntityEvent(id);
     }
 
     @Override

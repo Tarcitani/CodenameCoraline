@@ -84,13 +84,40 @@
 | `hurt` | 6 | Tranco para trás com asas semi-abertas e penas eriçadas | Reação rápida | n/a |
 | `death` | 20 | Asas perdem sustentação, corpo tomba de lado e se recolhe | Queda suave | n/a |
 
-- **Hierarquia de Juntas do Modelo:**
-  - `root` (posicionado na base dos pés)
-    - `body` (torso inclinado a 45°, ponto de articulação nos quadris)
-      - `neck` & `head` (base no topo do peito, com `beak` e `third_eye_layer`)
-      - `left_wing` & `right_wing` (ombros no topo lateral do torso, com sub-articulação de penas primárias)
-      - `tail` (base na garupa, com 3 leques de penas sobrepostas)
-      - `left_leg` & `right_leg` (coxas finas saindo do ventre, com garras articuladas e caixa do `scroll` na pata esquerda)
+- **Hierarquia de Juntas do Modelo (`FeyRavenModel`):**
+  - `root`
+    - `body` (pivô `0.0, 18.0, 0.0`, `xRot = +0.38 rad / +22°`)
+      - `breast_ruff` (pivô `0.0, -4.2, -0.8`, `CubeDeformation(0.25F)`)
+      - `neck` (pivô `0.0, -5.0, -1.0`, `xRot = -0.24 rad`)
+        - `head` (pivô `0.0, -2.2, -0.3`, `xRot = -0.14 rad`)
+          - `third_eye_crest` (pivô `0.0, -2.4, -3.0`, `CubeDeformation(0.15F)`)
+          - `upper_beak` (pivô `0.0, -1.8, -3.0`, `xRot = +0.06 rad`, culmen + ponta curva)
+          - `lower_beak` (pivô `0.0, -0.9, -3.0`)
+            - `beak_berries` (pivô `0.0, 0.6, -2.4`)
+      - `left_wing_inner` / `right_wing_inner` (pivô `±2.5, -4.6, -1.2`, `xRot = -0.72 rad, yRot = ±0.05 rad, zRot = ∓0.06 rad`)
+        - `left_wing_outer` / `right_wing_outer` (pivô `0.0, 0.2, 5.0`, `xRot = -0.08 rad, yRot = ∓0.06 rad`)
+      - `tail_base` (pivô `0.0, 0.8, 1.8`, `xRot = -0.68 rad`)
+        - `tail_mid` (pivô `0.0, 0.0, 3.4`, `xRot = +0.04 rad`)
+          - `tail_tip` (pivô `0.0, 0.0, 3.4`, `xRot = +0.04 rad`)
+      - `left_thigh` / `right_thigh` (pivô `±1.4, 0.6, -0.2`, `xRot = -0.52 rad, yRot = ∓0.08 rad`)
+        - `left_tarsus` / `right_tarsus` (pivô `0.0, 2.7, 0.2`, `xRot = +0.28 rad`)
+          - `messenger_scroll` (filho de `left_tarsus`, pivô `0.7, 0.6, 0.0`, `xRot = +0.22, yRot = +0.12, zRot = -0.20 rad`)
+          - `left_talons` / `right_talons` (pivô `0.0, 2.7, -0.2`, `xRot = -0.14 rad`)
+
+### 1.6b Animação (Parte B: Ângulos e Curvas Reais de `FeyRavenAnimations.java`)
+
+| Animação | Junta | Eixo / Canal | Inicial → Pico → Final (graus / px) | Curva | Status |
+|---|---|---|---|---|---|
+| `idle_breathe` (2.00s loop) | `body`, `breast_ruff`, `neck`, `left/right_wing_inner`, `tail_base/mid` | Rot X/Y/Z | `body` X `0° → +2.5° → 0°`; `breast_ruff` X `0° → -4.0° → 0°`; `tail_base` X `0° → -3.5° → 0°` | `CATMULLROM` | aprovado |
+| `idle_head_tilt` (1.25s) | `neck`, `head`, `tail_base` | Rot X/Y/Z | `head` `(0,0,0) → (+5°,+28°,+35°) → (+3°,-20°,-24°) → (0,0,0)` | `LINEAR` / `CATMULLROM` | aprovado |
+| `idle_preen` (1.75s) | `body`, `neck`, `head`, `lower_beak`, `left_wing_inner/outer` | Rot X/Y/Z | `neck` `(0,0,0) → (+24°,-44°,-14°)`; `head` `(0,0,0) → (+32°,-48°,-22°)`; `left_wing_inner` `(+14°,+22°,-34°)`; `lower_beak` X `0° → +14°` (2x) | `CATMULLROM` / `LINEAR` | aprovado |
+| `idle_caw` (1.25s) | `body`, `neck`, `head`, `upper/lower_beak`, `wings`, `tail` | Rot X/Y/Z | `body` X `0° → +30° → 0°`; `neck` X `0° → -18° → 0°`; `upper_beak` X `-14°`; `lower_beak` X `+32°`; `tail_base` X `-16°` | `CATMULLROM` / `LINEAR` | aprovado |
+| `walk` (0.60s loop) | `body`, `neck`, `head`, `left/right_thigh`, `left/right_tarsus`, `tail_base` | Pos Y / Rot X/Y/Z | `body` Pos Y `0 → +0.9 → 0`; `thigh` X `∓26° ↔ ±26°`; `tarsus` X `+18° ↔ -12°`; `neck` X `+10° ↔ -4°` | `CATMULLROM` / `LINEAR` | aprovado |
+| `fly_flap` (0.40s loop) | `body`, `neck`, `head`, `left/right_wing_inner/outer`, `thighs`, `tail_base` | Pos Y / Rot X/Y/Z | `wing_inner` `(+42°,±68°,∓48°) ↔ (+18°,±58°,±34°)`; `wing_outer` `(+12°,±22°,∓26°) ↔ (-8°,∓12°,±22°)`; `thigh` X `-38° ↔ -44°` | `CATMULLROM` | aprovado |
+| `fly_glide` (1.00s loop) | `body`, `neck`, `head`, `left/right_wing_inner/outer`, `thighs`, `tail_base` | Rot X/Y/Z | `wing_inner` `(+34°,±66°,∓24°) ↔ (+32°,±64°,∓18°)`; `wing_outer` `(+6°,±18°,∓12°)`; `thigh` X `-40°` | `CATMULLROM` | aprovado |
+| `peck_attack` (0.75s, hit 0.40s) | `body`, `neck`, `head`, `lower_beak`, `wings`, `tail_base` | Pos Y/Z / Rot X/Y/Z | Windup (0.25s): `body` X `-18°`, Pos `(0,+0.6,+1.2)`, `wing_inner` `(+36°,±58°,∓42°)` → Impacto (0.40s / tick 8): `body` X `+24°`, Pos `(0,-0.6,-2.2)`, `neck` X `+18°`, `head` X `+14°` → Recovery (0.75s): `(0,0,0)` | `LINEAR` | aprovado |
+| `hurt` (0.30s) | `body`, `head`, `left/right_wing_inner` | Rot X/Y/Z | `body` `(0,0,0) → (-18°,0,+8°) → (0,0,0)`; `head` `(-22°,+10°,+10°)`; `wing_inner` `(+12°,±18°,∓42°)` | `LINEAR` | aprovado |
+| `death` (1.00s) | `body`, `neck`, `head`, `left/right_wing_inner`, `thighs` | Pos Y / Rot X/Y/Z | `body` Rot `(0,0,0) → (+28°,-14°,+78°)`, Pos Y `0 → -4.5`; `head` `(+24°,+22°,+16°)`; `thigh` X `+36°` | `LINEAR` | aprovado |
 
 ---
 
@@ -100,11 +127,11 @@
 |---|---|---|---|
 | 0. Ficha revisada | **concluída** | 2026-11-05 | Ficha completa sem `<...>`, validada contra `docs/design/fey_raven_reference.jpg` |
 | 1. Fundação | **concluída** | 2026-11-05 | `.\gradlew.bat compileJava` (OK) + `.\gradlew.bat runFeyRavenTest` (All 3 required tests passed, 2 testes de `fey_raven_test_environment`, BUILD SUCCESSFUL in 13s) |
-| 2. Visual e rigging | pendente | | |
-| 2b. Revisão visual (humano) | pendente | | |
+| 2. Visual e rigging | **concluída** | 2026-11-05 | `.\gradlew.bat compileJava` (OK) + `python tools/generate_fey_raven_assets.py` (23 boxes, 0 UV overlaps) + `.\gradlew.bat -I tools/fey-raven-sketches.gradle exportFeyRavenSketchModel` (8 poses) + `python tools/generate_fey_raven_sketches.py` (6 poses + 2 pranchas Bestiário) |
+| 2b. Revisão visual (humano) | **concluída** | 2026-11-05 | Poses e texturas aprovadas pelo usuário |
 | 3. IA de Companheiro | pendente | | |
 | 4. Polimento e docs | pendente | | |
 | 5. Relatório de entrega | pendente | | |
 
-- **Próximo passo:** Iniciar a **Fatia 2 (Visual e rigging)** numa nova sessão (ou após `/clear`) executando o prompt [docs/prompts/fatia_2_visual.md](file:///c:/MinecraftDev/CodenameCoraline/docs/prompts/fatia_2_visual.md).
+- **Próximo passo:** Iniciar a **Fatia 3 (IA de Companheiro)** executando o prompt [docs/prompts/fatia_3_aliado.md](file:///c:/MinecraftDev/CodenameCoraline/docs/prompts/fatia_3_aliado.md).
 
