@@ -1,0 +1,13 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#codenamecoraline:fey_raven_habitat",
+  "spawners": [
+    {
+      "type": "codenamecoraline:fey_raven",
+      "weight": 15,
+      "minCount": 1,
+      "maxCount": 3
+    }
+  ]
+}
+

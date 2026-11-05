@@ -507,5 +507,7 @@
   "dialogue.codenamecoraline.ten_threads_witch.stage_10": "Meu último fio... meu primogênito! Durma, durma enquanto ele te despedaça!",
   "dialogue.codenamecoraline.ten_threads_witch.thread_cut": "Ai! Não toque nas minhas linhas, verme insolente!",
   "dialogue.codenamecoraline.ten_threads_witch.fury": "Meus filhos... você quebrou todos eles! Então eu mesma serei a agulha e a mortalha!",
-  "dialogue.codenamecoraline.ten_threads_witch.death": "Enfim... os dedos... podem descansar..."
+  "dialogue.codenamecoraline.ten_threads_witch.death": "Enfim... os dedos... podem descansar...",
+  "entity.codenamecoraline.fey_raven": "Corvo Feérico",
+  "item.codenamecoraline.fey_raven_spawn_egg": "Ovo de Geração de Corvo Feérico"
 }

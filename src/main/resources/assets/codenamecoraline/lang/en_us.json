@@ -507,5 +507,7 @@
   "dialogue.codenamecoraline.ten_threads_witch.stage_10": "My last thread... my firstborn! Sleep, sleep while he tears you apart!",
   "dialogue.codenamecoraline.ten_threads_witch.thread_cut": "Ouch! Do not touch my lines, insolent worm!",
   "dialogue.codenamecoraline.ten_threads_witch.fury": "My children... you broke every one of them! Then I will be the needle and the shroud myself!",
-  "dialogue.codenamecoraline.ten_threads_witch.death": "At last... the fingers... may rest..."
+  "dialogue.codenamecoraline.ten_threads_witch.death": "At last... the fingers... may rest...",
+  "entity.codenamecoraline.fey_raven": "Fey Raven",
+  "item.codenamecoraline.fey_raven_spawn_egg": "Fey Raven Spawn Egg"
 }

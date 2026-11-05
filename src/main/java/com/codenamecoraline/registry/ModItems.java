@@ -179,6 +179,9 @@ public final class ModItems {
     /** Render-only sprite for the companion's ember. */
     public static final DeferredItem<Item> DRAGON_EMBER = ITEMS.registerSimpleItem("dragon_ember");
 
+    public static final DeferredItem<Item> FEY_RAVEN_SPAWN_EGG = ITEMS.registerItem("fey_raven_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.FEY_RAVEN.get()));
+
     // Retired rewards stay registered to preserve items in existing worlds; no drops or recipes.
     public static final DeferredItem<Item> CATACOMB_LILY = ITEMS.registerItem("catacomb_lily", CatacombLilyItem::new);
     public static final DeferredItem<Item> ROTTEN_BUTTERFLY = ITEMS.registerSimpleItem("rotten_butterfly");

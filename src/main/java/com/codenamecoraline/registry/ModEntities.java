@@ -3,6 +3,7 @@ package com.codenamecoraline.registry;
 import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.entity.babydragon.BabyDragon;
 import com.codenamecoraline.entity.babydragon.DragonEmber;
+import com.codenamecoraline.entity.raven.FeyRaven;
 import com.codenamecoraline.entity.redcap.Redcap;
 import com.codenamecoraline.entity.redcap.RedcapRock;
 import com.codenamecoraline.entity.basilisk.Basilisk;
@@ -187,6 +188,13 @@ public final class ModEntities {
                     .sized(0.25F, 0.25F).noSave().clientTrackingRange(8).updateInterval(1)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
+    /** Three-eyed twilight messenger and companion. */
+    public static final DeferredHolder<EntityType<?>, EntityType<FeyRaven>> FEY_RAVEN = ENTITY_TYPES.register("fey_raven",
+            id -> EntityType.Builder.of(FeyRaven::new, MobCategory.CREATURE)
+                    .sized(FeyRaven.WIDTH, FeyRaven.HEIGHT).eyeHeight(FeyRaven.EYE_HEIGHT)
+                    .clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
     private ModEntities() {}
 
     public static EntityType<PuppetEntity> puppet(PuppetKind kind) {
@@ -217,6 +225,7 @@ public final class ModEntities {
         for (PuppetKind kind : PuppetKind.values()) {
             event.put(puppet(kind), PuppetEntity.createAttributes(kind).build());
         }
+        event.put(FEY_RAVEN.get(), FeyRaven.createAttributes().build());
     }
 
     private static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {
@@ -228,5 +237,7 @@ public final class ModEntities {
                 Lithophage::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(CRIMSON_COMMANDER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 CrimsonCommander::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(FEY_RAVEN.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING,
+                FeyRaven::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 }
