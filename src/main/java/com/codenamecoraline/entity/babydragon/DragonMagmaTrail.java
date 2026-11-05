@@ -40,7 +40,8 @@ public final class DragonMagmaTrail extends SavedData {
         var ground = level.getBlockState(pos.below());
         if (!(ground.is(Blocks.STONE) || ground.is(Blocks.DEEPSLATE) || ground.is(Blocks.GRASS_BLOCK)
                 || ground.is(Blocks.DIRT) || ground.is(Blocks.SAND) || ground.is(Blocks.NETHERRACK))) return false;
-        if (!level.noCollision(new AABB(pos)) || !level.getEntitiesOfClass(LivingEntity.class, new AABB(pos)).isEmpty()) return false;
+        if (!level.noCollision(new AABB(pos)) || !level.getEntitiesOfClass(LivingEntity.class, new AABB(pos)).isEmpty()
+                || !level.getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, new AABB(pos)).isEmpty()) return false;
         // Journal first; the original state is always air. A replacement is removed only while it is still ours.
         this.patches.add(new Patch(pos.immutable(), level.getGameTime() + 160, dragon.getUUID().toString(), level.getBlockState(pos))); this.setDirty();
         level.setBlockAndUpdate(pos, ModDragonSystems.TEMPORARY_MAGMA.get().defaultBlockState()); return true;
@@ -68,7 +69,7 @@ public final class DragonMagmaTrail extends SavedData {
             BabyDragon dragon = level.getEntity(uuid) instanceof BabyDragon d ? d : null;
             if (dragon == null || !dragon.isAlive()) continue;
             for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, new AABB(patch.pos).inflate(.1, .25, .1)))
-                if (dragon.validDefensiveTarget(target)) dragon.damageEnemy(target, 2);
+                if (dragon.validDefensiveTarget(target)) dragon.damageEnemyWithFire(target, 2, 2);
         }
     }
 }

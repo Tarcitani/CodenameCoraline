@@ -41,11 +41,13 @@ public final class DragonEmber extends ThrowableItemProjectile {
     @Override protected Item getDefaultItem() { return ModItems.DRAGON_EMBER.get(); }
     @Override protected double getDefaultGravity() { return 0; }
     @Override protected boolean canHitEntity(Entity entity) {
-        return entity != this.getOwner() && (!(this.getOwner() instanceof BabyDragon dragon) || !dragon.isProtected(entity)) && super.canHitEntity(entity);
+        return !(entity instanceof net.minecraft.world.entity.item.ItemEntity)
+                && entity != this.getOwner() && (!(this.getOwner() instanceof BabyDragon dragon) || !dragon.isProtected(entity)) && super.canHitEntity(entity);
     }
     @Override protected void onHitEntity(EntityHitResult hit) {
-        if (this.level() instanceof ServerLevel server && this.getOwner() instanceof BabyDragon dragon
-                && hit.getEntity() instanceof LivingEntity target && !dragon.isProtected(target)) dragon.damageEnemy(target, this.getDragonStage().fireball);
+        if (this.level() instanceof ServerLevel && this.getOwner() instanceof BabyDragon dragon
+                && hit.getEntity() instanceof LivingEntity target && !dragon.isProtected(target))
+            dragon.damageEnemyWithFire(target, dragon.getFireballDamage(), 3 + this.getDragonStage().ordinal());
     }
     @Override protected void onHit(HitResult hit) {
         super.onHit(hit);
@@ -58,7 +60,8 @@ public final class DragonEmber extends ThrowableItemProjectile {
                 for (LivingEntity target : server.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius))) {
                     if (target == direct || !dragon.validDefensiveTarget(target) || target.position().distanceToSqr(this.position()) > radius * radius) continue;
                     if (server.clip(new net.minecraft.world.level.ClipContext(this.position(), target.getBoundingBox().getCenter(), net.minecraft.world.level.ClipContext.Block.COLLIDER,
-                            net.minecraft.world.level.ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS) dragon.damageEnemy(target, this.getDragonStage().fireball * .5F);
+                            net.minecraft.world.level.ClipContext.Fluid.NONE, this)).getType() == HitResult.Type.MISS)
+                        dragon.damageEnemyWithFire(target, dragon.getFireballDamage() * .5F, 2 + this.getDragonStage().ordinal());
                 }
             }
             this.discard();
