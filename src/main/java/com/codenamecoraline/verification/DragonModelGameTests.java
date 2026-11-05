@@ -148,6 +148,17 @@ public final class DragonModelGameTests {
     private static void assets(GameTestHelper h) {
         for(String stage:List.of("baby","young","adult")) for(String suffix:List.of("","_glow"))
             h.assertTrue(DragonModelGameTests.class.getResource("/assets/codenamecoraline/textures/entity/"+stage+"_dragon"+suffix+".png")!=null,"stage texture packaged");
+        for(DragonStage stage:DragonStage.values()) {
+            Set<String> hashes=new HashSet<>();
+            for(int v=0;v<BabyDragon.VARIANT_COUNT;v++) {
+                Identifier tex=BabyDragonRenderer.textureFor(stage,v);
+                var url=DragonModelGameTests.class.getResource("/assets/"+tex.getNamespace()+"/"+tex.getPath());
+                h.assertTrue(url!=null,"variant texture packaged: "+tex);
+                try(var in=url.openStream()){hashes.add(java.util.Arrays.toString(java.security.MessageDigest.getInstance("SHA-256").digest(in.readAllBytes())));}
+                catch(Exception ex){h.fail("failed reading variant texture "+tex);}
+            }
+            h.assertValueEqual(hashes.size(),BabyDragon.VARIANT_COUNT,"all 6 variants per stage are visually distinct: "+stage);
+        }
         h.succeed();
     }
     private static BabyDragon adult(GameTestHelper h) {

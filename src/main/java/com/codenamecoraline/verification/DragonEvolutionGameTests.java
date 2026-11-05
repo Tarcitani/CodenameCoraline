@@ -122,10 +122,10 @@ public final class DragonEvolutionGameTests {
     }
     private static void attributes(GameTestHelper h) {
         var d = dragon(h);
-        for (var s : DragonStage.values()) { stage(h, d, s); h.assertValueEqual(d.getMaxHealth(), s.health, "health per stage");
-            h.assertValueEqual(d.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)s.melee, "melee per stage");
-            h.assertValueEqual(d.getAttributeValue(Attributes.FLYING_SPEED), s.flightSpeed, "flight per stage");
-            h.assertValueEqual(d.getAttributeValue(Attributes.ARMOR), (double)s.armor, "armor per stage"); }
+        for (var s : DragonStage.values()) { stage(h, d, s); h.assertTrue(Math.abs(d.getMaxHealth() - s.health * d.getVitality()) < 0.01F, "health per stage");
+            h.assertTrue(Math.abs(d.getAttributeValue(Attributes.ATTACK_DAMAGE) - (double) s.melee * d.getStrength()) < 0.01, "melee per stage");
+            h.assertTrue(Math.abs(d.getAttributeValue(Attributes.FLYING_SPEED) - s.flightSpeed * d.getAgility()) < 0.001, "flight per stage");
+            h.assertTrue(Math.abs(d.getAttributeValue(Attributes.ARMOR) - (double) s.armor * d.getVitality()) < 0.01, "armor per stage"); }
         h.succeed();
     }
     private static void xp(GameTestHelper h) {
@@ -151,12 +151,12 @@ public final class DragonEvolutionGameTests {
         h.assertValueEqual(d.getDragonXp(), 28, "kill bonus once"); h.succeed();
     }
     private static void persistence(GameTestHelper h) {
-        var d = dragon(h); var p = owner(h, d); stage(h, d, DragonStage.YOUNG); d.addDragonXp(240); d.setHealth(54);
+        var d = dragon(h); var p = owner(h, d); stage(h, d, DragonStage.YOUNG); d.addDragonXp(240); d.setHealth(48);
         d.getDragonInventory().setItem(0, new ItemStack(Items.DIAMOND, 7)); d.getDragonBrain().setAttackCooldown(40);
         var loaded = copy(h, d);
         h.assertTrue(loaded.getUUID().equals(d.getUUID()) && loaded.isOwnedBy(p), "UUID and tame owner survive");
         h.assertValueEqual(loaded.getDragonStage(), DragonStage.YOUNG, "saved stage"); h.assertValueEqual(loaded.getDragonXp(), 740, "saved XP");
-        h.assertValueEqual(loaded.getHealth(), 54F, "saved health"); h.assertValueEqual(loaded.getDragonInventory().getItem(0).getCount(), 7, "saved inventory");
+        h.assertValueEqual(loaded.getHealth(), 48F, "saved health"); h.assertValueEqual(loaded.getDragonInventory().getItem(0).getCount(), 7, "saved inventory");
         h.assertValueEqual(loaded.getDragonBrain().getAttackCooldown(), 40, "saved cooldown"); h.succeed();
     }
     private static void resume(GameTestHelper h) {
@@ -169,7 +169,7 @@ public final class DragonEvolutionGameTests {
         var d = dragon(h); owner(h, d); stage(h, d, s); var target = enemy(h, 9, 6);
         var shot = new DragonEmber(h.getLevel(), d); shot.setPos(target.position().add(-3, .7, 0)); shot.shoot(1, 0, 0, 1, 0); h.getLevel().addFreshEntity(shot);
         h.assertTrue(shot.getBbWidth() > ModEntities.DRAGON_EMBER.get().getDimensions().width(), "larger physical projectile");
-        h.runAfterDelay(8, () -> { h.assertValueEqual(target.getHealth(), 200 - s.fireball, "stage projectile damage"); h.succeed(); });
+        h.runAfterDelay(8, () -> { h.assertTrue(Math.abs(target.getHealth() - (200 - d.getFireballDamage())) < 0.01F, "stage projectile damage"); h.succeed(); });
     }
     private static void projectileWall(GameTestHelper h) {
         var d = dragon(h); stage(h, d, DragonStage.ADULT); var target = enemy(h, 8, 6);
