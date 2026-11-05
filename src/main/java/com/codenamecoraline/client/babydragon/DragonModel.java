@@ -17,6 +17,7 @@ public class DragonModel extends EntityModel<BabyDragonRenderState> {
         DragonAnimations.forStage(stage).forEach((pose, definition) -> this.baked.put(pose, definition.bake(root)));
     }
     public DragonStage stage() { return this.stage; }
+    public ModelPart part(String name) { return this.partLookup.apply(name); }
     @Override public void setupAnim(BabyDragonRenderState state) {
         super.setupAnim(state);
         var parts = this.partLookup;
@@ -27,14 +28,16 @@ public class DragonModel extends EntityModel<BabyDragonRenderState> {
             if (clock.isStarted()) entry.getValue().apply(clock.getTimeInMillis(state.ageInTicks), 1);
         }
         float air = state.flightBlend, age = this.stage.ordinal();
+        float glide = Mth.clamp(state.glideFactor, 0.0F, 1.0F);
+        float flapSuppression = 1.0F - 0.55F * glide;
         float phase = state.ageInTicks * (this.stage == DragonStage.BABY ? .47F : this.stage == DragonStage.YOUNG ? .35F : .24F);
         for (int side : new int[]{-1, 1}) {
             String p = side == 1 ? "left" : "right";
             ModelPart wing = parts.apply(p+"_wing"), elbow = parts.apply(p+"_wing_elbow"), tip = parts.apply(p+"_wing_tip");
-            wing.yRot += side*1.05F*air;
-            wing.zRot += side*(.18F + Mth.sin(phase)*(.48F+age*.07F))*air;
+            wing.yRot += side*(1.05F + 0.14F * glide)*air;
+            wing.zRot += side*(.18F + Mth.sin(phase)*(.48F+age*.07F)*flapSuppression)*air;
             elbow.yRot += side*.18F*air; tip.yRot += side*.24F*air;
-            tip.zRot += side*Mth.sin(phase-.65F)*.18F*air;
+            tip.zRot += side*Mth.sin(phase-.65F)*.18F*flapSuppression*air;
             parts.apply(p+"_front_leg").xRot -= .85F*air;
             parts.apply(p+"_back_leg").xRot -= .65F*air;
             boolean closed = state.sleeping || (state.ageInTicks+state.blinkSeed)%137 < 4;
@@ -53,10 +56,13 @@ public class DragonModel extends EntityModel<BabyDragonRenderState> {
             parts.apply("head").y = rig.headY(); parts.apply("head").zRot = 0;
             parts.apply("jaw").xRot = pose.jawPitch();
         } else {
+            parts.apply("body").zRot += state.flightRoll * Mth.DEG_TO_RAD * air;
+            parts.apply("body").xRot += state.flightPitch * Mth.DEG_TO_RAD * air;
             parts.apply("neck").yRot += Mth.clamp(state.yRot, -70, 70)*Mth.DEG_TO_RAD*.25F;
             parts.apply("head").yRot += Mth.clamp(state.yRot, -70, 70)*Mth.DEG_TO_RAD*.75F;
             parts.apply("neck").xRot += Mth.clamp(state.xRot, -45, 45)*Mth.DEG_TO_RAD*.25F;
             parts.apply("head").xRot += Mth.clamp(state.xRot, -45, 45)*Mth.DEG_TO_RAD*.75F;
+            if (state.carryingItem) parts.apply("jaw").xRot = Math.max(parts.apply("jaw").xRot, 0.28F);
         }
         String[] tail = {"tail_base", "tail_middle", "tail_tip", "tail_3", "tail_4", "tail_5"};
         for (int i=0; i<tail.length; i++) {
