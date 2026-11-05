@@ -142,12 +142,26 @@ def main() -> None:
     sheet.save(sheet_path)
     print(f"Saved composite pose sheet: {sheet_path}")
 
-    # Bestiary plates (112x80 anatomy, 112x72 combat)
+    # Bestiary plates (112x80 anatomy, 112x72 combat, 112x64 spoils)
     anatomy = render_pose_image("anatomy", 112, 80, yaw=0.64, pitch=0.16, sepia_mode=True)
     combat = render_pose_image("combat", 112, 72, yaw=-0.58, pitch=0.18, sepia_mode=True)
+    spoils = Image.new("RGBA", (112, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(spoils)
+    # Left: Fey Feather study; Right: Messenger scroll & glow berries study
+    d.line((18, 50, 46, 14), fill=(*INK, 230), width=2)
+    d.polygon([(24, 42), (32, 22), (46, 14), (42, 30), (30, 46)], fill=(*INK, 95), outline=(*INK, 220))
+    for rx, ry in [(34, 26), (38, 22), (30, 34)]:
+        d.ellipse((rx - 1, ry - 1, rx + 1, ry + 1), fill=(*CYAN_INK, 235))
+    d.rectangle((62, 22, 94, 38), fill=(*INK, 75), outline=(*INK, 220))
+    d.line((76, 22, 76, 38), fill=(*INK, 230), width=2)
+    d.ellipse((74, 28, 79, 33), fill=(*CYAN_INK, 240), outline=(*INK, 220))
+    for bx, by in [(68, 48), (74, 50), (80, 47)]:
+        d.ellipse((bx - 3, by - 3, bx + 3, by + 3), fill=(*CYAN_INK, 210), outline=(*INK, 220))
+
     anatomy.save(BESTIARY_OUT / "fey_raven_anatomy.png")
     combat.save(BESTIARY_OUT / "fey_raven_combat.png")
-    print(f"Saved Bestiary plates: {BESTIARY_OUT / 'fey_raven_anatomy.png'} and {BESTIARY_OUT / 'fey_raven_combat.png'}")
+    spoils.save(BESTIARY_OUT / "fey_raven_spoils.png")
+    print(f"Saved Bestiary plates: anatomy, combat, and spoils in {BESTIARY_OUT}")
 
 
 if __name__ == "__main__":

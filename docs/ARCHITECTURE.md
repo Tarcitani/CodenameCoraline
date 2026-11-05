@@ -42,13 +42,14 @@ CodenameCoraline/
 │   │   ├── crimson/            # Comandante Carmesim (boss duelo, combos, guarda/riposta)
 │   │   ├── ten_threads_witch/  # Bruxa dos Dez Fios (Matriarca + 10 marionetes, AttackRunner)
 │   │   ├── babydragon/         # Dragão Companheiro (3 anatomias, montaria, inventário, totem)
+│   │   ├── raven/              # Corvo Feérico (companheiro místico, sentinela, coleta, ombro)
 │   │   ├── spirit/             # Espíritos residuais de chefes derrotados (BossSpirit)
 │   │   └── PlayerSummon.java   # interface comum para invocações aliadas do jogador
 │   ├── client/                 # modelos, renderizadores, animações e telas (CLIENTE)
 │   │   ├── bossbar/            # ThemedBossBars e estilos temáticos de barra de vida
 │   │   ├── bestiary/           # telas, layouts de página e renderizadores do Bestiário
 │   │   ├── redcap/, basilisk/, lithophage/, collector/, canopy/,
-│   │   ├── macaque/, crimson/, ten_threads_witch/, babydragon/ # modelos e animações
+│   │   ├── macaque/, crimson/, ten_threads_witch/, babydragon/, raven/ # modelos e animações
 │   │   └── ...                 # camadas emissivas (EyesLayer) e EntityRenderState
 │   ├── bestiary/               # modelo de dados do Bestiário (Bestiary, BestiaryEntry, BestiaryPage)
 │   ├── inventory/              # menus de container do jogador (DragonMenu)
@@ -57,8 +58,8 @@ CodenameCoraline/
 │   └── verification/           # suítes de testes de integração automatizados (GameTests)
 │       ├── BabyDragonGameTests.java, BasiliskGameTests.java, CanopyBreakerGameTests.java,
 │       ├── CrimsonCommanderGameTests.java, DeadrootClubGameTests.java, DragonEvolutionGameTests.java,
-│       ├── DragonModelGameTests.java, LastGiftCollectorGameTests.java, LithophageGameTests.java,
-│       ├── MatriarchAnimationGameTests.java, TenThreadsWitchGameTests.java,
+│       ├── DragonModelGameTests.java, FeyRavenGameTests.java, LastGiftCollectorGameTests.java,
+│       ├── LithophageGameTests.java, MatriarchAnimationGameTests.java, TenThreadsWitchGameTests.java,
 │       └── ModelGameTestRegistration.java # controle de carregamento dedicado de testes de modelo
 ├── src/main/resources/
 │   ├── assets/codenamecoraline/# recursos visuais e sonoros do cliente
@@ -321,3 +322,11 @@ Entidade visual (LivingEntity sem colisão, sem dano, sem salvar) que sobe a 0,0
 ## Intro do Quebra-Copas (`client/canopy/CanopyCinematicDirector`)
 
 No padrão do Cobrador: enquanto o boss está em `INTRO` (120 ticks), a câmera do jogador próximo vira para ele (primeiro a copa, depois o peito, depois o rosto), o FOV fecha, tarjas de cinema entram, cada golpe no peito e o rugido tremem a câmera, e o título aparece com o rugido. A mesma tecla de pular (V) ou levar dano libera a câmera. O roteiro do servidor (`tickIntro`): olhar em volta (0 a 24), `INTRO_CHEST_BEAT` com um tambor por golpe (24 a 72), `ROAR_AGGRO` e a chegada dos dois Micos (72 a 104).
+
+## Corvo Feérico (`fey_raven`)
+
+- **Servidor:** `entity/raven/FeyRaven` (PathfinderMob implementando `PlayerSummon`; 18 PV, armadura 2, velocidade terrestre 0,25, velocidade de voo 0,55, ataque 3,0, hitbox 0,6 × 0,8) implementa a máquina de estados sincronizada `RavenState` (`IDLE_GROUND`, `WALK`, `FLY_ORBIT`, `PERCH_SHOULDER`, `FETCH_ITEM`, `SENTINEL_ALERT`, `PECK_ATTACK`, `SITTING`, `HURT`, `DYING`), domesticação com `minecraft:glow_berries` (33% de chance por baga) ou cura (+4 PV quando domesticado), ciclo de comandos (`FOLLOW` ↔ `STAY`), empoleiramento no ombro (`Shift + Clique direito` de mãos vazias preservando a entidade via `startRiding`), inventário de 1 slot no pergaminho da perna (`SimpleContainer(1)` persistido em NBT), coleta automática de itens brilhantes em raio de 12 blocos (`FETCH_ITEM`), Sentinela Mística que aplica `MobEffects.GLOWING` por 100 ticks a hostis invisíveis em raio de 16 blocos (`SENTINEL_ALERT`, recarga de 200 ticks), e voo de retorno em emergência quando a vida cai abaixo de 30% (`<= 5,4 PV`).
+- **Spawn:** `FeyRaven.checkSpawnRules` registrado em `ModEntities.onSpawnPlacements`; biome modifier `neoforge/biome_modifier/fey_raven_spawns.json` sobre a tag `tags/worldgen/biome/fey_raven_habitat.json` (`dark_forest`, `old_growth_pine_taiga`, `old_growth_spruce_taiga`, `taiga`, `forest`).
+- **Cliente:** `client/raven/` contém `FeyRavenModel` (21 juntas articuladas e 23 caixas 3D sem interseção de UV em atlas 128×128, incluindo terceiro olho na testa, colar de penas, asas duplas, cauda tripla, bagas no bico e pergaminho na canela esquerda), `FeyRavenAnimations` (10 animações por keyframe), `FeyRavenRenderState`, `FeyRavenEyesLayer` (camada emissiva ciano para os três olhos, runas das asas/peito e bagas), `FeyRavenRenderer` e `FeyRavenClient`.
+- **Recursos, Conquistas e Bestiário:** item `codenamecoraline:fey_feather` (`ModItems.FEY_FEATHER`), ovo `fey_raven_spawn_egg`, tabela de saque `loot_table/entities/fey_raven.json`, 5 eventos sonoros em `ModSounds` (`FEY_RAVEN_AMBIENT`, `FEY_RAVEN_ALERT`, `FEY_RAVEN_FLAP`, `FEY_RAVEN_HURT`, `FEY_RAVEN_DEATH`) mapeados para eventos vanilla em `sounds.json`, 3 conquistas (`advancement/bosses/{find_fey_raven,tame_fey_raven,fey_messenger}.json`), capítulo `Bestiary.FEY_RAVEN` (6 páginas) e gravuras `textures/gui/bestiary/fey_raven_{anatomy,combat,spoils}.png`.
+- **Verificação:** `verification/FeyRavenGameTests` registra 8 testes na execução `runFeyRavenTest` (`coraline.feyRavenTests=true`) em `build/fey-raven-gametest/`. Detalhes em [design/fey_raven.md](design/fey_raven.md).

@@ -181,6 +181,9 @@ public final class ModItems {
 
     public static final DeferredItem<Item> FEY_RAVEN_SPAWN_EGG = ITEMS.registerItem("fey_raven_spawn_egg", SpawnEggItem::new,
             () -> new Item.Properties().spawnEgg(ModEntities.FEY_RAVEN.get()));
+    /** Rare luminescent feather shed by the Fey Raven. */
+    public static final DeferredItem<Item> FEY_FEATHER = ITEMS.registerSimpleItem("fey_feather",
+            () -> new Item.Properties().rarity(Rarity.UNCOMMON));
 
     // Retired rewards stay registered to preserve items in existing worlds; no drops or recipes.
     public static final DeferredItem<Item> CATACOMB_LILY = ITEMS.registerItem("catacomb_lily", CatacombLilyItem::new);

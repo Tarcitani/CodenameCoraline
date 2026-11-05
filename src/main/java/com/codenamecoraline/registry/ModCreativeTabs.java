@@ -70,6 +70,7 @@ public final class ModCreativeTabs {
             event.accept(ModItems.CRIMSON_PLATE_SHARD.get());
             event.accept(ModItems.PUPPET_REMNANT.get());
             event.accept(ModItems.MATRIARCH_THIMBLE.get());
+            event.accept(ModItems.FEY_FEATHER.get());
         } else if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             event.accept(ModItems.LITHOPHAGE_SPAWN_EGG.get());
             event.accept(ModItems.LAST_GIFT_COLLECTOR_SPAWN_EGG.get());

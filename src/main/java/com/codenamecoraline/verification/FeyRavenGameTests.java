@@ -1,11 +1,14 @@
 package com.codenamecoraline.verification;
 
 import com.codenamecoraline.CodenameCoraline;
+import com.codenamecoraline.bestiary.Bestiary;
 import com.codenamecoraline.client.raven.FeyRavenAnimations;
 import com.codenamecoraline.client.raven.FeyRavenModel;
 import com.codenamecoraline.entity.raven.FeyRaven;
 import com.codenamecoraline.registry.ModEntities;
 import com.codenamecoraline.registry.ModItems;
+import com.codenamecoraline.registry.ModSounds;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
@@ -52,7 +55,8 @@ public final class FeyRavenGameTests {
             Map.entry("fey_raven_commands_follow_sit_sentinel_and_teleport", FeyRavenGameTests::commandsFollowSitSentinelAndTeleport),
             Map.entry("fey_raven_loyalty_defense_and_friendly_fire", FeyRavenGameTests::loyaltyDefenseAndFriendlyFire),
             Map.entry("fey_raven_mystic_sentinel_and_scroll_inventory", FeyRavenGameTests::mysticSentinelAndScrollInventory),
-            Map.entry("fey_raven_owner_and_scroll_persistence", FeyRavenGameTests::ownerAndScrollPersistence));
+            Map.entry("fey_raven_owner_and_scroll_persistence", FeyRavenGameTests::ownerAndScrollPersistence),
+            Map.entry("fey_raven_bestiary_loot_sounds_and_advancements", FeyRavenGameTests::bestiaryLootSoundsAndAdvancements));
 
     private FeyRavenGameTests() {}
 
@@ -330,6 +334,36 @@ public final class FeyRavenGameTests {
         helper.assertTrue(loaded.getScrollItem().is(Items.EMERALD), "ScrollItem persisted");
         helper.assertValueEqual(loaded.getAlertCooldown(), 240, "AlertCooldown persisted");
         helper.assertValueEqual(loaded.getHealth(), 9.0F, "Health persisted");
+        helper.succeed();
+    }
+
+    private static void bestiaryLootSoundsAndAdvancements(GameTestHelper helper) {
+        helper.assertTrue(
+                Bestiary.ENTRIES.contains(Bestiary.FEY_RAVEN) && Bestiary.FEY_RAVEN.pages().size() == 6,
+                "Fey Raven 6-page chapter must be registered in Bestiary");
+        helper.assertTrue(ModItems.FEY_FEATHER.get() != null, "Fey Feather item registered");
+        helper.assertTrue(
+                ModSounds.FEY_RAVEN_AMBIENT.get() != null
+                        && ModSounds.FEY_RAVEN_ALERT.get() != null
+                        && ModSounds.FEY_RAVEN_FLAP.get() != null
+                        && ModSounds.FEY_RAVEN_HURT.get() != null
+                        && ModSounds.FEY_RAVEN_DEATH.get() != null,
+                "All 5 Fey Raven sound events registered");
+        var advancements = helper.getLevel().getServer().getAdvancements();
+        for (String adv : List.of("bosses/find_fey_raven", "bosses/tame_fey_raven", "bosses/fey_messenger")) {
+            helper.assertTrue(advancements.get(id(adv)) != null, "Advancement loaded: " + adv);
+        }
+        for (String path : List.of(
+                "textures/entity/fey_raven.png",
+                "textures/entity/fey_raven_eyes.png",
+                "textures/item/fey_feather.png",
+                "textures/gui/bestiary/fey_raven_anatomy.png",
+                "textures/gui/bestiary/fey_raven_combat.png",
+                "textures/gui/bestiary/fey_raven_spoils.png")) {
+            helper.assertTrue(
+                    FeyRavenGameTests.class.getResource("/assets/codenamecoraline/" + path) != null,
+                    "Packaged asset present: " + path);
+        }
         helper.succeed();
     }
 }

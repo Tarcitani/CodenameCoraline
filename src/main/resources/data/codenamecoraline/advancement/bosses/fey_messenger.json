@@ -1,0 +1,37 @@
+{
+  "parent": "codenamecoraline:bosses/tame_fey_raven",
+  "criteria": {
+    "has_fey_feather": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "codenamecoraline:fey_feather"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.fey_messenger.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:writable_book"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.fey_messenger.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_fey_feather"
+    ]
+  ]
+}
+

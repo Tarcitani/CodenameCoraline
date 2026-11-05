@@ -1,6 +1,7 @@
 package com.codenamecoraline.entity.raven;
 
 import com.codenamecoraline.entity.PlayerSummon;
+import com.codenamecoraline.registry.ModSounds;
 import java.util.List;
 import java.util.Objects;
 import net.minecraft.core.BlockPos;
@@ -8,7 +9,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.FluidTags;
@@ -619,7 +620,7 @@ public final class FeyRaven extends TamableAnimal implements PlayerSummon {
                 this.alertPoseTicks = 25;
                 this.setState(State.ALERTING);
                 this.level().broadcastEntityEvent(this, EVENT_MYSTIC_ALERT);
-                this.playSound(SoundEvents.AMETHYST_BLOCK_RESONATE, 1.0F, 1.4F);
+                this.playSound(ModSounds.FEY_RAVEN_ALERT.get(), 1.0F, 1.0F);
                 return true;
             }
         }
@@ -849,6 +850,21 @@ public final class FeyRaven extends TamableAnimal implements PlayerSummon {
                 this.scrollDroppedOnDeath = true;
             }
         }
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return ModSounds.FEY_RAVEN_AMBIENT.get();
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource damageSource) {
+        return ModSounds.FEY_RAVEN_HURT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.FEY_RAVEN_DEATH.get();
     }
 
     @Override

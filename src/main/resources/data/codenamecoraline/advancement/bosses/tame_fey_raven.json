@@ -1,0 +1,35 @@
+{
+  "parent": "codenamecoraline:bosses/find_fey_raven",
+  "criteria": {
+    "tamed_fey_raven": {
+      "trigger": "minecraft:tame_animal",
+      "conditions": {
+        "entity": {
+          "type": "codenamecoraline:fey_raven"
+        }
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.tame_fey_raven.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:fey_feather"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.tame_fey_raven.title"
+    }
+  },
+  "requirements": [
+    [
+      "tamed_fey_raven"
+    ]
+  ]
+}
+

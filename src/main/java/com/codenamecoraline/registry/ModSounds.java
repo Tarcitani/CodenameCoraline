@@ -118,6 +118,12 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> PUPPET_CRASH = register("entity.ten_threads_puppet.crash");
     public static final DeferredHolder<SoundEvent, SoundEvent> PUPPET_CRACK = register("entity.ten_threads_puppet.crack");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> FEY_RAVEN_AMBIENT = register("entity.fey_raven.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FEY_RAVEN_ALERT = register("entity.fey_raven.alert");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FEY_RAVEN_FLAP = register("entity.fey_raven.flap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FEY_RAVEN_HURT = register("entity.fey_raven.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FEY_RAVEN_DEATH = register("entity.fey_raven.death");
+
     /** The signature sound of each puppet (steps and attacks), one event per kind. */
     private static final java.util.EnumMap<com.codenamecoraline.entity.ten_threads_witch.PuppetKind, DeferredHolder<SoundEvent, SoundEvent>> PUPPET_ACTIONS =
             new java.util.EnumMap<>(com.codenamecoraline.entity.ten_threads_witch.PuppetKind.class);

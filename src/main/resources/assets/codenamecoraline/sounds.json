@@ -1570,5 +1570,66 @@
         "pitch": 1.4
       }
     ]
+  },
+  "entity.fey_raven.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.fey_raven.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:entity.parrot.ambient",
+        "type": "event",
+        "volume": 0.9,
+        "pitch": 0.65
+      }
+    ]
+  },
+  "entity.fey_raven.alert": {
+    "subtitle": "subtitles.codenamecoraline.entity.fey_raven.alert",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.resonate",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 1.4
+      },
+      {
+        "name": "minecraft:entity.witch.celebrate",
+        "type": "event",
+        "volume": 0.7,
+        "pitch": 1.4
+      }
+    ]
+  },
+  "entity.fey_raven.flap": {
+    "subtitle": "subtitles.codenamecoraline.entity.fey_raven.flap",
+    "sounds": [
+      {
+        "name": "minecraft:entity.parrot.fly",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.85
+      }
+    ]
+  },
+  "entity.fey_raven.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.fey_raven.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:entity.parrot.hurt",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.70
+      }
+    ]
+  },
+  "entity.fey_raven.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.fey_raven.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.parrot.death",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.65
+      }
+    ]
   }
 }

@@ -168,7 +168,22 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     skin.save(out_dir / "fey_raven.png")
     eyes.save(out_dir / "fey_raven_eyes.png")
-    print(f"Generated {out_dir / 'fey_raven.png'} and {out_dir / 'fey_raven_eyes.png'}")
+
+    # 7. Item sprite: codenamecoraline:fey_feather (16x16 luminescent obsidian-cyan feather)
+    feather = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for i in range(2, 14):
+        # Diagonal quill from bottom-left (2,13) to top-right (13,2)
+        qx, qy = i, 15 - i
+        feather.putpixel((qx, qy), SILVER_RUNE if i < 6 else CYAN_CORE)
+        for offset in range(1, 4 if 4 <= i <= 11 else 2):
+            if qx - offset >= 1:
+                feather.putpixel((qx - offset, qy), HIGHLIGHT if offset == 1 else BASE)
+            if qy + offset <= 14:
+                feather.putpixel((qx, qy + offset), CYAN_GLOW if (i + offset) % 3 == 0 else MID_SLATE)
+    item_dir = ASSETS / "textures/item"
+    item_dir.mkdir(parents=True, exist_ok=True)
+    feather.save(item_dir / "fey_feather.png")
+    print(f"Generated {out_dir / 'fey_raven.png'}, {out_dir / 'fey_raven_eyes.png'}, and {item_dir / 'fey_feather.png'}")
 
 
 if __name__ == "__main__":

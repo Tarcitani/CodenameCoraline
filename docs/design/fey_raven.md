@@ -130,8 +130,8 @@
 | 2. Visual e rigging | **concluída** | 2026-11-05 | `.\gradlew.bat compileJava` (OK) + `python tools/generate_fey_raven_assets.py` (23 boxes, 0 UV overlaps) + `.\gradlew.bat -I tools/fey-raven-sketches.gradle exportFeyRavenSketchModel` (8 poses) + `python tools/generate_fey_raven_sketches.py` (6 poses + 2 pranchas Bestiário) |
 | 2b. Revisão visual (humano) | **concluída** | 2026-11-05 | Poses e texturas aprovadas pelo usuário |
 | 3. IA de Companheiro | **concluída** | 2026-11-05 | `.\gradlew.bat compileJava` (OK) + `.\gradlew.bat runFeyRavenTest` (7 testes de `fey_raven_test_environment`, All 8 required tests passed, BUILD SUCCESSFUL in 11s) |
-| 4. Polimento e docs | pendente | | |
+| 4. Polimento e docs | **concluída** | 2026-11-05 | `.\gradlew.bat build` (BUILD SUCCESSFUL) + 4 rodadas consecutivas de `.\gradlew.bat runFeyRavenTest` (8 testes de `fey_raven_test_environment`, All 9 required tests passed em 4/4) + regressão `.\gradlew.bat runDeadrootClubTest` (All 9 required tests passed) |
 | 5. Relatório de entrega | pendente | | |
 
-- **Próximo passo:** Iniciar a **Fatia 4 (Polimento e docs)** executando o prompt [docs/prompts/fatia_4_polimento.md](file:///c:/MinecraftDev/CodenameCoraline/docs/prompts/fatia_4_polimento.md).
+- **Próximo passo:** Executar a **Etapa 5 (Relatório de entrega)** usando o prompt [docs/prompts/relatorio.md](file:///c:/MinecraftDev/CodenameCoraline/docs/prompts/relatorio.md).
 
