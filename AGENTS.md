@@ -24,7 +24,7 @@ O projeto é a memória; a conversa não. Ao começar uma sessão nova:
 3. `docs/design/<sistema>.md` do mob/boss envolvido.
 4. `docs/ARCHITECTURE.md` e `docs/DECISIONS.md` apenas nas seções relevantes (são grandes: use busca, não leia inteiro).
 
-Mapa de docs: `ARCHITECTURE` (estrutura), `DECISIONS` (decisões), `DEVELOPMENT` (comandos e validação), `ROADMAP` (estado), `design/` (especificação por mob/boss), `PROMPT_NOVO_MOB.md` (checklist de mob novo).
+Mapa de docs: `ARCHITECTURE` (estrutura), `DECISIONS` (decisões), `DEVELOPMENT` (comandos e validação), `ROADMAP` (estado), `design/` (especificação por mob/boss), `PROCESSO_MOB.md` (fluxo de criação de mob: etapas, modelos, orçamento de contexto), `PROMPT_NOVO_MOB.md` (índice), `MOB_CONTRACT.md` (contrato técnico de entidades) e `prompts/` (um prompt por fatia).
 
 Precedência: **o código real prevalece sobre documentação desatualizada**. Se achar divergência, corrija a doc ou avise. Não invente funcionalidades que não existem no código nem refaça o que já está implementado (confira antes com busca).
 
@@ -74,6 +74,7 @@ Na raiz do projeto (PowerShell ou Git Bash):
 - Não crie memória paralela (arquivos de notas por ferramenta). Fontes de continuidade: código, docs e Git.
 
 ## Economia de contexto
+- Criação de mob: uma sessão por fatia, estado gravado em `docs/design/<mob>.md` (ver `docs/PROCESSO_MOB.md`). Ao ficar sem contexto, grave "Próximo passo" na ficha e abra sessão nova.
 - Leia só os arquivos envolvidos e suas dependências diretas. Use busca antes de abrir arquivos grandes.
 - Não despeje logs: redirecione para arquivo e leia só o trecho de erro.
 - Prefira diffs pequenos e evite relatórios intermediários redundantes.

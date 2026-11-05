@@ -8,34 +8,75 @@ Estado real do código em `src/`. Atualize este arquivo junto com qualquer mudan
 
 ```
 CodenameCoraline/
-├── build.gradle            # plugins, toolchain Java 25, run configs NeoForge, geração de metadados
+├── build.gradle            # plugins, toolchain Java 25, run configs NeoForge, GameTests, geração de metadados
 ├── settings.gradle         # plugin foojay (provisiona JDK) e repositórios do plugin
 ├── gradle.properties       # versões (Minecraft, NeoForge) e propriedades do mod
 ├── gradlew / gradlew.bat   # Gradle Wrapper
 ├── gradle/wrapper/         # distribuição e propriedades do wrapper
+├── tools/                  # scripts Python de geração de texturas, UVs, poses e boss bars
+├── docs/                   # arquitetura, decisões (ADRs), roadmap, estado atual e design por criatura
+│   ├── CURRENT_STATE.md    # resumo de 1 página para inicialização rápida de contexto
+│   ├── ARCHITECTURE.md     # estrutura de pacotes, registros e fluxo de inicialização
+│   ├── DECISIONS.md        # decisões arquiteturais (D-001 a D-037)
+│   ├── DEVELOPMENT.md      # comandos de build, GameTests e solução de problemas
+│   ├── ROADMAP.md          # histórico técnico detalhado de entregas
+│   ├── PROMPT_NOVO_MOB.md  # prompt mestre para criação de mobs/bosses
+│   └── design/             # especificações detalhadas e validações de cada mob/boss
 ├── src/main/java/com/codenamecoraline/
-│   ├── CodenameCoraline.java           # ponto de entrada
-│   ├── registry/ModEntities.java       # DeferredRegister de entidades e atributos
-│   ├── registry/ModSounds.java         # DeferredRegister de eventos de som
-│   ├── registry/ModItems.java          # ovo, pedrinha, unha, dente, adaga, pique, touca
-│   ├── registry/ModCreativeTabs.java   # aba do criativo só com os ovos
-│   ├── entity/redcap/Redcap.java       # entidade Redcap (variante, atributos, IA, ataques, sons, idle no cliente)
-│   ├── entity/redcap/RedcapVariant.java # lança, adaga, garras: números de combate
-│   ├── entity/redcap/RedcapAge.java    # jovem, adulto, velho: só a cor
-│   ├── entity/redcap/RedcapRock.java   # pedrinha arremessada pelas garras
-│   ├── entity/redcap/RockAim.java      # mira balística com antecipação do alvo
-│   └── client/redcap/                  # apenas cliente: modelo, animações, render state, renderizador, olhos, registro
-├── src/main/resources/assets/codenamecoraline/
-│   ├── items/, models/item/, textures/item/ # ovo de geração e pedrinha animada
-│   ├── sounds.json                     # áudios de cada evento de som (referências a áudios do jogo base)
-│   ├── lang/en_us.json, pt_br.json     # nomes de entidades e legendas de som
-│   └── textures/entity/                # redcap.png, redcap_eyes.png (ver docs/DEVELOPMENT.md)
-├── src/main/templates/META-INF/
-│   └── neoforge.mods.toml      # template de metadados (expandido pelo Gradle)
-└── docs/                   # esta documentação
+│   ├── CodenameCoraline.java   # ponto de entrada (@Mod) e orquestrador de eventos
+│   ├── registry/               # registros centralizados via DeferredRegister
+│   │   ├── ModEntities.java    # registro de tipos de entidade e atributos
+│   │   ├── ModItems.java       # registro de itens, armas, armaduras e ovos
+│   │   ├── ModSounds.java      # registro de SoundEvents
+│   │   ├── ModCreativeTabs.java# aba criativa do mod
+│   │   ├── ModEffects.java     # efeitos de status do mod
+│   │   ├── ModPotions.java     # poções vanilla customizadas
+│   │   └── ModDragonSystems.java# sistemas e atributos estendidos do dragão
+│   ├── entity/                 # lógica de gameplay, IA, atributos e estados (SERVIDOR)
+│   │   ├── redcap/             # Redcap (variantes de armas, idade, mira de pedras)
+│   │   ├── basilisk/           # Basilisco da Praga (sopro, cegueira, decomposição)
+│   │   ├── lithophage/         # Litófago (7 estados de IA, estilhaço de âmbar)
+│   │   ├── collector/          # Cobrador da Última Dádiva (boss, trenó, rituais)
+│   │   ├── canopy/             # Quebra-Copas (boss arbóreo, golpes de gorila, salto)
+│   │   ├── macaque/            # Micos de Casca (lacaios arbóreos do Quebra-Copas)
+│   │   ├── crimson/            # Comandante Carmesim (boss duelo, combos, guarda/riposta)
+│   │   ├── ten_threads_witch/  # Bruxa dos Dez Fios (Matriarca + 10 marionetes, AttackRunner)
+│   │   ├── babydragon/         # Dragão Companheiro (3 anatomias, montaria, inventário, totem)
+│   │   ├── spirit/             # Espíritos residuais de chefes derrotados (BossSpirit)
+│   │   └── PlayerSummon.java   # interface comum para invocações aliadas do jogador
+│   ├── client/                 # modelos, renderizadores, animações e telas (CLIENTE)
+│   │   ├── bossbar/            # ThemedBossBars e estilos temáticos de barra de vida
+│   │   ├── bestiary/           # telas, layouts de página e renderizadores do Bestiário
+│   │   ├── redcap/, basilisk/, lithophage/, collector/, canopy/,
+│   │   ├── macaque/, crimson/, ten_threads_witch/, babydragon/ # modelos e animações
+│   │   └── ...                 # camadas emissivas (EyesLayer) e EntityRenderState
+│   ├── bestiary/               # modelo de dados do Bestiário (Bestiary, BestiaryEntry, BestiaryPage)
+│   ├── inventory/              # menus de container do jogador (DragonMenu)
+│   ├── item/                   # classes de itens especiais (DeadrootClubItem, TenThreadsStaffItem, etc.)
+│   ├── util/                   # utilitários matemáticos, físicos e de rede
+│   └── verification/           # suítes de testes de integração automatizados (GameTests)
+│       ├── BabyDragonGameTests.java, BasiliskGameTests.java, CanopyBreakerGameTests.java,
+│       ├── CrimsonCommanderGameTests.java, DeadrootClubGameTests.java, DragonEvolutionGameTests.java,
+│       ├── DragonModelGameTests.java, LastGiftCollectorGameTests.java, LithophageGameTests.java,
+│       ├── MatriarchAnimationGameTests.java, TenThreadsWitchGameTests.java,
+│       └── ModelGameTestRegistration.java # controle de carregamento dedicado de testes de modelo
+├── src/main/resources/
+│   ├── assets/codenamecoraline/# recursos visuais e sonoros do cliente
+│   │   ├── textures/           # atlas de entidades, itens, partículas e gui/boss_bar/
+│   │   ├── models/ & items/    # definições de modelos de blocos e itens 1.21.x
+│   │   ├── lang/               # localizações completas (pt_br.json e en_us.json)
+│   │   └── sounds.json         # mapeamento de áudios vanilla e pitches
+│   └── data/codenamecoraline/  # dados de servidor e mecânicas vanilla
+│       ├── advancement/        # árvores de conquistas temáticas por boss/mob
+│       ├── loot_table/         # tabelas de saque de entidades e rituais
+│       ├── recipe/             # receitas de bancada e suporte de poções
+│       ├── tags/               # tags de entidades, blocos e itens
+│       └── neoforge/           # biome modifiers para spawn de entidades
+└── src/main/templates/META-INF/
+    └── neoforge.mods.toml      # template de metadados expandido pelo Gradle
 ```
 
-Pacotes existem somente quando há conteúdo real: `registry`, `entity` e `client` foram criados para o Redcap (ver `docs/design/redcap.md`).
+Pacotes existem somente quando há requisito funcional real: monólito modular onde cada mob possui subpastas dedicadas em `entity/` e `client/`, mantendo lógica de gameplay completamente desacoplada do cliente gráfico.
 
 ## Ponto de entrada
 
@@ -56,6 +97,33 @@ Pacotes existem somente quando há conteúdo real: `registry`, `entity` e `clien
 - Atributos de entidade: `EntityAttributeCreationEvent`, no barramento do mod.
 - Sons: `DeferredRegister<SoundEvent>` em `registry/ModSounds.java`; os áudios de cada evento ficam em `assets/codenamecoraline/sounds.json` e as legendas nos arquivos `lang`.
 - Modelo e renderização: somente no cliente, em `client/redcap`. `RedcapModel` estende `EntityModel<RedcapRenderState>` (não `HumanoidModel`); `RedcapRenderer` é um `MobRenderer`.
+
+## Anatomia de um mob (mapa de arquivos)
+
+Tomando o Litófago como exemplo (`<id>` = `lithophage`, `<pkg>` = `lithophage`). `<id>` nomeia arquivos, scripts e registros; `<pkg>` nomeia as pastas Java e pode ser mais curto (`canopy_breaker` → `canopy`, `last_gift_collector` → `collector`, `crimson_commander` → `crimson`, `baby_dragon` → `babydragon`). Todo mob novo toca os mesmos pontos; use o mob de referência da ficha para copiar o formato.
+
+| Camada | Arquivo / local | Papel |
+|---|---|---|
+| Entidade (servidor) | `entity/<pkg>/<Mob>.java` | Atributos (`createAttributes`), `enum State`, goals, ataques, `checkSpawnRules`. Sem código gráfico |
+| Tipo e atributos | `registry/ModEntities.java` | `EntityType` (`ENTITY_TYPES.register`), `EntityAttributeCreationEvent`, `RegisterSpawnPlacementsEvent` |
+| Itens | `registry/ModItems.java` | Ovo de spawn (`SpawnEggItem`) e itens do mob; `assets/.../items/<id>_spawn_egg.json`, `models/item/`, `textures/item/` |
+| Aba criativa | `registry/ModCreativeTabs.java` | Ovo e itens |
+| Sons | `registry/ModSounds.java` + `assets/.../sounds.json` | Eventos mapeados para áudios vanilla (D-010); legendas em `lang/` |
+| Modelo (cliente) | `client/<pkg>/<Mob>Model.java` | `EntityModel`, hierarquia de `ModelPart` e `createBodyLayer` |
+| Animação (cliente) | `client/<pkg>/<Mob>Animations.java` | `AnimationDefinition` por keyframe; acionadas por evento de entidade ou `SynchedEntityData` |
+| Render | `client/<pkg>/<Mob>RenderState.java`, `<Mob>Renderer.java`, `<Mob>EyesLayer.java` | Estado de render, renderizador, camada emissiva |
+| Registro do cliente | `client/<pkg>/<Mob>Client.java` | `@EventBusSubscriber(value = Dist.CLIENT)`: camada do modelo e renderizador |
+| Barra de boss | `client/bossbar/<Mob>BossBar.java` + `ThemedBossBars` | Estilo temático registrado pela chave de tradução do nome da entidade; textura em `textures/gui/boss_bar/<id>.png` |
+| Cinemática de boss | `client/<pkg>/<Mob>CinematicDirector.java` (ex.: `CollectorCinematicDirector`) | Câmera, FOV, letterbox, título; tecla `key.codenamecoraline.skip_cinematic` |
+| Bestiário | `bestiary/Bestiary.java` | Capítulo (6+ páginas) e gravuras `textures/gui/bestiary/<id>_{anatomy,combat,spoils}.png` |
+| Texturas | `assets/.../textures/entity/<id>.png`, `<id>_eyes.png` | Geradas por `tools/generate_<id>_assets.py` |
+| Dados | `data/.../loot_table/entities/<id>.json`, `neoforge/biome_modifier/*`, `tags/`, `recipe/`, `advancement/bosses/` | Drops, spawn por bioma, tags, receitas, conquistas |
+| Textos | `assets/.../lang/en_us.json`, `pt_br.json` | Nome, ovo, legendas, conquistas, Bestiário |
+| Testes | `verification/<Mob>GameTests.java` | `@EventBusSubscriber` + `RegisterGameTestsEvent`, ativado por `Boolean.getBoolean("coraline.<id>Tests")` |
+| Execução de teste | `build.gradle` (`runs { <id>Test { ... } }`) | Gera a tarefa `run<Mob>Test` |
+| Ferramentas | `tools/generate_<id>_assets.py`, `Export<Mob>Model.java`, `generate_<id>_sketches.py`, `<id>-sketches.gradle` | Textura, geometria exportada, gravuras e poses |
+
+Subsistemas compartilhados: `entity/PlayerSummon` (invocações do jogador), `entity/spirit/BossSpirit` (espírito pós-boss), `util/`, `inventory/`, `item/`. Fluxo de uma entidade nova: registrar tipo → atributos/spawn → cliente (modelo, animação, render) → dados → textos → testes.
 
 ## Animação do Redcap
 

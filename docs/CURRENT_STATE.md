@@ -18,10 +18,10 @@ Minecraft 26.1.2 · NeoForge 26.1.2.124 · Java 25 · Gradle 9.2.1. Mod ID `code
 | Quebra-Copas | Boss arbóreo, Micos de Casca, Porrete de Raiz-Morta | `design/canopy_breaker.md` |
 | Comandante Carmesim | Boss de 3 estágios, spawn raro em cavernas | `design/crimson_commander.md` |
 | Bruxa dos Dez Fios | Boss composto (Matriarca + 10 marionetes), 33 ataques, sistema de animação próprio | `design/ten_threads_witch.md`, `design/matriarch_animation.md` |
-| Dragão Bebê Companheiro | Domesticável; evolui Bebê → Jovem → Adulto; montaria, inventário, sopro | `design/baby_dragon.md`, `design/dragon_evolution.md`, `design/dragon_remodel.md` |
+| Dragão Bebê Companheiro | Domesticável; evolui Bebê → Jovem → Adulto; montaria, inventário, sopro | `design/baby_dragon.md`, `design/dragon_evolution.md`, `design/dragon_remodel.md`, `design/baby_dragon_roadmap.md` |
 | Bestiário | Livro com capítulo ilustrado por mob/boss | `ARCHITECTURE.md` |
 
-Os últimos commits trabalham o Baby Dragon: atributos, prioridades de IA, caça, interações sociais, proteção por totem e 100 GameTests (12 etapas). Plano em `BABY_DRAGON_DEVELOPMENT_ROADMAP.md` (raiz).
+Os últimos commits trabalham o Baby Dragon: atributos, prioridades de IA, caça, interações sociais, proteção por totem e 100 GameTests (12 etapas). Plano em `docs/design/baby_dragon_roadmap.md`.
 
 ## Validação
 - Os GameTests rodam por tarefas `run<Mob>Test` (lista em `build.gradle`). Contagens recentes: Dragão Bebê 81, Comandante 34, Quebra-Copas 35, Bruxa 30, Matriarca 20, Cobrador 18, Basilisco 17, Litófago 11, Porrete 9.
@@ -37,5 +37,5 @@ Os últimos commits trabalham o Baby Dragon: atributos, prioridades de IA, caça
 - Javali de Raiz adiado (D-029).
 
 ## Onde procurar
-`AGENTS.md` (regras) · `ROADMAP.md` (histórico detalhado) · `DECISIONS.md` (D-001 a D-037) · `DEVELOPMENT.md` (comandos, falhas conhecidas) · `PROMPT_NOVO_MOB.md` (checklist de mob novo).
+`AGENTS.md` (regras) · `ROADMAP.md` (histórico detalhado) · `DECISIONS.md` (D-001 a D-037) · `DEVELOPMENT.md` (comandos, falhas conhecidas) · `PROCESSO_MOB.md` (fluxo de criação de mob), `PROMPT_NOVO_MOB.md` (índice), `MOB_CONTRACT.md` (contratos) e `prompts/` (um prompt por fatia).
 
