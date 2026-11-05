@@ -131,7 +131,7 @@
 | 2b. Revisão visual (humano) | **concluída** | 2026-11-05 | Poses e texturas aprovadas pelo usuário |
 | 3. IA de Companheiro | **concluída** | 2026-11-05 | `.\gradlew.bat compileJava` (OK) + `.\gradlew.bat runFeyRavenTest` (7 testes de `fey_raven_test_environment`, All 8 required tests passed, BUILD SUCCESSFUL in 11s) |
 | 4. Polimento e docs | **concluída** | 2026-11-05 | `.\gradlew.bat build` (BUILD SUCCESSFUL) + 4 rodadas consecutivas de `.\gradlew.bat runFeyRavenTest` (8 testes de `fey_raven_test_environment`, All 9 required tests passed em 4/4) + regressão `.\gradlew.bat runDeadrootClubTest` (All 9 required tests passed) |
-| 5. Relatório de entrega | pendente | | |
+| 5. Relatório de entrega | **concluída** | 2026-11-05 | Relatório de auditoria com evidências (`docs/prompts/relatorio.md`); testes e divergências registrados |
 
 - **Próximo passo:** Executar a **Etapa 5 (Relatório de entrega)** usando o prompt [docs/prompts/relatorio.md](file:///c:/MinecraftDev/CodenameCoraline/docs/prompts/relatorio.md).
 
