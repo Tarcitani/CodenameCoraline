@@ -5,7 +5,8 @@
 ## 1. Ficha
 
 ### 1.1 Identificação e Lore
-- **ID / nome interno:** `<id>`; **Nome pt_br:** `<nome>`; **Nome en_us:** `<name>`; **Tipo:** mob comum | companheiro | mini-boss | **[BOSS]**.
+- **ID / nome interno:** `<id>`; **Nome pt_br:** `<nome>`; **Nome en_us:** `<name>`.
+- **Perfil:** `boss | hostil | neutro | aliado | invocação` (ver tabela de escopo e testes em `docs/PROCESSO_MOB.md`).
 - **Nome do pacote (`pkg`):** `<nome curto da pasta em entity/ e client/, ex.: canopy, collector, crimson, babydragon>`. O ID do mob (`<id>`) é usado em arquivos, scripts e registros; o `pkg` só nos pacotes Java. Confira os pacotes existentes antes de escolher.
 - **Mob de referência (estrutura de código):** `<Lithophage | LastGiftCollector | CanopyBreaker | CrimsonCommander | BabyDragon | outro>`.
 - **Lore e Origem Mítica (4–8 linhas):** `<origem mitológica/feérica, papel ecológico ou espiritual, lenda que os povos contam, motivação e ameaça/propósito>`.
@@ -28,7 +29,7 @@
 - **Rotina fora de combate:** `<patrulha, sono, vigília, alimentação>`.
 - **Idle 1 (sorteado):** `<inspeção/percepção>`. **Idle 2:** `<reajuste postural>`. **Idle 3:** `<demonstração de identidade/ameaça>`.
 
-### 1.4 Combate, Fases e Multiplayer
+### 1.4 Combate, Fases e Dinâmica Multiplayer (Obrigatório para Boss e Hostil)
 - **[BOSS] Cinemática:** duração `<ticks>`; ação cênica `<descida, rugido, ritual...>`; efeitos no cliente `<câmera, letterbox, tremor, título>`.
 - **Tabela de ataques** (uma linha por ataque):
 
@@ -41,6 +42,16 @@
 - **Escala multiplayer:** `<não | sim: fórmula e limite>`. **Leash:** `<distância>`; ao sair `<retorna | cura | desiste>`.
 - **Foco:** `<agressor recente | mais próximo | maior dano>`. **Anti-cerco:** `<ataque 360° | repulsão | salto>`. **Anti-pillaring:** `<ataque à distância | quebra de apoio | recuo>`.
 - **Lacaios/invocações:** `<conceito; regras via PlayerSummon (dono/UUID); limite populacional>`.
+
+### 1.4b Regras de Aliado / Companheiro (Apenas se Perfil = aliado)
+- **Domesticação e Cura:** item de domesticação `<item, chance, partículas>`; itens de cura `<item, quantidade de vida restaurada>`.
+- **Comportamento com o Dono:** modos suportados `<seguir | esperar/sentar | patrulha/defesa>`; distância de teletransporte se perder de vista `<blocos>`.
+- **Recursos Especiais:** inventário próprio `<tamanho: 0, 9 ou 18 slots>`; montaria `<sim/não>`; pouso no ombro `<sim/não>`.
+- **Proteção e Fogo Amigo:** imunidade a dano do dono `<sim/não>`; reação se o dono for atacado `<retalia imediatamente | foge>`; reação se o dono morrer `<permanece no local aguardando>`.
+
+### 1.4c Regras de Neutralidade (Apenas se Perfil = neutro)
+- **Gatilho de Provocação:** `<ataque direto | invasão de ninho/território | olhar nos olhos | proximidade de filhote>`.
+- **Memória de Raiva / Perdão:** duração da hostilidade `<ticks/segundos>`; alvos compartilhados em bando `<sim/não>`.
 
 ### 1.5 Drops, Sons e Textos
 - **Drops:** comuns `<item, quantidade, chance>`; especial/arma `<propriedade, durabilidade, recarga>`; receitas `<...>`.

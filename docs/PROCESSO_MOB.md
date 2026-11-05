@@ -22,9 +22,22 @@ Os comandos dos prompts estão em Bash; no PowerShell use `.\gradlew.bat` e os e
 | 1. Fundação | Claude Code, `docs/prompts/fatia_1_fundacao.md` | Entidade registrada, spawn, compila | Haiku ou Sonnet |
 | 2. Visual e rigging | Claude Code, `docs/prompts/fatia_2_visual.md` | Modelo, textura, animações, poses renderizadas | Opus ou Sonnet |
 | 2b. Revisão visual | **Você** | Aprovação ou lista de ajustes | (humano) |
-| 3. IA e combate | Claude Code, `docs/prompts/fatia_3_ia_combate.md` | Estados, ataques, cinemática, GameTests de IA | Opus ou Sonnet |
-| 4. Polimento e docs | Claude Code, `docs/prompts/fatia_4_polimento.md` | Drops, Bestiário, sons, conquistas, docs, 6 rodadas | Sonnet ou Haiku |
+| 3. IA e Comportamento | Claude Code, `docs/prompts/fatia_3_ia_combate.md` (ou `fatia_3_aliado.md`) | Estados, IA/vínculos, ataques/comandos, GameTests | Opus ou Sonnet |
+| 4. Polimento e docs | Claude Code, `docs/prompts/fatia_4_polimento.md` | Drops, Bestiário, sons, conquistas, docs, rodadas de teste | Sonnet ou Haiku |
 | 5. Relatório e verificação | Sessão nova, `docs/prompts/relatorio.md` | Matriz de conformidade com evidências | Sonnet |
+
+## Perfis de Entidade (Escopo e Testes)
+
+Nem toda criatura é um boss. O template e o contrato adaptam-se conforme o **Perfil** declarado na ficha:
+
+| Perfil | Escopo Obrigatório | Seções Dispensadas | Prompt Fatia 3 | Rodadas de Teste |
+|---|---|---|---|---|
+| **`boss`** | Cinemática, barra temática, estágios de fúria, arena/ritual, anti-cerco, anti-pillaring, 4 fases de ataque | Nenhuma | `fatia_3_ia_combate.md` | 6 consecutivas |
+| **`hostil`** (mob comum) | 4 fases de ataque, anti-whiff, IA ecológica, 3 idles sorteados | Cinemática, barra de boss, estágios múltiplos | `fatia_3_ia_combate.md` | 4 consecutivas |
+| **`neutro`** | Gatilhos de agressividade/raiva, defesa própria, perdão/memória, 3 idles sorteados | Anti-cerco complexo, cinemática, barra de boss | `fatia_3_ia_combate.md` | 4 consecutivas |
+| **`aliado`** (companheiro) | Domesticação, vínculo por UUID, seguir/esperar, inventário/cura, prevenção de fogo amigo | Tabela de ataques de boss, anti-pillaring, agressão cega | `fatia_3_aliado.md` | 4 consecutivas |
+| **`invocação`** (`PlayerSummon`) | Contrato `PlayerSummon`, limite populacional, tempo de vida, combate de apoio | Ecologia de bioma, spawn natural, domesticação | `fatia_3_ia_combate.md` | 3 consecutivas |
+O número de rodadas é o **N** usado em `MOB_CONTRACT.md` (regra 6), em `fatia_4_polimento.md` e no relatório. Uma falha em qualquer rodada reinicia a contagem.
 
 A escolha de modelo é uma sugestão de custo e risco: registro e arquivos de dados são mecânicos (barato); modelo 3D, animação e IA exigem julgamento (mais forte). Ajuste pela sua experiência.
 
@@ -32,7 +45,7 @@ A escolha de modelo é uma sugestão de custo e risco: registro e arquivos de da
 
 Pode e deve ser usado para pesquisa e para o **rascunho da ficha**, porque isso é texto e criatividade, sem acesso ao código. Não use o ChatGPT para gerar o plano de implementação: ele não vê o repositório e o plano sai genérico. O plano de implementação de cada fatia sai do Claude Code, que lê o código.
 
-Cole o conteúdo de `docs/prompts/ficha_chatgpt.md` junto com o template e suas referências. Exija números nos campos de animação.
+Cole o conteúdo de `docs/prompts/ficha_chatgpt.md` junto com o template e suas referências. Exija a Parte A da seção 1.6 (pose-chave em palavras e ticks); os ângulos (Parte B) não vêm do chat.
 
 ## Orçamento de contexto (limite do Claude Code)
 
@@ -87,5 +100,5 @@ Antes de cada commit: `git status`, conferir que só entraram arquivos do mob e 
 ## Quando algo dá errado
 
 - **Plano da fatia diverge da ficha:** corrija a ficha primeiro, depois o código. A ficha é a fonte.
-- **GameTest intermitente:** a regra do `MOB_CONTRACT` (6 rodadas) vale. Não rode em loop até "dar verde": registre a causa.
+- **GameTest intermitente:** a regra do `MOB_CONTRACT` (N rodadas conforme o Perfil) vale. Não rode em loop até "dar verde": registre a causa.
 - **Visual ruim depois de duas iterações:** pare, melhore a Parte A da 1.6 (pose-chave mais clara) ou a referência e recomece a fatia, em vez de continuar remendando.

@@ -27,4 +27,4 @@ Em cada sessão o agente lê só `AGENTS.md`, a seção da fatia no contrato, a 
 
 - A ficha saiu daqui e foi para `docs/design/_TEMPLATE_MOB.md`, com campos novos (escala multiplayer, persistência, leash, limite de spawn, tags de alvo) o campo `pkg` e a **animação em duas partes** (A: intenção e ticks na ficha; B: ângulos calculados na fatia 2).
 - O relatório de entrega saiu daqui e foi para `docs/prompts/relatorio.md`.
-- A regra "6 rodadas consecutivas" e a parada obrigatória entre fatias estão em `MOB_CONTRACT.md` (regra 6 e §8).
+- A regra "N rodadas consecutivas" (N pelo Perfil: 6 para boss) e a parada obrigatória entre fatias estão em `MOB_CONTRACT.md` (regra 6 e §8).

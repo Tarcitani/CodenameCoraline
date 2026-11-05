@@ -12,7 +12,7 @@ Todo agente e desenvolvedor deve cumprir estes contratos de engenharia.
 3. **Servidor Autoritativo:** Toda lógica de combate, IA, dano, estados e dados reside estritamente no servidor (`entity/`). O cliente (`client/`) é exclusivamente visual (modelos, animações, efeitos, HUD).
 4. **Ficha Completa (Sem Alucinação):** Se a ficha fornecida contiver campos vazios, contraditórios ou marcas `<...>` residuais, **pare imediatamente e pergunte ao usuário**. É proibido inventar atributos, lore ou ataques não especificados.
 5. **Verificação Obrigatória:** Nenhuma tarefa é declarada pronta sem compilação limpa (`compileJava` ou `build`) e execução bem-sucedida das suítes de GameTest pertinentes.
-6. **Tolerância Zero a Falhas Intermitentes:** A suíte de GameTests da entidade e as suítes de regressão devem passar em **6 rodadas consecutivas**. Uma única falha em qualquer rodada reinicia a contagem e bloqueia a entrega até a causa raiz ser corrigida. Falhas intermitentes são bugs reais de temporização ou concorrência, não ruído.
+6. **Tolerância Zero a Falhas Intermitentes:** A suíte de GameTests da entidade e as suítes de regressão devem passar em **N rodadas consecutivas**, com N definido pelo Perfil na ficha (`boss`: 6; `hostil`, `neutro` e `aliado`: 4; `invocação`: 3; tabela em `docs/PROCESSO_MOB.md`). Uma única falha em qualquer rodada reinicia a contagem e bloqueia a entrega até a causa raiz ser corrigida. Falhas intermitentes são bugs reais de temporização ou concorrência, não ruído.
 
 ---
 
@@ -135,7 +135,7 @@ Para evitar degradação de contexto em sessões longas, a implementação de um
 | **Fatia 1: Fundação** | Tipos de entidade, atributos, registros, ovo de spawn, tags e esqueleto da classe. | `compileJava` aprovado e GameTest de registro/spawn aprovado. |
 | **Fatia 2: Visual & Rigging** | Modelo Java, scripts de textura/UV em `tools/`, poses offline renderizadas e animações. | Script `tools/generate_<mob>_assets.py` executa sem erro; `Export<Mob>Model.java` exporta a geometria; `./gradlew -I tools/<id>-sketches.gradle export<Mob>SketchModel` e `generate_<id>_sketches.py` geram as poses (ver `tools/README.md`); [BOSS] script, PNG e `Style` da barra temática prontos para revisão visual; UVs sem colisão; `runClient` não acusa erro de carregamento de camada. |
 | **Fatia 3: IA & Combate** | Máquina de estados, metas de combate, ataques com 4 fases, anti-whiff, cinemática de boss. | Suíte de GameTests de IA e ataques aprovada no servidor de teste. |
-| **Fatia 4: Polimento & Docs** | Drops, itens especiais, Bestiário (textos e gravuras), sons, avanços, documentação completa. | `./gradlew build` e suítes completas executadas 6 rodadas seguidas sem falhas; docs atualizadas. |
+| **Fatia 4: Polimento & Docs** | Drops, itens especiais, Bestiário (textos e gravuras), sons, avanços, documentação completa. | `./gradlew build` e suítes completas executadas N rodadas seguidas sem falhas (N pelo Perfil, regra 6); docs atualizadas. |
 
 *Ao final de cada fatia, o agente deve parar, apresentar o resultado e **aguardar confirmação explícita do usuário** antes de iniciar a próxima. "Pausar" significa encerrar o turno, não seguir adiante sozinho.*
 

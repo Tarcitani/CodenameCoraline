@@ -19,22 +19,22 @@ Faça:
 - Bestiário: capítulo de 6+ páginas em `Bestiary.java`; gravuras 112×80, 112×72 e 112×64 geradas por `tools/generate_<id>_sketches.py`.
 - Conquistas de história (boss: em `advancement/bosses/`), textos em `en_us.json` e `pt_br.json`.
 - Documentação: `docs/ARCHITECTURE.md` (seção do mob), `docs/DECISIONS.md` (decisões grandes), `docs/ROADMAP.md`, `docs/CURRENT_STATE.md` (resumo), `docs/DEVELOPMENT.md` (comandos validados).
-- Validação final: 6 rodadas consecutivas.
+- Validação final: N rodadas consecutivas, com N do Perfil da ficha (`boss` 6; `hostil`/`neutro`/`aliado` 4; `invocação` 3).
 Bash:
 ```bash
 mkdir -p build/logs
 ./gradlew build > build/logs/fatia4_build.log 2>&1
-for i in 1 2 3 4 5 6; do ./gradlew run<Mob>Test > build/logs/fatia4_round$i.log 2>&1 || { echo "FALHOU rodada $i"; break; }; done
+for i in $(seq 1 N); do ./gradlew run<Mob>Test > build/logs/fatia4_round$i.log 2>&1 || { echo "FALHOU rodada $i"; break; }; done
 ```
 PowerShell (o terminal padrão no Windows):
 ```powershell
 New-Item -ItemType Directory -Force build/logs | Out-Null
 .\gradlew.bat build *> build/logs/fatia4_build.log
-foreach ($i in 1..6) { .\gradlew.bat run<Mob>Test *> "build/logs/fatia4_round$i.log"; if ($LASTEXITCODE -ne 0) { "FALHOU rodada $i"; break } }
+foreach ($i in 1..N) { .\gradlew.bat run<Mob>Test *> "build/logs/fatia4_round$i.log"; if ($LASTEXITCODE -ne 0) { "FALHOU rodada $i"; break } }
 ```
 Rode também as suítes de regressão dos mobs que dividem código (ex.: `PlayerSummon`, `BossSpirit`, `ThemedBossBars`). Falhou uma rodada: reinicie a contagem depois de corrigir a causa raiz.
 
-Se o Gradle falhar com `Unable to establish loopback connection`, peça ao usuário para rodar `build` e as 6 rodadas no terminal dele e colar o resultado; não declare a fatia concluída sem esse resultado.
+Se o Gradle falhar com `Unable to establish loopback connection`, peça ao usuário para rodar `build` e as N rodadas no terminal dele e colar o resultado; não declare a fatia concluída sem esse resultado.
 
 Ao final: atualize Estado de implementação, sugira `feat(<id>): fatia 4 - polimento e docs` e PARE. Não commit sem autorização.
 
