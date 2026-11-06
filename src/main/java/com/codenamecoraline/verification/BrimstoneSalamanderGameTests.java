@@ -3,9 +3,14 @@ package com.codenamecoraline.verification;
 import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.client.salamander.BrimstoneSalamanderAnimations;
 import com.codenamecoraline.client.salamander.BrimstoneSalamanderModel;
+import com.codenamecoraline.entity.basilisk.Basilisk;
+import com.codenamecoraline.entity.lithophage.Lithophage;
+import com.codenamecoraline.entity.raven.FeyRaven;
 import com.codenamecoraline.entity.salamander.BrimstoneSalamander;
+import com.codenamecoraline.entity.salamander.BrimstoneSpit;
 import com.codenamecoraline.registry.ModEntities;
 import com.codenamecoraline.registry.ModItems;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
@@ -15,22 +20,31 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestData;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.monster.Strider;
+import net.minecraft.world.entity.monster.skeleton.WitherSkeleton;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
-/** Server integration tests for the Brimstone Salamander foundation, attributes, immunities, and spawn rules (Slice 1). */
+/** Server integration tests for the Brimstone Salamander foundation, visual rig, AI, and 4-phase combat. */
 @EventBusSubscriber(modid = CodenameCoraline.MOD_ID)
 public final class BrimstoneSalamanderGameTests {
     private static final Map<String, Consumer<GameTestHelper>> TESTS = Map.ofEntries(
             Map.entry("brimstone_salamander_attributes_and_registration", BrimstoneSalamanderGameTests::attributesAndRegistration),
-            Map.entry("brimstone_salamander_spawn_rules_and_immunities", BrimstoneSalamanderGameTests::spawnRulesAndImmunities));
+            Map.entry("brimstone_salamander_spawn_rules_and_immunities", BrimstoneSalamanderGameTests::spawnRulesAndImmunities),
+            Map.entry("brimstone_salamander_snap_bite_and_anti_whiff", BrimstoneSalamanderGameTests::snapBiteAndAntiWhiff),
+            Map.entry("brimstone_salamander_sulfur_spit_and_tar_pool", BrimstoneSalamanderGameTests::sulfurSpitAndTarPool),
+            Map.entry("brimstone_salamander_tail_whip_and_target_matrix", BrimstoneSalamanderGameTests::tailWhipAndTargetMatrix));
 
     private BrimstoneSalamanderGameTests() {}
 
@@ -55,7 +69,7 @@ public final class BrimstoneSalamanderGameTests {
         var environment = event.registerEnvironment(id("brimstone_salamander_test_environment"));
         TESTS.forEach((name, fn) -> event.registerTest(id(name),
                 new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(name)),
-                        new TestData<>(environment, id("basilisk_test_arena"), 100, 0, true))));
+                        new TestData<>(environment, id("basilisk_test_arena"), 120, 0, true))));
     }
 
     private static void attributesAndRegistration(GameTestHelper helper) {
@@ -146,5 +160,104 @@ public final class BrimstoneSalamanderGameTests {
 
         helper.succeed();
     }
-}
 
+    private static void snapBiteAndAntiWhiff(GameTestHelper helper) {
+        BrimstoneSalamander salamander = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(3, 1, 3));
+        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new BlockPos(4, 1, 3));
+        float initialHealth = golem.getHealth();
+
+        // 1. Direct hit test: start SNAP_BITE and tick through prep (8t) + exec (4t)
+        salamander.setTarget(golem);
+        salamander.startSnapBite();
+        helper.assertValueEqual(salamander.getState(), BrimstoneSalamander.State.SNAP_BITE, "Starts in SNAP_BITE");
+
+        for (int i = 0; i < BrimstoneSalamander.SNAP_BITE_PREP_TICKS + BrimstoneSalamander.SNAP_BITE_EXEC_TICKS; i++) {
+            salamander.tick();
+        }
+
+        helper.assertTrue(golem.getHealth() < initialHealth, "SNAP_BITE deals 7.0 damage at impact tick");
+        helper.assertTrue(golem.getRemainingFireTicks() > 0, "SNAP_BITE ignites target for 40 ticks");
+        helper.assertValueEqual(salamander.getState(), BrimstoneSalamander.State.RECOVERY, "Enters RECOVERY after SNAP_BITE exec");
+        helper.assertValueEqual(salamander.getRecoveryTicks(), BrimstoneSalamander.SNAP_BITE_RECOVERY_TICKS, "Normal recovery is 12 ticks");
+
+        // 2. Anti-whiff test: move target beyond 2.6 blocks before tick 7
+        BlockPos farPos = helper.absolutePos(new BlockPos(9, 1, 3));
+        golem.setPos(farPos.getX() + 0.5D, farPos.getY(), farPos.getZ() + 0.5D);
+        salamander.startSnapBite();
+        for (int i = 0; i < BrimstoneSalamander.SNAP_BITE_ANTI_WHIFF_TICK; i++) {
+            salamander.tick();
+        }
+        helper.assertValueEqual(salamander.getState(), BrimstoneSalamander.State.PURSUING, "Anti-whiff cancels SNAP_BITE at tick 7 into PURSUING");
+        helper.assertValueEqual(salamander.getSnapBiteCooldown(), BrimstoneSalamander.SNAP_BITE_CANCEL_COOLDOWN_TICKS, "Anti-whiff sets 15-tick short cooldown");
+
+        helper.succeed();
+    }
+
+    private static void sulfurSpitAndTarPool(GameTestHelper helper) {
+        BrimstoneSalamander salamander = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(2, 1, 2));
+        IronGolem pillaringGolem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new BlockPos(4, 4, 2));
+
+        // Verify anti-pillaring detection (target 3 blocks above)
+        helper.assertTrue(salamander.isTargetPillaring(pillaringGolem), "Detects target 3 blocks above as pillaring");
+
+        salamander.setTarget(pillaringGolem);
+        salamander.startSulfurSpit();
+        helper.assertValueEqual(salamander.getState(), BrimstoneSalamander.State.SULFUR_SPIT, "Starts in SULFUR_SPIT");
+
+        for (int i = 0; i < BrimstoneSalamander.SULFUR_SPIT_PREP_TICKS + BrimstoneSalamander.SULFUR_SPIT_EXEC_TICKS; i++) {
+            salamander.tick();
+        }
+
+        helper.assertValueEqual(salamander.getState(), BrimstoneSalamander.State.RECOVERY, "Enters RECOVERY after SULFUR_SPIT exec");
+        AABB arenaBox = new AABB(helper.absolutePos(new BlockPos(0, 0, 0))).inflate(12.0D);
+        List<BrimstoneSpit> spits = helper.getLevel().getEntitiesOfClass(BrimstoneSpit.class, arenaBox);
+        helper.assertFalse(spits.isEmpty(), "SULFUR_SPIT spawns BrimstoneSpit projectile at impact tick");
+
+        // Verify Burning Tar Pool transformation and Slowness II + fire application
+        BrimstoneSpit spit = spits.get(0);
+        IronGolem groundVictim = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new BlockPos(6, 1, 6));
+        spit.becomeTarPool(groundVictim.position());
+        helper.assertTrue(spit.isTarPool(), "BrimstoneSpit transforms into Burning Tar Pool");
+        helper.assertValueEqual(spit.getTarPoolTicks(), BrimstoneSpit.TAR_POOL_DURATION_TICKS, "Tar pool lasts 100 ticks");
+        helper.assertTrue(groundVictim.hasEffect(MobEffects.SLOWNESS), "Burning Tar Pool applies Slowness II to non-salamander victims");
+        helper.assertTrue(groundVictim.getRemainingFireTicks() > 0, "Burning Tar Pool ignites victims");
+
+        helper.succeed();
+    }
+
+    private static void tailWhipAndTargetMatrix(GameTestHelper helper) {
+        BrimstoneSalamander salamander = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(4, 1, 4));
+        IronGolem flanker1 = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new BlockPos(3, 1, 4));
+        IronGolem flanker2 = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new BlockPos(5, 1, 4));
+        float initialHealth = flanker1.getHealth();
+
+        // Verify anti-cerco (2 enemies within 2.0 blocks)
+        helper.assertTrue(salamander.countNearbyEnemies(BrimstoneSalamander.ANTI_SURROUND_RADIUS) >= 2, "Detects >= 2 nearby enemies for anti-cerco");
+
+        salamander.setTarget(flanker1);
+        salamander.startTailWhip();
+        for (int i = 0; i < BrimstoneSalamander.TAIL_WHIP_PREP_TICKS + BrimstoneSalamander.TAIL_WHIP_EXEC_TICKS; i++) {
+            salamander.tick();
+        }
+        helper.assertTrue(flanker1.getHealth() < initialHealth && flanker2.getHealth() < initialHealth, "TAIL_WHIP damages surrounded flankers");
+        helper.assertValueEqual(salamander.getState(), BrimstoneSalamander.State.RECOVERY, "Enters RECOVERY after TAIL_WHIP exec");
+
+        // Verify Target Matrix rules
+        Strider babyStrider = helper.spawnWithNoFreeWill(EntityType.STRIDER, new BlockPos(7, 1, 4));
+        babyStrider.setBaby(true);
+        WitherSkeleton undead = helper.spawnWithNoFreeWill(EntityType.WITHER_SKELETON, new BlockPos(7, 1, 5));
+        Basilisk basilisk = helper.spawnWithNoFreeWill(ModEntities.BASILISK.get(), new BlockPos(7, 1, 6));
+        Lithophage lithophage = helper.spawnWithNoFreeWill(ModEntities.LITHOPHAGE.get(), new BlockPos(7, 1, 7));
+        FeyRaven raven = helper.spawnWithNoFreeWill(ModEntities.FEY_RAVEN.get(), new BlockPos(7, 1, 8));
+
+        helper.assertTrue(salamander.canTargetEntity(flanker1, false), "Targets Iron Golems");
+        helper.assertTrue(salamander.canTargetEntity(babyStrider, false), "Targets baby Striders");
+        helper.assertFalse(salamander.canTargetEntity(undead, false), "Ignores Undead unless attacked directly");
+        helper.assertTrue(salamander.canTargetEntity(undead, true), "Retaliates against Undead when directly attacked");
+        helper.assertFalse(salamander.canTargetEntity(basilisk, true), "Never targets Basilisk");
+        helper.assertFalse(salamander.canTargetEntity(lithophage, true), "Never targets Lithophage");
+        helper.assertFalse(salamander.canTargetEntity(raven, true), "Never targets Fey Raven");
+
+        helper.succeed();
+    }
+}

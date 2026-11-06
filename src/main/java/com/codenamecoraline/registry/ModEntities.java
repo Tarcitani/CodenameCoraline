@@ -5,6 +5,7 @@ import com.codenamecoraline.entity.babydragon.BabyDragon;
 import com.codenamecoraline.entity.babydragon.DragonEmber;
 import com.codenamecoraline.entity.raven.FeyRaven;
 import com.codenamecoraline.entity.salamander.BrimstoneSalamander;
+import com.codenamecoraline.entity.salamander.BrimstoneSpit;
 import com.codenamecoraline.entity.redcap.Redcap;
 import com.codenamecoraline.entity.redcap.RedcapRock;
 import com.codenamecoraline.entity.basilisk.Basilisk;
@@ -202,6 +203,12 @@ public final class ModEntities {
                     .sized(BrimstoneSalamander.WIDTH, BrimstoneSalamander.HEIGHT).eyeHeight(BrimstoneSalamander.EYE_HEIGHT)
                     .fireImmune()
                     .clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    /** Ballistic sulfurous tar globule hurled by the Brimstone Salamander. */
+    public static final DeferredHolder<EntityType<?>, EntityType<BrimstoneSpit>> BRIMSTONE_SPIT = ENTITY_TYPES.register("brimstone_spit",
+            id -> EntityType.Builder.<BrimstoneSpit>of(BrimstoneSpit::new, MobCategory.MISC)
+                    .sized(0.35F, 0.35F).fireImmune().clientTrackingRange(6).updateInterval(10)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
     private ModEntities() {}

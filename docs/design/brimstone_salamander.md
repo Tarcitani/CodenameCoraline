@@ -146,11 +146,11 @@
 | 1. Fundação | **concluída** | 2026-11-06 | `.\gradlew.bat compileJava` (OK) + `.\gradlew.bat runBrimstoneSalamanderTest` (All 3 required tests passed, 2 testes de `brimstone_salamander_test_environment`, BUILD SUCCESSFUL in 20s) |
 | 2. Visual e rigging | **concluída** | 2026-11-06 | `.\gradlew.bat compileJava` (OK) + `python tools/generate_brimstone_salamander_assets.py` (26 boxes, 0 UV overlaps on 128x128) + `.\gradlew.bat -I tools/brimstone-salamander-sketches.gradle exportBrimstoneSalamanderSketchModel` (12 poses) + `python tools/generate_brimstone_salamander_sketches.py` (9 poses + pranchas do Bestiário) |
 | 2b. Revisão visual (humano) | **concluída** | 2026-11-06 | Poses e texturas aprovadas pelo usuário |
-| 3. IA e combate | pendente | | |
+| 3. IA e combate | **concluída** | 2026-11-06 | `.\gradlew.bat compileJava` (OK) + `.\gradlew.bat runBrimstoneSalamanderTest` (All 6 required tests passed in 699.7 ms, 5 testes em `brimstone_salamander_test_environment`, BUILD SUCCESSFUL in 20s) |
 | 4. Polimento e docs | pendente | | |
 | 5. Relatório | pendente | | |
 
-- **Próximo passo:** Iniciar a **Fatia 3 (IA e combate)** usando o prompt de [docs/prompts/fatia_3_ia_combate.md](file:///c:/MinecraftDev/CodenameCoraline/docs/prompts/fatia_3_ia_combate.md): implementar máquina de estados completa, projétil `BrimstoneSpit`, ataques em 4 fases (`SNAP_BITE`, `SULFUR_SPIT`, `TAIL_WHIP`), regras de *anti-whiff* / *anti-pillaring* e suíte de GameTests de combate.
+- **Próximo passo:** Iniciar a **Fatia 4 (Polimento e docs)** usando o prompt de [docs/prompts/fatia_4_polimento_docs.md](file:///c:/MinecraftDev/CodenameCoraline/docs/prompts/fatia_4_polimento_docs.md): registrar item `brimstone_scale` e drops de morte, eventos de som e subtítulos, capítulo de 6 páginas no Bestiário (`Bestiary.BRIMSTONE_SALAMANDER`), conquistas em cadeia (`find_brimstone_salamander`, `brimstone_scale`), GameTests finais e atualização da documentação do projeto (`ARCHITECTURE.md`, `DEVELOPMENT.md`, `ROADMAP.md`, `CURRENT_STATE.md`).
 - **Decisões tomadas e motivos:**
   - Perfil `hostil`: predador territorial que habita as margens de lava e biomas quentes do Nether (*Basalt Deltas*, *Nether Wastes*, *Crimson Forest*).
   - Vulnerabilidade feérica: suscetibilidade severa a dano de frio/congelamento (200%), enfatizando o contraste mítico entre o fogo primordial feérico e o gelo ancestral.

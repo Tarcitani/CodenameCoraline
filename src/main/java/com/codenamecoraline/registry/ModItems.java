@@ -187,6 +187,8 @@ public final class ModItems {
 
     public static final DeferredItem<Item> BRIMSTONE_SALAMANDER_SPAWN_EGG = ITEMS.registerItem("brimstone_salamander_spawn_egg", SpawnEggItem::new,
             () -> new Item.Properties().spawnEgg(ModEntities.BRIMSTONE_SALAMANDER.get()));
+    /** Sprite item rendered for the Brimstone Salamander's BrimstoneSpit projectile. */
+    public static final DeferredItem<Item> BRIMSTONE_SPIT = ITEMS.registerSimpleItem("brimstone_spit");
 
     // Retired rewards stay registered to preserve items in existing worlds; no drops or recipes.
     public static final DeferredItem<Item> CATACOMB_LILY = ITEMS.registerItem("catacomb_lily", CatacombLilyItem::new);

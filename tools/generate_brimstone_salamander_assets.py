@@ -151,7 +151,24 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     skin.save(out_dir / "brimstone_salamander.png")
     eyes.save(out_dir / "brimstone_salamander_eyes.png")
-    print(f"Generated {out_dir / 'brimstone_salamander.png'} and {out_dir / 'brimstone_salamander_eyes.png'}")
+
+    item_dir = ASSETS / "textures/item"
+    item_dir.mkdir(parents=True, exist_ok=True)
+    spit = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for y in range(3, 13):
+        for x in range(3, 13):
+            dist = ((x - 7.5) ** 2 + (y - 7.5) ** 2) ** 0.5
+            if dist <= 4.6:
+                if dist < 1.8:
+                    spit.putpixel((x, y), SULPHUR_BRIGHT)
+                elif dist < 2.8:
+                    spit.putpixel((x, y), MAGMA_CORE if (x + y) % 2 == 0 else SULPHUR_GOLD)
+                elif dist < 3.8:
+                    spit.putpixel((x, y), MAGMA_ORANGE if (x * y) % 3 == 0 else SHADOW_BASALT)
+                else:
+                    spit.putpixel((x, y), EDGE_CHARCOAL)
+    spit.save(item_dir / "brimstone_spit.png")
+    print(f"Generated {out_dir / 'brimstone_salamander.png'}, {out_dir / 'brimstone_salamander_eyes.png'}, and {item_dir / 'brimstone_spit.png'}")
 
 
 if __name__ == "__main__":
