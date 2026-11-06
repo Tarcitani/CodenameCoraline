@@ -3,6 +3,7 @@ package com.codenamecoraline.entity.salamander;
 import com.codenamecoraline.entity.basilisk.Basilisk;
 import com.codenamecoraline.entity.lithophage.Lithophage;
 import com.codenamecoraline.entity.raven.FeyRaven;
+import com.codenamecoraline.registry.ModSounds;
 import java.util.EnumSet;
 import java.util.List;
 import net.minecraft.core.BlockPos;
@@ -11,6 +12,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.EntityTypeTags;
@@ -475,7 +477,7 @@ public final class BrimstoneSalamander extends Monster {
         }
 
         if (this.actionTicks == SNAP_BITE_PREP_TICKS + SNAP_BITE_IMPACT_TICK) {
-            this.playSound(SoundEvents.EVOKER_FANGS_ATTACK, 1.0F, 0.75F);
+            this.playSound(ModSounds.BRIMSTONE_SALAMANDER_BITE.get(), 1.0F, 0.85F);
             int nextRecovery = SNAP_BITE_RECOVERY_TICKS;
             if (target != null && this.horizontalSurfaceDistance(target) <= SNAP_BITE_ANTI_WHIFF_REACH) {
                 boolean shieldBlocked = target instanceof Player player && player.isBlocking();
@@ -537,7 +539,7 @@ public final class BrimstoneSalamander extends Monster {
             spit.shoot(forward.x, 0.2D, forward.z, 0.95F, 1.0F);
         }
         level.addFreshEntity(spit);
-        this.playSound(SoundEvents.BLAZE_SHOOT, 1.0F, 0.65F + this.random.nextFloat() * 0.15F);
+        this.playSound(ModSounds.BRIMSTONE_SALAMANDER_SPIT.get(), 1.0F, 0.75F + this.random.nextFloat() * 0.1F);
     }
 
     private void tickTailWhip(ServerLevel level, @Nullable LivingEntity target) {
@@ -549,7 +551,7 @@ public final class BrimstoneSalamander extends Monster {
         }
 
         if (this.actionTicks == TAIL_WHIP_PREP_TICKS + TAIL_WHIP_IMPACT_TICK) {
-            this.playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1.0F, 0.6F);
+            this.playSound(ModSounds.BRIMSTONE_SALAMANDER_TAIL_WHIP.get(), 1.0F, 0.6F);
             AABB sweepBox = this.getBoundingBox().inflate(TAIL_WHIP_MAX_REACH, 1.0D, TAIL_WHIP_MAX_REACH);
             List<LivingEntity> victims = level.getEntitiesOfClass(
                     LivingEntity.class,
@@ -670,6 +672,26 @@ public final class BrimstoneSalamander extends Monster {
         this.tailWhipPrepAnimationState.stop();
         this.tailWhipExecAnimationState.stop();
         this.tailWhipRecoveryAnimationState.stop();
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return ModSounds.BRIMSTONE_SALAMANDER_AMBIENT.get();
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return ModSounds.BRIMSTONE_SALAMANDER_HURT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.BRIMSTONE_SALAMANDER_DEATH.get();
+    }
+
+    @Override
+    protected void playStepSound(BlockPos pos, BlockState state) {
+        this.playSound(ModSounds.BRIMSTONE_SALAMANDER_STEP.get(), 0.15F, 1.0F);
     }
 
     @Override

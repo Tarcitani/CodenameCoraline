@@ -250,3 +250,17 @@ Os testes de servidor não medem frequência de geração em uma campanha de sob
   1. `python tools/generate_fey_raven_assets.py` — valida 0 sobreposições de UV entre as 23 caixas e gera `fey_raven.png` (128×128), `fey_raven_eyes.png` (128×128), `fey_raven_spawn_egg.png` (16×16) e `fey_feather.png` (16×16).
   2. `.\gradlew.bat -I tools/fey-raven-sketches.gradle exportFeyRavenSketchModel` e `python tools/generate_fey_raven_sketches.py` — exportam a geometria 3D real em 8 poses e geram `build/fey-raven-sketches/pose_*.png` e as 3 gravuras `textures/gui/bestiary/fey_raven_{anatomy,combat,spoils}.png`.
 - **Pendente:** inspeção em sessão real de `runClient` (voo, empoleiramento no ombro em 1ª/3ª pessoa, áudio e paginação do Bestiário em jogo).
+
+## Salamandra de Enxofre (`brimstone_salamander`) — 2026-11-06
+
+- `.\gradlew.bat runBrimstoneSalamanderTest`: **VALIDADO em 2026-11-06** em **4 execuções consecutivas** (`All 6 required tests passed :)` — 5 testes em `BrimstoneSalamanderGameTests` mais 1 do framework; logs `build/logs/fatia4_round1..4.log`).
+- Cobertura de `BrimstoneSalamanderGameTests`:
+  1. `attributesAndRegistration`: registro de entidade, ovo, projétil `brimstone_spit`, item `brimstone_scale`, atributos (44 PV, 8 armadura, 2 tenacidade, velocidade 0,23, dano 6,0, repulsão 0,65, alcance 24), sensibilidade à água, imunidade a fogo/lava, bake do modelo (18 juntas, 26 caixas) e existência das 17 animações, capítulo `Bestiary.BRIMSTONE_SALAMANDER` (6 páginas) e 7 sons de `ModSounds`.
+  2. `spawnRulesAndImmunities`: redução de 60% em dano de queda, rejeição de spawn fora de Y 24–48, e aceitação de spawn natural sobre basalto na faixa de camada.
+  3. `snapBiteAndAntiWhiff`: impacto da mordida aos 8+2 ticks aplicando 7,0 de dano e chamas, transição para recuperação (12 ticks), e validação anti-whiff aos 7 ticks de preparo (cancela e entra em recarga curta de 15 ticks quando o alvo recua além de 2,6 blocos).
+  4. `sulfurSpitAndTarPool`: detecção de alvo em pilares (anti-pillaring a 2–5 blocos acima), disparo balístico de `BrimstoneSpit` e transformação no impacto em Poça de Alcatrão Ardente (2×2 blocos por 100 ticks) aplicando Lentidão II e fogo a intrusos.
+  5. `tailWhipAndTargetMatrix`: acionamento prioritário por anti-cerco (2+ inimigos a menos de 2 blocos) causando dano e repulsão horizontal em arco amplo; validação da matriz de alvos (ataca Iron Golems e filhotes de Strider, ignora Undead/Basilisco/Litófago/Corvo Feérico em neutro, e retalia contra Undead sob ataque direto).
+- Geração reprodutível de recursos:
+  1. `python tools/generate_brimstone_salamander_assets.py` — valida 0 sobreposições de UV no atlas 128×128 (26 caixas) e gera `brimstone_salamander.png`, `brimstone_salamander_eyes.png`, `brimstone_spit.png` e `brimstone_scale.png`.
+  2. `.\gradlew.bat -I tools/brimstone-salamander-sketches.gradle exportBrimstoneSalamanderSketchModel` e `python tools/generate_brimstone_salamander_sketches.py` — exportam geometria 3D e geram 9 poses e as 3 gravuras `textures/gui/bestiary/brimstone_salamander_{anatomy,combat,spoils}.png`.
+- **Pendente:** inspeção em sessão real de `runClient` (natação na lava, partículas de alcatrão, sons e leitura do Bestiário em jogo).

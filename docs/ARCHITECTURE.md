@@ -43,23 +43,25 @@ CodenameCoraline/
 │   │   ├── ten_threads_witch/  # Bruxa dos Dez Fios (Matriarca + 10 marionetes, AttackRunner)
 │   │   ├── babydragon/         # Dragão Companheiro (3 anatomias, montaria, inventário, totem)
 │   │   ├── raven/              # Corvo Feérico (companheiro místico, sentinela, coleta, ombro)
+│   │   ├── salamander/         # Salamandra de Enxofre (predador de magma, cuspe balístico e alcatrão)
 │   │   ├── spirit/             # Espíritos residuais de chefes derrotados (BossSpirit)
 │   │   └── PlayerSummon.java   # interface comum para invocações aliadas do jogador
 │   ├── client/                 # modelos, renderizadores, animações e telas (CLIENTE)
 │   │   ├── bossbar/            # ThemedBossBars e estilos temáticos de barra de vida
 │   │   ├── bestiary/           # telas, layouts de página e renderizadores do Bestiário
 │   │   ├── redcap/, basilisk/, lithophage/, collector/, canopy/,
-│   │   ├── macaque/, crimson/, ten_threads_witch/, babydragon/, raven/ # modelos e animações
+│   │   ├── macaque/, crimson/, ten_threads_witch/, babydragon/, raven/, salamander/ # modelos e animações
 │   │   └── ...                 # camadas emissivas (EyesLayer) e EntityRenderState
 │   ├── bestiary/               # modelo de dados do Bestiário (Bestiary, BestiaryEntry, BestiaryPage)
 │   ├── inventory/              # menus de container do jogador (DragonMenu)
 │   ├── item/                   # classes de itens especiais (DeadrootClubItem, TenThreadsStaffItem, etc.)
 │   ├── util/                   # utilitários matemáticos, físicos e de rede
 │   └── verification/           # suítes de testes de integração automatizados (GameTests)
-│       ├── BabyDragonGameTests.java, BasiliskGameTests.java, CanopyBreakerGameTests.java,
-│       ├── CrimsonCommanderGameTests.java, DeadrootClubGameTests.java, DragonEvolutionGameTests.java,
-│       ├── DragonModelGameTests.java, FeyRavenGameTests.java, LastGiftCollectorGameTests.java,
-│       ├── LithophageGameTests.java, MatriarchAnimationGameTests.java, TenThreadsWitchGameTests.java,
+│       ├── BabyDragonGameTests.java, BasiliskGameTests.java, BrimstoneSalamanderGameTests.java,
+│       ├── CanopyBreakerGameTests.java, CrimsonCommanderGameTests.java, DeadrootClubGameTests.java,
+│       ├── DragonEvolutionGameTests.java, DragonModelGameTests.java, FeyRavenGameTests.java,
+│       ├── LastGiftCollectorGameTests.java, LithophageGameTests.java, MatriarchAnimationGameTests.java,
+│       ├── TenThreadsWitchGameTests.java,
 │       └── ModelGameTestRegistration.java # controle de carregamento dedicado de testes de modelo
 ├── src/main/resources/
 │   ├── assets/codenamecoraline/# recursos visuais e sonoros do cliente
@@ -330,3 +332,12 @@ No padrão do Cobrador: enquanto o boss está em `INTRO` (120 ticks), a câmera 
 - **Cliente:** `client/raven/` contém `FeyRavenModel` (21 juntas articuladas e 23 caixas 3D sem interseção de UV em atlas 64×64, incluindo terceiro olho na testa, colar de penas, asas duplas, cauda tripla, bagas no bico e pergaminho na canela esquerda), `FeyRavenAnimations` (10 animações por keyframe), `FeyRavenRenderState`, `FeyRavenEyesLayer` (camada emissiva ciano para os três olhos, runas das asas/peito e bagas), `FeyRavenRenderer` e `FeyRavenClient`.
 - **Recursos, Conquistas e Bestiário:** item `codenamecoraline:fey_feather` (`ModItems.FEY_FEATHER`), ovo `fey_raven_spawn_egg`, tabela de saque `loot_table/entities/fey_raven.json`, 5 eventos sonoros em `ModSounds` (`FEY_RAVEN_AMBIENT`, `FEY_RAVEN_ALERT`, `FEY_RAVEN_FLAP`, `FEY_RAVEN_HURT`, `FEY_RAVEN_DEATH`) mapeados para eventos vanilla em `sounds.json`, 3 conquistas (`advancement/bosses/{find_fey_raven,tame_fey_raven,fey_messenger}.json`), capítulo `Bestiary.FEY_RAVEN` (6 páginas) e gravuras `textures/gui/bestiary/fey_raven_{anatomy,combat,spoils}.png`.
 - **Verificação:** `verification/FeyRavenGameTests` registra 8 testes na execução `runFeyRavenTest` (`coraline.feyRavenTests=true`) em `build/fey-raven-gametest/`. Detalhes em [design/fey_raven.md](design/fey_raven.md).
+
+## Salamandra de Enxofre (`brimstone_salamander`)
+
+- **Servidor:** `entity/salamander/BrimstoneSalamander` (Monster; 44 PV, 8 de armadura, 2 de tenacidade, velocidade terrestre 0,23, velocidade em lava 0,38, dano base 6,0, repulsão 0,65, alcance 24, hitbox 1,3 × 0,85, altura dos olhos 0,55) implementa a máquina de estados `State` (`IDLE`, `STALKING`, `PURSUING`, `SNAP_BITE`, `SULFUR_SPIT`, `TAIL_WHIP`, `RECOVERY`, `DYING`), ataques com 4 fases de execução, anti-whiff com cancelamento aos 7 ticks da mordida e recarga curta de 15 ticks, atordoamento adicional de +10 ticks na mordida bloqueada por escudo, anti-pillaring para alvos 2 a 5 blocos acima e anti-cerco para 2+ inimigos a até 2 blocos. Fora do Nether, busca ativamente blocos incandescentes quando em repouso.
+- **Projétil:** `entity/salamander/BrimstoneSpit` estende `ThrowableItemProjectile`, causa 5,0 de dano e transforma-se no impacto em uma Poça de Alcatrão Ardente (2×2 blocos por 100 ticks) que aplica Lentidão II e incendeia entidades vivas que não sejam salamandras.
+- **Spawn:** `BrimstoneSalamander.checkSpawnRules` em `ModEntities.onSpawnPlacements`; bioma configurado via `neoforge/biome_modifier/brimstone_salamander_spawns.json` sobre a tag `tags/worldgen/biome/brimstone_salamander_habitat.json` (Basalt Deltas, Nether Wastes, Crimson Forest) entre Y = 24 e Y = 48 em basalto, pedra-negra, rocha do nether ou adjacente a lava.
+- **Cliente:** `client/salamander/` contém `BrimstoneSalamanderModel` (18 juntas e 26 caixas em atlas 128×128 sem sobreposição de UVs), `BrimstoneSalamanderAnimations` (17 animações por keyframe), `BrimstoneSalamanderRenderState`, `BrimstoneSalamanderEyesLayer` (camada emissiva de enxofre/magma para olhos, papo de fole, narinas e placas dorsais), `BrimstoneSalamanderRenderer` e `BrimstoneSalamanderClient` (registra renderizador da salamandra e renderizador com sprite do projétil `brimstone_spit`).
+- **Recursos, Conquistas e Bestiário:** item `codenamecoraline:brimstone_scale` (`ModItems.BRIMSTONE_SCALE`), item de projétil `codenamecoraline:brimstone_spit`, ovo `brimstone_salamander_spawn_egg`, tabela de saque `loot_table/entities/brimstone_salamander.json` (creme de magma, carvão e escama de enxofre com bônus de pilhagem), 7 eventos sonoros em `ModSounds` (`BRIMSTONE_SALAMANDER_AMBIENT`, `HURT`, `DEATH`, `STEP`, `BITE`, `SPIT`, `TAIL_WHIP`) mapeados em `sounds.json`, 2 conquistas (`find_brimstone_salamander`, `brimstone_scale`), capítulo `Bestiary.BRIMSTONE_SALAMANDER` (6 páginas) e gravuras `textures/gui/bestiary/brimstone_salamander_{anatomy,combat,spoils}.png`.
+- **Verificação:** `verification/BrimstoneSalamanderGameTests` registra 5 métodos de teste na execução `runBrimstoneSalamanderTest` (`coraline.brimstoneSalamanderTests=true`) cobrindo atributos, regras de spawn, imunidades, snap bite, anti-whiff, cuspe balístico, poça de alcatrão, tail whip e matriz de alvos/ecologia. Detalhes em [design/brimstone_salamander.md](design/brimstone_salamander.md).

@@ -84,6 +84,16 @@ public final class BrimstoneSalamanderGameTests {
         helper.assertValueEqual(ModEntities.BRIMSTONE_SALAMANDER.get().getCategory(), MobCategory.MONSTER, "Brimstone Salamander category");
         helper.assertValueEqual(salamander.getState(), BrimstoneSalamander.State.IDLE, "Brimstone Salamander initial state");
         helper.assertTrue(ModItems.BRIMSTONE_SALAMANDER_SPAWN_EGG.get() instanceof SpawnEggItem, "Brimstone Salamander spawn egg registered");
+        helper.assertTrue(ModItems.BRIMSTONE_SCALE.get() != null, "Brimstone Scale registered");
+        helper.assertTrue(ModItems.BRIMSTONE_SPIT.get() != null, "Brimstone Spit item registered");
+        helper.assertTrue(com.codenamecoraline.bestiary.Bestiary.BRIMSTONE_SALAMANDER != null, "Bestiary chapter registered");
+        helper.assertValueEqual(com.codenamecoraline.bestiary.Bestiary.BRIMSTONE_SALAMANDER.pages().size(), 6, "Bestiary chapter has 6 pages");
+        helper.assertTrue(com.codenamecoraline.registry.ModSounds.BRIMSTONE_SALAMANDER_AMBIENT.get() != null, "Ambient sound registered");
+        helper.assertTrue(com.codenamecoraline.registry.ModSounds.BRIMSTONE_SALAMANDER_HURT.get() != null, "Hurt sound registered");
+        helper.assertTrue(com.codenamecoraline.registry.ModSounds.BRIMSTONE_SALAMANDER_DEATH.get() != null, "Death sound registered");
+        helper.assertTrue(com.codenamecoraline.registry.ModSounds.BRIMSTONE_SALAMANDER_BITE.get() != null, "Bite sound registered");
+        helper.assertTrue(com.codenamecoraline.registry.ModSounds.BRIMSTONE_SALAMANDER_SPIT.get() != null, "Spit sound registered");
+        helper.assertTrue(com.codenamecoraline.registry.ModSounds.BRIMSTONE_SALAMANDER_TAIL_WHIP.get() != null, "Tail whip sound registered");
         helper.assertTrue(salamander.fireImmune(), "Brimstone Salamander must be immune to fire and lava");
         helper.assertTrue(salamander.isSensitiveToWater(), "Brimstone Salamander must be sensitive to water");
 

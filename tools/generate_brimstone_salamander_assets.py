@@ -168,7 +168,26 @@ def main() -> None:
                 else:
                     spit.putpixel((x, y), EDGE_CHARCOAL)
     spit.save(item_dir / "brimstone_spit.png")
-    print(f"Generated {out_dir / 'brimstone_salamander.png'}, {out_dir / 'brimstone_salamander_eyes.png'}, and {item_dir / 'brimstone_spit.png'}")
+
+    scale = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    # Pointed basalt scute / scale silhouette (x 3..12, y 2..14)
+    for y in range(2, 15):
+        half_w = 4.5 * (1.0 - (y - 2) / 14.0) if y > 7 else 1.5 + (y - 2) * 0.6
+        min_x = int(7.5 - half_w)
+        max_x = int(7.5 + half_w)
+        for x in range(min_x, max_x + 1):
+            if x in (min_x, max_x) or y in (2, 14):
+                scale.putpixel((x, y), EDGE_CHARCOAL)
+            elif (x + y) % 4 == 0:
+                scale.putpixel((x, y), SULPHUR_BRIGHT)
+            elif (x * 2 + y) % 5 == 0:
+                scale.putpixel((x, y), MAGMA_ORANGE)
+            elif (x + y * 2) % 3 == 0:
+                scale.putpixel((x, y), HIGHLIGHT_ASH)
+            else:
+                scale.putpixel((x, y), BASE_SLATE)
+    scale.save(item_dir / "brimstone_scale.png")
+    print(f"Generated {out_dir / 'brimstone_salamander.png'}, {out_dir / 'brimstone_salamander_eyes.png'}, {item_dir / 'brimstone_spit.png'}, and {item_dir / 'brimstone_scale.png'}")
 
 
 if __name__ == "__main__":

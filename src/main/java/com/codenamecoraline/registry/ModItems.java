@@ -189,6 +189,9 @@ public final class ModItems {
             () -> new Item.Properties().spawnEgg(ModEntities.BRIMSTONE_SALAMANDER.get()));
     /** Sprite item rendered for the Brimstone Salamander's BrimstoneSpit projectile. */
     public static final DeferredItem<Item> BRIMSTONE_SPIT = ITEMS.registerSimpleItem("brimstone_spit");
+    /** Tough basaltic plate shed by the Brimstone Salamander, used in fey thermal infusions. */
+    public static final DeferredItem<Item> BRIMSTONE_SCALE = ITEMS.registerSimpleItem("brimstone_scale",
+            () -> new Item.Properties().rarity(Rarity.UNCOMMON));
 
     // Retired rewards stay registered to preserve items in existing worlds; no drops or recipes.
     public static final DeferredItem<Item> CATACOMB_LILY = ITEMS.registerItem("catacomb_lily", CatacombLilyItem::new);

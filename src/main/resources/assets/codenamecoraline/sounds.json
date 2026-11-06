@@ -1631,5 +1631,112 @@
         "pitch": 0.65
       }
     ]
+  },
+  "entity.brimstone_salamander.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.brimstone_salamander.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:block.lava.ambient",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.85
+      },
+      {
+        "name": "minecraft:block.blastfurnace.fire_crackle",
+        "type": "event",
+        "volume": 0.7,
+        "pitch": 0.75
+      },
+      {
+        "name": "minecraft:entity.strider.ambient",
+        "type": "event",
+        "volume": 0.6,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.brimstone_salamander.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.brimstone_salamander.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:block.basalt.hit",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.75
+      },
+      {
+        "name": "minecraft:block.lava.extinguish",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 1.1
+      }
+    ]
+  },
+  "entity.brimstone_salamander.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.brimstone_salamander.death",
+    "sounds": [
+      {
+        "name": "minecraft:block.basalt.break",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.6
+      },
+      {
+        "name": "minecraft:entity.blaze.death",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.65
+      }
+    ]
+  },
+  "entity.brimstone_salamander.step": {
+    "subtitle": "subtitles.codenamecoraline.entity.brimstone_salamander.step",
+    "sounds": [
+      {
+        "name": "minecraft:block.basalt.step",
+        "type": "event",
+        "volume": 0.6,
+        "pitch": 0.8
+      }
+    ]
+  },
+  "entity.brimstone_salamander.bite": {
+    "subtitle": "subtitles.codenamecoraline.entity.brimstone_salamander.bite",
+    "sounds": [
+      {
+        "name": "minecraft:entity.evoker_fangs.attack",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.85
+      }
+    ]
+  },
+  "entity.brimstone_salamander.spit": {
+    "subtitle": "subtitles.codenamecoraline.entity.brimstone_salamander.spit",
+    "sounds": [
+      {
+        "name": "minecraft:entity.blaze.shoot",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.75
+      },
+      {
+        "name": "minecraft:block.lava.pop",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.8
+      }
+    ]
+  },
+  "entity.brimstone_salamander.tail_whip": {
+    "subtitle": "subtitles.codenamecoraline.entity.brimstone_salamander.tail_whip",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.sweep",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.6
+      }
+    ]
   }
 }

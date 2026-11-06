@@ -1,0 +1,37 @@
+{
+  "parent": "codenamecoraline:bosses/find_brimstone_salamander",
+  "criteria": {
+    "has_brimstone_scale": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "codenamecoraline:brimstone_scale"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.brimstone_scale.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:brimstone_scale"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.brimstone_scale.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_brimstone_scale"
+    ]
+  ]
+}
+

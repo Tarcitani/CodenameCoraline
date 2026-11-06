@@ -85,8 +85,16 @@ public final class Bestiary {
             BestiaryPage.text("sentinel"),
             BestiaryPage.sketch("spoils", "fey_raven_spoils", 112, 64)));
 
+    public static final BestiaryEntry BRIMSTONE_SALAMANDER = new BestiaryEntry("brimstone_salamander", List.of(
+            BestiaryPage.sketch("anatomy", "brimstone_salamander_anatomy", 112, 80),
+            BestiaryPage.text("habitat"),
+            BestiaryPage.text("attributes"),
+            BestiaryPage.sketch("combat", "brimstone_salamander_combat", 112, 72),
+            BestiaryPage.text("tactics"),
+            BestiaryPage.sketch("spoils", "brimstone_salamander_spoils", 112, 64)));
+
     public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK, LITHOPHAGE, LAST_GIFT_COLLECTOR, CANOPY_BREAKER, BABY_DRAGON,
-            CRIMSON_COMMANDER, TEN_THREADS_WITCH, FEY_RAVEN);
+            CRIMSON_COMMANDER, TEN_THREADS_WITCH, FEY_RAVEN, BRIMSTONE_SALAMANDER);
 
     private Bestiary() {}
 }

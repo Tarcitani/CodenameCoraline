@@ -1,0 +1,52 @@
+{
+  "parent": "minecraft:nether/root",
+  "criteria": {
+    "encounter_salamander": {
+      "trigger": "minecraft:player_hurt_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "codenamecoraline:brimstone_salamander"
+            }
+          }
+        ]
+      }
+    },
+    "attacked_by_salamander": {
+      "trigger": "minecraft:entity_hurt_player",
+      "conditions": {
+        "damage": {
+          "source_entity": {
+            "type": "codenamecoraline:brimstone_salamander"
+          }
+        }
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.find_brimstone_salamander.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:magma_cream"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.find_brimstone_salamander.title"
+    }
+  },
+  "requirements": [
+    [
+      "encounter_salamander",
+      "attacked_by_salamander"
+    ]
+  ]
+}
+

@@ -20,12 +20,13 @@ Minecraft 26.1.2 · NeoForge 26.1.2.124 · Java 25 · Gradle 9.2.1. Mod ID `code
 | Bruxa dos Dez Fios | Boss composto (Matriarca + 10 marionetes), 33 ataques, sistema de animação próprio | `design/ten_threads_witch.md`, `design/matriarch_animation.md` |
 | Dragão Bebê Companheiro | Domesticável; evolui Bebê → Jovem → Adulto; montaria, inventário, sopro | `design/baby_dragon.md`, `design/dragon_evolution.md`, `design/dragon_remodel.md`, `design/baby_dragon_roadmap.md` |
 | Corvo Feérico Companheiro | Domesticável com bagas brilhantes; ombro, coleta de itens brilhantes (1 slot), Sentinela Mística contra invisíveis | `design/fey_raven.md` |
+| Salamandra de Enxofre | Predador vulcânico do Nether, 8 estados, 3 ataques (mordida anti-whiff, cuspe balístico com alcatrão, cauda anti-cerco) | `design/brimstone_salamander.md` |
 | Bestiário | Livro com capítulo ilustrado por mob/boss | `ARCHITECTURE.md` |
 
-Os últimos commits entregam o Corvo Feérico Companheiro (`fey_raven`, estreando o fluxo em fatias para o perfil `aliado`) e as etapas do Baby Dragon (atributos, prioridades de IA, caça, interações sociais, proteção por totem).
+Os últimos commits entregam a Salamandra de Enxofre (`brimstone_salamander`, perfil `hostil` no Nether), o Corvo Feérico Companheiro (`fey_raven`, perfil `aliado`) e as etapas do Baby Dragon.
 
 ## Validação
-- Os GameTests rodam por tarefas `run<Mob>Test` (lista em `build.gradle`). Contagens recentes: Dragão Bebê 81, Comandante 34, Quebra-Copas 35, Bruxa 30, Matriarca 20, Cobrador 18, Basilisco 17, Litófago 11, Porrete 9, Corvo Feérico 8.
+- Os GameTests rodam por tarefas `run<Mob>Test` (lista em `build.gradle`). Contagens recentes: Dragão Bebê 81, Comandante 34, Quebra-Copas 35, Bruxa 30, Matriarca 20, Cobrador 18, Basilisco 17, Litófago 11, Porrete 9, Corvo Feérico 8, Salamandra de Enxofre 6.
 - Em 2026-11-05 o `build` e o `runTenThreadsWitchTest` ainda não tinham sido executados pelo agente (o Gradle não roda no shell de alguns agentes; ver `DEVELOPMENT.md`). Confirme no seu terminal.
 
 ## Pendências recorrentes

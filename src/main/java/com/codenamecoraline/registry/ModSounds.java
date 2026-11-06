@@ -124,6 +124,14 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> FEY_RAVEN_HURT = register("entity.fey_raven.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> FEY_RAVEN_DEATH = register("entity.fey_raven.death");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> BRIMSTONE_SALAMANDER_AMBIENT = register("entity.brimstone_salamander.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BRIMSTONE_SALAMANDER_HURT = register("entity.brimstone_salamander.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BRIMSTONE_SALAMANDER_DEATH = register("entity.brimstone_salamander.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BRIMSTONE_SALAMANDER_STEP = register("entity.brimstone_salamander.step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BRIMSTONE_SALAMANDER_BITE = register("entity.brimstone_salamander.bite");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BRIMSTONE_SALAMANDER_SPIT = register("entity.brimstone_salamander.spit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> BRIMSTONE_SALAMANDER_TAIL_WHIP = register("entity.brimstone_salamander.tail_whip");
+
     /** The signature sound of each puppet (steps and attacks), one event per kind. */
     private static final java.util.EnumMap<com.codenamecoraline.entity.ten_threads_witch.PuppetKind, DeferredHolder<SoundEvent, SoundEvent>> PUPPET_ACTIONS =
             new java.util.EnumMap<>(com.codenamecoraline.entity.ten_threads_witch.PuppetKind.class);
