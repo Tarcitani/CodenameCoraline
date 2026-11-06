@@ -4,6 +4,7 @@ import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.entity.babydragon.BabyDragon;
 import com.codenamecoraline.entity.babydragon.DragonEmber;
 import com.codenamecoraline.entity.raven.FeyRaven;
+import com.codenamecoraline.entity.salamander.BrimstoneSalamander;
 import com.codenamecoraline.entity.redcap.Redcap;
 import com.codenamecoraline.entity.redcap.RedcapRock;
 import com.codenamecoraline.entity.basilisk.Basilisk;
@@ -195,6 +196,14 @@ public final class ModEntities {
                     .clientTrackingRange(8)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
+    /** Predatory magma-dwelling amphibian of traditional fey alchemy lore. */
+    public static final DeferredHolder<EntityType<?>, EntityType<BrimstoneSalamander>> BRIMSTONE_SALAMANDER = ENTITY_TYPES.register("brimstone_salamander",
+            id -> EntityType.Builder.of(BrimstoneSalamander::new, MobCategory.MONSTER)
+                    .sized(BrimstoneSalamander.WIDTH, BrimstoneSalamander.HEIGHT).eyeHeight(BrimstoneSalamander.EYE_HEIGHT)
+                    .fireImmune()
+                    .clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
     private ModEntities() {}
 
     public static EntityType<PuppetEntity> puppet(PuppetKind kind) {
@@ -226,6 +235,7 @@ public final class ModEntities {
             event.put(puppet(kind), PuppetEntity.createAttributes(kind).build());
         }
         event.put(FEY_RAVEN.get(), FeyRaven.createAttributes().build());
+        event.put(BRIMSTONE_SALAMANDER.get(), BrimstoneSalamander.createAttributes().build());
     }
 
     private static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {
@@ -239,5 +249,7 @@ public final class ModEntities {
                 CrimsonCommander::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(FEY_RAVEN.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING,
                 FeyRaven::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(BRIMSTONE_SALAMANDER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING,
+                BrimstoneSalamander::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 }

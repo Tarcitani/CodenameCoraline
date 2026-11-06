@@ -185,6 +185,9 @@ public final class ModItems {
     public static final DeferredItem<Item> FEY_FEATHER = ITEMS.registerSimpleItem("fey_feather",
             () -> new Item.Properties().rarity(Rarity.UNCOMMON));
 
+    public static final DeferredItem<Item> BRIMSTONE_SALAMANDER_SPAWN_EGG = ITEMS.registerItem("brimstone_salamander_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.BRIMSTONE_SALAMANDER.get()));
+
     // Retired rewards stay registered to preserve items in existing worlds; no drops or recipes.
     public static final DeferredItem<Item> CATACOMB_LILY = ITEMS.registerItem("catacomb_lily", CatacombLilyItem::new);
     public static final DeferredItem<Item> ROTTEN_BUTTERFLY = ITEMS.registerSimpleItem("rotten_butterfly");

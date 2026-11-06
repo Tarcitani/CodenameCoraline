@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:basalt_deltas",
+    "minecraft:nether_wastes",
+    "minecraft:crimson_forest"
+  ]
+}
+

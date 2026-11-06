@@ -101,6 +101,12 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
             systemProperty 'coraline.feyRavenTests', 'true'
         }
+        brimstoneSalamanderTest {
+            type = 'gameTestServer'
+            gameDirectory = file('build/brimstone-salamander-gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'coraline.brimstoneSalamanderTests', 'true'
+        }
         // Applies to all run configurations above.
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'

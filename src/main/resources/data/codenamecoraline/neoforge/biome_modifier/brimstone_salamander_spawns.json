@@ -1,0 +1,13 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#codenamecoraline:brimstone_salamander_habitat",
+  "spawners": [
+    {
+      "type": "codenamecoraline:brimstone_salamander",
+      "weight": 25,
+      "minCount": 1,
+      "maxCount": 3
+    }
+  ]
+}
+
