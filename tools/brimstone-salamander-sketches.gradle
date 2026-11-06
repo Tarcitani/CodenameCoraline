@@ -1,0 +1,22 @@
+// Optional asset tooling for Brimstone Salamander visual pose review and Bestiary plates.
+allprojects {
+    afterEvaluate {
+        def exporterClasses = layout.buildDirectory.dir('brimstone-salamander-sketches/classes')
+        def compileExporter = tasks.register('compileBrimstoneSalamanderSketchExporter', JavaCompile) {
+            dependsOn tasks.named('classes')
+            source = files('tools/ExportBrimstoneSalamanderModel.java')
+            classpath = sourceSets.main.runtimeClasspath
+            destinationDirectory = exporterClasses
+            javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }
+            options.encoding = 'UTF-8'
+        }
+        tasks.register('exportBrimstoneSalamanderSketchModel', JavaExec) {
+            dependsOn compileExporter
+            classpath = sourceSets.main.runtimeClasspath + files(exporterClasses)
+            javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+            mainClass = 'ExportBrimstoneSalamanderModel'
+            args layout.buildDirectory.file('brimstone-salamander-sketches/model.json').get().asFile.absolutePath
+        }
+    }
+}
+

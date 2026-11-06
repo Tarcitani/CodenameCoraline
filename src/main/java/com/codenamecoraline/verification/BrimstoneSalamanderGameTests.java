@@ -1,6 +1,8 @@
 package com.codenamecoraline.verification;
 
 import com.codenamecoraline.CodenameCoraline;
+import com.codenamecoraline.client.salamander.BrimstoneSalamanderAnimations;
+import com.codenamecoraline.client.salamander.BrimstoneSalamanderModel;
 import com.codenamecoraline.entity.salamander.BrimstoneSalamander;
 import com.codenamecoraline.registry.ModEntities;
 import com.codenamecoraline.registry.ModItems;
@@ -70,6 +72,29 @@ public final class BrimstoneSalamanderGameTests {
         helper.assertTrue(ModItems.BRIMSTONE_SALAMANDER_SPAWN_EGG.get() instanceof SpawnEggItem, "Brimstone Salamander spawn egg registered");
         helper.assertTrue(salamander.fireImmune(), "Brimstone Salamander must be immune to fire and lava");
         helper.assertTrue(salamander.isSensitiveToWater(), "Brimstone Salamander must be sensitive to water");
+
+        var root = BrimstoneSalamanderModel.createBodyLayer().bakeRoot();
+        var model = new BrimstoneSalamanderModel(root);
+        helper.assertTrue(model != null, "BrimstoneSalamanderModel bakes all 18 joints and 17 animations cleanly");
+        helper.assertTrue(
+                BrimstoneSalamanderAnimations.IDLE_BREATHE != null
+                        && BrimstoneSalamanderAnimations.IDLE_THROAT_PUFF != null
+                        && BrimstoneSalamanderAnimations.IDLE_TAIL_SWAY != null
+                        && BrimstoneSalamanderAnimations.IDLE_SNIFF != null
+                        && BrimstoneSalamanderAnimations.WALK != null
+                        && BrimstoneSalamanderAnimations.SWIM_LAVA != null
+                        && BrimstoneSalamanderAnimations.SNAP_BITE_PREP != null
+                        && BrimstoneSalamanderAnimations.SNAP_BITE_EXEC != null
+                        && BrimstoneSalamanderAnimations.SNAP_BITE_RECOVERY != null
+                        && BrimstoneSalamanderAnimations.SULFUR_SPIT_PREP != null
+                        && BrimstoneSalamanderAnimations.SULFUR_SPIT_EXEC != null
+                        && BrimstoneSalamanderAnimations.SULFUR_SPIT_RECOVERY != null
+                        && BrimstoneSalamanderAnimations.TAIL_WHIP_PREP != null
+                        && BrimstoneSalamanderAnimations.TAIL_WHIP_EXEC != null
+                        && BrimstoneSalamanderAnimations.TAIL_WHIP_RECOVERY != null
+                        && BrimstoneSalamanderAnimations.HURT != null
+                        && BrimstoneSalamanderAnimations.DEATH != null,
+                "All 17 Brimstone Salamander animations must be defined");
         helper.succeed();
     }
 

@@ -5,10 +5,12 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -31,7 +33,7 @@ import net.minecraft.world.phys.AABB;
 /**
  * Brimstone Salamander ({@code codenamecoraline:brimstone_salamander}): a predatory, magma-dwelling
  * amphibian of traditional fey alchemy lore. Native to Nether Basalt Deltas, Nether Wastes, and Crimson Forest shores.
- * Slice 1 provides the foundation entity, attributes, state enum, and spawn rules.
+ * Slice 1 & 2 provide the foundation entity, attributes, state enum, spawn rules, and client animation states.
  */
 public final class BrimstoneSalamander extends Monster {
     public static final float WIDTH = 1.3F;
@@ -48,9 +50,31 @@ public final class BrimstoneSalamander extends Monster {
     public static final byte EVENT_SNAP_BITE = (byte) 153;
     public static final byte EVENT_HURT = (byte) 154;
     public static final byte EVENT_DEATH = (byte) 155;
+    public static final byte EVENT_IDLE_TAIL_SWAY = (byte) 156;
+    public static final byte EVENT_IDLE_SNIFF = (byte) 157;
+    public static final byte EVENT_ATTACK_RECOVERY = (byte) 158;
 
     private static final EntityDataAccessor<Integer> DATA_STATE =
             SynchedEntityData.defineId(BrimstoneSalamander.class, EntityDataSerializers.INT);
+
+    public final AnimationState idleBreatheAnimationState = new AnimationState();
+    public final AnimationState idleThroatPuffAnimationState = new AnimationState();
+    public final AnimationState idleTailSwayAnimationState = new AnimationState();
+    public final AnimationState idleSniffAnimationState = new AnimationState();
+    public final AnimationState swimLavaAnimationState = new AnimationState();
+    public final AnimationState snapBitePrepAnimationState = new AnimationState();
+    public final AnimationState snapBiteExecAnimationState = new AnimationState();
+    public final AnimationState snapBiteRecoveryAnimationState = new AnimationState();
+    public final AnimationState sulfurSpitPrepAnimationState = new AnimationState();
+    public final AnimationState sulfurSpitExecAnimationState = new AnimationState();
+    public final AnimationState sulfurSpitRecoveryAnimationState = new AnimationState();
+    public final AnimationState tailWhipPrepAnimationState = new AnimationState();
+    public final AnimationState tailWhipExecAnimationState = new AnimationState();
+    public final AnimationState tailWhipRecoveryAnimationState = new AnimationState();
+    public final AnimationState hurtAnimationState = new AnimationState();
+    public final AnimationState deathAnimationState = new AnimationState();
+
+    private int idleVariationCooldown = 140;
 
     public enum State {
         IDLE,
@@ -106,6 +130,85 @@ public final class BrimstoneSalamander extends Monster {
         this.entityData.set(DATA_STATE, state.ordinal());
     }
 
+    public boolean isSwimmingInLava() {
+        return this.isInLava() || this.level().getFluidState(this.blockPosition()).is(FluidTags.LAVA);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (this.level().isClientSide()) {
+            this.idleBreatheAnimationState.startIfStopped(this.tickCount);
+            if (this.isSwimmingInLava()) {
+                this.swimLavaAnimationState.startIfStopped(this.tickCount);
+            } else {
+                this.swimLavaAnimationState.stop();
+            }
+        } else if (this.isAlive() && this.getState() == State.IDLE && this.getTarget() == null) {
+            if (--this.idleVariationCooldown <= 0) {
+                this.idleVariationCooldown = 120 + this.random.nextInt(121);
+                int roll = this.random.nextInt(3);
+                byte event = switch (roll) {
+                    case 0 -> EVENT_THROAT_PUFF;
+                    case 1 -> EVENT_IDLE_TAIL_SWAY;
+                    default -> EVENT_IDLE_SNIFF;
+                };
+                this.level().broadcastEntityEvent(this, event);
+            }
+        }
+    }
+
+    @Override
+    public void handleEntityEvent(byte id) {
+        switch (id) {
+            case EVENT_THROAT_PUFF -> {
+                this.idleTailSwayAnimationState.stop();
+                this.idleSniffAnimationState.stop();
+                this.idleThroatPuffAnimationState.start(this.tickCount);
+            }
+            case EVENT_IDLE_TAIL_SWAY -> {
+                this.idleThroatPuffAnimationState.stop();
+                this.idleSniffAnimationState.stop();
+                this.idleTailSwayAnimationState.start(this.tickCount);
+            }
+            case EVENT_IDLE_SNIFF -> {
+                this.idleThroatPuffAnimationState.stop();
+                this.idleTailSwayAnimationState.stop();
+                this.idleSniffAnimationState.start(this.tickCount);
+            }
+            case EVENT_SNAP_BITE -> {
+                this.stopAllAttackAnimations();
+                this.snapBitePrepAnimationState.start(this.tickCount);
+            }
+            case EVENT_SULFUR_SPIT -> {
+                this.stopAllAttackAnimations();
+                this.sulfurSpitPrepAnimationState.start(this.tickCount);
+            }
+            case EVENT_TAIL_WHIP -> {
+                this.stopAllAttackAnimations();
+                this.tailWhipPrepAnimationState.start(this.tickCount);
+            }
+            case EVENT_HURT -> this.hurtAnimationState.start(this.tickCount);
+            case EVENT_DEATH -> {
+                this.stopAllAttackAnimations();
+                this.deathAnimationState.start(this.tickCount);
+            }
+            default -> super.handleEntityEvent(id);
+        }
+    }
+
+    public void stopAllAttackAnimations() {
+        this.snapBitePrepAnimationState.stop();
+        this.snapBiteExecAnimationState.stop();
+        this.snapBiteRecoveryAnimationState.stop();
+        this.sulfurSpitPrepAnimationState.stop();
+        this.sulfurSpitExecAnimationState.stop();
+        this.sulfurSpitRecoveryAnimationState.stop();
+        this.tailWhipPrepAnimationState.stop();
+        this.tailWhipExecAnimationState.stop();
+        this.tailWhipRecoveryAnimationState.stop();
+    }
+
     @Override
     public boolean isSensitiveToWater() {
         return true;
@@ -121,7 +224,20 @@ public final class BrimstoneSalamander extends Monster {
         if (source.is(DamageTypes.FREEZE)) {
             amount *= 2.0F;
         }
-        return super.hurtServer(level, source, amount);
+        boolean hurt = super.hurtServer(level, source, amount);
+        if (hurt && this.isAlive()) {
+            level.broadcastEntityEvent(this, EVENT_HURT);
+        }
+        return hurt;
+    }
+
+    @Override
+    public void die(DamageSource source) {
+        super.die(source);
+        if (!this.level().isClientSide()) {
+            this.setState(State.DYING);
+            this.level().broadcastEntityEvent(this, EVENT_DEATH);
+        }
     }
 
     @Override

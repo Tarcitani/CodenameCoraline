@@ -17,7 +17,7 @@
 - **Referências visuais:**
   Salamandras de fogo reais (*Salamandra salamandra*), salamandras alquímicas medievais, blocos de basalto polido e netherrack. Paleta: carapaça em basalto carvão (`#1c1d21`) com placas de cinza vulcânico (`#383a42`), veios de pó de enxofre amarelo-ácido (`#e3c434` / `#f2e06b`), papo e fendas de lava em gradiente incandescente alaranjado e rubro (`#ff5722` / `#ff9800`).
 - **Dimensões:** altura `0.85` blocos, largura da colisão `1.3` blocos, comprimento da colisão `2.2` blocos, altura dos olhos `0.55` blocos.
-- **Resolução do atlas / texel:** `64×64` px (densidade uniforme de 16 px/bloco).
+- **Resolução do atlas / texel:** `128×128` px (densidade uniforme de 16 px/bloco; 26 caixas mapeadas sem sobreposição de UV).
 
 ### 1.2 Atributos e Ecologia Básica
 - **Atributos:** vida `44.0`, armadura `8.0` (+ resistência de armadura `2.0`), velocidade `0.23` (terrestre) / `0.38` (em lava), dano base `6.0`, resistência a repulsão `0.65`, alcance de visão `24.0`, XP `10`.
@@ -115,11 +115,26 @@
           - `tail_tip` (ponta afilada e achatada verticalmente)
 
 ### 1.6b Animação (Parte B: Ângulos e Curvas Reais de `BrimstoneSalamanderAnimations.java`)
-> Reservada para a Fatia 2 (Visual e rigging). Preenchida pelo agente após cálculo contra o modelo real e validação de poses.
 
-| Animação | Junta | Rot inicial (x/y/z, graus) | Rot final (x/y/z, graus) | Curva | Estado |
+| Animação | Junta | Eixo / Canal | Inicial → Pico → Final (graus / px / escala) | Curva | Estado |
 |---|---|---|---|---|---|
-| `idle_breathe` | `throat_sac` | | | | pendente |
+| `idle_breathe` (2.00s loop) | `body`, `throat_sac`, `tail_base`, `tail_tip` | Pos Y / Scale / Rot X/Y | `body` Pos Y `0 → -0.3 → 0`; `throat_sac` Scale `(1,1,1) → (1.18,1.28,1.15) → (1,1,1)`, Rot X `0° → +8° → 0°`; `tail_base` Y `±2.5°`; `tail_tip` Y `∓3.5°` | `CATMULLROM` | aprovado |
+| `idle_throat_puff` (1.50s) | `neck`, `head`, `throat_sac`, `lower_jaw` | Scale / Rot X | `neck` X `0° → -15° → -12° → 0°`; `head` X `0° → -10° → -6° → 0°`; `throat_sac` Scale `(1,1,1) → (1.52,1.95,1.45) → (0.92,0.85,0.92) → (1,1,1)`, Rot X `0° → +18° → -4° → 0°`; `lower_jaw` X `0° → +18° → 0°` | `CATMULLROM` / `LINEAR` | aprovado |
+| `idle_tail_sway` (1.75s) | `body`, `tail_base`, `tail_mid`, `tail_tip` | Rot Y | `body` Y `±6°`; `tail_base` Y `+24° → -24° → 0°`; `tail_mid` Y `-16° → +28° → -28° → 0°`; `tail_tip` Y `-24° → +32° → -32° → 0°` | `CATMULLROM` | aprovado |
+| `idle_sniff` (1.25s) | `neck`, `head`, `lower_jaw` | Rot X/Y/Z | `neck` `(0,0,0) → (-6°,+18°,0°) → (-2°,-8°,0°) → (0,0,0)`; `head` `(0,0,0) → (-4°,+21°,-6°) → (-2°,-10°,+4°) → (0,0,0)`; `lower_jaw` X `0° → +24° (8 ticks) → 0°` | `LINEAR` | aprovado |
+| `walk` (0.80s loop) | `body`, `neck`, `legs`, `tail` | Rot X/Y/Z | `body` Y `±8°`, Z `∓2°`; `neck` Y `∓6°`; `left_front`/`right_hind` Y `-18° ↔ +24°`, Z `-14°`; `right_front`/`left_hind` Y `+18° ↔ -24°`, Z `+14°`; `tail_base/mid/tip` Y `∓16° / ∓22° / ∓26°` | `CATMULLROM` / `LINEAR` | aprovado |
+| `swim_lava` (0.70s loop) | `body`, `neck`, `legs`, `tail` | Rot Y/Z | `legs` recolhidas nos flancos (`yRot ∓48°/∓52°, zRot ±12°`); onda senoidal `body` Y `±12°`, `neck` Y `∓10°`, `tail_base` Y `∓24°`, `tail_mid` Y `∓32°`, `tail_tip` Y `∓38°` | `CATMULLROM` | aprovado |
+| `snap_bite_prep` (0.40s) | `body`, `neck`, `head`, `lower_jaw`, `front_legs` | Pos Z / Rot X/Y | `body` Pos Z `0 → +1.8`, Rot X `0° → -8°`; `neck` X `0° → -22°`; `head` X `0° → +14°`; `lower_jaw` X `0° → +40°`; `front_legs` Y `0° → ±18°` | `LINEAR` | aprovado |
+| `snap_bite_exec` (0.20s, hit 0.10s) | `body`, `neck`, `head`, `lower_jaw`, `front_legs` | Pos Z / Rot X/Y | `body` Pos Z `+1.8 → -2.8 → -2.4`, Rot X `-8° → +10° → +8°`; `neck` X `-22° → +18° → +14°`; `head` X `+14° → -8° → -4°`; `lower_jaw` X `+40° → 0°` | `LINEAR` | aprovado |
+| `snap_bite_recovery` (0.60s) | `body`, `neck`, `head`, `front_legs` | Pos Z / Rot X/Y | `body` Pos Z `-2.4 → 0`, Rot X `+8° → 0°`; `neck` X `+14° → 0°`; `head` X `-4° → 0°`; `front_legs` Y `∓20° → 0°` | `CATMULLROM` | aprovado |
+| `sulfur_spit_prep` (0.80s) | `body`, `neck`, `head`, `throat_sac`, `lower_jaw` | Scale / Rot X | `body` X `0° → -10°`; `neck` X `0° → -18°`; `head` X `0° → -12°`; `throat_sac` Scale `(1,1,1) → (1.65,2.10,1.55)`, Rot X `0° → +22°`; `lower_jaw` X `0° → +10°` | `CATMULLROM` / `LINEAR` | aprovado |
+| `sulfur_spit_exec` (0.30s, hit 0.10s) | `body`, `neck`, `head`, `throat_sac`, `lower_jaw` | Pos Z / Scale / Rot X | `body` Pos Z `0 → +1.4 → +0.8`, Rot X `-10° → +8° → +4°`; `neck` X `-18° → +20° → +10°`; `head` X `-12° → +14° → +6°`; `throat_sac` Scale `(1.65,2.10,1.55) → (0.85,0.75,0.85) → (0.90,0.80,0.90)`; `lower_jaw` X `+10° → +42° → +26°` | `LINEAR` | aprovado |
+| `sulfur_spit_recovery` (0.90s) | `body`, `neck`, `head`, `throat_sac`, `lower_jaw` | Pos Z / Scale / Rot X | `body` Pos Z `+0.8 → 0`, Rot X `+4° → 0°`; `neck` X `+10° → +14° → 0°`; `head` X `+6° → +10° → 0°`; `throat_sac` Scale `(0.90,0.80,0.90) → (1,1,1)`; `lower_jaw` X `+26° → +8° → 0°` | `CATMULLROM` | aprovado |
+| `tail_whip_prep` (0.50s) | `body`, `neck`, `tail_base`, `tail_mid`, `tail_tip` | Rot X/Y | `body` Y `0° → -28°`; `neck` Y `0° → +18°`; `tail_base` `(0,0,0) → (+12°,-38°,0°)`; `tail_mid` `(0,0,0) → (+10°,-42°,0°)`; `tail_tip` `(0,0,0) → (+8°,-36°,0°)` | `LINEAR` | aprovado |
+| `tail_whip_exec` (0.25s, hit 0.15s) | `body`, `neck`, `tail_base`, `tail_mid`, `tail_tip` | Rot X/Y | `body` Y `-28° → +32° → +28°`; `neck` Y `+18° → -20° → -16°`; `tail_base` `(+12°,-38°,0°) → (-4°,+58°,0°) → (-2°,+52°,0°)`; `tail_mid` `(+10°,-42°,0°) → (-4°,+64°,0°) → (-2°,+56°,0°)`; `tail_tip` `(+8°,-36°,0°) → (-2°,+56°,0°) → (0°,+48°,0°)` | `LINEAR` | aprovado |
+| `tail_whip_recovery` (0.70s) | `body`, `neck`, `tail_base`, `tail_mid`, `tail_tip` | Rot X/Y | `body` Y `+28° → 0°`; `neck` Y `-16° → 0°`; `tail_base` `(-2°,+52°,0°) → (0,0,0)`; `tail_mid` `(-2°,+56°,0°) → (0,0,0)`; `tail_tip` `(0°,+48°,0°) → (0,0,0)` | `CATMULLROM` | aprovado |
+| `hurt` (0.30s) | `body`, `head`, `lower_jaw` | Pos Z / Rot X/Y/Z | `body` Pos Z `0 → +1.2 → 0`, Rot `(0,0,0) → (-14°,0°,+6°) → (0,0,0)`; `head` `(0,0,0) → (-18°,+8°,+10°) → (0,0,0)`; `lower_jaw` X `0° → +24° → 0°` | `LINEAR` | aprovado |
+| `death` (1.20s) | `body`, `neck`, `head`, `lower_jaw`, `throat_sac`, `legs`, `tail` | Pos Y / Scale / Rot X/Y/Z | `body` Pos Y `0 → -2.2`, Rot `(0,0,0) → (+6°,-10°,+22°)`; `neck` `(+18°,+16°,0°)`; `head` `(+16°,+14°,-16°)`; `lower_jaw` X `+32°`; `legs` Y `∓28°..∓32°`, Z `∓32°`; `tail` X `-8°..-4°`, Y `+18°..+22°` | `LINEAR` | aprovado |
 
 ---
 
@@ -129,13 +144,13 @@
 |---|---|---|---|
 | 0. Ficha revisada | **concluída** | 2026-11-06 | Ficha completa sem `<...>`, valores calibrados contra a escala vanilla e contrato de perfil `hostil` |
 | 1. Fundação | **concluída** | 2026-11-06 | `.\gradlew.bat compileJava` (OK) + `.\gradlew.bat runBrimstoneSalamanderTest` (All 3 required tests passed, 2 testes de `brimstone_salamander_test_environment`, BUILD SUCCESSFUL in 20s) |
-| 2. Visual e rigging | pendente | | |
-| 2b. Revisão visual (humano) | pendente | | |
+| 2. Visual e rigging | **concluída** | 2026-11-06 | `.\gradlew.bat compileJava` (OK) + `python tools/generate_brimstone_salamander_assets.py` (26 boxes, 0 UV overlaps on 128x128) + `.\gradlew.bat -I tools/brimstone-salamander-sketches.gradle exportBrimstoneSalamanderSketchModel` (12 poses) + `python tools/generate_brimstone_salamander_sketches.py` (9 poses + pranchas do Bestiário) |
+| 2b. Revisão visual (humano) | **concluída** | 2026-11-06 | Poses e texturas aprovadas pelo usuário |
 | 3. IA e combate | pendente | | |
 | 4. Polimento e docs | pendente | | |
 | 5. Relatório | pendente | | |
 
-- **Próximo passo:** Iniciar a **Fatia 2 (Visual e rigging)** usando o prompt de [docs/prompts/fatia_2_visual.md](file:///c:/MinecraftDev/CodenameCoraline/docs/prompts/fatia_2_visual.md): criar modelo 3D Java (`BrimstoneSalamanderModel`), script gerador de textura e emissivos (`tools/generate_brimstone_salamander_assets.py`), classes de cliente/render e poses renderizadas para aprovação humana (Fatia 2b).
+- **Próximo passo:** Iniciar a **Fatia 3 (IA e combate)** usando o prompt de [docs/prompts/fatia_3_ia_combate.md](file:///c:/MinecraftDev/CodenameCoraline/docs/prompts/fatia_3_ia_combate.md): implementar máquina de estados completa, projétil `BrimstoneSpit`, ataques em 4 fases (`SNAP_BITE`, `SULFUR_SPIT`, `TAIL_WHIP`), regras de *anti-whiff* / *anti-pillaring* e suíte de GameTests de combate.
 - **Decisões tomadas e motivos:**
   - Perfil `hostil`: predador territorial que habita as margens de lava e biomas quentes do Nether (*Basalt Deltas*, *Nether Wastes*, *Crimson Forest*).
   - Vulnerabilidade feérica: suscetibilidade severa a dano de frio/congelamento (200%), enfatizando o contraste mítico entre o fogo primordial feérico e o gelo ancestral.
