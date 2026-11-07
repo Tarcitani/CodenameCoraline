@@ -7,6 +7,7 @@ import com.codenamecoraline.registry.ModSounds;
 import java.util.EnumSet;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -20,6 +21,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.AnimationState;
@@ -27,6 +29,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -44,6 +47,8 @@ import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
@@ -128,6 +133,8 @@ public final class BrimstoneSalamander extends Monster {
 
     private static final EntityDataAccessor<Integer> DATA_STATE =
             SynchedEntityData.defineId(BrimstoneSalamander.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> DATA_VARIANT =
+            SynchedEntityData.defineId(BrimstoneSalamander.class, EntityDataSerializers.INT);
 
     public final AnimationState idleBreatheAnimationState = new AnimationState();
     public final AnimationState idleThroatPuffAnimationState = new AnimationState();
@@ -193,6 +200,7 @@ public final class BrimstoneSalamander extends Monster {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_STATE, State.IDLE.ordinal());
+        builder.define(DATA_VARIANT, BrimstoneSalamanderVariant.BRIMSTONE.getId());
     }
 
     @Override
@@ -254,6 +262,14 @@ public final class BrimstoneSalamander extends Monster {
 
     public void setState(State state) {
         this.entityData.set(DATA_STATE, state.ordinal());
+    }
+
+    public BrimstoneSalamanderVariant getVariant() {
+        return BrimstoneSalamanderVariant.byId(this.entityData.get(DATA_VARIANT));
+    }
+
+    public void setVariant(BrimstoneSalamanderVariant variant) {
+        this.entityData.set(DATA_VARIANT, variant.getId());
     }
 
     public int getActionTicks() {
@@ -774,6 +790,7 @@ public final class BrimstoneSalamander extends Monster {
     protected void addAdditionalSaveData(ValueOutput output) {
         super.addAdditionalSaveData(output);
         output.putString("SalamanderState", this.getState().name());
+        output.putString("Variant", this.getVariant().getSerializedName());
         output.putInt("SnapBiteCooldown", this.snapBiteCooldown);
         output.putInt("SulfurSpitCooldown", this.sulfurSpitCooldown);
         output.putInt("TailWhipCooldown", this.tailWhipCooldown);
@@ -788,9 +805,33 @@ public final class BrimstoneSalamander extends Monster {
         } catch (IllegalArgumentException ignored) {
             this.setState(State.IDLE);
         }
+        String variantName = input.getStringOr("Variant", BrimstoneSalamanderVariant.BRIMSTONE.getSerializedName());
+        this.setVariant(BrimstoneSalamanderVariant.byName(variantName));
         this.snapBiteCooldown = input.getIntOr("SnapBiteCooldown", 0);
         this.sulfurSpitCooldown = input.getIntOr("SulfurSpitCooldown", 0);
         this.tailWhipCooldown = input.getIntOr("TailWhipCooldown", 0);
+    }
+
+    @Override
+    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
+                                                  EntitySpawnReason spawnReason, @Nullable SpawnGroupData groupData) {
+        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnReason, groupData);
+        Holder<Biome> biome = level.getBiome(this.blockPosition());
+        if (biome.is(Biomes.SOUL_SAND_VALLEY)) {
+            this.setVariant(this.random.nextFloat() < 0.70F ? BrimstoneSalamanderVariant.SOULFLAME : BrimstoneSalamanderVariant.BRIMSTONE);
+        } else if (biome.is(Biomes.CRIMSON_FOREST)) {
+            this.setVariant(this.random.nextFloat() < 0.60F ? BrimstoneSalamanderVariant.CRIMSON : BrimstoneSalamanderVariant.BRIMSTONE);
+        } else {
+            float roll = this.random.nextFloat();
+            if (roll < 0.15F) {
+                this.setVariant(BrimstoneSalamanderVariant.SOULFLAME);
+            } else if (roll < 0.30F) {
+                this.setVariant(BrimstoneSalamanderVariant.CRIMSON);
+            } else {
+                this.setVariant(BrimstoneSalamanderVariant.BRIMSTONE);
+            }
+        }
+        return data;
     }
 
     public static boolean checkSpawnRules(

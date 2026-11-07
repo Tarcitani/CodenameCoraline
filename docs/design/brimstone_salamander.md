@@ -19,6 +19,12 @@
 - **Dimensões:** altura `0.85` blocos, largura da colisão `1.3` blocos, comprimento da colisão `2.2` blocos, altura dos olhos `0.55` blocos.
 - **Resolução do atlas / texel:** `128×128` px (densidade uniforme de 16 px/bloco; 26 caixas mapeadas sem sobreposição de UV).
 
+### 1.1.1 Variantes Visuais e Ecológicas
+A Salamandra de Enxofre possui 3 variações cromáticas adaptadas aos biomas do Nether, cada uma com textura base e camada emissiva dedicada (`_eyes.png`):
+- **`BRIMSTONE` (Padrão - id 0):** Carapaça em basalto carvão (`#1C1D21`), ardósia vulcânica (`#383A42`) e pó de enxofre amarelo-ácido (`#E3C434`). Fendas, papo e olhos em magma âmbar/laranja (`#FF5722` / `#FFA726`). Típica de *Basalt Deltas* e *Nether Wastes* (70% de spawn nesses biomas).
+- **`SOULFLAME` (Chama das Almas - id 1):** Carapaça em basalto ardósia fria azulada (`#242E38`), placas de osso calcinado (`#96A8B2`) e cristais cianos (`#00B4D8`). Fendas, papo e olhos em fogo das almas turquesa/ciano espectral (`#00E5FF` / `#E0F7FA`). Típica de *Soul Sand Valley* (70% de spawn).
+- **`CRIMSON` (Carmesim Vulcânico - id 2):** Carapaça em netherrack vulcanizado escarlate (`#3E1A24`), placas carmesins ferruginosas (`#522430`) e esporos fúngicos (`#D81B60`). Fendas, papo e olhos em rubi e carmesim incandescente (`#FF1744` / `#FF8A80`). Típica de *Crimson Forest* (60% de spawn).
+
 ### 1.2 Atributos e Ecologia Básica
 - **Atributos:** vida `44.0`, armadura `8.0` (+ resistência de armadura `2.0`), velocidade `0.23` (terrestre) / `0.38` (em lava), dano base `6.0`, resistência a repulsão `0.65`, alcance de visão `24.0`, XP `10`.
 - **Imunidades e afinidades:** imunidade total a fogo e lava (`fireImmune`), navega e não se afoga em lava (`canBreatheUnderwater` / fluidos). Vulnerabilidade feérica: sofre 200% de dano por congelamento/frio extremo; água no Overworld causa choque térmico e 4.0 de dano por segundo. Redução de 60% no dano de queda.
@@ -150,6 +156,7 @@
 | 4. Polimento e docs | **concluída** | 2026-11-06 | `.\gradlew.bat build` (OK) + 4 rodadas de `.\gradlew.bat runBrimstoneSalamanderTest` (All 6 required tests passed em todas as 4 rodadas; 5 testes em `brimstone_salamander_test_environment`); Bestiário de 6 páginas com gravuras, item `brimstone_scale`, 7 sons em `ModSounds`, 2 conquistas e docs atualizados |
 | 5. Relatório | **concluída** | 2026-11-06 | Relatório executivo completo gerado; 100% de conformidade com a ficha, 0 pendências de compilação, 4 rodadas consecutivas de GameTests aprovadas |
 | Hotfix. Nado e Navegação em Lava | **concluída** | 2026-11-06 | `.\gradlew.bat compileJava` (OK) + `.\gradlew.bat runBrimstoneSalamanderTest` (All 7 required tests passed in 604.2 ms, 6 testes em `brimstone_salamander_test_environment`). Correção do bloqueio diagonal de 45° e fuga em sentido oposto: removido clamp manual em `tick()`, adotado `travel(Vec3)` canônico com `moveRelative` e arrasto fluido 0.68D; implementado `SalamanderPathNavigation` com aceite de lava/magma e `setCanFloat(true)`; flutuabilidade controlada em `handleLavaBuoyancy()` sem `FloatGoal` |
+| Variantes Visuais (+2 Texturas) | **concluída** | 2026-11-06 | Implementadas variantes SOULFLAME e CRIMSON com texturas base e emissivas dedicadas geradas via script Python (128x128, 26 caixas, 0 overlaps), suporte no renderizador e camada emissiva (EyesLayer), sincronização de dados via `DATA_VARIANT` e persistência NBT validada via GameTest (All 8 required tests passed em `runBrimstoneSalamanderTest`) |
 
 - **Próximo passo:** Inspeção interativa em `runClient` para validação de áudio, partículas de alcatrão e navegação em lava no jogo real.
 - **Decisões tomadas e motivos:**

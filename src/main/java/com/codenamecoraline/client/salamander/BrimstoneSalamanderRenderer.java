@@ -9,8 +9,12 @@ import net.minecraft.resources.Identifier;
 /** Client renderer for the Brimstone Salamander. */
 public final class BrimstoneSalamanderRenderer
         extends MobRenderer<BrimstoneSalamander, BrimstoneSalamanderRenderState, BrimstoneSalamanderModel> {
-    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(
+    private static final Identifier TEXTURE_BRIMSTONE = Identifier.fromNamespaceAndPath(
             CodenameCoraline.MOD_ID, "textures/entity/brimstone_salamander.png");
+    private static final Identifier TEXTURE_SOULFLAME = Identifier.fromNamespaceAndPath(
+            CodenameCoraline.MOD_ID, "textures/entity/brimstone_salamander_soulflame.png");
+    private static final Identifier TEXTURE_CRIMSON = Identifier.fromNamespaceAndPath(
+            CodenameCoraline.MOD_ID, "textures/entity/brimstone_salamander_crimson.png");
 
     public BrimstoneSalamanderRenderer(EntityRendererProvider.Context context) {
         super(context, new BrimstoneSalamanderModel(context.bakeLayer(BrimstoneSalamanderModel.LAYER)), 0.65F);
@@ -24,7 +28,11 @@ public final class BrimstoneSalamanderRenderer
 
     @Override
     public Identifier getTextureLocation(BrimstoneSalamanderRenderState state) {
-        return TEXTURE;
+        return switch (state.variant) {
+            case BRIMSTONE -> TEXTURE_BRIMSTONE;
+            case SOULFLAME -> TEXTURE_SOULFLAME;
+            case CRIMSON -> TEXTURE_CRIMSON;
+        };
     }
 
     @Override
@@ -36,6 +44,7 @@ public final class BrimstoneSalamanderRenderer
     public void extractRenderState(BrimstoneSalamander entity, BrimstoneSalamanderRenderState state, float partialTick) {
         super.extractRenderState(entity, state, partialTick);
         state.state = entity.getState();
+        state.variant = entity.getVariant();
         state.swimmingInLava = entity.isSwimmingInLava();
         state.fissuresGlowing = !entity.isDeadOrDying();
 

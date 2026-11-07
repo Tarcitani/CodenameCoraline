@@ -1,22 +1,49 @@
-"""Generate the Brimstone Salamander entity texture, emissive magma/sulphur layer, and verify UV non-overlap (Pillow)."""
+"""Generate the Brimstone Salamander entity textures (3 variants: Brimstone, Soulflame, Crimson),
+emissive layers, and verify UV non-overlap (Pillow)."""
 from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "src/main/resources/assets/codenamecoraline"
 
-# 5-tone volcanic basalt & fey alchemy sulphur-magma palette from docs/design/brimstone_salamander.md
-EDGE_CHARCOAL = (18, 19, 23, 255)      # #121317 deep basalt crevice / scale outline
-SHADOW_BASALT = (28, 29, 33, 255)      # #1C1D21 dark basalt belly & lower faces
-BASE_SLATE = (44, 46, 54, 255)         # #2C2E36 main volcanic rock hide
-MID_SLATE = (56, 58, 66, 255)          # #383A42 carapace scutes
-HIGHLIGHT_ASH = (76, 79, 90, 255)      # #4C4F5A top ridge highlight
+BRIMSTONE_PALETTE = {
+    "edge_charcoal": (18, 19, 23, 255),      # #121317 deep basalt crevice
+    "shadow_basalt": (28, 29, 33, 255),      # #1C1D21 dark basalt belly & lower faces
+    "base_slate": (44, 46, 54, 255),         # #2C2E36 main volcanic rock hide
+    "mid_slate": (56, 58, 66, 255),          # #383A42 carapace scutes
+    "highlight_ash": (76, 79, 90, 255),      # #4C4F5A top ridge highlight
+    "accent_base": (227, 196, 52, 255),      # #E3C434 alchemy brimstone spot base
+    "accent_bright": (242, 224, 107, 255),   # #F2E06B bright sulphur crystal fleck
+    "glow_dark": (216, 67, 21, 255),         # #D84315 deep ember fissure
+    "glow_mid": (255, 87, 34, 255),          # #FF5722 glowing lava vein
+    "glow_core": (255, 167, 38, 255),        # #FFA726 white-hot bellows core
+}
 
-SULPHUR_GOLD = (227, 196, 52, 255)     # #E3C434 alchemy brimstone spot base
-SULPHUR_BRIGHT = (242, 224, 107, 255)  # #F2E06B bright sulphur crystal fleck
-MAGMA_RED = (216, 67, 21, 255)         # #D84315 deep ember fissure
-MAGMA_ORANGE = (255, 87, 34, 255)      # #FF5722 glowing lava vein
-MAGMA_CORE = (255, 167, 38, 255)       # #FFA726 white-hot bellows core
+SOULFLAME_PALETTE = {
+    "edge_charcoal": (14, 18, 24, 255),      # #0E1218 deep soul-soil basalt
+    "shadow_basalt": (22, 30, 38, 255),      # #161E26 dark soul-shale belly
+    "base_slate": (36, 46, 56, 255),         # #242E38 cold slate hide
+    "mid_slate": (48, 62, 74, 255),          # #303E4A blue scute plates
+    "highlight_ash": (150, 168, 178, 255),   # #96A8B2 calcined soul-bone scute ridge
+    "accent_base": (0, 180, 216, 255),       # #00B4D8 spectral cyan crystal spot
+    "accent_bright": (144, 224, 239, 255),   # #90E0EF bright soul spark
+    "glow_dark": (2, 62, 138, 255),          # #023E8A deep abyssal soul fissure
+    "glow_mid": (0, 229, 255, 255),          # #00E5FF soul fire turquoise
+    "glow_core": (224, 247, 250, 255),       # #E0F7FA white-hot soul core
+}
+
+CRIMSON_PALETTE = {
+    "edge_charcoal": (24, 12, 16, 255),      # #180C10 deep crimson crevice
+    "shadow_basalt": (42, 18, 26, 255),      # #2A121A vulcanized netherrack belly
+    "base_slate": (62, 26, 36, 255),         # #3E1A24 dark crimson rock hide
+    "mid_slate": (82, 36, 48, 255),          # #522430 crimson scutes
+    "highlight_ash": (138, 38, 60, 255),     # #8A263C fungal spore scute crest
+    "accent_base": (216, 27, 96, 255),       # #D81B60 crimson spore fleck
+    "accent_bright": (255, 64, 129, 255),    # #FF4081 vibrant spore bloom
+    "glow_dark": (183, 28, 28, 255),         # #B71C1C deep blood ember fissure
+    "glow_mid": (255, 23, 68, 255),          # #FF1744 glowing ruby vein
+    "glow_core": (255, 138, 128, 255),       # #FF8A80 incandescent ruby core
+}
 
 # Exact 22-box UV table matching BrimstoneSalamanderModel.createBodyLayer() (u, v, w, h, d, name)
 UV_BOXES = [
@@ -68,7 +95,7 @@ def verify_uv_non_overlap(atlas_w: int = 128, atlas_h: int = 128) -> None:
     print(f"[UV CHECK PASSED] {len(UV_BOXES)} boxes verified on {atlas_w}x{atlas_h} atlas with 0 overlaps.")
 
 
-def paint_basalt_box(skin: Image.Image, eyes: Image.Image, u: int, v: int, w: int, h: int, d: int, name: str) -> None:
+def paint_basalt_box(skin: Image.Image, eyes: Image.Image, u: int, v: int, w: int, h: int, d: int, name: str, palette: dict) -> None:
     rect_w = 2 * (d + w)
     rect_h = d + h
     for py in range(v, v + rect_h):
@@ -76,15 +103,15 @@ def paint_basalt_box(skin: Image.Image, eyes: Image.Image, u: int, v: int, w: in
         for px in range(u, u + rect_w):
             rel_x = px - u
             if rel_y < d:
-                tone = HIGHLIGHT_ASH if rel_x < d + w else SHADOW_BASALT
+                tone = palette["highlight_ash"] if rel_x < d + w else palette["shadow_basalt"]
             elif rel_y == rect_h - 1 or rel_x in (0, d, d + w, rect_w - 1):
-                tone = EDGE_CHARCOAL
+                tone = palette["edge_charcoal"]
             elif (rel_x + rel_y) % 5 == 0:
-                tone = HIGHLIGHT_ASH
+                tone = palette["highlight_ash"]
             elif (rel_x * 2 + rel_y) % 3 == 0:
-                tone = MID_SLATE
+                tone = palette["mid_slate"]
             else:
-                tone = BASE_SLATE
+                tone = palette["base_slate"]
             skin.putpixel((px, py), tone)
 
     # Specialized details per anatomical group
@@ -92,65 +119,70 @@ def paint_basalt_box(skin: Image.Image, eyes: Image.Image, u: int, v: int, w: in
         for py in range(v, v + rect_h):
             for px in range(u, u + rect_w):
                 dist = abs((px - u) - rect_w // 2) + abs((py - v) - rect_h // 2)
-                c = MAGMA_CORE if dist < 4 else (MAGMA_ORANGE if dist < 8 else SULPHUR_GOLD)
+                c = palette["glow_core"] if dist < 4 else (palette["glow_mid"] if dist < 8 else palette["accent_base"])
                 skin.putpixel((px, py), c)
                 eyes.putpixel((px, py), c)
     elif name == "forked_tongue":
         for py in range(v, v + rect_h):
             for px in range(u, u + rect_w):
-                c = SULPHUR_BRIGHT if (px + py) % 2 == 0 else MAGMA_ORANGE
+                c = palette["accent_bright"] if (px + py) % 2 == 0 else palette["glow_mid"]
                 skin.putpixel((px, py), c)
                 eyes.putpixel((px, py), c)
     elif name.startswith("dorsal_plate_"):
         for py in range(v + d, v + rect_h):
             for px in range(u, u + rect_w):
                 if py == v + d:
-                    skin.putpixel((px, py), SULPHUR_BRIGHT)
-                    eyes.putpixel((px, py), SULPHUR_GOLD)
+                    skin.putpixel((px, py), palette["accent_bright"])
+                    eyes.putpixel((px, py), palette["accent_base"])
                 elif (px + py) % 3 == 0:
-                    skin.putpixel((px, py), MAGMA_ORANGE)
-                    eyes.putpixel((px, py), MAGMA_RED)
+                    skin.putpixel((px, py), palette["glow_mid"])
+                    eyes.putpixel((px, py), palette["glow_dark"])
     elif name in ("body", "body_carapace", "neck", "tail_base", "tail_mid", "tail_tip"):
         for py in range(v, v + rect_h):
             for px in range(u, u + rect_w):
-                # Classic salamander sulphur blotches & glowing magma cracks
                 pattern = (px * 7 + py * 13) % 29
                 if pattern in (0, 1):
-                    skin.putpixel((px, py), SULPHUR_GOLD)
+                    skin.putpixel((px, py), palette["accent_base"])
                     if pattern == 0:
-                        eyes.putpixel((px, py), SULPHUR_BRIGHT)
+                        eyes.putpixel((px, py), palette["accent_bright"])
                 elif pattern == 14:
-                    skin.putpixel((px, py), MAGMA_ORANGE)
-                    eyes.putpixel((px, py), MAGMA_ORANGE)
+                    skin.putpixel((px, py), palette["glow_mid"])
+                    eyes.putpixel((px, py), palette["glow_mid"])
+
+
+def generate_variant(palette: dict, out_skin_path: Path, out_eyes_path: Path) -> None:
+    skin = Image.new("RGBA", (128, 128), (0, 0, 0, 0))
+    eyes = Image.new("RGBA", (128, 128), (0, 0, 0, 0))
+
+    for u, v, w, h, d, name in UV_BOXES:
+        paint_basalt_box(skin, eyes, u, v, w, h, d, name, palette)
+
+    # Lateral glowing eyes on head_cranium (0, 34, 9, 4, 6)
+    for ex, ey in [(2, 41), (3, 41), (17, 41), (18, 41), (7, 41), (13, 41)]:
+        skin.putpixel((ex, ey), palette["accent_bright"])
+        eyes.putpixel((ex, ey), palette["accent_bright"])
+    for ex, ey in [(2, 42), (18, 42), (8, 41), (12, 41)]:
+        skin.putpixel((ex, ey), palette["glow_mid"])
+        eyes.putpixel((ex, ey), palette["glow_mid"])
+
+    # Glowing nostrils on upper_jaw (58, 34, 7, 2, 5) front face [63..70, 39..41]
+    for nx, ny in [(64, 39), (68, 39)]:
+        skin.putpixel((nx, ny), palette["glow_core"])
+        eyes.putpixel((nx, ny), palette["glow_core"])
+
+    out_skin_path.parent.mkdir(parents=True, exist_ok=True)
+    skin.save(out_skin_path)
+    eyes.save(out_eyes_path)
+    print(f"Generated {out_skin_path.name} and {out_eyes_path.name}")
 
 
 def main() -> None:
     verify_uv_non_overlap(128, 128)
 
-    skin = Image.new("RGBA", (128, 128), (0, 0, 0, 0))
-    eyes = Image.new("RGBA", (128, 128), (0, 0, 0, 0))
-
-    for u, v, w, h, d, name in UV_BOXES:
-        paint_basalt_box(skin, eyes, u, v, w, h, d, name)
-
-    # Lateral glowing sulphur-amber eyes on head_cranium (0, 34, 9, 4, 6)
-    # Right side face: x in [0..6], y in [40..44]; Left side face: x in [15..21], y in [40..44]; Front face: x in [6..15], y in [40..44]
-    for ex, ey in [(2, 41), (3, 41), (17, 41), (18, 41), (7, 41), (13, 41)]:
-        skin.putpixel((ex, ey), SULPHUR_BRIGHT)
-        eyes.putpixel((ex, ey), SULPHUR_BRIGHT)
-    for ex, ey in [(2, 42), (18, 42), (8, 41), (12, 41)]:
-        skin.putpixel((ex, ey), MAGMA_ORANGE)
-        eyes.putpixel((ex, ey), MAGMA_ORANGE)
-
-    # Glowing nostrils on upper_jaw (58, 34, 7, 2, 5) front face [63..70, 39..41]
-    for nx, ny in [(64, 39), (68, 39)]:
-        skin.putpixel((nx, ny), MAGMA_CORE)
-        eyes.putpixel((nx, ny), MAGMA_CORE)
-
-    out_dir = ASSETS / "textures/entity"
-    out_dir.mkdir(parents=True, exist_ok=True)
-    skin.save(out_dir / "brimstone_salamander.png")
-    eyes.save(out_dir / "brimstone_salamander_eyes.png")
+    entity_dir = ASSETS / "textures/entity"
+    generate_variant(BRIMSTONE_PALETTE, entity_dir / "brimstone_salamander.png", entity_dir / "brimstone_salamander_eyes.png")
+    generate_variant(SOULFLAME_PALETTE, entity_dir / "brimstone_salamander_soulflame.png", entity_dir / "brimstone_salamander_soulflame_eyes.png")
+    generate_variant(CRIMSON_PALETTE, entity_dir / "brimstone_salamander_crimson.png", entity_dir / "brimstone_salamander_crimson_eyes.png")
 
     item_dir = ASSETS / "textures/item"
     item_dir.mkdir(parents=True, exist_ok=True)
@@ -160,36 +192,34 @@ def main() -> None:
             dist = ((x - 7.5) ** 2 + (y - 7.5) ** 2) ** 0.5
             if dist <= 4.6:
                 if dist < 1.8:
-                    spit.putpixel((x, y), SULPHUR_BRIGHT)
+                    spit.putpixel((x, y), BRIMSTONE_PALETTE["accent_bright"])
                 elif dist < 2.8:
-                    spit.putpixel((x, y), MAGMA_CORE if (x + y) % 2 == 0 else SULPHUR_GOLD)
+                    spit.putpixel((x, y), BRIMSTONE_PALETTE["glow_core"] if (x + y) % 2 == 0 else BRIMSTONE_PALETTE["accent_base"])
                 elif dist < 3.8:
-                    spit.putpixel((x, y), MAGMA_ORANGE if (x * y) % 3 == 0 else SHADOW_BASALT)
+                    spit.putpixel((x, y), BRIMSTONE_PALETTE["glow_mid"] if (x * y) % 3 == 0 else BRIMSTONE_PALETTE["shadow_basalt"])
                 else:
-                    spit.putpixel((x, y), EDGE_CHARCOAL)
+                    spit.putpixel((x, y), BRIMSTONE_PALETTE["edge_charcoal"])
     spit.save(item_dir / "brimstone_spit.png")
 
     scale = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
-    # Pointed basalt scute / scale silhouette (x 3..12, y 2..14)
     for y in range(2, 15):
         half_w = 4.5 * (1.0 - (y - 2) / 14.0) if y > 7 else 1.5 + (y - 2) * 0.6
         min_x = int(7.5 - half_w)
         max_x = int(7.5 + half_w)
         for x in range(min_x, max_x + 1):
             if x in (min_x, max_x) or y in (2, 14):
-                scale.putpixel((x, y), EDGE_CHARCOAL)
+                scale.putpixel((x, y), BRIMSTONE_PALETTE["edge_charcoal"])
             elif (x + y) % 4 == 0:
-                scale.putpixel((x, y), SULPHUR_BRIGHT)
+                scale.putpixel((x, y), BRIMSTONE_PALETTE["accent_bright"])
             elif (x * 2 + y) % 5 == 0:
-                scale.putpixel((x, y), MAGMA_ORANGE)
+                scale.putpixel((x, y), BRIMSTONE_PALETTE["glow_mid"])
             elif (x + y * 2) % 3 == 0:
-                scale.putpixel((x, y), HIGHLIGHT_ASH)
+                scale.putpixel((x, y), BRIMSTONE_PALETTE["highlight_ash"])
             else:
-                scale.putpixel((x, y), BASE_SLATE)
+                scale.putpixel((x, y), BRIMSTONE_PALETTE["base_slate"])
     scale.save(item_dir / "brimstone_scale.png")
-    print(f"Generated {out_dir / 'brimstone_salamander.png'}, {out_dir / 'brimstone_salamander_eyes.png'}, {item_dir / 'brimstone_spit.png'}, and {item_dir / 'brimstone_scale.png'}")
+    print(f"Generated item textures brimstone_spit.png and brimstone_scale.png")
 
 
 if __name__ == "__main__":
     main()
-

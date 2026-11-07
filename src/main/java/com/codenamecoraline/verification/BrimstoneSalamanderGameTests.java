@@ -7,6 +7,7 @@ import com.codenamecoraline.entity.basilisk.Basilisk;
 import com.codenamecoraline.entity.lithophage.Lithophage;
 import com.codenamecoraline.entity.raven.FeyRaven;
 import com.codenamecoraline.entity.salamander.BrimstoneSalamander;
+import com.codenamecoraline.entity.salamander.BrimstoneSalamanderVariant;
 import com.codenamecoraline.entity.salamander.BrimstoneSpit;
 import com.codenamecoraline.registry.ModEntities;
 import com.codenamecoraline.registry.ModItems;
@@ -20,6 +21,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestData;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
@@ -30,6 +32,8 @@ import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.monster.skeleton.WitherSkeleton;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -46,7 +50,8 @@ public final class BrimstoneSalamanderGameTests {
             Map.entry("brimstone_salamander_snap_bite_and_anti_whiff", BrimstoneSalamanderGameTests::snapBiteAndAntiWhiff),
             Map.entry("brimstone_salamander_sulfur_spit_and_tar_pool", BrimstoneSalamanderGameTests::sulfurSpitAndTarPool),
             Map.entry("brimstone_salamander_tail_whip_and_target_matrix", BrimstoneSalamanderGameTests::tailWhipAndTargetMatrix),
-            Map.entry("brimstone_salamander_lava_swimming_and_navigation", BrimstoneSalamanderGameTests::lavaSwimmingAndNavigation));
+            Map.entry("brimstone_salamander_lava_swimming_and_navigation", BrimstoneSalamanderGameTests::lavaSwimmingAndNavigation),
+            Map.entry("brimstone_salamander_texture_variants_and_persistence", BrimstoneSalamanderGameTests::textureVariantsAndPersistence));
 
     private BrimstoneSalamanderGameTests() {}
 
@@ -324,6 +329,45 @@ public final class BrimstoneSalamanderGameTests {
             salamander.travel(Vec3.ZERO);
         }
         helper.assertTrue(salamander.getDeltaMovement().horizontalDistance() < 0.05D, "Idle salamander smoothly decelerates to rest in lava");
+
+        helper.succeed();
+    }
+
+    private static void textureVariantsAndPersistence(GameTestHelper helper) {
+        BrimstoneSalamander salamander = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(3, 1, 3));
+        helper.assertValueEqual(salamander.getVariant(), BrimstoneSalamanderVariant.BRIMSTONE, "Default variant is BRIMSTONE");
+
+        // 1. Variant mutation & enumeration
+        salamander.setVariant(BrimstoneSalamanderVariant.SOULFLAME);
+        helper.assertValueEqual(salamander.getVariant(), BrimstoneSalamanderVariant.SOULFLAME, "Can mutate to SOULFLAME");
+        helper.assertValueEqual(salamander.getVariant().getId(), 1, "SOULFLAME has id 1");
+
+        salamander.setVariant(BrimstoneSalamanderVariant.CRIMSON);
+        helper.assertValueEqual(salamander.getVariant(), BrimstoneSalamanderVariant.CRIMSON, "Can mutate to CRIMSON");
+        helper.assertValueEqual(salamander.getVariant().getId(), 2, "CRIMSON has id 2");
+
+        // Enum helpers
+        helper.assertValueEqual(BrimstoneSalamanderVariant.byId(0), BrimstoneSalamanderVariant.BRIMSTONE, "byId(0)");
+        helper.assertValueEqual(BrimstoneSalamanderVariant.byId(1), BrimstoneSalamanderVariant.SOULFLAME, "byId(1)");
+        helper.assertValueEqual(BrimstoneSalamanderVariant.byId(2), BrimstoneSalamanderVariant.CRIMSON, "byId(2)");
+        helper.assertValueEqual(BrimstoneSalamanderVariant.byName("soulflame"), BrimstoneSalamanderVariant.SOULFLAME, "byName(soulflame)");
+        helper.assertValueEqual(BrimstoneSalamanderVariant.byName("crimson"), BrimstoneSalamanderVariant.CRIMSON, "byName(crimson)");
+        helper.assertValueEqual(BrimstoneSalamanderVariant.byName("invalid"), BrimstoneSalamanderVariant.BRIMSTONE, "byName(invalid) fallback");
+
+        // 2. NBT Persistence
+        var out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, helper.getLevel().registryAccess());
+        salamander.saveWithoutId(out);
+        BrimstoneSalamander loaded = ModEntities.BRIMSTONE_SALAMANDER.get().create(helper.getLevel(), EntitySpawnReason.LOAD);
+        loaded.load(TagValueInput.create(ProblemReporter.DISCARDING, helper.getLevel().registryAccess(), out.buildResult()));
+        helper.assertValueEqual(loaded.getVariant(), BrimstoneSalamanderVariant.CRIMSON, "NBT reload preserves CRIMSON variant");
+
+        // Test persistence of SOULFLAME
+        salamander.setVariant(BrimstoneSalamanderVariant.SOULFLAME);
+        var outSoul = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, helper.getLevel().registryAccess());
+        salamander.saveWithoutId(outSoul);
+        BrimstoneSalamander loadedSoul = ModEntities.BRIMSTONE_SALAMANDER.get().create(helper.getLevel(), EntitySpawnReason.LOAD);
+        loadedSoul.load(TagValueInput.create(ProblemReporter.DISCARDING, helper.getLevel().registryAccess(), outSoul.buildResult()));
+        helper.assertValueEqual(loadedSoul.getVariant(), BrimstoneSalamanderVariant.SOULFLAME, "NBT reload preserves SOULFLAME variant");
 
         helper.succeed();
     }

@@ -7,6 +7,8 @@ import net.minecraft.world.entity.AnimationState;
 /** Client render state for the Brimstone Salamander, carrying state-machine and keyframe animation states. */
 public final class BrimstoneSalamanderRenderState extends LivingEntityRenderState {
     public BrimstoneSalamander.State state = BrimstoneSalamander.State.IDLE;
+    public com.codenamecoraline.entity.salamander.BrimstoneSalamanderVariant variant =
+            com.codenamecoraline.entity.salamander.BrimstoneSalamanderVariant.BRIMSTONE;
     public boolean swimmingInLava = false;
     public boolean fissuresGlowing = true;
 
