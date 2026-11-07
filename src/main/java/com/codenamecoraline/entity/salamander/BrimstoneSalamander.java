@@ -26,15 +26,17 @@ import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.monster.MagmaCube;
 import net.minecraft.world.entity.monster.Monster;
@@ -195,7 +197,6 @@ public final class BrimstoneSalamander extends Monster {
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(1, new SalamanderCombatGoal(this));
         this.goalSelector.addGoal(2, new SeekHeatOutsideNetherGoal(this));
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D));
@@ -311,14 +312,8 @@ public final class BrimstoneSalamander extends Monster {
             this.tailWhipCooldown--;
         }
 
-        // Lava hydrodynamic speed boost (0.38 effective speed in lava)
-        if (this.isSwimmingInLava() && this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-4D) {
-            Vec3 vel = this.getDeltaMovement();
-            double boost = LAVA_SWIM_SPEED / MOVEMENT_SPEED;
-            double maxHoriz = 0.28D;
-            double nx = Mth.clamp(vel.x * boost, -maxHoriz, maxHoriz);
-            double nz = Mth.clamp(vel.z * boost, -maxHoriz, maxHoriz);
-            this.setDeltaMovement(nx, Math.max(vel.y, 0.02D), nz);
+        if (this.isAlive()) {
+            this.handleLavaBuoyancy();
         }
 
         this.tickCombatStateMachine(serverLevel);
@@ -362,6 +357,36 @@ public final class BrimstoneSalamander extends Monster {
             this.setDeltaMovement(this.getDeltaMovement().add((dx / dist) * push, 0.0D, (dz / dist) * push));
             this.hurtMarked = true;
         }
+    }
+
+    private void handleLavaBuoyancy() {
+        if (this.isInLava()) {
+            if (!this.level().getFluidState(this.blockPosition().above()).is(FluidTags.LAVA)) {
+                if (this.getDeltaMovement().y < 0.0D) {
+                    this.setDeltaMovement(this.getDeltaMovement().multiply(1.0D, 0.5D, 1.0D));
+                }
+            } else {
+                this.setDeltaMovement(this.getDeltaMovement().add(0.0D, 0.04D, 0.0D));
+            }
+        }
+    }
+
+    @Override
+    public void travel(Vec3 travelVector) {
+        if (!this.level().isClientSide() && this.isSwimmingInLava()) {
+            float baseSpeed = this.getSpeed() > 0.0F ? this.getSpeed() : (float) this.getAttributeValue(Attributes.MOVEMENT_SPEED);
+            float swimImpulse = (float) (baseSpeed * (LAVA_SWIM_SPEED / MOVEMENT_SPEED) * 0.474F);
+            this.moveRelative(swimImpulse, travelVector);
+            this.move(MoverType.SELF, this.getDeltaMovement());
+            this.setDeltaMovement(this.getDeltaMovement().multiply(0.68D, 0.80D, 0.68D));
+        } else {
+            super.travel(travelVector);
+        }
+    }
+
+    @Override
+    protected PathNavigation createNavigation(Level level) {
+        return new SalamanderPathNavigation(this, level);
     }
 
     public double horizontalSurfaceDistance(LivingEntity target) {
@@ -796,6 +821,26 @@ public final class BrimstoneSalamander extends Monster {
         }
         AABB area = new AABB(pos).inflate(16.0D);
         return level.getEntitiesOfClass(BrimstoneSalamander.class, area).size() < 3;
+    }
+
+    /** Specialized path navigation that treats lava and heated mineral blocks as valid travel paths. */
+    private static final class SalamanderPathNavigation extends GroundPathNavigation {
+        SalamanderPathNavigation(BrimstoneSalamander mob, Level level) {
+            super(mob, level);
+            this.setCanFloat(true);
+        }
+
+        @Override
+        protected boolean hasValidPathType(PathType pathType) {
+            return pathType == PathType.LAVA || pathType == PathType.FIRE || pathType == PathType.FIRE_IN_NEIGHBOR || super.hasValidPathType(pathType);
+        }
+
+        @Override
+        public boolean isStableDestination(BlockPos pos) {
+            return this.level.getBlockState(pos).is(Blocks.LAVA)
+                    || this.level.getBlockState(pos).is(Blocks.MAGMA_BLOCK)
+                    || super.isStableDestination(pos);
+        }
     }
 
     /** Primary combat goal orchestrating STALKING, PURSUING, SNAP_BITE, SULFUR_SPIT, and TAIL_WHIP. */

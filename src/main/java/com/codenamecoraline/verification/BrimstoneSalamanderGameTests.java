@@ -31,6 +31,7 @@ import net.minecraft.world.entity.monster.skeleton.WitherSkeleton;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
@@ -44,7 +45,8 @@ public final class BrimstoneSalamanderGameTests {
             Map.entry("brimstone_salamander_spawn_rules_and_immunities", BrimstoneSalamanderGameTests::spawnRulesAndImmunities),
             Map.entry("brimstone_salamander_snap_bite_and_anti_whiff", BrimstoneSalamanderGameTests::snapBiteAndAntiWhiff),
             Map.entry("brimstone_salamander_sulfur_spit_and_tar_pool", BrimstoneSalamanderGameTests::sulfurSpitAndTarPool),
-            Map.entry("brimstone_salamander_tail_whip_and_target_matrix", BrimstoneSalamanderGameTests::tailWhipAndTargetMatrix));
+            Map.entry("brimstone_salamander_tail_whip_and_target_matrix", BrimstoneSalamanderGameTests::tailWhipAndTargetMatrix),
+            Map.entry("brimstone_salamander_lava_swimming_and_navigation", BrimstoneSalamanderGameTests::lavaSwimmingAndNavigation));
 
     private BrimstoneSalamanderGameTests() {}
 
@@ -267,6 +269,61 @@ public final class BrimstoneSalamanderGameTests {
         helper.assertFalse(salamander.canTargetEntity(basilisk, true), "Never targets Basilisk");
         helper.assertFalse(salamander.canTargetEntity(lithophage, true), "Never targets Lithophage");
         helper.assertFalse(salamander.canTargetEntity(raven, true), "Never targets Fey Raven");
+
+        helper.succeed();
+    }
+
+    private static void lavaSwimmingAndNavigation(GameTestHelper helper) {
+        // 1. Setup lava pool at (3, 1, 3)
+        for (int x = 2; x <= 4; x++) {
+            for (int z = 2; z <= 4; z++) {
+                helper.setBlock(new BlockPos(x, 1, z), Blocks.LAVA);
+            }
+        }
+
+        BrimstoneSalamander salamander = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(3, 1, 3));
+        helper.assertTrue(salamander.isSwimmingInLava(), "Salamander inside lava block returns isSwimmingInLava == true");
+
+        // 2. Navigation path & destination stability
+        BlockPos lavaPos = helper.absolutePos(new BlockPos(3, 1, 3));
+        helper.assertTrue(salamander.getNavigation().isStableDestination(lavaPos), "SalamanderPathNavigation recognizes lava as stable destination");
+
+        BlockPos magmaPos = helper.absolutePos(new BlockPos(4, 0, 4));
+        helper.setBlock(new BlockPos(4, 0, 4), Blocks.MAGMA_BLOCK);
+        helper.assertTrue(salamander.getNavigation().isStableDestination(magmaPos), "SalamanderPathNavigation recognizes magma block as stable destination");
+
+        // 3. Buoyancy: submerged entity receives gentle upward impulse
+        helper.setBlock(new BlockPos(3, 2, 3), Blocks.LAVA);
+        salamander.setDeltaMovement(Vec3.ZERO);
+        salamander.tick();
+        helper.assertTrue(salamander.getDeltaMovement().y > 0.0D, "Submerged salamander gains upward buoyancy");
+        helper.setBlock(new BlockPos(3, 2, 3), Blocks.AIR);
+
+        // 4. Locomotion along heading (verifying absence of 45-degree diagonal lock)
+        // A: Facing South (yaw = 0.0F -> forward is purely +Z)
+        salamander.setYRot(0.0F);
+        salamander.setYBodyRot(0.0F);
+        salamander.setDeltaMovement(Vec3.ZERO);
+        salamander.travel(new Vec3(0.0D, 0.0D, 1.0D));
+        Vec3 velSouth = salamander.getDeltaMovement();
+        helper.assertTrue(velSouth.z > 0.05D, "Southbound swim propels towards +Z");
+        helper.assertTrue(Math.abs(velSouth.x) < 1.0E-3D, "Southbound swim produces zero X drift (no 45-degree lock)");
+
+        // B: Facing West (yaw = 90.0F -> forward is purely -X)
+        salamander.setYRot(90.0F);
+        salamander.setYBodyRot(90.0F);
+        salamander.setDeltaMovement(Vec3.ZERO);
+        salamander.travel(new Vec3(0.0D, 0.0D, 1.0D));
+        Vec3 velWest = salamander.getDeltaMovement();
+        helper.assertTrue(velWest.x < -0.05D, "Westbound swim propels towards -X");
+        helper.assertTrue(Math.abs(velWest.z) < 1.0E-3D, "Westbound swim produces zero Z drift (no 45-degree lock)");
+
+        // 5. Viscous fluid damping (no runaway positive feedback or infinite sliding)
+        salamander.setDeltaMovement(new Vec3(0.35D, 0.0D, 0.35D));
+        for (int i = 0; i < 8; i++) {
+            salamander.travel(Vec3.ZERO);
+        }
+        helper.assertTrue(salamander.getDeltaMovement().horizontalDistance() < 0.05D, "Idle salamander smoothly decelerates to rest in lava");
 
         helper.succeed();
     }
