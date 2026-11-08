@@ -132,6 +132,33 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> BRIMSTONE_SALAMANDER_SPIT = register("entity.brimstone_salamander.spit");
     public static final DeferredHolder<SoundEvent, SoundEvent> BRIMSTONE_SALAMANDER_TAIL_WHIP = register("entity.brimstone_salamander.tail_whip");
 
+    // The Architect and his scimitar (docs/design/architect.md §16.4, §26.4)
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_HURT = register("entity.architect.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_DEATH = register("entity.architect.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_STEP = register("entity.architect.step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_AWAKEN = register("entity.architect.awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_MASK_FALL = register("entity.architect.mask_fall");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_TABLET_FALL = register("entity.architect.tablet_fall");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_LAUGH = register("entity.architect.laugh");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_WINDUP = register("entity.architect.windup");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_WHEEL_WINDUP = register("entity.architect.wheel_windup");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_SENTENCE_WINDUP = register("entity.architect.sentence_windup");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_BLADE_CUT = register("entity.architect.blade_cut");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_WING_FLAP = register("entity.architect.wing_flap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_GARGOYLE_IMPACT = register("entity.architect.gargoyle_impact");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_PARRY = register("entity.architect.parry");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_STAGGER = register("entity.architect.stagger");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_DEFLECT = register("entity.architect.deflect");
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARCHITECT_ENRAGE = register("entity.architect.enrage");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SCIMITAR_PARRY_RAISE = register("item.architect_scimitar.parry_raise");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SCIMITAR_PARRY_SUCCESS = register("item.architect_scimitar.parry_success");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SCIMITAR_PARRY_RESONANCE = register("item.architect_scimitar.parry_resonance");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SCIMITAR_PARRY_DEFLECT = register("item.architect_scimitar.parry_deflect");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SCIMITAR_PARRY_FAIL = register("item.architect_scimitar.parry_fail");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SCIMITAR_REPRISE_CHARGED = register("item.architect_scimitar.reprise_charged");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SCIMITAR_REPRISE_HIT = register("item.architect_scimitar.reprise_hit");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SCIMITAR_REPRISE_FADE = register("item.architect_scimitar.reprise_fade");
+
     /** The signature sound of each puppet (steps and attacks), one event per kind. */
     private static final java.util.EnumMap<com.codenamecoraline.entity.ten_threads_witch.PuppetKind, DeferredHolder<SoundEvent, SoundEvent>> PUPPET_ACTIONS =
             new java.util.EnumMap<>(com.codenamecoraline.entity.ten_threads_witch.PuppetKind.class);

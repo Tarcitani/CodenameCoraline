@@ -1,0 +1,36 @@
+{
+  "parent": "codenamecoraline:bosses/architect_defeated",
+  "criteria": {
+    "has_scimitar": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "codenamecoraline:architect_scimitar"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.architect_scimitar.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:architect_scimitar"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.architect_scimitar.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_scimitar"
+    ]
+  ]
+}

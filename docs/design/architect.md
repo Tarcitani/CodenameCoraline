@@ -1262,7 +1262,7 @@ H e I **não** podem ser marcados prontos sem a arena (M9).
 | Q-05 | Cross-fade entre clips | [HIP] | fatia de animação |
 | Q-06 | Arena: Estátua de Deus, estruturas comandáveis, nós, pedestal, leash, persistência | pendente; o encontro já pode começar pela Tábua dos Mandamentos (§23) | ficha de arena/estrutura própria |
 | Q-07 | Atributos numéricos | **resolvido em 2026-11-08** (escolha do usuário, conjunto "mais duro"; ver §23) | — |
-| Q-08 | Drops, conquistas, textos do Bestiário | pendente | fatia de conteúdo |
+| Q-08 | Drops, conquistas, textos do Bestiário | **resolvido na fatia 4**: drop = Cimitarra do Arquiteto garantida (escolha do usuário, §26) + 500 XP; 4 conquistas; Bestiário de 8 páginas | — |
 | Q-09 | Ângulos da §5.4 e limites da §5.3 | [HIP] | M2/M3 |
 | Q-10 | Todos os tempos de §10 e §13 | [ADP] | M8 (`runClient`) e balanceamento |
 | Q-11 | Chão incandescente com dano | [OPC] | após M9 |
@@ -1288,7 +1288,7 @@ Nada desta ficha foi testado no jogo. Nenhum comando de build foi necessário (s
 - **Perfil:** `boss`. **Pacote (`pkg`):** `architect`. **Mob de referência:** `CrimsonCommander` (boss com fases) e `BrimstoneSalamander` (forma da fatia 1).
 - **Atributos** (escolha do usuário em 2026-11-08, conjunto "mais duro"): vida 480, armadura 16, resistência de armadura 8, dano base 12, velocidade 0,30, resistência a repulsão 0,95, alcance de visão 48, XP 500, altura de passo 1,1. Em `Architect.createAttributes()`.
 - **Imunidades** (§11.1): Veneno e Wither, afogamento, congelamento, quedas < 6 blocos. **Não** é imune a fogo nem a dano físico. A estátua dormente ignora dano que não venha de jogador (e `/kill`), não pode ser empurrada e não sofre repulsão.
-- **Spawn:** sem spawn natural. Ovo gerador (criativo) e **Tábua dos Mandamentos** (`commandment_tablet`, raridade épica, 1 por pilha): usada no topo de um bloco sólido, ergue o Arquiteto dormente virado para o jogador. Precisa de um mundo fora do pacífico, espaço livre para 1,55 × 3,35 blocos e nenhum outro Arquiteto vivo a 96 blocos. Uso que falha não gasta a tábua e mostra o motivo. **Receita/obtenção em sobrevivência: pendente para a fatia 4** (decisão de design ainda não tomada). Quando a arena existir, ela vira o caminho principal (Q-06).
+- **Spawn:** sem spawn natural. Ovo gerador (criativo) e **Tábua dos Mandamentos** (`commandment_tablet`, raridade épica, 1 por pilha): usada no topo de um bloco sólido, ergue o Arquiteto dormente virado para o jogador. Precisa de um mundo fora do pacífico, espaço livre para 1,55 × 3,35 blocos e nenhum outro Arquiteto vivo a 96 blocos. Uso que falha não gasta a tábua e mostra o motivo. **Receita** (fatia 4, escolha do usuário): bancada, moldada, deepslate cinzelado nos cantos, fragmentos de ametista nas laterais e diamante no centro (`recipe/commandment_tablet.json`). Quando a arena existir, ela vira o caminho principal (Q-06).
 - **Estados (`Architect.State`):** DORMANT, AWAKENING, COMBAT_IDLE, REPOSITION, ATTACKING, CHANNELING, GUARDING, PARRYING, STAGGERED, PHASE_TRANSITION, DYING. **Fases (`Architect.Phase`):** MONUMENT (dormente), DUELIST (≥ 70 %), ADMINISTRATOR (≥ 35 %), COLLAPSE (< 35 %), via `phaseFor`.
 - **Eventos de rede:** constantes 160–178 já declaradas na classe (§19); disparo a partir da fatia 3.
 
@@ -1301,7 +1301,7 @@ Nada desta ficha foi testado no jogo. Nenhum comando de build foi necessário (s
 | 2. Visual e rigging | **concluída** | 2026-11-08 | `python tools/generate_architect_assets.py` (110 partes, 181 cubos, sem sobreposição de UV, 3 texturas glow, 16 clipes); `.\gradlew.bat compileJava` OK; `.\gradlew.bat runArchitectTest` → 5 testes do Arquiteto + 1 de outra suíte aprovados; `.\gradlew.bat -I tools/architect-sketches.gradle exportArchitectSketchModel` OK; `python tools/generate_architect_sketches.py` → `build/architect-sketches/architect_pose_sheet.png`. **O `runClient` ainda falta.** |
 | 2b. Revisão visual (humano) | **concluída** | 2026-11-08 | Poses da folha e barra temática aprovadas pelo usuário (fora do jogo); visual no jogo pendente de `runClient` |
 | 3. IA e combate | **concluída** (aguarda revisão do usuário) | 2026-11-08 | `python tools/generate_architect_assets.py` (22 clipes); `.\gradlew.bat compileJava` → BUILD SUCCESSFUL; `.\gradlew.bat runArchitectTest` → "All 26 required tests passed" (25 do Arquiteto + 1 de outra suíte) em **6 rodadas seguidas** (logs `build/logs/fatia3_test.log`, `fatia3_r2..r6.log`). Rodados pelo agente no terminal do app. **Sem `runClient`:** cinemática, partículas e sensação do combate não foram vistas. |
-| 4. Polimento e docs | pendente | — | — |
+| 4. Polimento e docs | **concluída** (aguarda revisão do usuário) | 2026-11-08 | `python tools/generate_architect_scimitar_assets.py` e `python tools/generate_architect_bestiary.py`; `.\gradlew.bat compileJava` → BUILD SUCCESSFUL; `.\gradlew.bat build` → BUILD SUCCESSFUL (`build/logs/fatia4_build.log`); `.\gradlew.bat runArchitectTest` → "All 35 required tests passed" (34 do Arquiteto + 1 de outra suíte) em **6 rodadas seguidas** (`build/logs/fatia4_round1..6.log`); regressão `runCrimsonCommanderTest` (34) e `runCanopyBreakerTest` (35) verdes. Rodados pelo agente no terminal do app. **Sem `runClient`:** sons, poses e efeitos da cimitarra, modelo na mão, ícones, gravuras e Bestiário não foram vistos no jogo. |
 
 Arquivos da fatia 1: `entity/architect/Architect.java`, `item/CommandmentTabletItem.java`, `verification/ArchitectGameTests.java`, registros em `ModEntities`/`ModItems`/`ModCreativeTabs`, `architectTest` em `build.gradle`, textos en_us/pt_br, `items/` e `models/item/` do ovo e da tábua, `tools/generate_architect_assets.py` (gera os ícones).
 
@@ -1309,7 +1309,11 @@ Arquivos da fatia 3: `entity/architect/Architect.java` (IA e linhas do tempo), `
 
 GameTests (`coraline.architectTests=true`, 25): fundação (`architect_attributes_and_registration`, `architect_phase_thresholds`, `architect_dormant_statue_constitution`, `architect_tablet_summon_rules`), revelação (`architect_player_hit_awakens_statue`, `architect_reveal_protects_players`), um `architect_<ataque>_lands` para A–F (acerta dentro do volume e nada antes do primeiro tick ativo), um `architect_<ataque>_aborts_on_whiff` para A–E, `architect_parry_and_reprise`, `architect_posture_stagger_and_immunity`, `architect_weak_hits_never_stagger`, `architect_stagger_cancels_windup`, `architect_stagger_waits_for_active_blow`, `architect_phase_transitions_and_bar`, `architect_deflects_light_projectiles`, `architect_answers_pillaring_with_gargoyle_fall` (o único com IA ligada).
 
-**Próximo passo:** revisão da fatia 3 pelo usuário e `runClient` (revelação com cinemática, ataques A–F, aparo, stagger, transições). Depois fatia 4 (`docs/prompts/fatia_4_polimento.md`): sons (§16.4), receita da tábua, Bestiário, conquistas, drops e o `build` completo.
+Arquivos da fatia 4: `item/ArchitectScimitarItem.java`, `client/architect/ArchitectScimitarClient.java`, `client/architect/ScimitarArmPoses.java`, `META-INF/enumextensions.json` e `enumExtensions` em `neoforge.mods.toml`, sons em `ModSounds`/`sounds.json` e chamadas em `Architect.java` (+`receiveParry`), `ModItems` (cimitarra, retrato), `ModCreativeTabs`, `Bestiary.ARCHITECT`, `recipe/commandment_tablet.json`, `loot_table/entities/architect.json`, `advancement/bosses/architect_{tablet,statue,defeated,scimitar}.json`, textos en_us/pt_br, `tools/generate_architect_scimitar_assets.py` (ícones, atlas 32, 6 modelos, definição do item, retrato) e `tools/generate_architect_bestiary.py` (3 gravuras).
+
+GameTests da fatia 4 (+9, total 34): `architect_content_loaded`, `architect_drops_scimitar`, `architect_scimitar_parry_in_window`, `architect_scimitar_parry_misses_outside_window`, `architect_scimitar_no_parry_from_behind`, `architect_scimitar_reprise_bonus_once`, `architect_scimitar_reprise_expires`, `architect_scimitar_deflects_projectiles`, `architect_scimitar_parry_breaks_his_posture`.
+
+**Próximo passo:** revisão da fatia 4 pelo usuário e `runClient` (o boss inteiro e a cimitarra: poses, brilho, sons, ângulos [ADP] de §26.3 e §26.5). Depois: arena (Q-06) com H e I.
 
 ## 24. Fatia 2 — o que o código faz (Parte B)
 
@@ -1342,3 +1346,87 @@ GameTests (`coraline.architectTests=true`, 25): fundação (`architect_attribute
 - **Clipes novos** (gerados por `tools/architect_clips.py`): PARRY_RIGHT 24, PROJECTILE_DEFLECT 14, BACKSTEP 16, IDLE_BLADE_INSPECT 30, IDLE_WING_ADJUST 24, PHASE_ENRAGE 40 (22 clipes no total).
 - **Fora desta fatia:** H e I (dependem da arena, §20 M9), J (desligado na v1), sons próprios (fatia 4; hoje só sons vanilla diretos), strafe, guardas alta/média/baixa, overlays de hurt. Pivô é a rotação limitada a 9°/tick, sem clipe próprio.
 - **Sem teste automático:** a cinemática do cliente, as partículas, o recuo (BACKSTEP) e a escolha ponderada em combate real (só o pillaring roda com IA ligada nos testes), o leash e os idles de descanso.
+
+## 26. Cimitarra do Arquiteto (`architect_scimitar`) — plano da fatia 4
+
+Drop do Arquiteto (escolha do usuário em 2026-11-08). É a `sword_top_right` (§9.2): a dominante, com runa central completa e fio claro. Ticks a 20/s. Valores marcados [ADP] são ajustados no `runClient`.
+
+### 26.1 Atributos
+
+Material próprio `KANDIARU_BASALT`: durabilidade 2200, conserto por `#minecraft:netherite_tool_materials`, encantabilidade 15. `sword(..., 5.0F, -2.2F)` = **dano 9, velocidade 1,8** (netherite: 8 e 1,6). Raridade épica, à prova de fogo. Drop garantido (1) + 500 XP.
+
+### 26.2 Habilidade: Aparo e Réplica
+
+Clique direito começa o uso (`startUsingItem`, duração 16 t; soltar antes não encerra a ação). Estado por jogador no servidor (mapa por UUID avançado em `PlayerTickEvent.Post`, limpo ao sair, padrão do Montante Carmesim).
+
+| t | Fase | Lógica |
+|---|---|---|
+| 0–2 | erguer | sem defesa ainda |
+| 2–10 | **janela (8 t)** | `LivingIncomingDamageEvent`: dano de entidade vindo do cone frontal ±60° (direção do atacante ou do projétil em relação ao olhar) é cancelado → **aparo certo** |
+| 10–16 | baixar | sem defesa; se a janela passou sem aparo → **erro** |
+
+- **Aparo certo:** dano zerado. Corpo a corpo: atacante leva repulsão 0,4 e Lentidão II + Fraqueza I por 40 t; contra o Arquiteto, soma 8 de postura (golpe pesado), e o golpe aparado conta como já acertado nele. Projétil leve (flecha, bola de neve, ovo, mesma regra de `Architect.isLightProjectile`): devolvido com `ProjectileDeflection.REVERSE`. Projétil forte (tridente, bola de fogo, crânio do Wither): só anulado, sem devolver, custa 6 de durabilidade em vez de 2. Explosões, magia, queda e fogo: nunca aparáveis. A ação é encurtada: pula direto para o contragolpe (§26.3). Recarga **60 t**. Arma ganha **Réplica carregada**.
+- **Erro:** recarga **100 t**, sem outro efeito.
+- **Réplica carregada (40 t):** o próximo golpe corpo a corpo do jogador que acertar uma entidade causa **+60 %** (`LivingIncomingDamageEvent`, fonte = jogador com a cimitarra na mão principal), uma vez só. Ao expirar sem uso, some.
+- Custo: 2 de durabilidade por uso (6 no projétil forte). Não funciona montado nem com o item na mão secundária.
+
+### 26.3 Animações do jogador
+
+Sem biblioteca (D-009). Três mecanismos, todos confirmados no NeoForge 26.1.2.124:
+
+1. **Terceira pessoa — pose de braço própria.** `HumanoidModel.ArmPose` é extensível (`IExtensibleEnum`): entrada `ARCHITECT_PARRY` em `META-INF/enumextensions.json` (novo, declarado em `neoforge.mods.toml` via `enumExtensions`) com um `IArmPoseTransformer`, devolvida por `IClientItemExtensions.getArmPose` enquanto o jogador usa a cimitarra. O transformer lê `HumanoidRenderState.ticksUsingItem` (com fração do tick).
+2. **Primeira pessoa — `IClientItemExtensions.applyForgeHandTransform`**, mesma timeline, por `LocalPlayer.getTicksUsingItem()` + `partialTick`.
+3. **Contragolpe** (após aparo certo): sem pacote de rede novo. O cliente o reconhece quando o uso termina antes de 16 t e a flag da Réplica (`custom_model_data` flag 0, §26.5) aparece no item.
+
+Timeline da pose (braço principal; o secundário segue o vanilla). Ângulos em graus, X = levantar, Y = para dentro, Z = abrir:
+
+| t | Terceira pessoa (braço) | Primeira pessoa (mão) | Leitura |
+|---|---|---|---|
+| 0–2 | X 0→−95, Y 0→−35, ease-out | sobe 0,15, gira Y −60, Z +70 (lâmina atravessa a tela na horizontal, fio para fora, ponta para o lado oposto) | guarda erguida, rápida |
+| 2–10 | segura; tremor ±1° em X a cada 2 t | segura; tremor ±0,6° | janela aberta (o tremor é o "estou pronto") |
+| 10–16 | volta a 0 em ease-in | volta | baixou a guarda (erro) |
+| contragolpe 0–2 (após aparo) | Y −35→+40 (lâmina varre para fora), X −95→−70 | chute de 12° em Z e recuo 0,05 | "o golpe foi empurrado" |
+| contragolpe 2–6 | volta a 0 | volta | — |
+
+Golpe com Réplica carregada: animação de golpe vanilla (`SwingAnimationType.WHACK`), sem pose nova; o peso vem dos efeitos (§26.4). Ângulos [ADP].
+
+### 26.4 Efeitos (partículas e sons)
+
+Partículas vanilla e `DustParticleOptions` (§16.2), emitidas pelo servidor. Mão do jogador ≈ olho − 0,4 Y + olhar × 0,5 + direita × 0,35 [ADP].
+
+| Momento | Partículas | Som (evento do mod → áudio vanilla, pitch) |
+|---|---|---|
+| Erguer (t0) | 2 dust `#38BDBA` 0,4 percorrendo a ranhura (mão → ponta) | `parry_raise` → `item.spear.use` 1,3, vol 0,5 |
+| Janela (t2–10) | 1 dust `#B6FFF0` 0,3 na ponta a cada 2 t | — |
+| Aparo certo | no ponto de contato (ponto do atacante/projétil mais próximo do peito): 3 `ELECTRIC_SPARK` vel. 0,2; **anel de pressão** de 8 dust `#B6FFF0` 0,6, raio 0,5, perpendicular ao olhar; 4 partículas de bloco `deepslate`; sobre o atacante, 6 dust `#D8C8FF` 0,5 (autoridade) | `parry_success` → `block.anvil.land` 1,8, vol 0,35 + `parry_resonance` → `block.amethyst_block.resonate` 1,2 |
+| Projétil devolvido | + rastro de 4 dust `#38BDBA` atrás do projétil por 4 t | `parry_deflect` → `entity.breeze.deflect` 0,8 |
+| Erro (t10) | 2 partículas de bloco `deepslate` caindo da lâmina | `parry_fail` → `block.grindstone.use` 1,6, vol 0,3 |
+| Réplica carregada (40 t) | 1 dust `#38BDBA` 0,35 na mão a cada 4 t | `reprise_charged` → `block.amethyst_block.chime` 1,4 (uma vez) |
+| Golpe com Réplica | **arco de corte**: 7 dust `#38BDBA` 0,5 + 3 `#55515B` em arco de 120°, raio 1,6, na altura do peito, no sentido do golpe; 6 `ENCHANTED_HIT` e 1 `SWEEP_ATTACK` no alvo | `reprise_hit` → `entity.player.attack.strong` 0,7 |
+| Réplica expira | 3 dust `#55515B` caindo da mão | `reprise_fade` → `block.amethyst_block.hit` 0,6, vol 0,4 |
+
+Todos os IDs vanilla acima foram conferidos em `SoundEvents` do 26.1.2. Legendas em en/pt.
+
+### 26.5 Modelo 3D, ícone e estados visuais
+
+- **Modelo de mão** (`models/item/architect_scimitar_3d*.json`, textura 32×32 `item/architect_scimitar_3d.png`), os cinco cubos de §9.1 em escala de item: `pommel` 1,5³ facetado; `grip` 1×4×1 escuro; `guard` 3×1×1,5 (duas pontas de pedra); `blade_base` 1×7×3; `blade_tip` 1×7×2 com rotação livre (`x/y/z`) de 14° = a curvatura real da `sword_top_right`. Mais dois elementos finos: **ranhura** (0,2 de espessura, nas duas faces da `blade_base`, ~60 % do comprimento) e **fio** (0,5, cor clara). Paleta §9.3: basalto `#15151D/#282831/#55515B`, fio `#9BA3B0`, ranhura `#38BDBA`/`#B6FFF0`, runa `#D8C8FF` na base, cabo `#1E1A1F/#3B3540`.
+- **Brilho real:** `light_emission` por elemento (confirmado em `CuboidModelElement` do 26.1.2) só na ranhura e na runa.
+- **Ícone de inventário** 16×16 (`item/architect_scimitar.png`): diagonal pomo (baixo-esq.) → ponta (cima-dir.), lâmina de 11 px curvando para o dorso, fio claro de 1 px do lado de fora da curva, 3 px de ranhura ciano, 1 px lilás da runa junto da guarda, contorno só em sombra `#15151D` (sem preto). Variante `architect_scimitar_charged.png`: ranhura inteira `#B6FFF0` e runa acesa.
+- **Gerado por script:** `tools/generate_architect_scimitar_assets.py` escreve as três texturas e os modelos JSON (fonte única da geometria, como os demais assets do Arquiteto).
+- **Estados** (`items/architect_scimitar.json`, propriedades vanilla conferidas no 26.1.2):
+  - contexto GUI/chão/moldura/prateleira → ícone 2D; `custom_model_data` flag 0 → ícone carregado.
+  - na mão: `using_item` → `_3d_raised` (ranhura emissão 15); flag 0 (Réplica carregada) → `_3d_charged` (ranhura e runa 15); `cooldown` > 0 → `_3d_dim` (emissão 0, ranhura em `#24232B`); senão `_3d` (emissão 8).
+  - A flag 0 é escrita pelo servidor no `ItemStack` ao carregar a Réplica e apagada ao usar/expirar.
+- **Transformações de exibição** [ADP]: terceira pessoa direita rot `[0, -90, 55]`, trans `[0, 4, 0.5]`, escala 0,85; primeira pessoa direita rot `[0, -90, 25]`, trans `[1.13, 3.2, 1.13]`, escala 0,68; mão esquerda espelhada; chão e moldura como espada vanilla.
+
+### 26.6 Testes e o que só o `runClient` valida
+
+GameTests (servidor): aparo na janela anula dano frontal; fora da janela não; pelas costas não; projétil leve volta; Réplica +60 % uma vez e expira em 40 t; recargas 60/100; durabilidade 2/6; loot table do Arquiteto dá a cimitarra. Só `runClient`: poses, efeitos, sons, modelo na mão, ícone e estados de brilho.
+
+### 26.7 Implementação (fatia 4)
+
+Como planejado, com três detalhes do código: o aparo corpo a corpo só vale para golpe dado em pessoa por um ser vivo e que um escudo poderia parar (`DamageTypeTags.BYPASSES_SHIELD` fica de fora, assim como explosão, fogo e projétil); o golpe do Arquiteto aparado já conta como acerto no limite por vítima dele (o registro acontece antes do dano); e a recarga longa (100 t) entra ao erguer a guarda, trocada pela curta (60 t) quando o aparo acerta. Os sons do boss (§16.4) agora são eventos do mod: ferimento, morte, passos, despertar, queda de cada metade da máscara e da tábua, gargalhada em três pulsos (revelação t86/94/102 e Colapso t8/16/24), preparo por ataque (genérico, Roda e Sentença; a Gárgula usa a batida de asa), corte, impacto da Gárgula, aparo, stagger, deflexão e enrage.
+
+### 26.8 Opcional (fora por padrão)
+
+Passivo "Seis Mandamentos": 6 acertos seguidos no mesmo alvo acendem a lâmina e o 6º solta um ARCO de 3 bl / 120° com 50 % do dano. Só se o usuário pedir.

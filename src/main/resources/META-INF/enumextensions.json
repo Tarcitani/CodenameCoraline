@@ -1,0 +1,22 @@
+{
+  "entries": [
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "CODENAMECORALINE_SCIMITAR_PARRY",
+      "constructor": "(ZZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": {
+        "class": "com/codenamecoraline/client/architect/ScimitarArmPoses",
+        "field": "PARRY"
+      }
+    },
+    {
+      "enum": "net/minecraft/client/model/HumanoidModel$ArmPose",
+      "name": "CODENAMECORALINE_SCIMITAR_COUNTER",
+      "constructor": "(ZZLnet/neoforged/neoforge/client/IArmPoseTransformer;)V",
+      "parameters": {
+        "class": "com/codenamecoraline/client/architect/ScimitarArmPoses",
+        "field": "COUNTER"
+      }
+    }
+  ]
+}

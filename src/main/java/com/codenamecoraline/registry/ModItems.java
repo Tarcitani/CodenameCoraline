@@ -1,6 +1,7 @@
 package com.codenamecoraline.registry;
 
 import com.codenamecoraline.CodenameCoraline;
+import com.codenamecoraline.item.ArchitectScimitarItem;
 import com.codenamecoraline.item.BestiaryItem;
 import com.codenamecoraline.item.CatacombLilyItem;
 import com.codenamecoraline.item.CrimsonOathGreatswordItem;
@@ -40,6 +41,10 @@ public final class ModItems {
     /** Renegade steel: the greataxe the Collector of the Last Gift carried. */
     private static final ToolMaterial RENEGADE_STEEL = new ToolMaterial(
             BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 2200, 8.0F, 4.0F, 16, ItemTags.NETHERITE_TOOL_MATERIALS);
+
+    /** Carved basalt with a mana groove: the Architect's Scimitar (9 attack damage in all, speed 1.8; spec §26.1). */
+    private static final ToolMaterial KANDIARU_BASALT = new ToolMaterial(
+            BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 2200, 8.0F, 4.0F, 15, ItemTags.NETHERITE_TOOL_MATERIALS);
 
     /** Deadroot: a heavy club of dead wood. */
     private static final ToolMaterial DEADROOT = new ToolMaterial(
@@ -199,6 +204,15 @@ public final class ModItems {
     /** Raises the Architect as a dormant statue on a sturdy block. */
     public static final DeferredItem<Item> COMMANDMENT_TABLET = ITEMS.registerItem("commandment_tablet", CommandmentTabletItem::new,
             properties -> properties.stacksTo(1).rarity(Rarity.EPIC));
+    /** The Architect's drop: parries blows and answers with the Reprise (spec §26). */
+    public static final DeferredItem<Item> ARCHITECT_SCIMITAR = ITEMS.registerItem("architect_scimitar", ArchitectScimitarItem::new,
+            properties -> properties.sword(KANDIARU_BASALT, 5.0F, -2.2F).rarity(Rarity.EPIC).fireResistant()
+                    .component(DataComponents.LORE, new ItemLore(List.of(
+                            Component.translatable("item.codenamecoraline.architect_scimitar.lore1").withStyle(ChatFormatting.AQUA),
+                            Component.translatable("item.codenamecoraline.architect_scimitar.lore2").withStyle(ChatFormatting.GRAY)))));
+    /** The Architect's face, used only as the icon of his story advancements. */
+    public static final DeferredItem<Item> ARCHITECT_PORTRAIT = ITEMS.registerSimpleItem("architect_portrait",
+            () -> new Item.Properties().stacksTo(1));
 
     // Retired rewards stay registered to preserve items in existing worlds; no drops or recipes.
     public static final DeferredItem<Item> CATACOMB_LILY = ITEMS.registerItem("catacomb_lily", CatacombLilyItem::new);

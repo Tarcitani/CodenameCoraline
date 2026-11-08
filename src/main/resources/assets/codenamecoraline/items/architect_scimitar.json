@@ -1,0 +1,63 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:display_context",
+    "cases": [
+      {
+        "when": [
+          "gui",
+          "ground",
+          "fixed",
+          "on_shelf"
+        ],
+        "model": {
+          "type": "minecraft:condition",
+          "property": "minecraft:custom_model_data",
+          "index": 0,
+          "on_true": {
+            "type": "minecraft:model",
+            "model": "codenamecoraline:item/architect_scimitar_charged"
+          },
+          "on_false": {
+            "type": "minecraft:model",
+            "model": "codenamecoraline:item/architect_scimitar"
+          }
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:condition",
+      "property": "minecraft:using_item",
+      "on_true": {
+        "type": "minecraft:model",
+        "model": "codenamecoraline:item/architect_scimitar_3d_raised"
+      },
+      "on_false": {
+        "type": "minecraft:condition",
+        "property": "minecraft:custom_model_data",
+        "index": 0,
+        "on_true": {
+          "type": "minecraft:model",
+          "model": "codenamecoraline:item/architect_scimitar_3d_charged"
+        },
+        "on_false": {
+          "type": "minecraft:range_dispatch",
+          "property": "minecraft:cooldown",
+          "entries": [
+            {
+              "threshold": 0.0001,
+              "model": {
+                "type": "minecraft:model",
+                "model": "codenamecoraline:item/architect_scimitar_3d_dim"
+              }
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "codenamecoraline:item/architect_scimitar_3d"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "parent": "codenamecoraline:bosses/architect_statue",
+  "criteria": {
+    "killed_architect": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "codenamecoraline:architect"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.architect_defeated.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:architect_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.architect_defeated.title"
+    }
+  },
+  "requirements": [
+    [
+      "killed_architect"
+    ]
+  ],
+  "sends_telemetry_event": false
+}

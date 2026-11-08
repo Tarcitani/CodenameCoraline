@@ -2,6 +2,7 @@ package com.codenamecoraline.client.architect;
 
 import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.registry.ModEntities;
+import com.codenamecoraline.registry.ModItems;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -10,8 +11,9 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 
-/** Client-only registration of the model layer, the renderer and the reveal cinematic of the Architect. */
+/** Client-only registration of the model layer, the renderer, the reveal cinematic and the scimitar's poses. */
 @EventBusSubscriber(modid = CodenameCoraline.MOD_ID, value = Dist.CLIENT)
 public final class ArchitectClient {
     private ArchitectClient() {}
@@ -27,8 +29,14 @@ public final class ArchitectClient {
     }
 
     @SubscribeEvent
+    static void registerClientExtensions(RegisterClientExtensionsEvent event) {
+        event.registerItem(ArchitectScimitarClient.INSTANCE, ModItems.ARCHITECT_SCIMITAR.get());
+    }
+
+    @SubscribeEvent
     static void onClientTickPost(ClientTickEvent.Post event) {
         ArchitectCinematicDirector.onClientTick(event);
+        ArchitectScimitarClient.onClientTick(event);
     }
 
     @SubscribeEvent

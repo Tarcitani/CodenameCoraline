@@ -1617,7 +1617,7 @@
         "name": "minecraft:entity.parrot.hurt",
         "type": "event",
         "volume": 1.0,
-        "pitch": 0.70
+        "pitch": 0.7
       }
     ]
   },
@@ -1735,6 +1735,281 @@
         "name": "minecraft:entity.player.attack.sweep",
         "type": "event",
         "volume": 1.0,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.architect.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:block.deepslate_bricks.hit",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.architect.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.iron_golem.death",
+        "type": "event",
+        "volume": 1.2,
+        "pitch": 0.5
+      }
+    ]
+  },
+  "entity.architect.step": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.step",
+    "sounds": [
+      {
+        "name": "minecraft:entity.iron_golem.step",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.architect.awaken": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.awaken",
+    "sounds": [
+      {
+        "name": "minecraft:block.deepslate.break",
+        "type": "event",
+        "volume": 1.4,
+        "pitch": 0.5
+      }
+    ]
+  },
+  "entity.architect.mask_fall": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.mask_fall",
+    "sounds": [
+      {
+        "name": "minecraft:block.decorated_pot.shatter",
+        "type": "event",
+        "volume": 1.2,
+        "pitch": 0.8
+      }
+    ]
+  },
+  "entity.architect.tablet_fall": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.tablet_fall",
+    "sounds": [
+      {
+        "name": "minecraft:block.anvil.land",
+        "type": "event",
+        "volume": 1.4,
+        "pitch": 0.5
+      }
+    ]
+  },
+  "entity.architect.laugh": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.laugh",
+    "sounds": [
+      {
+        "name": "minecraft:block.grindstone.use",
+        "type": "event",
+        "volume": 1.4,
+        "pitch": 0.45
+      }
+    ]
+  },
+  "entity.architect.windup": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.windup",
+    "sounds": [
+      {
+        "name": "minecraft:block.stone_button.click_on",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 1.6
+      }
+    ]
+  },
+  "entity.architect.wheel_windup": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.wheel_windup",
+    "sounds": [
+      {
+        "name": "minecraft:block.respawn_anchor.charge",
+        "type": "event",
+        "volume": 1.2,
+        "pitch": 0.8
+      }
+    ]
+  },
+  "entity.architect.sentence_windup": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.sentence_windup",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.power_select",
+        "type": "event",
+        "volume": 1.2,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.architect.blade_cut": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.blade_cut",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.sweep",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.55
+      }
+    ]
+  },
+  "entity.architect.wing_flap": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.wing_flap",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ender_dragon.flap",
+        "type": "event",
+        "volume": 1.6,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.architect.gargoyle_impact": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.gargoyle_impact",
+    "sounds": [
+      {
+        "name": "minecraft:item.mace.smash_ground",
+        "type": "event",
+        "volume": 1.4,
+        "pitch": 0.55
+      }
+    ]
+  },
+  "entity.architect.parry": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.parry",
+    "sounds": [
+      {
+        "name": "minecraft:block.anvil.land",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 1.6
+      }
+    ]
+  },
+  "entity.architect.stagger": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.stagger",
+    "sounds": [
+      {
+        "name": "minecraft:block.decorated_pot.shatter",
+        "type": "event",
+        "volume": 1.4,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.architect.deflect": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.deflect",
+    "sounds": [
+      {
+        "name": "minecraft:item.shield.block",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "entity.architect.enrage": {
+    "subtitle": "subtitles.codenamecoraline.entity.architect.enrage",
+    "sounds": [
+      {
+        "name": "minecraft:block.trial_spawner.ominous_activate",
+        "type": "event",
+        "volume": 1.4,
+        "pitch": 0.7
+      }
+    ]
+  },
+  "item.architect_scimitar.parry_raise": {
+    "subtitle": "subtitles.codenamecoraline.item.architect_scimitar.parry_raise",
+    "sounds": [
+      {
+        "name": "minecraft:item.spear.use",
+        "type": "event",
+        "volume": 0.5,
+        "pitch": 1.3
+      }
+    ]
+  },
+  "item.architect_scimitar.parry_success": {
+    "subtitle": "subtitles.codenamecoraline.item.architect_scimitar.parry_success",
+    "sounds": [
+      {
+        "name": "minecraft:block.anvil.land",
+        "type": "event",
+        "volume": 0.35,
+        "pitch": 1.8
+      }
+    ]
+  },
+  "item.architect_scimitar.parry_resonance": {
+    "subtitle": "subtitles.codenamecoraline.item.architect_scimitar.parry_resonance",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.resonate",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 1.2
+      }
+    ]
+  },
+  "item.architect_scimitar.parry_deflect": {
+    "subtitle": "subtitles.codenamecoraline.item.architect_scimitar.parry_deflect",
+    "sounds": [
+      {
+        "name": "minecraft:entity.breeze.deflect",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.8
+      }
+    ]
+  },
+  "item.architect_scimitar.parry_fail": {
+    "subtitle": "subtitles.codenamecoraline.item.architect_scimitar.parry_fail",
+    "sounds": [
+      {
+        "name": "minecraft:block.grindstone.use",
+        "type": "event",
+        "volume": 0.3,
+        "pitch": 1.6
+      }
+    ]
+  },
+  "item.architect_scimitar.reprise_charged": {
+    "subtitle": "subtitles.codenamecoraline.item.architect_scimitar.reprise_charged",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.chime",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 1.4
+      }
+    ]
+  },
+  "item.architect_scimitar.reprise_hit": {
+    "subtitle": "subtitles.codenamecoraline.item.architect_scimitar.reprise_hit",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.strong",
+        "type": "event",
+        "volume": 1.0,
+        "pitch": 0.7
+      }
+    ]
+  },
+  "item.architect_scimitar.reprise_fade": {
+    "subtitle": "subtitles.codenamecoraline.item.architect_scimitar.reprise_fade",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.hit",
+        "type": "event",
+        "volume": 0.4,
         "pitch": 0.6
       }
     ]

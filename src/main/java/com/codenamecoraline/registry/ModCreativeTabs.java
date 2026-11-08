@@ -46,6 +46,7 @@ public final class ModCreativeTabs {
             event.accept(ModItems.RENEGADE_GREATAXE.get());
             event.accept(ModItems.DEADROOT_CLUB.get());
             event.accept(ModItems.CRIMSON_OATH_GREATSWORD.get());
+            event.accept(ModItems.ARCHITECT_SCIMITAR.get());
             event.accept(ModItems.TEN_THREADS_STAFF.get());
             event.accept(ModItems.REDCAP_DAGGER.get());
             event.accept(ModItems.REDCAP_PIKESTAFF.get());

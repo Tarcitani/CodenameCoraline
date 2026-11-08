@@ -4,7 +4,16 @@ import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.entity.architect.Architect;
 import com.codenamecoraline.entity.architect.ArchitectAnim;
 import com.codenamecoraline.entity.architect.ArchitectAttack;
+import com.codenamecoraline.bestiary.Bestiary;
+import com.codenamecoraline.bestiary.BestiaryPage;
+import com.codenamecoraline.item.ArchitectScimitarItem;
 import com.codenamecoraline.item.CommandmentTabletItem;
+import com.codenamecoraline.registry.ModSounds;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import com.codenamecoraline.registry.ModEntities;
 import com.codenamecoraline.registry.ModItems;
 import java.util.LinkedHashMap;
@@ -16,6 +25,9 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.projectile.ProjectileDeflection;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -41,7 +53,8 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 /**
  * Server integration tests for the Architect: foundation (slice 1), the reveal (slice 2) and the AI and combat of slice 3
  * (every attack lands inside its volume and aborts when the target escaped, parry and reprise, posture and stagger,
- * phase transitions with the bar colour, projectile deflection, protection during the reveal and anti-pillaring).
+ * phase transitions with the bar colour, projectile deflection, protection during the reveal and anti-pillaring), and the
+ * content of slice 4 (bestiary, advancements, recipe, drop, sounds, both languages) with the Architect's Scimitar.
  */
 @EventBusSubscriber(modid = CodenameCoraline.MOD_ID)
 public final class ArchitectGameTests {
@@ -73,6 +86,16 @@ public final class ArchitectGameTests {
         TESTS.put("architect_phase_transitions_and_bar", ArchitectGameTests::phaseTransitionsAndBar);
         TESTS.put("architect_deflects_light_projectiles", ArchitectGameTests::deflectsLightProjectiles);
         TESTS.put("architect_answers_pillaring_with_gargoyle_fall", ArchitectGameTests::answersPillaring);
+        // slice 4: content, drop and the Architect's Scimitar (spec §26)
+        TESTS.put("architect_content_loaded", ArchitectGameTests::contentLoaded);
+        TESTS.put("architect_drops_scimitar", ArchitectGameTests::dropsScimitar);
+        TESTS.put("architect_scimitar_parry_in_window", ArchitectGameTests::scimitarParryInWindow);
+        TESTS.put("architect_scimitar_parry_misses_outside_window", ArchitectGameTests::scimitarParryMissesOutsideWindow);
+        TESTS.put("architect_scimitar_no_parry_from_behind", ArchitectGameTests::scimitarNoParryFromBehind);
+        TESTS.put("architect_scimitar_reprise_bonus_once", ArchitectGameTests::scimitarRepriseBonusOnce);
+        TESTS.put("architect_scimitar_reprise_expires", ArchitectGameTests::scimitarRepriseExpires);
+        TESTS.put("architect_scimitar_deflects_projectiles", ArchitectGameTests::scimitarDeflectsProjectiles);
+        TESTS.put("architect_scimitar_parry_breaks_his_posture", ArchitectGameTests::scimitarParryBreaksHisPosture);
     }
 
     private ArchitectGameTests() {}
@@ -427,5 +450,223 @@ public final class ArchitectGameTests {
         dummy(helper, new BlockPos(7, 4, 6));
         helper.succeedWhen(() -> helper.assertTrue(boss.getLastAttack() == ArchitectAttack.GARGOYLE_FALL,
                 "The Gargoyle Fall answers the pillar"));
+    }
+
+    // ================================================================= slice 4: content and the Architect's Scimitar
+    private static JsonObject lang(String name) {
+        try (var in = ArchitectGameTests.class.getResourceAsStream("/assets/codenamecoraline/lang/" + name + ".json")) {
+            return JsonParser.parseReader(new InputStreamReader(in, StandardCharsets.UTF_8)).getAsJsonObject();
+        } catch (Exception e) {
+            throw new IllegalStateException("lang " + name, e);
+        }
+    }
+
+    /** Bestiary chapter, engravings, advancements, recipe, loot table, assets, sounds and both languages. */
+    private static void contentLoaded(GameTestHelper helper) {
+        var server = helper.getLevel().getServer();
+        helper.assertTrue(Bestiary.ENTRIES.contains(Bestiary.ARCHITECT), "the Bestiary has his chapter");
+        List<BestiaryPage> pages = Bestiary.ARCHITECT.pages();
+        helper.assertTrue(pages.size() >= 6, "a chapter of six or more pages");
+        for (String art : new String[] {"architect_anatomy", "architect_combat", "architect_spoils"}) {
+            helper.assertTrue(ArchitectGameTests.class.getResourceAsStream("/assets/codenamecoraline/textures/gui/bestiary/" + art + ".png") != null,
+                    "engraving " + art);
+        }
+        for (String adv : new String[] {"architect_tablet", "architect_statue", "architect_defeated", "architect_scimitar"}) {
+            helper.assertTrue(server.getAdvancements().get(id("bosses/" + adv)) != null, "advancement bosses/" + adv);
+        }
+        helper.assertTrue(server.getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE, id("commandment_tablet"))).isPresent(),
+                "the tablet recipe is loaded");
+        helper.assertTrue(ArchitectGameTests.class.getResourceAsStream("/data/codenamecoraline/loot_table/entities/architect.json") != null,
+                "loot table");
+        for (String res : new String[] {"textures/item/architect_scimitar.png", "textures/item/architect_scimitar_charged.png",
+                "textures/item/architect_scimitar_3d.png", "textures/item/architect_portrait.png", "items/architect_scimitar.json",
+                "models/item/architect_scimitar_3d.json", "models/item/architect_scimitar_3d_raised.json",
+                "models/item/architect_scimitar_3d_charged.json", "models/item/architect_scimitar_3d_dim.json"}) {
+            helper.assertTrue(ArchitectGameTests.class.getResourceAsStream("/assets/codenamecoraline/" + res) != null, "asset " + res);
+        }
+        helper.assertTrue(ModSounds.ARCHITECT_PARRY.isBound() && ModSounds.SCIMITAR_PARRY_SUCCESS.isBound(), "sound events registered");
+        JsonObject en = lang("en_us");
+        JsonObject pt = lang("pt_br");
+        java.util.List<String> keys = new java.util.ArrayList<>(List.of("item.codenamecoraline.architect_scimitar",
+                "item.codenamecoraline.architect_scimitar.lore1", "item.codenamecoraline.architect_portrait",
+                "bestiary.codenamecoraline.architect.name", "subtitles.codenamecoraline.item.architect_scimitar.parry_success",
+                "subtitles.codenamecoraline.entity.architect.laugh"));
+        for (String adv : new String[] {"architect_tablet", "architect_statue", "architect_defeated", "architect_scimitar"}) {
+            keys.add("advancements.codenamecoraline.bosses." + adv + ".title");
+            keys.add("advancements.codenamecoraline.bosses." + adv + ".description");
+        }
+        for (BestiaryPage page : pages) {
+            keys.add(Bestiary.ARCHITECT.titleKey(page));
+            keys.add(Bestiary.ARCHITECT.bodyKey(page));
+        }
+        for (String key : keys) {
+            helper.assertTrue(en.has(key), "en_us has " + key);
+            helper.assertTrue(pt.has(key), "pt_br has " + key);
+        }
+        helper.succeed();
+    }
+
+    /** The loot table always gives the scimitar. */
+    private static void dropsScimitar(GameTestHelper helper) {
+        Architect boss = awakeBoss(helper, new BlockPos(5, 1, 5));
+        Player killer = fighter(helper, new Vec3(5.5D, 1.0D, 3.0D), 0.0F);
+        boss.invulnerableTime = 0;
+        boss.hurtServer(helper.getLevel(), helper.getLevel().damageSources().playerAttack(killer), 100000.0F);
+        helper.assertTrue(boss.isDeadOrDying(), "the boss falls");
+        helper.runAfterDelay(3, () -> {
+            helper.assertItemEntityPresent(ModItems.ARCHITECT_SCIMITAR.get(), new BlockPos(5, 1, 5), 4.0D);
+            helper.succeed();
+        });
+    }
+
+    /** A survival player in the test arena, facing yaw (0 = +Z), with the scimitar in the main hand. */
+    private static Player fighter(GameTestHelper helper, Vec3 local, float yaw) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL); // a plain survival player (the server mock is creative)
+        Vec3 world = helper.absoluteVec(local);
+        player.snapTo(world.x, world.y, world.z, yaw, 0.0F);
+        player.setYHeadRot(yaw);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.ARCHITECT_SCIMITAR.get()));
+        return player;
+    }
+
+    private static void hit(GameTestHelper helper, Player victim, IronGolem from, float amount) {
+        victim.invulnerableTime = 0;
+        victim.hurtServer(helper.getLevel(), helper.getLevel().damageSources().mobAttack(from), amount);
+    }
+
+    /** Spec §26.2: inside the window a frontal blow is cancelled, the attacker is shaken and the Reprise charges. */
+    private static void scimitarParryInWindow(GameTestHelper helper) {
+        Player player = fighter(helper, new Vec3(5.5D, 1.0D, 3.5D), 0.0F);
+        IronGolem golem = dummy(helper, new BlockPos(5, 1, 5));
+        ItemStack blade = player.getMainHandItem();
+        int durability = blade.getDamageValue();
+        helper.assertTrue(ArchitectScimitarItem.raiseGuard(player), "the guard rises");
+        helper.assertValueEqual(blade.getDamageValue(), durability + ArchitectScimitarItem.DURABILITY_COST, "raising costs 2 durability");
+        helper.runAfterDelay(4, () -> {
+            helper.assertTrue(ArchitectScimitarItem.isInWindow(player), "the window is open at tick 4");
+            float health = player.getHealth();
+            hit(helper, player, golem, 6.0F);
+            helper.assertValueEqual(player.getHealth(), health, "the parried blow does no damage");
+            helper.assertTrue(ArchitectScimitarItem.isRepriseCharged(player), "the Reprise is charged");
+            helper.assertTrue(ArchitectScimitarItem.isChargedStack(player.getMainHandItem()), "the blade carries the charged flag");
+            helper.assertTrue(golem.hasEffect(MobEffects.SLOWNESS) && golem.hasEffect(MobEffects.WEAKNESS), "the attacker is shaken");
+            helper.assertFalse(ArchitectScimitarItem.isGuarding(player), "the guard ends with the parry");
+            helper.assertTrue(player.getCooldowns().isOnCooldown(player.getMainHandItem()), "the scimitar recharges");
+            helper.succeed();
+        });
+    }
+
+    /** Before tick 2 there is no defence; when the window passes unused the guard drops on the long cooldown. */
+    private static void scimitarParryMissesOutsideWindow(GameTestHelper helper) {
+        Player player = fighter(helper, new Vec3(5.5D, 1.0D, 3.5D), 0.0F);
+        IronGolem golem = dummy(helper, new BlockPos(5, 1, 5));
+        ArchitectScimitarItem.raiseGuard(player);
+        float health = player.getHealth();
+        hit(helper, player, golem, 4.0F);
+        helper.assertTrue(player.getHealth() < health, "a blow before the window lands");
+        helper.assertFalse(ArchitectScimitarItem.isRepriseCharged(player), "no Reprise without a parry");
+        helper.runAfterDelay(ArchitectScimitarItem.WINDOW_END + 2, () -> {
+            helper.assertFalse(ArchitectScimitarItem.isGuarding(player), "the guard drops after the window");
+            helper.assertFalse(ArchitectScimitarItem.isRepriseCharged(player), "a missed parry charges nothing");
+            float before = player.getHealth();
+            hit(helper, player, golem, 4.0F);
+            helper.assertTrue(player.getHealth() < before, "after the window blows land again");
+            helper.assertTrue(player.getCooldowns().isOnCooldown(player.getMainHandItem()), "a missed parry is on cooldown");
+            helper.succeed();
+        });
+    }
+
+    /** The cone covers the front only: a blow from behind lands even inside the window. */
+    private static void scimitarNoParryFromBehind(GameTestHelper helper) {
+        Player player = fighter(helper, new Vec3(5.5D, 1.0D, 5.5D), 0.0F);
+        IronGolem golem = dummy(helper, new BlockPos(5, 1, 3)); // behind: the player faces +Z
+        ArchitectScimitarItem.raiseGuard(player);
+        helper.runAfterDelay(4, () -> {
+            float health = player.getHealth();
+            hit(helper, player, golem, 4.0F);
+            helper.assertTrue(player.getHealth() < health, "a blow from behind lands");
+            helper.assertFalse(ArchitectScimitarItem.isRepriseCharged(player), "no Reprise from a blow from behind");
+            helper.succeed();
+        });
+    }
+
+    /** The charged Reprise multiplies one melee hit by 1.6, once. */
+    private static void scimitarRepriseBonusOnce(GameTestHelper helper) {
+        Player player = fighter(helper, new Vec3(5.5D, 1.0D, 3.5D), 0.0F);
+        IronGolem golem = dummy(helper, new BlockPos(5, 1, 5));
+        ArchitectScimitarItem.raiseGuard(player);
+        helper.runAfterDelay(4, () -> {
+            hit(helper, player, golem, 6.0F);
+            helper.assertTrue(ArchitectScimitarItem.isRepriseCharged(player), "the Reprise is charged");
+            var source = helper.getLevel().damageSources().playerAttack(player);
+            golem.invulnerableTime = 0;
+            float h0 = golem.getHealth();
+            golem.hurtServer(helper.getLevel(), source, 10.0F);
+            float first = h0 - golem.getHealth();
+            golem.invulnerableTime = 0;
+            float h1 = golem.getHealth();
+            golem.hurtServer(helper.getLevel(), source, 10.0F);
+            float second = h1 - golem.getHealth();
+            helper.assertTrue(Math.abs(first - second * ArchitectScimitarItem.REPRISE_MULTIPLIER) < 0.01F,
+                    "the Reprise hit deals 1.6x (" + first + " vs " + second + ")");
+            helper.assertFalse(ArchitectScimitarItem.isRepriseCharged(player), "the Reprise is spent");
+            helper.assertFalse(ArchitectScimitarItem.isChargedStack(player.getMainHandItem()), "the blade goes dark");
+            helper.succeed();
+        });
+    }
+
+    /** Unused, the Reprise fades after 40 ticks and the flag leaves the blade. */
+    private static void scimitarRepriseExpires(GameTestHelper helper) {
+        Player player = fighter(helper, new Vec3(5.5D, 1.0D, 3.5D), 0.0F);
+        IronGolem golem = dummy(helper, new BlockPos(5, 1, 5));
+        ArchitectScimitarItem.raiseGuard(player);
+        helper.runAfterDelay(4, () -> {
+            hit(helper, player, golem, 6.0F);
+            helper.assertTrue(ArchitectScimitarItem.isRepriseCharged(player), "the Reprise is charged");
+            helper.runAfterDelay(ArchitectScimitarItem.REPRISE_TICKS + 2, () -> {
+                helper.assertFalse(ArchitectScimitarItem.isRepriseCharged(player), "the Reprise fades");
+                helper.assertFalse(ArchitectScimitarItem.isChargedStack(player.getMainHandItem()), "the flag leaves the blade");
+                helper.succeed();
+            });
+        });
+    }
+
+    /** A light projectile from the front flies back; a strong one is stopped and costs more durability. */
+    private static void scimitarDeflectsProjectiles(GameTestHelper helper) {
+        var level = helper.getLevel();
+        Player player = fighter(helper, new Vec3(5.5D, 1.0D, 3.5D), 0.0F);
+        ArchitectScimitarItem.raiseGuard(player);
+        helper.runAfterDelay(4, () -> {
+            var arrow = EntityType.ARROW.create(level, EntitySpawnReason.TRIGGERED);
+            helper.assertTrue(arrow != null, "an arrow can be created");
+            arrow.setPos(player.position().add(0.0D, 1.5D, 0.6D));
+            arrow.setDeltaMovement(0.0D, 0.0D, -1.5D); // flying at the player's face
+            level.addFreshEntity(arrow);
+            helper.assertTrue(ArchitectScimitarItem.parryProjectile(player, arrow), "the frontal arrow is parried");
+            helper.assertTrue(arrow.getDeltaMovement().z > 0.0D, "the arrow flies back");
+            helper.assertTrue(ArchitectScimitarItem.isRepriseCharged(player), "a parried projectile charges the Reprise");
+            var behind = EntityType.ARROW.create(level, EntitySpawnReason.TRIGGERED);
+            behind.setDeltaMovement(0.0D, 0.0D, 1.5D);
+            helper.assertFalse(ArchitectScimitarItem.parryProjectile(player, behind), "no second parry once the guard is down");
+            var trident = EntityType.TRIDENT.create(level, EntitySpawnReason.TRIGGERED);
+            helper.assertFalse(Architect.isLightProjectile(trident), "a trident is stopped, not sent back");
+            helper.succeed();
+        });
+    }
+
+    /** Parrying one of his blows weighs on his posture like a heavy hit (spec §26.2). */
+    private static void scimitarParryBreaksHisPosture(GameTestHelper helper) {
+        Architect boss = awakeBoss(helper, new BlockPos(5, 1, 6));
+        Player player = fighter(helper, new Vec3(5.5D, 1.0D, 3.5D), 0.0F);
+        ArchitectScimitarItem.raiseGuard(player);
+        helper.runAfterDelay(4, () -> {
+            float health = player.getHealth();
+            player.invulnerableTime = 0;
+            player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().mobAttack(boss), 12.0F);
+            helper.assertValueEqual(player.getHealth(), health, "his blow is parried");
+            helper.assertTrue(boss.getPosture() >= Architect.POSTURE_HEAVY_HIT - 0.01F,
+                    "the parry fills his posture like a heavy hit (" + boss.getPosture() + ")");
+            helper.succeed();
+        });
     }
 }

@@ -44,13 +44,14 @@ CodenameCoraline/
 │   │   ├── babydragon/         # Dragão Companheiro (3 anatomias, montaria, inventário, totem)
 │   │   ├── raven/              # Corvo Feérico (companheiro místico, sentinela, coleta, ombro)
 │   │   ├── salamander/         # Salamandra de Enxofre (predador de magma, cuspe balístico e alcatrão)
+│   │   ├── architect/          # O Arquiteto (boss de seis braços: estátua, ataques A–F, aparo, postura)
 │   │   ├── spirit/             # Espíritos residuais de chefes derrotados (BossSpirit)
 │   │   └── PlayerSummon.java   # interface comum para invocações aliadas do jogador
 │   ├── client/                 # modelos, renderizadores, animações e telas (CLIENTE)
 │   │   ├── bossbar/            # ThemedBossBars e estilos temáticos de barra de vida
 │   │   ├── bestiary/           # telas, layouts de página e renderizadores do Bestiário
 │   │   ├── redcap/, basilisk/, lithophage/, collector/, canopy/,
-│   │   ├── macaque/, crimson/, ten_threads_witch/, babydragon/, raven/, salamander/ # modelos e animações
+│   │   ├── macaque/, crimson/, ten_threads_witch/, babydragon/, raven/, salamander/, architect/ # modelos e animações
 │   │   └── ...                 # camadas emissivas (EyesLayer) e EntityRenderState
 │   ├── bestiary/               # modelo de dados do Bestiário (Bestiary, BestiaryEntry, BestiaryPage)
 │   ├── inventory/              # menus de container do jogador (DragonMenu)
@@ -341,3 +342,12 @@ No padrão do Cobrador: enquanto o boss está em `INTRO` (120 ticks), a câmera 
 - **Cliente:** `client/salamander/` contém `BrimstoneSalamanderModel` (18 juntas e 26 caixas em atlas 128×128 sem sobreposição de UVs), `BrimstoneSalamanderAnimations` (17 animações por keyframe), `BrimstoneSalamanderRenderState`, `BrimstoneSalamanderEyesLayer` (camada emissiva de enxofre/magma para olhos, papo de fole, narinas e placas dorsais), `BrimstoneSalamanderRenderer` e `BrimstoneSalamanderClient` (registra renderizador da salamandra e renderizador com sprite do projétil `brimstone_spit`).
 - **Recursos, Conquistas e Bestiário:** item `codenamecoraline:brimstone_scale` (`ModItems.BRIMSTONE_SCALE`), item de projétil `codenamecoraline:brimstone_spit`, ovo `brimstone_salamander_spawn_egg`, tabela de saque `loot_table/entities/brimstone_salamander.json` (creme de magma, carvão e escama de enxofre com bônus de pilhagem), 7 eventos sonoros em `ModSounds` (`BRIMSTONE_SALAMANDER_AMBIENT`, `HURT`, `DEATH`, `STEP`, `BITE`, `SPIT`, `TAIL_WHIP`) mapeados em `sounds.json`, 2 conquistas (`find_brimstone_salamander`, `brimstone_scale`), capítulo `Bestiary.BRIMSTONE_SALAMANDER` (6 páginas) e gravuras `textures/gui/bestiary/brimstone_salamander_{anatomy,combat,spoils}.png`.
 - **Verificação:** `verification/BrimstoneSalamanderGameTests` registra 5 métodos de teste na execução `runBrimstoneSalamanderTest` (`coraline.brimstoneSalamanderTests=true`) cobrindo atributos, regras de spawn, imunidades, snap bite, anti-whiff, cuspe balístico, poça de alcatrão, tail whip e matriz de alvos/ecologia. Detalhes em [design/brimstone_salamander.md](design/brimstone_salamander.md).
+
+## O Arquiteto — Kandiaru (`architect`)
+
+- **Entidade:** `entity/architect/Architect` (boss, 480 PV; estados em `Architect.State`, fases em `Architect.Phase`). A linha do tempo de cada ataque roda em `tick()`; as decisões ficam em `customServerAiStep`. Tabela de ataques em `ArchitectAttack`, volumes de golpe (ARCO, ANEL, CORREDOR) em `ArchitectStrikes`, proteção dos jogadores na revelação em `ArchitectRevealProtection` (`LivingIncomingDamageEvent`). Eventos de rede 160–178.
+- **Cliente:** `client/architect/` — modelo de 110 partes e animações geradas por `tools/generate_architect_assets.py` (fonte única dos clipes: `tools/architect_clips.py`), `ArchitectGlowLayer` (brilho por estado), `ArchitectCinematicDirector` (cinemática da revelação), barra `client/bossbar/ArchitectBossBar`.
+- **Itens:** `item/CommandmentTabletItem` (ergue a estátua; receita `recipe/commandment_tablet.json`) e `item/ArchitectScimitarItem` (drop: Aparo e Réplica; estado por jogador num mapa do servidor avançado em `ServerTickEvent.Post`; aparo corpo a corpo em `LivingIncomingDamageEvent`, de projétil em `ProjectileImpactEvent`). O brilho da cimitarra carregada vem da flag 0 de `CUSTOM_MODEL_DATA`, lida pelo modelo do item (`items/architect_scimitar.json`: `using_item`, `custom_model_data`, `cooldown`).
+- **Poses do jogador com a cimitarra:** `client/architect/ArchitectScimitarClient` (`IClientItemExtensions`: pose de braço e mão em primeira pessoa) e `ScimitarArmPoses`, duas entradas novas de `HumanoidModel.ArmPose` declaradas em `META-INF/enumextensions.json` (D-038).
+- **Recursos, conquistas e Bestiário:** saque `loot_table/entities/architect.json`, conquistas `advancement/bosses/architect_{tablet,statue,defeated,scimitar}.json`, sons `ModSounds.ARCHITECT_*` e `SCIMITAR_*` mapeados para eventos vanilla (D-010), entrada `Bestiary.ARCHITECT` (8 páginas) e gravuras `textures/gui/bestiary/architect_*.png` (`tools/generate_architect_bestiary.py`). Assets da cimitarra e do retrato: `tools/generate_architect_scimitar_assets.py`.
+- **Verificação:** `verification/ArchitectGameTests` (execução `runArchitectTest`, `coraline.architectTests=true`). Ficha: `docs/design/architect.md`.

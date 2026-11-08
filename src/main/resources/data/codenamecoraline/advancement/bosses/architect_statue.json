@@ -1,0 +1,39 @@
+{
+  "parent": "codenamecoraline:bosses/architect_tablet",
+  "criteria": {
+    "raised_the_statue": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "location": [
+          {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "codenamecoraline:commandment_tablet"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.architect_statue.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:architect_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.architect_statue.title"
+    }
+  },
+  "requirements": [
+    [
+      "raised_the_statue"
+    ]
+  ]
+}

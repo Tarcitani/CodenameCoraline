@@ -1,6 +1,7 @@
 package com.codenamecoraline.entity.architect;
 
 import com.codenamecoraline.entity.architect.ArchitectStrikes.Strike;
+import com.codenamecoraline.registry.ModSounds;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -45,6 +46,7 @@ import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEgg;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -151,6 +153,8 @@ public final class Architect extends Monster {
     public static final int REVEAL_MASK_RIGHT_TICK = 58;
     public static final int REVEAL_MASK_LEFT_TICK = 64;
     public static final int REVEAL_TABLET_TICK = 72;
+    /** The jaw opens and he laughs while the title card rises (§7.4 rows 10-11). */
+    public static final int REVEAL_LAUGH_TICK = 86;
     public static final int DEATH_TICKS = 80;
 
     // Reserved entity event range: 160..179 (spec §19).
@@ -368,6 +372,7 @@ public final class Architect extends Monster {
         this.setAnchorHere();
         this.setState(State.AWAKENING);
         this.level().broadcastEntityEvent(this, EVENT_AWAKEN_START);
+        this.playSound(ModSounds.ARCHITECT_AWAKEN.get(), 1.0F, 1.0F);
     }
 
     public boolean isDormant() {
@@ -500,11 +505,17 @@ public final class Architect extends Monster {
         int t = this.stateTicks;
         if (t == REVEAL_MASK_RIGHT_TICK) {
             level.broadcastEntityEvent(this, EVENT_MASK_RIGHT);
+            this.playSound(ModSounds.ARCHITECT_MASK_FALL.get(), 1.0F, 1.0F);
         } else if (t == REVEAL_MASK_LEFT_TICK) {
             level.broadcastEntityEvent(this, EVENT_MASK_LEFT);
+            this.playSound(ModSounds.ARCHITECT_MASK_FALL.get(), 1.0F, 0.9F);
         } else if (t == REVEAL_TABLET_TICK) {
             level.broadcastEntityEvent(this, EVENT_TABLET_FALL);
+            this.playSound(ModSounds.ARCHITECT_TABLET_FALL.get(), 1.0F, 1.0F);
             level.sendParticles(STONE_DUST, this.getX(), this.getY() + 0.3D, this.getZ(), 24, 0.8D, 0.1D, 0.8D, 0.02D);
+        }
+        if (t == REVEAL_LAUGH_TICK || t == REVEAL_LAUGH_TICK + 8 || t == REVEAL_LAUGH_TICK + 16) {
+            this.playSound(ModSounds.ARCHITECT_LAUGH.get(), 1.0F, 1.0F); // stone grinding in three pulses (§16.4)
         }
         if (t >= ArchitectAnim.AWAKEN.ticks) {
             this.setState(State.COMBAT_IDLE);
@@ -562,7 +573,35 @@ public final class Architect extends Monster {
         this.getNavigation().stop();
         this.setState(State.ATTACKING);
         this.setAnim(type.anim);
-        this.playSound(SoundEvents.GRINDSTONE_USE, 1.2F, 0.6F);
+        SoundEvent windup = windupSound(type);
+        if (windup != null) {
+            this.playSound(windup, 1.0F, 1.0F);
+        }
+    }
+
+    /** Each blow has its own wind-up sound (spec §16.4); the Gargoyle Fall announces itself with the wing beat. */
+    private static @Nullable SoundEvent windupSound(ArchitectAttack type) {
+        return switch (type) {
+            case CARTENON_WHEEL -> ModSounds.ARCHITECT_WHEEL_WINDUP.get();
+            case PIERCING_SENTENCE -> ModSounds.ARCHITECT_SENTENCE_WINDUP.get();
+            case GARGOYLE_FALL -> null;
+            default -> ModSounds.ARCHITECT_WINDUP.get();
+        };
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return ModSounds.ARCHITECT_HURT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.ARCHITECT_DEATH.get();
+    }
+
+    @Override
+    protected void playStepSound(BlockPos pos, BlockState state) {
+        this.playSound(ModSounds.ARCHITECT_STEP.get(), 0.9F, 1.0F);
     }
 
     /** The spec's variations: A glued to him, B in the Collapse, D against a target in the air. */
@@ -722,7 +761,7 @@ public final class Architect extends Monster {
             }
             level.sendParticles(MANA_DUST, this.getX() + px, y, this.getZ() + pz, 1, 0.05D, 0.05D, 0.05D, 0.0D);
         }
-        this.playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1.0F, 0.55F);
+        this.playSound(ModSounds.ARCHITECT_BLADE_CUT.get(), 1.0F, 1.0F);
     }
 
     // ================================================================= F: the Gargoyle Fall
@@ -741,7 +780,7 @@ public final class Architect extends Monster {
             this.airborne = true;
             this.setNoGravity(true);
             this.noPhysics = true;
-            this.playSound(SoundEvents.ENDER_DRAGON_FLAP, 1.6F, 0.6F);
+            this.playSound(ModSounds.ARCHITECT_WING_FLAP.get(), 1.0F, 1.0F);
         }
         if (this.airborne && t > LEAP_LOCK_TICK && t < LEAP_LAND_TICK) {
             this.setPos(this.leapPoint(t));
@@ -754,7 +793,7 @@ public final class Architect extends Monster {
             this.endAirborne();
             level.broadcastEntityEvent(this, EVENT_GARGOYLE_IMPACT);
             level.sendParticles(STONE_DUST, this.getX(), this.getY() + 0.2D, this.getZ(), 40, 1.8D, 0.1D, 1.8D, 0.05D);
-            this.playSound(SoundEvents.GENERIC_EXPLODE.value(), 1.0F, 0.5F);
+            this.playSound(ModSounds.ARCHITECT_GARGOYLE_IMPACT.get(), 1.0F, 1.0F);
         }
         return true;
     }
@@ -951,7 +990,7 @@ public final class Architect extends Monster {
         Vec3 f = Vec3.directionFromRotation(0.0F, this.lockedYaw);
         level.sendParticles(MANA_DUST, this.getX() + f.x * 1.2D, this.getY() + 2.0D, this.getZ() + f.z * 1.2D,
                 8, 0.15D, 0.15D, 0.15D, 0.1D);
-        this.playSound(SoundEvents.ANVIL_PLACE, 0.8F, 1.6F);
+        this.playSound(ModSounds.ARCHITECT_PARRY.get(), 1.0F, 1.0F);
     }
 
     /** C and F leave his back open with the wings spread during their recovery (spec §11.6). */
@@ -982,6 +1021,11 @@ public final class Architect extends Monster {
         this.stagger();
     }
 
+    /** A player's Architect's Scimitar parried one of his blows: a heavy hit on his posture (spec §26.2). */
+    public void receiveParry() {
+        this.addPosture(POSTURE_HEAVY_HIT, false);
+    }
+
     /** Breaks his guard: the current attack is cancelled, the sternum is exposed for 30 ticks. */
     public void stagger() {
         this.endAirborne();
@@ -997,7 +1041,7 @@ public final class Architect extends Monster {
         if (this.level() instanceof ServerLevel level) {
             level.sendParticles(ERROR_DUST, this.getX(), this.getY() + 2.3D, this.getZ(), 14, 0.3D, 0.3D, 0.3D, 0.05D);
         }
-        this.playSound(SoundEvents.DECORATED_POT_SHATTER, 1.4F, 0.6F);
+        this.playSound(ModSounds.ARCHITECT_STAGGER.get(), 1.0F, 1.0F);
     }
 
     /** Raises the full guard for {@code ticks} (spec §11.2): frontal damage halved, nothing behind covered. */
@@ -1025,7 +1069,7 @@ public final class Architect extends Monster {
         this.deflections++;
         this.raiseGuard(ArchitectAnim.PROJECTILE_DEFLECT.ticks);
         this.setAnim(ArchitectAnim.PROJECTILE_DEFLECT);
-        this.playSound(SoundEvents.SHIELD_BLOCK.value(), 1.0F, 0.6F);
+        this.playSound(ModSounds.ARCHITECT_DEFLECT.get(), 1.0F, 1.0F);
         return ProjectileDeflection.REVERSE;
     }
 
@@ -1059,6 +1103,7 @@ public final class Architect extends Monster {
         this.setState(State.PHASE_TRANSITION);
         this.setAnim(now == Phase.ADMINISTRATOR ? ArchitectAnim.PHASE_ENRAGE : ArchitectAnim.MANIACAL_LAUGH);
         level.broadcastEntityEvent(this, EVENT_ENRAGE);
+        this.playSound(ModSounds.ARCHITECT_ENRAGE.get(), 1.0F, 1.0F);
         level.sendParticles(MANA_DUST, this.getX(), this.getY() + 2.3D, this.getZ(), 24, 0.6D, 0.6D, 0.6D, 0.12D);
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class,
                 this.getBoundingBox().inflate(ENRAGE_PUSH_RADIUS), this.foeInLeash)) {
@@ -1067,6 +1112,10 @@ public final class Architect extends Monster {
     }
 
     private void tickTransition() {
+        int t = this.stateTicks;
+        if (this.getAnim() == ArchitectAnim.MANIACAL_LAUGH && (t == 8 || t == 16 || t == 24)) {
+            this.playSound(ModSounds.ARCHITECT_LAUGH.get(), 1.0F, 1.0F);
+        }
         if (this.stateTicks >= this.getAnim().ticks) {
             this.setState(State.COMBAT_IDLE);
         }
