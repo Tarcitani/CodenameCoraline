@@ -1,0 +1,22 @@
+// Optional asset tooling for the Architect pose review sheets and Bestiary plates.
+allprojects {
+    afterEvaluate {
+        def exporterClasses = layout.buildDirectory.dir('architect-sketches/classes')
+        def compileExporter = tasks.register('compileArchitectSketchExporter', JavaCompile) {
+            dependsOn tasks.named('classes')
+            source = files('tools/ExportArchitectModel.java')
+            classpath = sourceSets.main.runtimeClasspath
+            destinationDirectory = exporterClasses
+            javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }
+            options.encoding = 'UTF-8'
+        }
+        tasks.register('exportArchitectSketchModel', JavaExec) {
+            dependsOn compileExporter
+            classpath = sourceSets.main.runtimeClasspath + files(exporterClasses)
+            javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+            mainClass = 'ExportArchitectModel'
+            args layout.buildDirectory.file('architect-sketches/model.json').get().asFile.absolutePath
+        }
+    }
+}
+

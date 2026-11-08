@@ -2,7 +2,7 @@
 
 Resumo de uma página para começar sessões novas. **Não é fonte de verdade:** detalhes e evidências estão em `ROADMAP.md`, `DECISIONS.md` e `design/`. O código real prevalece. Atualize este arquivo ao concluir ou mudar algo relevante.
 
-Última revisão: 2026-11-05 (a partir do `ROADMAP.md`).
+Última revisão: 2026-11-08 (a partir do `ROADMAP.md`).
 
 ## Stack
 Minecraft 26.1.2 · NeoForge 26.1.2.124 · Java 25 · Gradle 9.2.1. Mod ID `codenamecoraline`. Tema: folclore feérico tradicional.
@@ -28,6 +28,12 @@ Os últimos commits entregam a Salamandra de Enxofre (`brimstone_salamander`, pe
 ## Validação
 - Os GameTests rodam por tarefas `run<Mob>Test` (lista em `build.gradle`). Contagens recentes: Dragão Bebê 81, Comandante 34, Quebra-Copas 35, Bruxa 30, Salamandra de Enxofre 23, Matriarca 20, Cobrador 18, Basilisco 17, Litófago 11, Porrete 9, Corvo Feérico 8.
 - Em 2026-11-05 o `build` e o `runTenThreadsWitchTest` ainda não tinham sido executados pelo agente (o Gradle não roda no shell de alguns agentes; ver `DEVELOPMENT.md`). Confirme no seu terminal.
+
+## Em desenvolvimento
+
+| Sistema | Resumo | Design |
+|---|---|---|
+| O Arquiteto (Kandiaru) | Boss de seis braços, disfarce de estátua; fatias 1 (fundação) e 2 (visual, poses aprovadas na 2b) concluídas: modelo de 110 partes, 16 animações, barra temática; sem IA de combate ainda (próximo: `runClient` e fatia 3) | `design/architect.md` |
 
 ## Pendências recorrentes
 - **Nada de Comandante, Bruxa e Matriarca foi visto no jogo** (`runClient`): aparência, animações, sons, barra, gravuras.
