@@ -242,7 +242,8 @@ public final class BrimstoneSalamanderModel extends EntityModel<BrimstoneSalaman
 
         // Ground crawl when moving and not swimming in lava
         if (!state.swimmingInLava && state.walkAnimationSpeed > 0.01F) {
-            this.walkAnim.applyWalk(state.walkAnimationPos, state.walkAnimationSpeed, 2.0F, 2.5F);
+            float walkSpeed = state.isBaby ? 2.5F : 2.0F;
+            this.walkAnim.applyWalk(state.walkAnimationPos, state.walkAnimationSpeed, walkSpeed, 2.5F);
         }
 
         // Keyframe animations
@@ -261,6 +262,19 @@ public final class BrimstoneSalamanderModel extends EntityModel<BrimstoneSalaman
         this.tailWhipExecAnim.apply(state.tailWhipExecAnimationState, state.ageInTicks);
         this.tailWhipRecoveryAnim.apply(state.tailWhipRecoveryAnimationState, state.ageInTicks);
         this.hurtAnim.apply(state.hurtAnimationState, state.ageInTicks);
+
+        // Juvenile neotenic proportions
+        if (state.isBaby) {
+            this.head.xScale = 1.15F;
+            this.head.yScale = 1.15F;
+            this.head.zScale = 1.15F;
+            this.dorsalRidge.xScale = 0.4F;
+            this.dorsalRidge.yScale = 0.4F;
+            this.dorsalRidge.zScale = 0.4F;
+            this.throatSac.xScale = 0.6F;
+            this.throatSac.yScale = 0.6F;
+            this.throatSac.zScale = 0.6F;
+        }
     }
 }
 

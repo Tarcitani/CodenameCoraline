@@ -13,24 +13,31 @@ import com.codenamecoraline.registry.ModEntities;
 import com.codenamecoraline.registry.ModItems;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.FunctionGameTestInstance;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestData;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.monster.MagmaCube;
 import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.monster.skeleton.WitherSkeleton;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
@@ -51,7 +58,22 @@ public final class BrimstoneSalamanderGameTests {
             Map.entry("brimstone_salamander_sulfur_spit_and_tar_pool", BrimstoneSalamanderGameTests::sulfurSpitAndTarPool),
             Map.entry("brimstone_salamander_tail_whip_and_target_matrix", BrimstoneSalamanderGameTests::tailWhipAndTargetMatrix),
             Map.entry("brimstone_salamander_lava_swimming_and_navigation", BrimstoneSalamanderGameTests::lavaSwimmingAndNavigation),
-            Map.entry("brimstone_salamander_texture_variants_and_persistence", BrimstoneSalamanderGameTests::textureVariantsAndPersistence));
+            Map.entry("brimstone_salamander_texture_variants_and_persistence", BrimstoneSalamanderGameTests::textureVariantsAndPersistence),
+            Map.entry("brimstone_salamander_baby_dimensions_and_scaling", BrimstoneSalamanderGameTests::babyDimensionsAndScaling),
+            Map.entry("brimstone_salamander_baby_growth_age_progression", BrimstoneSalamanderGameTests::babyGrowthAgeProgression),
+            Map.entry("brimstone_salamander_baby_nbt_persistence", BrimstoneSalamanderGameTests::babyNbtPersistence),
+            Map.entry("brimstone_salamander_baby_stage_attributes", BrimstoneSalamanderGameTests::babyStageAttributes),
+            Map.entry("brimstone_salamander_baby_maturation_clearance", BrimstoneSalamanderGameTests::babyMaturationClearance),
+            Map.entry("brimstone_salamander_family_group_variant_consistency", BrimstoneSalamanderGameTests::familyGroupVariantConsistency),
+            Map.entry("brimstone_salamander_baby_variant_persistence", BrimstoneSalamanderGameTests::babyVariantPersistence),
+            Map.entry("brimstone_salamander_family_nbt_persistence", BrimstoneSalamanderGameTests::familyNbtPersistence),
+            Map.entry("brimstone_salamander_baby_follow_family", BrimstoneSalamanderGameTests::babyFollowFamily),
+            Map.entry("brimstone_salamander_baby_flee_threat", BrimstoneSalamanderGameTests::babyFleeThreat),
+            Map.entry("brimstone_salamander_baby_prey_restriction", BrimstoneSalamanderGameTests::babyPreyRestriction),
+            Map.entry("brimstone_salamander_baby_nip_combat", BrimstoneSalamanderGameTests::babyNipCombat),
+            Map.entry("brimstone_salamander_parental_protection_fury", BrimstoneSalamanderGameTests::parentalProtectionFury),
+            Map.entry("brimstone_salamander_baby_water_shock", BrimstoneSalamanderGameTests::babyWaterShock),
+            Map.entry("brimstone_salamander_baby_feeding_magma_and_blaze", BrimstoneSalamanderGameTests::babyFeedingMagmaAndBlaze));
 
     private BrimstoneSalamanderGameTests() {}
 
@@ -368,6 +390,360 @@ public final class BrimstoneSalamanderGameTests {
         BrimstoneSalamander loadedSoul = ModEntities.BRIMSTONE_SALAMANDER.get().create(helper.getLevel(), EntitySpawnReason.LOAD);
         loadedSoul.load(TagValueInput.create(ProblemReporter.DISCARDING, helper.getLevel().registryAccess(), outSoul.buildResult()));
         helper.assertValueEqual(loadedSoul.getVariant(), BrimstoneSalamanderVariant.SOULFLAME, "NBT reload preserves SOULFLAME variant");
+
+        helper.succeed();
+    }
+
+    private static void babyDimensionsAndScaling(GameTestHelper helper) {
+        BrimstoneSalamander adult = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(2, 1, 2));
+        helper.assertFalse(adult.isBaby(), "Adult is not baby");
+        helper.assertValueEqual(adult.getGrowthAge(), 0, "Adult growthAge is 0");
+        helper.assertTrue(Math.abs(adult.getBbWidth() - BrimstoneSalamander.WIDTH) < 0.05F, "Adult width is 1.30");
+        helper.assertTrue(Math.abs(adult.getBbHeight() - BrimstoneSalamander.HEIGHT) < 0.05F, "Adult height is 0.85");
+
+        BrimstoneSalamander baby = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(4, 1, 4));
+        baby.setBaby(true);
+        helper.assertTrue(baby.isBaby(), "Baby isBaby() is true");
+        helper.assertValueEqual(baby.getGrowthAge(), BrimstoneSalamander.BABY_START_AGE, "Baby growthAge is -24000");
+        helper.assertTrue(Math.abs(baby.getBbWidth() - BrimstoneSalamander.BABY_WIDTH) < 0.05F, "Baby width is 0.65");
+        helper.assertTrue(Math.abs(baby.getBbHeight() - BrimstoneSalamander.BABY_HEIGHT) < 0.05F, "Baby height is 0.425");
+        helper.assertTrue(Math.abs(baby.getEyeHeight() - BrimstoneSalamander.BABY_EYE_HEIGHT) < 0.05F, "Baby eyeHeight is 0.275");
+
+        helper.succeed();
+    }
+
+    private static void babyGrowthAgeProgression(GameTestHelper helper) {
+        BrimstoneSalamander baby = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(3, 1, 3));
+        baby.setGrowthAge(BrimstoneSalamander.BABY_START_AGE);
+        helper.assertValueEqual(baby.getGrowthAge(), BrimstoneSalamander.BABY_START_AGE, "Initial age is -24000");
+
+        // Tick once on server
+        baby.tick();
+        helper.assertValueEqual(baby.getGrowthAge(), BrimstoneSalamander.BABY_START_AGE + 1, "Advances 1 tick per server tick");
+
+        // Set to ready to mature
+        baby.setGrowthAge(BrimstoneSalamander.READY_TO_MATURE_AGE);
+        helper.assertValueEqual(baby.getGrowthAge(), -1, "Ready to mature age is -1");
+        helper.assertTrue(baby.isBaby(), "Still baby when READY_TO_MATURE");
+
+        // In clear space, tryMature allows maturation
+        helper.assertTrue(baby.canFitAdultHitbox(), "Clear space allows adult hitbox");
+        boolean matured = baby.tryMature(helper.getLevel());
+        helper.assertTrue(matured, "Maturation succeeds in open space");
+        helper.assertValueEqual(baby.getGrowthAge(), BrimstoneSalamander.ADULT_AGE, "Matured to adult age 0");
+        helper.assertFalse(baby.isBaby(), "No longer baby after maturation");
+        helper.assertTrue(Math.abs(baby.getBbWidth() - BrimstoneSalamander.WIDTH) < 0.05F, "AABB updated to adult width");
+
+        helper.succeed();
+    }
+
+    private static void babyNbtPersistence(GameTestHelper helper) {
+        BrimstoneSalamander baby = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(3, 1, 3));
+        baby.setGrowthAge(-12000);
+        helper.assertValueEqual(baby.getGrowthAge(), -12000, "Partial age set");
+
+        var out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, helper.getLevel().registryAccess());
+        baby.saveWithoutId(out);
+        BrimstoneSalamander loaded = ModEntities.BRIMSTONE_SALAMANDER.get().create(helper.getLevel(), EntitySpawnReason.LOAD);
+        loaded.load(TagValueInput.create(ProblemReporter.DISCARDING, helper.getLevel().registryAccess(), out.buildResult()));
+
+        helper.assertValueEqual(loaded.getGrowthAge(), -12000, "Loaded preserves growthAge -12000");
+        helper.assertTrue(loaded.isBaby(), "Loaded is baby");
+        helper.assertTrue(Math.abs(loaded.getBbWidth() - BrimstoneSalamander.BABY_WIDTH) < 0.05F, "Loaded baby width");
+
+        // Test legacy migration: CompoundTag with legacy IsBaby=true but no GrowthAge
+        net.minecraft.nbt.CompoundTag legacyTag = new net.minecraft.nbt.CompoundTag();
+        legacyTag.putBoolean("IsBaby", true);
+        BrimstoneSalamander migrated = ModEntities.BRIMSTONE_SALAMANDER.get().create(helper.getLevel(), EntitySpawnReason.LOAD);
+        migrated.load(TagValueInput.create(ProblemReporter.DISCARDING, helper.getLevel().registryAccess(), legacyTag));
+        helper.assertValueEqual(migrated.getGrowthAge(), BrimstoneSalamander.BABY_START_AGE, "Legacy IsBaby migrates to -24000");
+        helper.assertTrue(migrated.isBaby(), "Migrated is baby");
+
+        helper.succeed();
+    }
+
+    private static void babyStageAttributes(GameTestHelper helper) {
+        BrimstoneSalamander baby = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(3, 1, 3));
+        baby.setBaby(true);
+
+        helper.assertValueEqual(baby.getMaxHealth(), 16.0F, "Baby max health 16 HP");
+        helper.assertValueEqual(baby.getAttributeValue(Attributes.ARMOR), 2.0D, "Baby armor 2");
+        helper.assertValueEqual(baby.getAttributeValue(Attributes.ARMOR_TOUGHNESS), 0.0D, "Baby toughness 0");
+        helper.assertValueEqual(baby.getAttributeValue(Attributes.MOVEMENT_SPEED), 0.26D, "Baby speed 0.26");
+        helper.assertValueEqual(baby.getAttributeValue(Attributes.ATTACK_DAMAGE), 2.0D, "Baby damage 2");
+        helper.assertValueEqual(baby.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 0.15D, "Baby knockback resistance 0.15");
+        helper.assertValueEqual(baby.getAttributeValue(Attributes.FOLLOW_RANGE), 16.0D, "Baby follow range 16");
+
+        // Idempotency: reapply baby attributes twice
+        baby.applyBabyAttributes();
+        baby.applyBabyAttributes();
+        helper.assertValueEqual(baby.getMaxHealth(), 16.0F, "Idempotent max health");
+        helper.assertValueEqual(baby.getAttributeValue(Attributes.ARMOR), 2.0D, "Idempotent armor");
+
+        // Switch to adult
+        baby.setBaby(false);
+        helper.assertValueEqual(baby.getMaxHealth(), 44.0F, "Adult max health 44 HP");
+        helper.assertValueEqual(baby.getAttributeValue(Attributes.ARMOR), 8.0D, "Adult armor 8");
+        helper.assertValueEqual(baby.getAttributeValue(Attributes.ARMOR_TOUGHNESS), 2.0D, "Adult toughness 2");
+        helper.assertValueEqual(baby.getAttributeValue(Attributes.MOVEMENT_SPEED), 0.23D, "Adult speed 0.23");
+        helper.assertValueEqual(baby.getAttributeValue(Attributes.ATTACK_DAMAGE), 6.0D, "Adult damage 6");
+
+        helper.succeed();
+    }
+
+    private static void babyMaturationClearance(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(3, 1, 3);
+        BrimstoneSalamander baby = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), pos);
+        baby.setGrowthAge(BrimstoneSalamander.READY_TO_MATURE_AGE);
+
+        // Place a top slab at pos (y = 1.0 to 1.5 is air with 0.5m clearance; slab occupies y = 1.5 to 2.0).
+        // Baby height is 0.425m (fits under 1.5m).
+        // Adult height is 0.85m (reaches 1.85m, colliding with the top slab at 1.5m).
+        helper.setBlock(pos, Blocks.BLACKSTONE_SLAB.defaultBlockState().setValue(
+                net.minecraft.world.level.block.SlabBlock.TYPE,
+                net.minecraft.world.level.block.state.properties.SlabType.TOP));
+
+        helper.assertFalse(baby.canFitAdultHitbox(), "Adult hitbox cannot fit with 0.5m clearance under top slab");
+        boolean maturedUnderCeiling = baby.tryMature(helper.getLevel());
+        helper.assertFalse(maturedUnderCeiling, "Maturation postponed when space is blocked");
+        helper.assertValueEqual(baby.getGrowthAge(), BrimstoneSalamander.READY_TO_MATURE_AGE, "Stays at READY_TO_MATURE (-1)");
+        helper.assertTrue(baby.isBaby(), "Remains a baby while blocked");
+
+        // Clear the obstacle (replace with air)
+        helper.setBlock(pos, Blocks.AIR);
+        helper.assertTrue(baby.canFitAdultHitbox(), "Adult hitbox fits after clearing ceiling");
+
+        // Set partial health on baby (e.g. 10.0 HP)
+        baby.setHealth(10.0F);
+
+        boolean maturedInClear = baby.tryMature(helper.getLevel());
+        helper.assertTrue(maturedInClear, "Maturation succeeds when space is clear");
+        helper.assertFalse(baby.isBaby(), "Becomes adult");
+        helper.assertValueEqual(baby.getGrowthAge(), BrimstoneSalamander.ADULT_AGE, "Adult growthAge is 0");
+        helper.assertValueEqual(baby.getHealth(), 10.0F, "Absolute health preserved across maturation (no free heal)");
+
+        helper.succeed();
+    }
+
+    private static void familyGroupVariantConsistency(GameTestHelper helper) {
+        BrimstoneSalamander leader = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(2, 1, 2));
+        var difficulty = helper.getLevel().getCurrentDifficultyAt(leader.blockPosition());
+        var groupData = leader.finalizeSpawn(helper.getLevel(), difficulty, EntitySpawnReason.NATURAL, null);
+
+        helper.assertTrue(groupData != null, "Leader produces group data");
+        helper.assertTrue(leader.getFamilyId() != null, "Leader has valid familyId");
+
+        BrimstoneSalamander child = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(3, 1, 2));
+        child.finalizeSpawn(helper.getLevel(), difficulty, EntitySpawnReason.NATURAL, groupData);
+
+        helper.assertValueEqual(child.getVariant(), leader.getVariant(), "Group member inherits leader variant");
+        helper.assertValueEqual(child.getFamilyId(), leader.getFamilyId(), "Group member shares familyId");
+        helper.assertValueEqual(child.getLeaderUUID(), leader.getUUID(), "Group member references leader UUID");
+
+        helper.succeed();
+    }
+
+    private static void babyVariantPersistence(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(3, 1, 3);
+        BrimstoneSalamander babySoul = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), pos);
+        babySoul.setVariant(BrimstoneSalamanderVariant.SOULFLAME);
+        babySoul.setBaby(true);
+        babySoul.setGrowthAge(BrimstoneSalamander.READY_TO_MATURE_AGE);
+
+        boolean maturedSoul = babySoul.tryMature(helper.getLevel());
+        helper.assertTrue(maturedSoul, "Soulflame baby matures successfully");
+        helper.assertFalse(babySoul.isBaby(), "Is adult after maturation");
+        helper.assertValueEqual(babySoul.getVariant(), BrimstoneSalamanderVariant.SOULFLAME, "Variant remains SOULFLAME after maturing");
+
+        BrimstoneSalamander babyCrimson = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), pos);
+        babyCrimson.setVariant(BrimstoneSalamanderVariant.CRIMSON);
+        babyCrimson.setBaby(true);
+        babyCrimson.setGrowthAge(BrimstoneSalamander.READY_TO_MATURE_AGE);
+
+        boolean maturedCrimson = babyCrimson.tryMature(helper.getLevel());
+        helper.assertTrue(maturedCrimson, "Crimson baby matures successfully");
+        helper.assertFalse(babyCrimson.isBaby(), "Is adult after maturation");
+        helper.assertValueEqual(babyCrimson.getVariant(), BrimstoneSalamanderVariant.CRIMSON, "Variant remains CRIMSON after maturing");
+
+        helper.succeed();
+    }
+
+    private static void familyNbtPersistence(GameTestHelper helper) {
+        BrimstoneSalamander original = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(3, 1, 3));
+        UUID testFamily = UUID.randomUUID();
+        UUID testLeader = UUID.randomUUID();
+        original.setFamilyId(testFamily);
+        original.setLeaderUUID(testLeader);
+
+        var out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, helper.getLevel().registryAccess());
+        original.saveWithoutId(out);
+        CompoundTag tag = out.buildResult();
+
+        BrimstoneSalamander loaded = ModEntities.BRIMSTONE_SALAMANDER.get().create(helper.getLevel(), EntitySpawnReason.LOAD);
+        loaded.load(TagValueInput.create(ProblemReporter.DISCARDING, helper.getLevel().registryAccess(), tag));
+
+        helper.assertValueEqual(loaded.getFamilyId(), testFamily, "FamilyId persists across NBT save/load");
+        helper.assertValueEqual(loaded.getLeaderUUID(), testLeader, "LeaderUUID persists across NBT save/load");
+
+        helper.succeed();
+    }
+
+    private static void babyFollowFamily(GameTestHelper helper) {
+        BrimstoneSalamander adult = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(2, 1, 2));
+        UUID familyId = UUID.randomUUID();
+        adult.setFamilyId(familyId);
+
+        BrimstoneSalamander baby = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(8, 1, 2));
+        baby.setBaby(true);
+        baby.setFamilyId(familyId);
+        baby.setLeaderUUID(adult.getUUID());
+
+        helper.assertTrue(baby.distanceToSqr(adult) > 20.25D, "Baby starts beyond comfortable distance (> 4.5 blocks)");
+        helper.assertFalse(baby.canTargetEntity(adult, false), "Baby never targets family adult");
+
+        helper.succeed();
+    }
+
+    private static void babyFleeThreat(GameTestHelper helper) {
+        BrimstoneSalamander baby = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(5, 1, 5));
+        baby.setBaby(true);
+
+        IronGolem golem = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new BlockPos(5, 1, 7));
+
+        helper.assertFalse(baby.canTargetEntity(golem, false), "Baby ignores iron golem autonomously");
+        helper.assertTrue(baby.canTargetEntity(golem, true), "Baby allows retaliation if directly attacked");
+
+        helper.succeed();
+    }
+
+    private static void babyPreyRestriction(GameTestHelper helper) {
+        BrimstoneSalamander baby = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(3, 1, 3));
+        baby.setBaby(true);
+
+        MagmaCube smallCube = helper.spawnWithNoFreeWill(EntityType.MAGMA_CUBE, new BlockPos(4, 1, 3));
+        smallCube.setSize(1, true);
+        helper.assertTrue(baby.canTargetEntity(smallCube, false), "Baby targets small MagmaCube (size <= 1)");
+
+        MagmaCube bigCube = helper.spawnWithNoFreeWill(EntityType.MAGMA_CUBE, new BlockPos(5, 1, 3));
+        bigCube.setSize(2, true);
+        helper.assertFalse(baby.canTargetEntity(bigCube, false), "Baby ignores larger MagmaCube (size > 1)");
+
+        Strider babyStrider = helper.spawnWithNoFreeWill(EntityType.STRIDER, new BlockPos(6, 1, 3));
+        babyStrider.setBaby(true);
+        helper.assertFalse(baby.canTargetEntity(babyStrider, false), "Baby salamander does not hunt baby Strider");
+
+        BrimstoneSalamander adult = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(7, 1, 3));
+        helper.assertTrue(adult.canTargetEntity(babyStrider, false), "Adult salamander hunts baby Strider");
+
+        helper.succeed();
+    }
+
+    private static void babyNipCombat(GameTestHelper helper) {
+        BrimstoneSalamander baby = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(2, 1, 2));
+        baby.setBaby(true);
+
+        IronGolem dummy = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new BlockPos(3, 1, 2));
+        float initialHp = dummy.getHealth();
+
+        // 1. Strict block of adult moves
+        baby.startSulfurSpit();
+        helper.assertFalse(baby.getState() == BrimstoneSalamander.State.SULFUR_SPIT, "Baby cannot perform SULFUR_SPIT");
+        baby.startTailWhip();
+        helper.assertFalse(baby.getState() == BrimstoneSalamander.State.TAIL_WHIP, "Baby cannot perform TAIL_WHIP");
+
+        // 2. Direct hit with BABY_NIP (tick 4 impact, 2.0 damage, 15 fire ticks, 25 cooldown)
+        baby.setTarget(dummy);
+        baby.startBabyNip();
+        helper.assertValueEqual(baby.getState(), BrimstoneSalamander.State.SNAP_BITE, "Starts in SNAP_BITE for baby nip");
+
+        for (int i = 0; i < BrimstoneSalamander.BABY_NIP_PREP_TICKS; i++) {
+            baby.tick();
+        }
+
+        helper.assertTrue(dummy.getHealth() < initialHp, "BABY_NIP deals 2.0 damage on tick 4");
+        helper.assertTrue(dummy.getRemainingFireTicks() > 0, "BABY_NIP ignites target for 15 ticks");
+        helper.assertValueEqual(baby.getSnapBiteCooldown(), BrimstoneSalamander.BABY_NIP_COOLDOWN_TICKS, "BABY_NIP cooldown is 25 ticks");
+
+        // 3. Anti-whiff test for BABY_NIP at tick 3
+        dummy.setPos(dummy.getX() + 5.0D, dummy.getY(), dummy.getZ());
+        baby.startBabyNip();
+        for (int i = 0; i < BrimstoneSalamander.BABY_NIP_ANTI_WHIFF_TICK; i++) {
+            baby.tick();
+        }
+        helper.assertValueEqual(baby.getState(), BrimstoneSalamander.State.PURSUING, "Anti-whiff cancels BABY_NIP at tick 3 into PURSUING");
+        helper.assertValueEqual(baby.getSnapBiteCooldown(), BrimstoneSalamander.BABY_NIP_CANCEL_COOLDOWN_TICKS, "Anti-whiff sets 10-tick short cooldown");
+
+        helper.succeed();
+    }
+
+    private static void parentalProtectionFury(GameTestHelper helper) {
+        UUID familyId = UUID.randomUUID();
+        BrimstoneSalamander baby = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(4, 1, 4));
+        baby.setBaby(true);
+        baby.setFamilyId(familyId);
+
+        BrimstoneSalamander adult = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(6, 1, 4));
+        adult.setFamilyId(familyId);
+        baby.setLeaderUUID(adult.getUUID());
+        adult.setState(BrimstoneSalamander.State.IDLE);
+
+        IronGolem attacker = helper.spawnWithNoFreeWill(EntityType.IRON_GOLEM, new BlockPos(4, 1, 6));
+
+        // Damage baby
+        baby.hurtServer(helper.getLevel(), helper.getLevel().damageSources().mobAttack(attacker), 4.0F);
+
+        // Adult immediately targets attacker
+        helper.assertValueEqual(adult.getTarget(), attacker, "Parental guardian targets attacker of baby");
+        helper.assertValueEqual(adult.getState(), BrimstoneSalamander.State.PURSUING, "Parental guardian engages into PURSUING");
+
+        helper.succeed();
+    }
+
+    private static void babyWaterShock(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(3, 1, 3);
+        BrimstoneSalamander baby = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), pos);
+        baby.setBaby(true);
+        helper.assertValueEqual(baby.getHealth(), 16.0F, "Baby starts with full 16 HP");
+
+        helper.setBlock(pos, Blocks.WATER);
+
+        for (int i = 0; i < 20; i++) {
+            baby.tick();
+        }
+
+        helper.assertTrue(baby.getHealth() <= 12.0F, "Water shock deals 4.0 HP damage to baby within 20 ticks");
+
+        helper.succeed();
+    }
+
+    private static void babyFeedingMagmaAndBlaze(GameTestHelper helper) {
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BrimstoneSalamander baby = helper.spawnWithNoFreeWill(ModEntities.BRIMSTONE_SALAMANDER.get(), new BlockPos(3, 1, 3));
+        baby.setBaby(true);
+        baby.setHealth(8.0F);
+        baby.setGrowthAge(-24000);
+
+        // 1. Magma Cream: +3.0 HP and +2400 ticks (10%)
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.MAGMA_CREAM, 1));
+        var res1 = baby.mobInteract(player, InteractionHand.MAIN_HAND);
+        helper.assertValueEqual(res1, net.minecraft.world.InteractionResult.SUCCESS, "Feeding Magma Cream succeeds");
+        helper.assertValueEqual(baby.getHealth(), 11.0F, "Magma Cream heals 3 HP (8 -> 11)");
+        helper.assertValueEqual(baby.getGrowthAge(), -21600, "Magma Cream advances age by 2400 ticks");
+
+        // 2. Blaze Powder: +5.0 HP and +3600 ticks (15%)
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BLAZE_POWDER, 1));
+        var res2 = baby.mobInteract(player, InteractionHand.MAIN_HAND);
+        helper.assertValueEqual(res2, net.minecraft.world.InteractionResult.SUCCESS, "Feeding Blaze Powder succeeds");
+        helper.assertValueEqual(baby.getHealth(), 16.0F, "Blaze Powder heals up to max 16 HP (11 + 5 = 16)");
+        helper.assertValueEqual(baby.getGrowthAge(), -18000, "Blaze Powder advances age by 3600 ticks");
+
+        // 3. Maturation via feeding: advance to near maturation and feed Blaze Powder
+        baby.setGrowthAge(-100);
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BLAZE_POWDER, 1));
+        var res3 = baby.mobInteract(player, InteractionHand.MAIN_HAND);
+        helper.assertValueEqual(res3, net.minecraft.world.InteractionResult.SUCCESS, "Feeding near maturity succeeds");
+        helper.assertFalse(baby.isBaby(), "Baby matures to adult upon reaching threshold via feeding");
+        helper.assertValueEqual(baby.getGrowthAge(), BrimstoneSalamander.ADULT_AGE, "GrowthAge reaches 0 (adult)");
 
         helper.succeed();
     }

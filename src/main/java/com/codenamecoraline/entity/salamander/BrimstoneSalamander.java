@@ -6,6 +6,7 @@ import com.codenamecoraline.entity.raven.FeyRaven;
 import com.codenamecoraline.registry.ModSounds;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
@@ -22,13 +23,17 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.AnimationState;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -45,6 +50,8 @@ import net.minecraft.world.entity.monster.MagmaCube;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.monster.Strider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -67,6 +74,14 @@ public final class BrimstoneSalamander extends Monster {
     public static final float HEIGHT = 0.85F;
     public static final float EYE_HEIGHT = 0.55F;
 
+    public static final float BABY_WIDTH = WIDTH * 0.5F;
+    public static final float BABY_HEIGHT = HEIGHT * 0.5F;
+    public static final float BABY_EYE_HEIGHT = EYE_HEIGHT * 0.5F;
+
+    public static final int BABY_START_AGE = -24000;
+    public static final int READY_TO_MATURE_AGE = -1;
+    public static final int ADULT_AGE = 0;
+
     public static final int MIN_SPAWN_Y = 24;
     public static final int MAX_SPAWN_Y = 48;
 
@@ -79,6 +94,19 @@ public final class BrimstoneSalamander extends Monster {
     public static final double ATTACK_DAMAGE = 6.0D;
     public static final double KNOCKBACK_RESISTANCE = 0.65D;
     public static final double FOLLOW_RANGE = 24.0D;
+
+    // Juvenile scaled attributes (Section 4.2)
+    public static final double BABY_MAX_HEALTH = 16.0D;
+    public static final double BABY_ARMOR = 2.0D;
+    public static final double BABY_ARMOR_TOUGHNESS = 0.0D;
+    public static final double BABY_MOVEMENT_SPEED = 0.26D;
+    public static final double BABY_LAVA_SWIM_SPEED = 0.42D;
+    public static final double BABY_ATTACK_DAMAGE = 2.0D;
+    public static final double BABY_KNOCKBACK_RESISTANCE = 0.15D;
+    public static final double BABY_FOLLOW_RANGE = 16.0D;
+    public static final float BABY_WATER_SHOCK_DAMAGE = 4.0F;
+    public static final int BABY_XP_REWARD = 0;
+    public static final int ADULT_XP_REWARD = 10;
     public static final double STALKING_MIN_RANGE = 8.0D;
     public static final double SPECIES_SPACING_RANGE = 4.0D;
 
@@ -95,6 +123,18 @@ public final class BrimstoneSalamander extends Monster {
     public static final int SNAP_BITE_FIRE_TICKS = 40;
     public static final int SNAP_BITE_COOLDOWN_TICKS = 35;
     public static final int SNAP_BITE_CANCEL_COOLDOWN_TICKS = 15;
+
+    // Attack Juvenile: Mordiscao Juvenil (BABY_NIP)
+    public static final double BABY_NIP_MAX_REACH = 1.4D;
+    public static final double BABY_NIP_ANTI_WHIFF_REACH = 1.8D;
+    public static final int BABY_NIP_PREP_TICKS = 4;
+    public static final int BABY_NIP_ANTI_WHIFF_TICK = 3;
+    public static final int BABY_NIP_EXEC_TICKS = 3;
+    public static final int BABY_NIP_RECOVERY_TICKS = 8;
+    public static final float BABY_NIP_DAMAGE = 2.0F;
+    public static final int BABY_NIP_FIRE_TICKS = 15;
+    public static final int BABY_NIP_COOLDOWN_TICKS = 25;
+    public static final int BABY_NIP_CANCEL_COOLDOWN_TICKS = 10;
 
     // Attack 2: Cuspe Sulfuroso (SULFUR_SPIT)
     public static final double SULFUR_SPIT_MIN_REACH = 4.5D;
@@ -135,6 +175,8 @@ public final class BrimstoneSalamander extends Monster {
             SynchedEntityData.defineId(BrimstoneSalamander.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_VARIANT =
             SynchedEntityData.defineId(BrimstoneSalamander.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> DATA_IS_BABY =
+            SynchedEntityData.defineId(BrimstoneSalamander.class, EntityDataSerializers.BOOLEAN);
 
     public final AnimationState idleBreatheAnimationState = new AnimationState();
     public final AnimationState idleThroatPuffAnimationState = new AnimationState();
@@ -163,6 +205,23 @@ public final class BrimstoneSalamander extends Monster {
     private State lastAttackState = State.IDLE;
     private State clientActiveAttack = State.IDLE;
     private @Nullable BlockPos cachedHeatTarget;
+    private int growthAge = ADULT_AGE;
+    private @Nullable UUID familyId = null;
+    private @Nullable UUID leaderUUID = null;
+    private int lavaHysteresisTicks = 0;
+
+    public static class SalamanderGroupData implements SpawnGroupData {
+        public final UUID familyId;
+        public final BrimstoneSalamanderVariant variant;
+        public final @Nullable UUID leaderUUID;
+        public int spawnedCount = 0;
+
+        public SalamanderGroupData(UUID familyId, BrimstoneSalamanderVariant variant, @Nullable UUID leaderUUID) {
+            this.familyId = familyId;
+            this.variant = variant;
+            this.leaderUUID = leaderUUID;
+        }
+    }
 
     public enum State {
         IDLE,
@@ -201,12 +260,15 @@ public final class BrimstoneSalamander extends Monster {
         super.defineSynchedData(builder);
         builder.define(DATA_STATE, State.IDLE.ordinal());
         builder.define(DATA_VARIANT, BrimstoneSalamanderVariant.BRIMSTONE.getId());
+        builder.define(DATA_IS_BABY, false);
     }
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new SalamanderCombatGoal(this));
-        this.goalSelector.addGoal(2, new SeekHeatOutsideNetherGoal(this));
+        this.goalSelector.addGoal(1, new SalamanderBabyFleeGoal(this));
+        this.goalSelector.addGoal(2, new SalamanderCombatGoal(this));
+        this.goalSelector.addGoal(3, new SalamanderFollowFamilyGoal(this));
+        this.goalSelector.addGoal(4, new SeekHeatOutsideNetherGoal(this));
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
@@ -251,6 +313,9 @@ public final class BrimstoneSalamander extends Monster {
         if (!directRetaliation && entity.getType().builtInRegistryHolder().is(EntityTypeTags.UNDEAD)) {
             return false;
         }
+        if (this.isBaby() && !directRetaliation) {
+            return entity instanceof MagmaCube cube && cube.getSize() <= 1;
+        }
         return true;
     }
 
@@ -270,6 +335,158 @@ public final class BrimstoneSalamander extends Monster {
 
     public void setVariant(BrimstoneSalamanderVariant variant) {
         this.entityData.set(DATA_VARIANT, variant.getId());
+    }
+
+    @Override
+    public EntityDimensions getDefaultDimensions(Pose pose) {
+        EntityDimensions base = super.getDefaultDimensions(pose);
+        return this.isBaby() ? base.withEyeHeight(BABY_EYE_HEIGHT) : base;
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
+        super.onSyncedDataUpdated(key);
+        if (DATA_IS_BABY.equals(key)) {
+            this.refreshDimensions();
+        }
+    }
+
+    @Override
+    public boolean isBaby() {
+        if (this.level().isClientSide()) {
+            return this.entityData.get(DATA_IS_BABY);
+        }
+        return this.growthAge < ADULT_AGE;
+    }
+
+    public void setBaby(boolean baby) {
+        this.setGrowthAge(baby ? BABY_START_AGE : ADULT_AGE);
+    }
+
+    public int getGrowthAge() {
+        return this.growthAge;
+    }
+
+    public void setGrowthAge(int age) {
+        int clamped = Math.clamp(age, BABY_START_AGE, ADULT_AGE);
+        boolean wasBaby = this.isBaby();
+        this.growthAge = clamped;
+        boolean nowBaby = clamped < ADULT_AGE;
+        if (wasBaby != nowBaby || this.entityData.get(DATA_IS_BABY) != nowBaby) {
+            this.entityData.set(DATA_IS_BABY, nowBaby);
+            if (!this.level().isClientSide()) {
+                if (nowBaby) {
+                    this.applyBabyAttributes();
+                } else {
+                    this.applyAdultAttributes();
+                }
+            }
+            this.refreshDimensions();
+        }
+    }
+
+    public @Nullable UUID getFamilyId() {
+        return this.familyId;
+    }
+
+    public void setFamilyId(@Nullable UUID familyId) {
+        this.familyId = familyId;
+    }
+
+    public @Nullable UUID getLeaderUUID() {
+        return this.leaderUUID;
+    }
+
+    public void setLeaderUUID(@Nullable UUID leaderUUID) {
+        this.leaderUUID = leaderUUID;
+    }
+
+    public void applyBabyAttributes() {
+        float currentHealth = this.getHealth();
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(BABY_MAX_HEALTH);
+        this.getAttribute(Attributes.ARMOR).setBaseValue(BABY_ARMOR);
+        this.getAttribute(Attributes.ARMOR_TOUGHNESS).setBaseValue(BABY_ARMOR_TOUGHNESS);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(BABY_MOVEMENT_SPEED);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(BABY_ATTACK_DAMAGE);
+        this.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(BABY_KNOCKBACK_RESISTANCE);
+        this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(BABY_FOLLOW_RANGE);
+        this.setHealth(Math.min(currentHealth, (float) BABY_MAX_HEALTH));
+        this.xpReward = BABY_XP_REWARD;
+    }
+
+    public void applyAdultAttributes() {
+        float currentHealth = this.getHealth();
+        this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(MAX_HEALTH);
+        this.getAttribute(Attributes.ARMOR).setBaseValue(ARMOR);
+        this.getAttribute(Attributes.ARMOR_TOUGHNESS).setBaseValue(ARMOR_TOUGHNESS);
+        this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(MOVEMENT_SPEED);
+        this.getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(ATTACK_DAMAGE);
+        this.getAttribute(Attributes.KNOCKBACK_RESISTANCE).setBaseValue(KNOCKBACK_RESISTANCE);
+        this.getAttribute(Attributes.FOLLOW_RANGE).setBaseValue(FOLLOW_RANGE);
+        this.setHealth(Math.min(currentHealth, (float) MAX_HEALTH));
+        this.xpReward = ADULT_XP_REWARD;
+    }
+
+    public boolean canFitAdultHitbox() {
+        AABB adultAABB = EntityDimensions.scalable(WIDTH, HEIGHT).makeBoundingBox(this.position());
+        return this.level().noCollision(this, adultAABB);
+    }
+
+    public boolean tryMature(ServerLevel level) {
+        if (!this.isBaby() || this.growthAge > READY_TO_MATURE_AGE) {
+            return false;
+        }
+        if (!this.canFitAdultHitbox()) {
+            return false;
+        }
+        this.setGrowthAge(ADULT_AGE);
+        for (int i = 0; i < 16; i++) {
+            double ox = (this.random.nextDouble() - 0.5D) * WIDTH;
+            double oy = this.random.nextDouble() * HEIGHT;
+            double oz = (this.random.nextDouble() - 0.5D) * WIDTH;
+            level.sendParticles(ParticleTypes.LARGE_SMOKE, this.getX() + ox, this.getY() + oy, this.getZ() + oz, 1, 0.0D, 0.02D, 0.0D, 0.02D);
+            level.sendParticles(ParticleTypes.FLAME, this.getX() + ox, this.getY() + oy, this.getZ() + oz, 1, 0.0D, 0.03D, 0.0D, 0.03D);
+        }
+        this.playSound(ModSounds.BRIMSTONE_SALAMANDER_AMBIENT.get(), 1.0F, 0.8F);
+        return true;
+    }
+
+    @Override
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
+        ItemStack held = player.getItemInHand(hand);
+        if (this.isBaby()) {
+            boolean isMagmaCream = held.is(Items.MAGMA_CREAM);
+            boolean isBlazePowder = held.is(Items.BLAZE_POWDER);
+            if (isMagmaCream || isBlazePowder) {
+                if (!player.getAbilities().instabuild) {
+                    held.shrink(1);
+                }
+                if (!this.level().isClientSide() && this.level() instanceof ServerLevel serverLevel) {
+                    float healAmount = isMagmaCream ? 3.0F : 5.0F;
+                    this.heal(healAmount);
+
+                    int ageBonus = isMagmaCream ? 2400 : 3600;
+                    int newAge = this.growthAge + ageBonus;
+                    if (newAge >= READY_TO_MATURE_AGE) {
+                        this.setGrowthAge(READY_TO_MATURE_AGE);
+                        this.tryMature(serverLevel);
+                    } else {
+                        this.setGrowthAge(newAge);
+                    }
+
+                    for (int i = 0; i < 8; i++) {
+                        double ox = (this.random.nextDouble() - 0.5D) * this.getBbWidth();
+                        double oy = this.random.nextDouble() * this.getBbHeight();
+                        double oz = (this.random.nextDouble() - 0.5D) * this.getBbWidth();
+                        serverLevel.sendParticles(ParticleTypes.FLAME, this.getX() + ox, this.getY() + oy, this.getZ() + oz, 1, 0.0D, 0.02D, 0.0D, 0.02D);
+                        serverLevel.sendParticles(ParticleTypes.SMOKE, this.getX() + ox, this.getY() + oy, this.getZ() + oz, 1, 0.0D, 0.01D, 0.0D, 0.01D);
+                    }
+                }
+                this.playSound(SoundEvents.GENERIC_EAT.value(), 1.0F, 1.0F);
+                return InteractionResult.SUCCESS;
+            }
+        }
+        return super.mobInteract(player, hand);
     }
 
     public int getActionTicks() {
@@ -293,7 +510,9 @@ public final class BrimstoneSalamander extends Monster {
     }
 
     public boolean isSwimmingInLava() {
-        return this.isInLava() || this.level().getFluidState(this.blockPosition()).is(FluidTags.LAVA);
+        return this.isInLava()
+                || this.level().getFluidState(this.blockPosition()).is(FluidTags.LAVA)
+                || this.lavaHysteresisTicks > 0;
     }
 
     public boolean isInAttackOrRecovery() {
@@ -304,6 +523,13 @@ public final class BrimstoneSalamander extends Monster {
     @Override
     public void tick() {
         super.tick();
+        boolean inLava = this.isInLava() || this.level().getFluidState(this.blockPosition()).is(FluidTags.LAVA);
+        if (inLava) {
+            this.lavaHysteresisTicks = 4;
+        } else if (this.lavaHysteresisTicks > 0) {
+            this.lavaHysteresisTicks--;
+        }
+
         if (this.level().isClientSide()) {
             this.idleBreatheAnimationState.startIfStopped(this.tickCount);
             if (this.isSwimmingInLava()) {
@@ -316,6 +542,19 @@ public final class BrimstoneSalamander extends Monster {
 
         if (!this.isAlive() || !(this.level() instanceof ServerLevel serverLevel)) {
             return;
+        }
+
+        boolean exposedToWater = this.isInWater() || this.level().isRainingAt(this.blockPosition());
+        if (this.isBaby() && exposedToWater && this.tickCount % 20 == 0) {
+            this.hurtServer(serverLevel, this.damageSources().drown(), BABY_WATER_SHOCK_DAMAGE);
+        }
+
+        if (this.growthAge < ADULT_AGE) {
+            if (this.growthAge < READY_TO_MATURE_AGE) {
+                this.growthAge++;
+            } else if (this.growthAge == READY_TO_MATURE_AGE) {
+                this.tryMature(serverLevel);
+            }
         }
 
         if (this.snapBiteCooldown > 0) {
@@ -356,7 +595,15 @@ public final class BrimstoneSalamander extends Monster {
         List<BrimstoneSalamander> neighbors = this.level().getEntitiesOfClass(
                 BrimstoneSalamander.class,
                 box,
-                other -> other != this && other.isAlive() && other.getState() == State.IDLE);
+                other -> {
+                    if (other == this || !other.isAlive() || other.getState() != State.IDLE) {
+                        return false;
+                    }
+                    if (this.familyId != null && this.familyId.equals(other.familyId) && (this.isBaby() || other.isBaby())) {
+                        return false;
+                    }
+                    return true;
+                });
         if (neighbors.isEmpty()) {
             return;
         }
@@ -391,7 +638,9 @@ public final class BrimstoneSalamander extends Monster {
     public void travel(Vec3 travelVector) {
         if (!this.level().isClientSide() && this.isSwimmingInLava()) {
             float baseSpeed = this.getSpeed() > 0.0F ? this.getSpeed() : (float) this.getAttributeValue(Attributes.MOVEMENT_SPEED);
-            float swimImpulse = (float) (baseSpeed * (LAVA_SWIM_SPEED / MOVEMENT_SPEED) * 0.474F);
+            double targetSwimSpeed = this.isBaby() ? BABY_LAVA_SWIM_SPEED : LAVA_SWIM_SPEED;
+            double targetMoveSpeed = this.isBaby() ? BABY_MOVEMENT_SPEED : MOVEMENT_SPEED;
+            float swimImpulse = (float) (baseSpeed * (targetSwimSpeed / targetMoveSpeed) * 0.474F);
             this.moveRelative(swimImpulse, travelVector);
             this.move(MoverType.SELF, this.getDeltaMovement());
             this.setDeltaMovement(this.getDeltaMovement().multiply(0.68D, 0.80D, 0.68D));
@@ -444,7 +693,14 @@ public final class BrimstoneSalamander extends Monster {
         this.level().broadcastEntityEvent(this, EVENT_SNAP_BITE);
     }
 
+    public void startBabyNip() {
+        this.startSnapBite();
+    }
+
     public void startSulfurSpit() {
+        if (this.isBaby()) {
+            return;
+        }
         this.setState(State.SULFUR_SPIT);
         this.lastAttackState = State.SULFUR_SPIT;
         this.actionTicks = 0;
@@ -454,6 +710,9 @@ public final class BrimstoneSalamander extends Monster {
     }
 
     public void startTailWhip() {
+        if (this.isBaby()) {
+            return;
+        }
         this.setState(State.TAIL_WHIP);
         this.lastAttackState = State.TAIL_WHIP;
         this.actionTicks = 0;
@@ -496,6 +755,10 @@ public final class BrimstoneSalamander extends Monster {
     }
 
     private void tickSnapBite(ServerLevel level, @Nullable LivingEntity target) {
+        if (this.isBaby()) {
+            this.tickBabyNip(level, target);
+            return;
+        }
         this.actionTicks++;
         this.getNavigation().stop();
         if (target != null && this.actionTicks <= SNAP_BITE_PREP_TICKS) {
@@ -539,6 +802,43 @@ public final class BrimstoneSalamander extends Monster {
         if (this.actionTicks >= SNAP_BITE_PREP_TICKS + SNAP_BITE_EXEC_TICKS) {
             int rec = this.recoveryTicks > 0 ? this.recoveryTicks : SNAP_BITE_RECOVERY_TICKS;
             this.enterRecovery(rec);
+        }
+    }
+
+    private void tickBabyNip(ServerLevel level, @Nullable LivingEntity target) {
+        this.actionTicks++;
+        this.getNavigation().stop();
+        if (target != null && this.actionTicks <= BABY_NIP_PREP_TICKS) {
+            this.getLookControl().setLookAt(target, 30.0F, 30.0F);
+        }
+
+        // Anti-whiff check at tick 3
+        if (this.actionTicks == BABY_NIP_ANTI_WHIFF_TICK) {
+            if (target == null || this.horizontalSurfaceDistance(target) > BABY_NIP_ANTI_WHIFF_REACH) {
+                this.snapBiteCooldown = BABY_NIP_CANCEL_COOLDOWN_TICKS;
+                this.actionTicks = 0;
+                this.setState(target != null ? State.PURSUING : State.IDLE);
+                this.level().broadcastEntityEvent(this, EVENT_ATTACK_RECOVERY);
+                return;
+            }
+        }
+
+        // Impact at tick 4
+        if (this.actionTicks == BABY_NIP_PREP_TICKS) {
+            this.level().broadcastEntityEvent(this, EVENT_ATTACK_EXEC);
+            this.playSound(ModSounds.BRIMSTONE_SALAMANDER_BITE.get(), 0.8F, 1.3F);
+            if (target != null && this.horizontalSurfaceDistance(target) <= BABY_NIP_ANTI_WHIFF_REACH) {
+                boolean hit = target.hurtServer(level, this.damageSources().mobAttack(this), BABY_NIP_DAMAGE);
+                if (hit) {
+                    target.setRemainingFireTicks(Math.max(target.getRemainingFireTicks(), BABY_NIP_FIRE_TICKS));
+                }
+            }
+            this.snapBiteCooldown = BABY_NIP_COOLDOWN_TICKS;
+            this.recoveryTicks = BABY_NIP_RECOVERY_TICKS;
+        }
+
+        if (this.actionTicks >= BABY_NIP_PREP_TICKS + BABY_NIP_EXEC_TICKS) {
+            this.enterRecovery(BABY_NIP_RECOVERY_TICKS);
         }
     }
 
@@ -753,9 +1053,12 @@ public final class BrimstoneSalamander extends Monster {
         boolean hurt = super.hurtServer(level, source, amount);
         if (hurt && this.isAlive()) {
             level.broadcastEntityEvent(this, EVENT_HURT);
-            if (source.is(DamageTypeTags.IS_PROJECTILE)) {
+            if (!this.isBaby() && source.is(DamageTypeTags.IS_PROJECTILE)) {
                 this.retaliateWithSpit = true;
                 this.sulfurSpitCooldown = 0;
+            }
+            if (this.isBaby()) {
+                this.alertParentalGuardians(source);
             }
             if (source.getEntity() instanceof LivingEntity attacker && this.canTargetEntity(attacker, true)) {
                 LivingEntity currentTarget = this.getTarget();
@@ -777,6 +1080,33 @@ public final class BrimstoneSalamander extends Monster {
         return hurt;
     }
 
+    private void alertParentalGuardians(DamageSource source) {
+        net.minecraft.world.entity.Entity attackerEntity = source.getEntity() != null ? source.getEntity() : source.getDirectEntity();
+        if (!(attackerEntity instanceof LivingEntity attacker) || !attacker.isAlive() || attacker == this) {
+            return;
+        }
+        if (attacker instanceof Player player && (player.isCreative() || player.isSpectator())) {
+            return;
+        }
+        AABB defenseBox = this.getBoundingBox().inflate(16.0D, 8.0D, 16.0D);
+        List<BrimstoneSalamander> adults = this.level().getEntitiesOfClass(
+                BrimstoneSalamander.class,
+                defenseBox,
+                other -> other != this && !other.isBaby() && other.isAlive()
+        );
+        for (BrimstoneSalamander adult : adults) {
+            boolean familyMatch = this.familyId == null
+                    || this.familyId.equals(adult.getFamilyId())
+                    || (this.leaderUUID != null && this.leaderUUID.equals(adult.getUUID()));
+            if (familyMatch && adult.canTargetEntity(attacker, true)) {
+                adult.setTarget(attacker);
+                if (adult.getState() == State.IDLE) {
+                    adult.setState(State.PURSUING);
+                }
+            }
+        }
+    }
+
     @Override
     public void die(DamageSource source) {
         super.die(source);
@@ -791,9 +1121,17 @@ public final class BrimstoneSalamander extends Monster {
         super.addAdditionalSaveData(output);
         output.putString("SalamanderState", this.getState().name());
         output.putString("Variant", this.getVariant().getSerializedName());
+        output.putInt("GrowthAge", this.growthAge);
+        output.putBoolean("IsBaby", this.isBaby());
         output.putInt("SnapBiteCooldown", this.snapBiteCooldown);
         output.putInt("SulfurSpitCooldown", this.sulfurSpitCooldown);
         output.putInt("TailWhipCooldown", this.tailWhipCooldown);
+        if (this.familyId != null) {
+            output.putString("FamilyId", this.familyId.toString());
+        }
+        if (this.leaderUUID != null) {
+            output.putString("LeaderUUID", this.leaderUUID.toString());
+        }
     }
 
     @Override
@@ -807,31 +1145,81 @@ public final class BrimstoneSalamander extends Monster {
         }
         String variantName = input.getStringOr("Variant", BrimstoneSalamanderVariant.BRIMSTONE.getSerializedName());
         this.setVariant(BrimstoneSalamanderVariant.byName(variantName));
+        int savedAge = input.getIntOr("GrowthAge", Integer.MIN_VALUE);
+        if (savedAge == Integer.MIN_VALUE) {
+            int legacyAge = input.getIntOr("Age", Integer.MIN_VALUE);
+            if (legacyAge != Integer.MIN_VALUE) {
+                savedAge = legacyAge;
+            } else {
+                boolean legacyBaby = input.getBooleanOr("IsBaby", false);
+                savedAge = legacyBaby ? BABY_START_AGE : ADULT_AGE;
+            }
+        }
+        this.setGrowthAge(savedAge);
         this.snapBiteCooldown = input.getIntOr("SnapBiteCooldown", 0);
         this.sulfurSpitCooldown = input.getIntOr("SulfurSpitCooldown", 0);
         this.tailWhipCooldown = input.getIntOr("TailWhipCooldown", 0);
+
+        String famStr = input.getStringOr("FamilyId", "");
+        if (!famStr.isEmpty()) {
+            try {
+                this.familyId = UUID.fromString(famStr);
+            } catch (IllegalArgumentException ignored) {
+                this.familyId = null;
+            }
+        } else {
+            this.familyId = null;
+        }
+
+        String leaderStr = input.getStringOr("LeaderUUID", "");
+        if (!leaderStr.isEmpty()) {
+            try {
+                this.leaderUUID = UUID.fromString(leaderStr);
+            } catch (IllegalArgumentException ignored) {
+                this.leaderUUID = null;
+            }
+        } else {
+            this.leaderUUID = null;
+        }
     }
 
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty,
                                                   EntitySpawnReason spawnReason, @Nullable SpawnGroupData groupData) {
-        SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnReason, groupData);
-        Holder<Biome> biome = level.getBiome(this.blockPosition());
-        if (biome.is(Biomes.SOUL_SAND_VALLEY)) {
-            this.setVariant(this.random.nextFloat() < 0.70F ? BrimstoneSalamanderVariant.SOULFLAME : BrimstoneSalamanderVariant.BRIMSTONE);
-        } else if (biome.is(Biomes.CRIMSON_FOREST)) {
-            this.setVariant(this.random.nextFloat() < 0.60F ? BrimstoneSalamanderVariant.CRIMSON : BrimstoneSalamanderVariant.BRIMSTONE);
-        } else {
-            float roll = this.random.nextFloat();
-            if (roll < 0.15F) {
-                this.setVariant(BrimstoneSalamanderVariant.SOULFLAME);
-            } else if (roll < 0.30F) {
-                this.setVariant(BrimstoneSalamanderVariant.CRIMSON);
-            } else {
-                this.setVariant(BrimstoneSalamanderVariant.BRIMSTONE);
+        super.finalizeSpawn(level, difficulty, spawnReason, groupData);
+        SalamanderGroupData resultData;
+        if (groupData instanceof SalamanderGroupData salamanderGroupData) {
+            resultData = salamanderGroupData;
+            this.setVariant(resultData.variant);
+            this.setFamilyId(resultData.familyId);
+            if (resultData.leaderUUID != null) {
+                this.setLeaderUUID(resultData.leaderUUID);
             }
+            if (resultData.spawnedCount > 0 && this.random.nextFloat() < 0.40F) {
+                this.setBaby(true);
+            }
+            resultData.spawnedCount++;
+        } else {
+            Holder<Biome> biome = level.getBiome(this.blockPosition());
+            if (biome.is(Biomes.SOUL_SAND_VALLEY)) {
+                this.setVariant(this.random.nextFloat() < 0.70F ? BrimstoneSalamanderVariant.SOULFLAME : BrimstoneSalamanderVariant.BRIMSTONE);
+            } else if (biome.is(Biomes.CRIMSON_FOREST)) {
+                this.setVariant(this.random.nextFloat() < 0.60F ? BrimstoneSalamanderVariant.CRIMSON : BrimstoneSalamanderVariant.BRIMSTONE);
+            } else {
+                float roll = this.random.nextFloat();
+                if (roll < 0.15F) {
+                    this.setVariant(BrimstoneSalamanderVariant.SOULFLAME);
+                } else if (roll < 0.30F) {
+                    this.setVariant(BrimstoneSalamanderVariant.CRIMSON);
+                } else {
+                    this.setVariant(BrimstoneSalamanderVariant.BRIMSTONE);
+                }
+            }
+            this.familyId = UUID.randomUUID();
+            resultData = new SalamanderGroupData(this.familyId, this.getVariant(), this.getUUID());
+            resultData.spawnedCount = 1;
         }
-        return data;
+        return resultData;
     }
 
     public static boolean checkSpawnRules(
@@ -935,16 +1323,16 @@ public final class BrimstoneSalamander extends Monster {
             double surfDist = this.mob.horizontalSurfaceDistance(target);
             boolean pillaring = this.mob.isTargetPillaring(target);
 
-            // 1. Anti-cerco / Flanking Tail Whip priority
-            if (this.mob.tailWhipCooldown <= 0 && surfDist <= TAIL_WHIP_MAX_REACH && !pillaring) {
+            // 1. Anti-cerco / Flanking Tail Whip priority (adults only)
+            if (!this.mob.isBaby() && this.mob.tailWhipCooldown <= 0 && surfDist <= TAIL_WHIP_MAX_REACH && !pillaring) {
                 if (this.mob.countNearbyEnemies(ANTI_SURROUND_RADIUS) >= 2 || this.mob.isTargetFlankingOrBehind(target)) {
                     this.mob.startTailWhip();
                     return;
                 }
             }
 
-            // 2. Anti-pillaring, ranged retaliation, or mid-range Sulfur Spit
-            if (this.mob.sulfurSpitCooldown <= 0 && this.mob.hasLineOfSight(target)) {
+            // 2. Anti-pillaring, ranged retaliation, or mid-range Sulfur Spit (adults only)
+            if (!this.mob.isBaby() && this.mob.sulfurSpitCooldown <= 0 && this.mob.hasLineOfSight(target)) {
                 boolean inSpitRange = surfDist >= SULFUR_SPIT_MIN_REACH && surfDist <= SULFUR_SPIT_MAX_REACH;
                 if (pillaring || this.mob.retaliateWithSpit || inSpitRange) {
                     this.mob.startSulfurSpit();
@@ -952,8 +1340,9 @@ public final class BrimstoneSalamander extends Monster {
                 }
             }
 
-            // 3. Close-range Snap Bite (disabled when target is pillaring)
-            if (this.mob.snapBiteCooldown <= 0 && surfDist <= SNAP_BITE_MAX_REACH && !pillaring) {
+            // 3. Close-range Snap Bite (adult) or Baby Nip (juvenile) (disabled when target is pillaring)
+            double biteReach = this.mob.isBaby() ? BABY_NIP_MAX_REACH : SNAP_BITE_MAX_REACH;
+            if (this.mob.snapBiteCooldown <= 0 && surfDist <= biteReach && !pillaring) {
                 this.mob.startSnapBite();
                 return;
             }
@@ -1048,6 +1437,223 @@ public final class BrimstoneSalamander extends Monster {
                     || state.is(Blocks.FIRE)
                     || state.is(Blocks.SOUL_FIRE)
                     || state.is(Blocks.TORCH);
+        }
+    }
+
+    /** Baby flee goal: retreats behind an adult family member, into lava, or away from large threats. */
+    private static final class SalamanderBabyFleeGoal extends Goal {
+        private final BrimstoneSalamander baby;
+        private @Nullable LivingEntity threat;
+        private @Nullable Vec3 fleeTarget;
+        private int fleeTicks = 0;
+
+        SalamanderBabyFleeGoal(BrimstoneSalamander baby) {
+            this.baby = baby;
+            this.setFlags(EnumSet.of(Flag.MOVE));
+        }
+
+        @Override
+        public boolean canUse() {
+            if (!this.baby.isBaby() || this.baby.isInAttackOrRecovery()) {
+                return false;
+            }
+            AABB search = this.baby.getBoundingBox().inflate(8.0D, 4.0D, 8.0D);
+            List<LivingEntity> threats = this.baby.level().getEntitiesOfClass(
+                    LivingEntity.class, search,
+                    e -> (e instanceof Player p && !p.isCreative() && !p.isSpectator()) || e instanceof IronGolem
+            );
+            if (threats.isEmpty()) {
+                return false;
+            }
+            this.threat = threats.get(0);
+            this.fleeTarget = this.calculateFleeTarget(this.threat);
+            return this.fleeTarget != null;
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            return this.threat != null && this.threat.isAlive() && this.fleeTicks > 0
+                    && this.baby.distanceToSqr(this.threat) < 144.0D
+                    && !this.baby.getNavigation().isDone();
+        }
+
+        @Override
+        public void start() {
+            this.fleeTicks = 60;
+            if (this.fleeTarget != null) {
+                this.baby.getNavigation().moveTo(this.fleeTarget.x, this.fleeTarget.y, this.fleeTarget.z, 1.25D);
+            }
+        }
+
+        @Override
+        public void tick() {
+            this.fleeTicks--;
+            if (this.fleeTicks % 15 == 0 && this.threat != null && this.threat.isAlive()) {
+                Vec3 newTarget = this.calculateFleeTarget(this.threat);
+                if (newTarget != null) {
+                    this.fleeTarget = newTarget;
+                    this.baby.getNavigation().moveTo(newTarget.x, newTarget.y, newTarget.z, 1.25D);
+                }
+            }
+        }
+
+        @Override
+        public void stop() {
+            this.threat = null;
+            this.fleeTarget = null;
+            this.fleeTicks = 0;
+            this.baby.getNavigation().stop();
+        }
+
+        private @Nullable Vec3 calculateFleeTarget(LivingEntity threat) {
+            BrimstoneSalamander adult = this.findNearbyAdult();
+            if (adult != null) {
+                Vec3 adultPos = adult.position();
+                Vec3 threatPos = threat.position();
+                Vec3 awayFromThreat = adultPos.subtract(threatPos).horizontal().normalize();
+                if (awayFromThreat.lengthSqr() < 1.0E-4D) {
+                    awayFromThreat = new Vec3(1, 0, 0);
+                }
+                return adultPos.add(awayFromThreat.scale(2.5D));
+            }
+
+            BlockPos lavaPos = this.findNearbyLava();
+            if (lavaPos != null) {
+                return Vec3.atBottomCenterOf(lavaPos);
+            }
+
+            Vec3 dir = this.baby.position().subtract(threat.position()).horizontal().normalize();
+            if (dir.lengthSqr() < 1.0E-4D) {
+                dir = new Vec3(this.baby.getRandom().nextGaussian(), 0, this.baby.getRandom().nextGaussian()).normalize();
+            }
+            return this.baby.position().add(dir.scale(8.0D));
+        }
+
+        private @Nullable BrimstoneSalamander findNearbyAdult() {
+            AABB box = this.baby.getBoundingBox().inflate(16.0D, 8.0D, 16.0D);
+            List<BrimstoneSalamander> adults = this.baby.level().getEntitiesOfClass(
+                    BrimstoneSalamander.class, box,
+                    other -> other != this.baby && !other.isBaby() && other.isAlive()
+            );
+            if (adults.isEmpty()) return null;
+            UUID familyId = this.baby.getFamilyId();
+            for (BrimstoneSalamander a : adults) {
+                if (familyId != null && familyId.equals(a.getFamilyId())) {
+                    return a;
+                }
+            }
+            return adults.get(0);
+        }
+
+        private @Nullable BlockPos findNearbyLava() {
+            BlockPos origin = this.baby.blockPosition();
+            BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+            for (int r = 1; r <= 8; r++) {
+                for (int dy = -2; dy <= 2; dy++) {
+                    for (int dx = -r; dx <= r; dx++) {
+                        for (int dz = -r; dz <= r; dz++) {
+                            cursor.set(origin.getX() + dx, origin.getY() + dy, origin.getZ() + dz);
+                            if (this.baby.level().getFluidState(cursor).is(FluidTags.LAVA)) {
+                                return cursor.immutable();
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
+    /** Follow family goal: keeps juveniles safely escorted near their adult family leader. */
+    private static final class SalamanderFollowFamilyGoal extends Goal {
+        private final BrimstoneSalamander baby;
+        private @Nullable BrimstoneSalamander adult;
+        private int checkCooldown = 0;
+
+        SalamanderFollowFamilyGoal(BrimstoneSalamander baby) {
+            this.baby = baby;
+            this.setFlags(EnumSet.of(Flag.MOVE));
+        }
+
+        @Override
+        public boolean canUse() {
+            if (!this.baby.isBaby() || this.baby.isInAttackOrRecovery()) {
+                return false;
+            }
+            if (--this.checkCooldown > 0) {
+                return false;
+            }
+            this.checkCooldown = 10;
+            this.adult = this.findAdult();
+            if (this.adult != null) {
+                double distSq = this.baby.distanceToSqr(this.adult);
+                return distSq > 20.25D; // > 4.5 blocks
+            }
+            return false;
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            if (!this.baby.isBaby() || this.baby.isInAttackOrRecovery() || this.adult == null || !this.adult.isAlive()) {
+                return false;
+            }
+            double distSq = this.baby.distanceToSqr(this.adult);
+            return distSq > 4.0D && distSq < 576.0D; // between 2.0 and 24.0 blocks
+        }
+
+        @Override
+        public void start() {
+            if (this.adult != null) {
+                this.baby.getNavigation().moveTo(this.adult, 1.15D);
+            }
+        }
+
+        @Override
+        public void tick() {
+            if (this.adult == null) return;
+            this.baby.getLookControl().setLookAt(this.adult, 20.0F, 20.0F);
+            if (this.baby.getNavigation().isDone() || this.baby.tickCount % 20 == 0) {
+                double distSq = this.baby.distanceToSqr(this.adult);
+                double speed = distSq > 100.0D ? 1.25D : 1.15D;
+                this.baby.getNavigation().moveTo(this.adult, speed);
+            }
+        }
+
+        @Override
+        public void stop() {
+            this.adult = null;
+            this.baby.getNavigation().stop();
+        }
+
+        private @Nullable BrimstoneSalamander findAdult() {
+            AABB box = this.baby.getBoundingBox().inflate(16.0D, 8.0D, 16.0D);
+            List<BrimstoneSalamander> list = this.baby.level().getEntitiesOfClass(
+                    BrimstoneSalamander.class, box,
+                    other -> other != this.baby && !other.isBaby() && other.isAlive()
+            );
+            if (list.isEmpty()) {
+                return null;
+            }
+            UUID familyId = this.baby.getFamilyId();
+            UUID leaderUUID = this.baby.getLeaderUUID();
+            for (BrimstoneSalamander a : list) {
+                if (leaderUUID != null && leaderUUID.equals(a.getUUID())) {
+                    return a;
+                }
+                if (familyId != null && familyId.equals(a.getFamilyId())) {
+                    return a;
+                }
+            }
+            BrimstoneSalamander closest = null;
+            double minDist = Double.MAX_VALUE;
+            for (BrimstoneSalamander a : list) {
+                double d = this.baby.distanceToSqr(a);
+                if (d < minDist) {
+                    minDist = d;
+                    closest = a;
+                }
+            }
+            return closest;
         }
     }
 }

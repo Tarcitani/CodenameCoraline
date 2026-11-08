@@ -23,6 +23,13 @@ public final class BrimstoneSalamanderEyesLayer
     private static final RenderType CRIMSON_GLOW = RenderTypes.eyes(
             Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "textures/entity/brimstone_salamander_crimson_eyes.png"));
 
+    private static final RenderType BRIMSTONE_BABY_GLOW = RenderTypes.eyes(
+            Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "textures/entity/brimstone_salamander_baby_eyes.png"));
+    private static final RenderType SOULFLAME_BABY_GLOW = RenderTypes.eyes(
+            Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "textures/entity/brimstone_salamander_soulflame_baby_eyes.png"));
+    private static final RenderType CRIMSON_BABY_GLOW = RenderTypes.eyes(
+            Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "textures/entity/brimstone_salamander_crimson_baby_eyes.png"));
+
     public BrimstoneSalamanderEyesLayer(
             RenderLayerParent<BrimstoneSalamanderRenderState, BrimstoneSalamanderModel> parent) {
         super(parent);
@@ -32,11 +39,17 @@ public final class BrimstoneSalamanderEyesLayer
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords,
                        BrimstoneSalamanderRenderState state, float yRot, float xRot) {
         if (state.fissuresGlowing) {
-            RenderType type = switch (state.variant) {
-                case BRIMSTONE -> BRIMSTONE_GLOW;
-                case SOULFLAME -> SOULFLAME_GLOW;
-                case CRIMSON -> CRIMSON_GLOW;
-            };
+            RenderType type = state.isBaby
+                    ? switch (state.variant) {
+                        case BRIMSTONE -> BRIMSTONE_BABY_GLOW;
+                        case SOULFLAME -> SOULFLAME_BABY_GLOW;
+                        case CRIMSON -> CRIMSON_BABY_GLOW;
+                    }
+                    : switch (state.variant) {
+                        case BRIMSTONE -> BRIMSTONE_GLOW;
+                        case SOULFLAME -> SOULFLAME_GLOW;
+                        case CRIMSON -> CRIMSON_GLOW;
+                    };
             submitNodeCollector.submitModel(
                     this.getParentModel(),
                     state,

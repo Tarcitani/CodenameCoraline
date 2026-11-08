@@ -95,7 +95,7 @@ def verify_uv_non_overlap(atlas_w: int = 128, atlas_h: int = 128) -> None:
     print(f"[UV CHECK PASSED] {len(UV_BOXES)} boxes verified on {atlas_w}x{atlas_h} atlas with 0 overlaps.")
 
 
-def paint_basalt_box(skin: Image.Image, eyes: Image.Image, u: int, v: int, w: int, h: int, d: int, name: str, palette: dict) -> None:
+def paint_basalt_box(skin: Image.Image, eyes: Image.Image, u: int, v: int, w: int, h: int, d: int, name: str, palette: dict, is_baby: bool = False) -> None:
     rect_w = 2 * (d + w)
     rect_h = d + h
     for py in range(v, v + rect_h):
@@ -106,6 +106,12 @@ def paint_basalt_box(skin: Image.Image, eyes: Image.Image, u: int, v: int, w: in
                 tone = palette["highlight_ash"] if rel_x < d + w else palette["shadow_basalt"]
             elif rel_y == rect_h - 1 or rel_x in (0, d, d + w, rect_w - 1):
                 tone = palette["edge_charcoal"]
+            elif is_baby:
+                # Smoother juvenile texture with fewer jagged scutes
+                if (rel_x + rel_y) % 6 == 0:
+                    tone = palette["mid_slate"]
+                else:
+                    tone = palette["base_slate"]
             elif (rel_x + rel_y) % 5 == 0:
                 tone = palette["highlight_ash"]
             elif (rel_x * 2 + rel_y) % 3 == 0:
@@ -119,9 +125,16 @@ def paint_basalt_box(skin: Image.Image, eyes: Image.Image, u: int, v: int, w: in
         for py in range(v, v + rect_h):
             for px in range(u, u + rect_w):
                 dist = abs((px - u) - rect_w // 2) + abs((py - v) - rect_h // 2)
-                c = palette["glow_core"] if dist < 4 else (palette["glow_mid"] if dist < 8 else palette["accent_base"])
-                skin.putpixel((px, py), c)
-                eyes.putpixel((px, py), c)
+                if is_baby:
+                    # Smaller, tender bellows with gentle warm glow
+                    c = palette["glow_mid"] if dist < 2 else (palette["accent_base"] if dist < 5 else palette["shadow_basalt"])
+                    skin.putpixel((px, py), c)
+                    if dist < 2:
+                        eyes.putpixel((px, py), c)
+                else:
+                    c = palette["glow_core"] if dist < 4 else (palette["glow_mid"] if dist < 8 else palette["accent_base"])
+                    skin.putpixel((px, py), c)
+                    eyes.putpixel((px, py), c)
     elif name == "forked_tongue":
         for py in range(v, v + rect_h):
             for px in range(u, u + rect_w):
@@ -131,23 +144,39 @@ def paint_basalt_box(skin: Image.Image, eyes: Image.Image, u: int, v: int, w: in
     elif name.startswith("dorsal_plate_"):
         for py in range(v + d, v + rect_h):
             for px in range(u, u + rect_w):
-                if py == v + d:
-                    skin.putpixel((px, py), palette["accent_bright"])
-                    eyes.putpixel((px, py), palette["accent_base"])
-                elif (px + py) % 3 == 0:
-                    skin.putpixel((px, py), palette["glow_mid"])
-                    eyes.putpixel((px, py), palette["glow_dark"])
+                if is_baby:
+                    # Softer juvenile dorsal scutes
+                    if py == v + d:
+                        skin.putpixel((px, py), palette["accent_base"])
+                    elif (px + py) % 4 == 0:
+                        skin.putpixel((px, py), palette["glow_dark"])
+                else:
+                    if py == v + d:
+                        skin.putpixel((px, py), palette["accent_bright"])
+                        eyes.putpixel((px, py), palette["accent_base"])
+                    elif (px + py) % 3 == 0:
+                        skin.putpixel((px, py), palette["glow_mid"])
+                        eyes.putpixel((px, py), palette["glow_dark"])
     elif name in ("body", "body_carapace", "neck", "tail_base", "tail_mid", "tail_tip"):
         for py in range(v, v + rect_h):
             for px in range(u, u + rect_w):
-                pattern = (px * 7 + py * 13) % 29
-                if pattern in (0, 1):
-                    skin.putpixel((px, py), palette["accent_base"])
+                if is_baby:
+                    # Fine, subtle juvenile fissure lines
+                    pattern = (px * 11 + py * 7) % 37
                     if pattern == 0:
-                        eyes.putpixel((px, py), palette["accent_bright"])
-                elif pattern == 14:
-                    skin.putpixel((px, py), palette["glow_mid"])
-                    eyes.putpixel((px, py), palette["glow_mid"])
+                        skin.putpixel((px, py), palette["accent_base"])
+                        eyes.putpixel((px, py), palette["accent_base"])
+                    elif pattern == 18:
+                        skin.putpixel((px, py), palette["glow_dark"])
+                else:
+                    pattern = (px * 7 + py * 13) % 29
+                    if pattern in (0, 1):
+                        skin.putpixel((px, py), palette["accent_base"])
+                        if pattern == 0:
+                            eyes.putpixel((px, py), palette["accent_bright"])
+                    elif pattern == 14:
+                        skin.putpixel((px, py), palette["glow_mid"])
+                        eyes.putpixel((px, py), palette["glow_mid"])
 
 
 def generate_variant(palette: dict, out_skin_path: Path, out_eyes_path: Path) -> None:
@@ -155,7 +184,7 @@ def generate_variant(palette: dict, out_skin_path: Path, out_eyes_path: Path) ->
     eyes = Image.new("RGBA", (128, 128), (0, 0, 0, 0))
 
     for u, v, w, h, d, name in UV_BOXES:
-        paint_basalt_box(skin, eyes, u, v, w, h, d, name, palette)
+        paint_basalt_box(skin, eyes, u, v, w, h, d, name, palette, is_baby=False)
 
     # Lateral glowing eyes on head_cranium (0, 34, 9, 4, 6)
     for ex, ey in [(2, 41), (3, 41), (17, 41), (18, 41), (7, 41), (13, 41)]:
@@ -176,6 +205,46 @@ def generate_variant(palette: dict, out_skin_path: Path, out_eyes_path: Path) ->
     print(f"Generated {out_skin_path.name} and {out_eyes_path.name}")
 
 
+def generate_baby_variant(palette: dict, out_skin_path: Path, out_eyes_path: Path) -> None:
+    skin = Image.new("RGBA", (128, 128), (0, 0, 0, 0))
+    eyes = Image.new("RGBA", (128, 128), (0, 0, 0, 0))
+
+    for u, v, w, h, d, name in UV_BOXES:
+        paint_basalt_box(skin, eyes, u, v, w, h, d, name, palette, is_baby=True)
+
+    # Expressive, rounder lateral eyes on head_cranium (0, 34, 9, 4, 6)
+    # Left eye cluster (px 2..4, py 41..42)
+    for ex, ey in [(2, 41), (2, 42), (4, 41), (4, 42)]:
+        skin.putpixel((ex, ey), palette["glow_mid"])
+        eyes.putpixel((ex, ey), palette["glow_mid"])
+    for ex, ey in [(3, 41), (3, 42)]:
+        skin.putpixel((ex, ey), palette["glow_core"])
+        eyes.putpixel((ex, ey), palette["accent_bright"])
+
+    # Right eye cluster (px 16..18, py 41..42)
+    for ex, ey in [(16, 41), (16, 42), (18, 41), (18, 42)]:
+        skin.putpixel((ex, ey), palette["glow_mid"])
+        eyes.putpixel((ex, ey), palette["glow_mid"])
+    for ex, ey in [(17, 41), (17, 42)]:
+        skin.putpixel((ex, ey), palette["glow_core"])
+        eyes.putpixel((ex, ey), palette["accent_bright"])
+
+    # Forward curiosity sparkles (px 7, 8, 12, 13, py 41)
+    for ex, ey in [(7, 41), (13, 41)]:
+        skin.putpixel((ex, ey), palette["accent_bright"])
+        eyes.putpixel((ex, ey), palette["accent_bright"])
+
+    # Subtle glowing nostrils on upper_jaw (58, 34, 7, 2, 5)
+    for nx, ny in [(64, 39), (68, 39)]:
+        skin.putpixel((nx, ny), palette["glow_mid"])
+        eyes.putpixel((nx, ny), palette["glow_mid"])
+
+    out_skin_path.parent.mkdir(parents=True, exist_ok=True)
+    skin.save(out_skin_path)
+    eyes.save(out_eyes_path)
+    print(f"Generated {out_skin_path.name} and {out_eyes_path.name}")
+
+
 def main() -> None:
     verify_uv_non_overlap(128, 128)
 
@@ -183,6 +252,10 @@ def main() -> None:
     generate_variant(BRIMSTONE_PALETTE, entity_dir / "brimstone_salamander.png", entity_dir / "brimstone_salamander_eyes.png")
     generate_variant(SOULFLAME_PALETTE, entity_dir / "brimstone_salamander_soulflame.png", entity_dir / "brimstone_salamander_soulflame_eyes.png")
     generate_variant(CRIMSON_PALETTE, entity_dir / "brimstone_salamander_crimson.png", entity_dir / "brimstone_salamander_crimson_eyes.png")
+
+    generate_baby_variant(BRIMSTONE_PALETTE, entity_dir / "brimstone_salamander_baby.png", entity_dir / "brimstone_salamander_baby_eyes.png")
+    generate_baby_variant(SOULFLAME_PALETTE, entity_dir / "brimstone_salamander_soulflame_baby.png", entity_dir / "brimstone_salamander_soulflame_baby_eyes.png")
+    generate_baby_variant(CRIMSON_PALETTE, entity_dir / "brimstone_salamander_crimson_baby.png", entity_dir / "brimstone_salamander_crimson_baby_eyes.png")
 
     item_dir = ASSETS / "textures/item"
     item_dir.mkdir(parents=True, exist_ok=True)

@@ -11,6 +11,7 @@ public final class BrimstoneSalamanderRenderState extends LivingEntityRenderStat
             com.codenamecoraline.entity.salamander.BrimstoneSalamanderVariant.BRIMSTONE;
     public boolean swimmingInLava = false;
     public boolean fissuresGlowing = true;
+    public boolean isBaby = false;
 
     public final AnimationState idleBreatheAnimationState = new AnimationState();
     public final AnimationState idleThroatPuffAnimationState = new AnimationState();
