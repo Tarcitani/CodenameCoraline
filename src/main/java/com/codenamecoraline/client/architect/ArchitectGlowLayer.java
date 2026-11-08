@@ -44,7 +44,7 @@ public final class ArchitectGlowLayer extends EyesLayer<ArchitectRenderState, Ar
             return;
         } else if (state.anim == ArchitectAnim.AWAKEN) {
             type = WAKING;
-        } else if (state.state == Architect.State.CHANNELING) {
+        } else if (state.state == Architect.State.CHANNELING || state.anim == ArchitectAnim.PHASE_ENRAGE) {
             type = COMMAND;
         } else {
             type = COMBAT;

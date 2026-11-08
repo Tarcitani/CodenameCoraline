@@ -577,5 +577,7 @@
   "entity.codenamecoraline.architect.summon.wrong_face": "The tablet must rest on top of a solid block.",
   "entity.codenamecoraline.architect.summon.peaceful": "No god answers in a peaceful world.",
   "entity.codenamecoraline.architect.summon.no_room": "There is no room for the statue here (it needs 2 x 4 free blocks).",
-  "entity.codenamecoraline.architect.summon.already_active": "Another Architect already watches over this place."
+  "entity.codenamecoraline.architect.summon.already_active": "Another Architect already watches over this place.",
+  "entity.codenamecoraline.architect.cinematic.title": "The Architect",
+  "entity.codenamecoraline.architect.cinematic.subtitle": "Kandiaru, Administrator of the Temple"
 }

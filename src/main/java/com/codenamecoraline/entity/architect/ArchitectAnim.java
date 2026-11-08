@@ -25,7 +25,14 @@ public enum ArchitectAnim {
     SPLITTER_CRESCENT(false, 32),
     PIERCING_SENTENCE(false, 26),
     GARGOYLE_FALL(false, 56),
-    PARRY_LEFT(false, 24);
+    PARRY_LEFT(false, 24),
+    // ---- slice 3: the right parry, deflection, backstep, the out-of-combat idles and the phase enrage
+    PARRY_RIGHT(false, 24),
+    PROJECTILE_DEFLECT(false, 14),
+    BACKSTEP(false, 16),
+    IDLE_BLADE_INSPECT(false, 30),
+    IDLE_WING_ADJUST(false, 24),
+    PHASE_ENRAGE(false, 40);
 
     public final boolean loops;
     public final int ticks;

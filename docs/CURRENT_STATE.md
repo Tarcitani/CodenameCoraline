@@ -33,7 +33,7 @@ Os últimos commits entregam a Salamandra de Enxofre (`brimstone_salamander`, pe
 
 | Sistema | Resumo | Design |
 |---|---|---|
-| O Arquiteto (Kandiaru) | Boss de seis braços, disfarce de estátua; fatias 1 (fundação) e 2 (visual, poses aprovadas na 2b) concluídas: modelo de 110 partes, 16 animações, barra temática; sem IA de combate ainda (próximo: `runClient` e fatia 3) | `design/architect.md` |
+| O Arquiteto (Kandiaru) | Boss de seis braços, disfarce de estátua; fatias 1 (fundação), 2 (visual, aprovada na 2b) e 3 (IA e combate: ataques A–F, aparo, stagger, fases, cinemática; 25 GameTests em 6 rodadas) concluídas; nada visto no jogo ainda (próximo: `runClient` e fatia 4) | `design/architect.md` |
 
 ## Pendências recorrentes
 - **Nada de Comandante, Bruxa e Matriarca foi visto no jogo** (`runClient`): aparência, animações, sons, barra, gravuras.

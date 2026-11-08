@@ -577,5 +577,7 @@
   "entity.codenamecoraline.architect.summon.wrong_face": "A tábua precisa repousar sobre o topo de um bloco sólido.",
   "entity.codenamecoraline.architect.summon.peaceful": "Nenhum deus responde num mundo pacífico.",
   "entity.codenamecoraline.architect.summon.no_room": "Não há espaço para a estátua aqui (ela precisa de 2 x 4 blocos livres).",
-  "entity.codenamecoraline.architect.summon.already_active": "Outro Arquiteto já vigia este lugar."
+  "entity.codenamecoraline.architect.summon.already_active": "Outro Arquiteto já vigia este lugar.",
+  "entity.codenamecoraline.architect.cinematic.title": "O Arquiteto",
+  "entity.codenamecoraline.architect.cinematic.subtitle": "Kandiaru, Administrador do Templo"
 }

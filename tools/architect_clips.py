@@ -194,6 +194,48 @@ def defence():
     rip = P({"arm_top_right": (-50, -40, 0), "elbow_top_right": (-10, 0, 0), "torso": (10, 14, 0)}, sym=False, base=block)
     clip("PARRY_LEFT", 24, False, [(0, BASE), (4, block), (9, block), (12, rip_wind), (14, rip), (16, rip), (24, BASE)],
          smooth=False)
+    # the right parry is the left one mirrored: the right mid arm blocks, the upper LEFT arm answers (spec §11.3)
+    block_r = P({"arm_mid_right": (-85, -30, 0), "elbow_mid_right": (-40, 0, 0), "wrist_mid_right": (-50, 0, 0),
+                 "arm_top_right": (-100, 20, 0), "elbow_top_right": (-30, 0, 0), "torso": (6, 12, 0)}, sym=False)
+    rip_wind_r = P({"arm_top_left": (-160, -20, -30), "elbow_top_left": (-30, 0, 0)}, sym=False, base=block_r)
+    rip_r = P({"arm_top_left": (-50, 40, 0), "elbow_top_left": (-10, 0, 0), "torso": (10, -14, 0)}, sym=False,
+              base=block_r)
+    clip("PARRY_RIGHT", 24, False, [(0, BASE), (4, block_r), (9, block_r), (12, rip_wind_r), (14, rip_r), (16, rip_r),
+                                    (24, BASE)], smooth=False)
+    # projectile deflection (14): the mid arms cross in front of the chest, one wing leans in (spec §11.4)
+    cross = P({"torso": (8, 0, 0), "wing_root_left": (0, -20, -25)}, lr("mid", (-80, 40, 0), (-30, 0, 0)))
+    clip("PROJECTILE_DEFLECT", 14, False, [(0, BASE), (3, cross), (8, cross), (14, BASE)], smooth=False)
+    # backstep (16): 1.5 blocks back, two heavy steps at 8 and 11 (spec §10.5)
+    back_a = P({"leg_left": (18, 0, -7), "knee_left": (20, 0, 0), "leg_right": (-18, 0, 7), "torso": (12, 0, 0),
+                "@pelvis": (0, 2, 0)}, sym=False)
+    back_b = P({"leg_right": (18, 0, 7), "knee_right": (20, 0, 0), "leg_left": (-14, 0, -7), "torso": (10, 0, 0),
+                "@pelvis": (0, 2, 0)}, sym=False)
+    clip("BACKSTEP", 16, False, [(0, BASE), (6, back_a), (8, back_a), (11, back_b), (16, BASE)])
+
+
+# ------------------------------------------------------------------------------------------------ idle variants
+def idles():
+    """The three out-of-combat idles drawn every 100-200 ticks (MOB_CONTRACT §3.2): the laugh (presentation), the
+    blade inspection and the wing adjustment."""
+    inspect = P({"head": (16, 0, 14), "neck": (4, 0, 0), "arm_mid_left": (-70, -60, -10), "elbow_mid_left": (-60, 0, 0),
+                 "wrist_mid_left": (0, 0, 40)}, sym=False)
+    turn = P({"wrist_mid_left": (0, 0, -30), "head": (14, 0, 18)}, sym=False, base=inspect)
+    clip("IDLE_BLADE_INSPECT", 30, False, [(0, BASE), (8, inspect), (16, turn), (22, inspect), (30, BASE)])
+    stretch = P(WING_OPEN, {"torso": (0, 0, 0), "head": (-8, 0, 4)})
+    clip("IDLE_WING_ADJUST", 24, False, [(0, BASE), (8, stretch), (12, stretch), (18, P(WING_FOLDED)), (24, BASE)])
+
+
+# ------------------------------------------------------------------------------------------------ phase transition
+def transition():
+    """Phase enrage (40, spec §15.3): rises, wings fully open, jaw +35, arms open in pairs, the seal swells."""
+    rise = P({"torso": (-10, 0, 0), "head": (-8, 0, 0)}, WING_OPEN)
+    jaw = P({"jaw": (35, 0, 0)}, base=rise)
+    top = P(lr("top", (-20, -90, -135)), base=jaw)
+    mid = P(lr("mid", (-20, -90, -100)), base=top)
+    low = P(lr("low", (-30, 0, -62)), base=mid)
+    swell = P({"%sternum_seal": (1.15, 1.15, 1.15), "%forehead_diamond_seal": (1.15, 1.15, 1.15)}, base=low)
+    clip("PHASE_ENRAGE", 40, False, [(0, BASE), (8, rise), (12, jaw), (14, top), (16, mid), (18, low), (20, low),
+                                     (25, swell), (30, low), (40, BASE)])
 
 
 # ------------------------------------------------------------------------------------------------ attacks
@@ -282,3 +324,5 @@ presentation()
 locomotion()
 defence()
 attacks()
+idles()
+transition()

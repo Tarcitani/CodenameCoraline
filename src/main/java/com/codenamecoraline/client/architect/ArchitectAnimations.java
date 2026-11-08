@@ -80,12 +80,18 @@ public final class ArchitectAnimations {
         DEFINITIONS.put(ArchitectAnim.STAGGER, Stagger());
         DEFINITIONS.put(ArchitectAnim.DEATH, Death());
         DEFINITIONS.put(ArchitectAnim.PARRY_LEFT, ParryLeft());
+        DEFINITIONS.put(ArchitectAnim.PARRY_RIGHT, ParryRight());
+        DEFINITIONS.put(ArchitectAnim.PROJECTILE_DEFLECT, ProjectileDeflect());
+        DEFINITIONS.put(ArchitectAnim.BACKSTEP, Backstep());
         DEFINITIONS.put(ArchitectAnim.SIXFOLD_EDICT, SixfoldEdict());
         DEFINITIONS.put(ArchitectAnim.CROSSED_MANDATE, CrossedMandate());
         DEFINITIONS.put(ArchitectAnim.CARTENON_WHEEL, CartenonWheel());
         DEFINITIONS.put(ArchitectAnim.SPLITTER_CRESCENT, SplitterCrescent());
         DEFINITIONS.put(ArchitectAnim.PIERCING_SENTENCE, PiercingSentence());
         DEFINITIONS.put(ArchitectAnim.GARGOYLE_FALL, GargoyleFall());
+        DEFINITIONS.put(ArchitectAnim.IDLE_BLADE_INSPECT, IdleBladeInspect());
+        DEFINITIONS.put(ArchitectAnim.IDLE_WING_ADJUST, IdleWingAdjust());
+        DEFINITIONS.put(ArchitectAnim.PHASE_ENRAGE, PhaseEnrage());
     }
 
     private ArchitectAnimations() {}
@@ -426,6 +432,45 @@ public final class ArchitectAnimations {
         return b.build();
     }
 
+    private static AnimationDefinition ParryRight() {
+        AnimationDefinition.Builder b = AnimationDefinition.Builder.withLength(1.2F);
+        pos(b, "pelvis", LINEAR, 0F, 0F, 1F, 0F, 0.2F, 0F, 1F, 0F, 0.45F, 0F, 1F, 0F, 0.6F, 0F, 1F, 0F, 0.7F, 0F, 1F, 0F, 0.8F, 0F, 1F, 0F, 1.2F, 0F, 1F, 0F);
+        rot(b, "arm_mid_right", LINEAR, 0F, 0F, 0F, 0F, 0.2F, -65F, -120F, -70F, 0.45F, -65F, -120F, -70F, 0.6F, -65F, -120F, -70F, 0.7F, -65F, -120F, -70F, 0.8F, -65F, -120F, -70F, 1.2F, 0F, 0F, 0F);
+        rot(b, "arm_top_left", LINEAR, 0F, 0F, 0F, 0F, 0.2F, 0F, 0F, 0F, 0.45F, 0F, 0F, 0F, 0.6F, -145F, 70F, 75F, 0.7F, -35F, 130F, 105F, 0.8F, -35F, 130F, 105F, 1.2F, 0F, 0F, 0F);
+        rot(b, "arm_top_right", LINEAR, 0F, 0F, 0F, 0F, 0.2F, -85F, -70F, -105F, 0.45F, -85F, -70F, -105F, 0.6F, -85F, -70F, -105F, 0.7F, -85F, -70F, -105F, 0.8F, -85F, -70F, -105F, 1.2F, 0F, 0F, 0F);
+        rot(b, "elbow_top_left", LINEAR, 0F, 0F, 0F, 0F, 0.2F, 0F, 0F, 0F, 0.45F, 0F, 0F, 0F, 0.6F, 40F, 0F, 0F, 0.7F, 60F, 0F, 0F, 0.8F, 60F, 0F, 0F, 1.2F, 0F, 0F, 0F);
+        rot(b, "elbow_top_right", LINEAR, 0F, 0F, 0F, 0F, 0.2F, 40F, 0F, 0F, 0.45F, 40F, 0F, 0F, 0.6F, 40F, 0F, 0F, 0.7F, 40F, 0F, 0F, 0.8F, 40F, 0F, 0F, 1.2F, 0F, 0F, 0F);
+        rot(b, "torso", LINEAR, 0F, 0F, 0F, 0F, 0.2F, 0F, 12F, 0F, 0.45F, 0F, 12F, 0F, 0.6F, 0F, 12F, 0F, 0.7F, 4F, -14F, 0F, 0.8F, 4F, -14F, 0F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wrist_mid_right", LINEAR, 0F, 0F, 0F, 0F, 0.2F, -30F, 0F, 0F, 0.45F, -30F, 0F, 0F, 0.6F, -30F, 0F, 0F, 0.7F, -30F, 0F, 0F, 0.8F, -30F, 0F, 0F, 1.2F, 0F, 0F, 0F);
+        return b.build();
+    }
+
+    private static AnimationDefinition ProjectileDeflect() {
+        AnimationDefinition.Builder b = AnimationDefinition.Builder.withLength(0.7F);
+        pos(b, "pelvis", LINEAR, 0F, 0F, 1F, 0F, 0.15F, 0F, 1F, 0F, 0.4F, 0F, 1F, 0F, 0.7F, 0F, 1F, 0F);
+        rot(b, "arm_mid_left", LINEAR, 0F, 0F, 0F, 0F, 0.15F, -60F, 130F, 70F, 0.4F, -60F, 130F, 70F, 0.7F, 0F, 0F, 0F);
+        rot(b, "arm_mid_right", LINEAR, 0F, 0F, 0F, 0F, 0.15F, -60F, -130F, -70F, 0.4F, -60F, -130F, -70F, 0.7F, 0F, 0F, 0F);
+        rot(b, "elbow_mid_left", LINEAR, 0F, 0F, 0F, 0F, 0.15F, 10F, 0F, 0F, 0.4F, 10F, 0F, 0F, 0.7F, 0F, 0F, 0F);
+        rot(b, "elbow_mid_right", LINEAR, 0F, 0F, 0F, 0F, 0.15F, 10F, 0F, 0F, 0.4F, 10F, 0F, 0F, 0.7F, 0F, 0F, 0F);
+        rot(b, "torso", LINEAR, 0F, 0F, 0F, 0F, 0.15F, 2F, 0F, 0F, 0.4F, 2F, 0F, 0F, 0.7F, 0F, 0F, 0F);
+        rot(b, "wing_root_left", LINEAR, 0F, 0F, 0F, 0F, 0.15F, 0F, 20F, -25F, 0.4F, 0F, 20F, -25F, 0.7F, 0F, 0F, 0F);
+        rot(b, "wing_root_right", LINEAR, 0F, 0F, 0F, 0F, 0.15F, 0F, -20F, 25F, 0.4F, 0F, -20F, 25F, 0.7F, 0F, 0F, 0F);
+        rot(b, "wrist_mid_left", LINEAR, 0F, 0F, 0F, 0F, 0.15F, 20F, 0F, 0F, 0.4F, 20F, 0F, 0F, 0.7F, 0F, 0F, 0F);
+        rot(b, "wrist_mid_right", LINEAR, 0F, 0F, 0F, 0F, 0.15F, 20F, 0F, 0F, 0.4F, 20F, 0F, 0F, 0.7F, 0F, 0F, 0F);
+        return b.build();
+    }
+
+    private static AnimationDefinition Backstep() {
+        AnimationDefinition.Builder b = AnimationDefinition.Builder.withLength(0.8F);
+        pos(b, "pelvis", SMOOTH, 0F, 0F, 1F, 0F, 0.3F, 0F, 2F, 0F, 0.4F, 0F, 2F, 0F, 0.55F, 0F, 2F, 0F, 0.8F, 0F, 1F, 0F);
+        rot(b, "knee_left", SMOOTH, 0F, 0F, 0F, 0F, 0.3F, 6F, 0F, 0F, 0.4F, 6F, 0F, 0F, 0.55F, 0F, 0F, 0F, 0.8F, 0F, 0F, 0F);
+        rot(b, "knee_right", SMOOTH, 0F, 0F, 0F, 0F, 0.3F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.55F, 6F, 0F, 0F, 0.8F, 0F, 0F, 0F);
+        rot(b, "leg_left", SMOOTH, 0F, 0F, 0F, 0F, 0.3F, 26F, 0F, 0F, 0.4F, 26F, 0F, 0F, 0.55F, -6F, 0F, 0F, 0.8F, 0F, 0F, 0F);
+        rot(b, "leg_right", SMOOTH, 0F, 0F, 0F, 0F, 0.3F, -10F, 0F, 0F, 0.4F, -10F, 0F, 0F, 0.55F, 26F, 0F, 0F, 0.8F, 0F, 0F, 0F);
+        rot(b, "torso", SMOOTH, 0F, 0F, 0F, 0F, 0.3F, 6F, 0F, 0F, 0.4F, 6F, 0F, 0F, 0.55F, 4F, 0F, 0F, 0.8F, 0F, 0F, 0F);
+        return b.build();
+    }
+
     private static AnimationDefinition SixfoldEdict() {
         AnimationDefinition.Builder b = AnimationDefinition.Builder.withLength(1.9F);
         pos(b, "pelvis", LINEAR, 0F, 0F, 1F, 0F, 0.25F, 0F, 1F, 0F, 0.3F, 0F, 1F, 0F, 0.5F, 0F, 1F, 0F, 0.7F, 0F, 1F, 0F, 0.9F, 0F, 3F, 0F, 1.1F, 0F, 1F, 0F, 1.3F, 0F, 1F, 0F, 1.5F, 0F, 3F, 0F, 1.55F, 0F, 3F, 0F, 1.9F, 0F, 1F, 0F);
@@ -620,6 +665,82 @@ public final class ArchitectAnimations {
         rot(b, "wrist_mid_right", LINEAR, 0F, 0F, 0F, 0F, 0.4F, 20F, 0F, 0F, 0.8F, 20F, 0F, 0F, 0.85F, 20F, 0F, 0F, 1.15F, 20F, 0F, 0F, 1.55F, 20F, 0F, 0F, 1.65F, 60F, 0F, 0F, 2.15F, 60F, 0F, 0F, 2.4F, 60F, 0F, 0F, 2.8F, 0F, 0F, 0F);
         rot(b, "wrist_top_left", LINEAR, 0F, 0F, 0F, 0F, 0.4F, 10F, 0F, 0F, 0.8F, 10F, 0F, 0F, 0.85F, 10F, 0F, 0F, 1.15F, 10F, 0F, 0F, 1.55F, 10F, 0F, 0F, 1.65F, 50F, 0F, 0F, 2.15F, 50F, 0F, 0F, 2.4F, 50F, 0F, 0F, 2.8F, 0F, 0F, 0F);
         rot(b, "wrist_top_right", LINEAR, 0F, 0F, 0F, 0F, 0.4F, 10F, 0F, 0F, 0.8F, 10F, 0F, 0F, 0.85F, 10F, 0F, 0F, 1.15F, 10F, 0F, 0F, 1.55F, 10F, 0F, 0F, 1.65F, 50F, 0F, 0F, 2.15F, 50F, 0F, 0F, 2.4F, 50F, 0F, 0F, 2.8F, 0F, 0F, 0F);
+        return b.build();
+    }
+
+    private static AnimationDefinition IdleBladeInspect() {
+        AnimationDefinition.Builder b = AnimationDefinition.Builder.withLength(1.5F);
+        pos(b, "pelvis", SMOOTH, 0F, 0F, 1F, 0F, 0.4F, 0F, 1F, 0F, 0.8F, 0F, 1F, 0F, 1.1F, 0F, 1F, 0F, 1.5F, 0F, 1F, 0F);
+        rot(b, "arm_mid_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, -50F, 30F, 60F, 0.8F, -50F, 30F, 60F, 1.1F, -50F, 30F, 60F, 1.5F, 0F, 0F, 0F);
+        rot(b, "elbow_mid_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, -20F, 0F, 0F, 0.8F, -20F, 0F, 0F, 1.1F, -20F, 0F, 0F, 1.5F, 0F, 0F, 0F);
+        rot(b, "head", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 18F, 0F, 10F, 0.8F, 16F, 0F, 14F, 1.1F, 18F, 0F, 10F, 1.5F, 0F, 0F, 0F);
+        rot(b, "neck", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 8F, 0F, 0F, 0.8F, 8F, 0F, 0F, 1.1F, 8F, 0F, 0F, 1.5F, 0F, 0F, 0F);
+        rot(b, "wrist_mid_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 20F, 0F, 40F, 0.8F, 20F, 0F, -30F, 1.1F, 20F, 0F, 40F, 1.5F, 0F, 0F, 0F);
+        return b.build();
+    }
+
+    private static AnimationDefinition IdleWingAdjust() {
+        AnimationDefinition.Builder b = AnimationDefinition.Builder.withLength(1.2F);
+        pos(b, "pelvis", SMOOTH, 0F, 0F, 1F, 0F, 0.4F, 0F, 1F, 0F, 0.6F, 0F, 1F, 0F, 0.9F, 0F, 1F, 0F, 1.2F, 0F, 1F, 0F);
+        rot(b, "head", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, -6F, 0F, 0F, 0.6F, -6F, 0F, 0F, 0.9F, 0F, 0F, 0F, 1.2F, 0F, 0F, 0F);
+        rot(b, "torso", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, -6F, 0F, 0F, 0.6F, -6F, 0F, 0F, 0.9F, 0F, 0F, 0F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_arm_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, -4F, 0.6F, 0F, 0F, -4F, 0.9F, 0F, 0F, -10F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_arm_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 4F, 0.6F, 0F, 0F, 4F, 0.9F, 0F, 0F, 10F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_1_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 2F, 0.6F, 0F, 0F, 2F, 0.9F, 0F, 0F, 18F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_1_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, -2F, 0.6F, 0F, 0F, -2F, 0.9F, 0F, 0F, -18F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_2_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, -2F, 0.6F, 0F, 0F, -2F, 0.9F, 0F, 0F, 23F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_2_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 2F, 0.6F, 0F, 0F, 2F, 0.9F, 0F, 0F, -23F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_3_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, -6F, 0.6F, 0F, 0F, -6F, 0.9F, 0F, 0F, 28F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_3_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 6F, 0.6F, 0F, 0F, 6F, 0.9F, 0F, 0F, -28F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_4_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, -12F, 0.6F, 0F, 0F, -12F, 0.9F, 0F, 0F, 33F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_4_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 12F, 0.6F, 0F, 0F, 12F, 0.9F, 0F, 0F, -33F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_forearm_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, -47F, -6F, 0.6F, 0F, -47F, -6F, 0.9F, 0F, 113F, 30F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_forearm_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 47F, 6F, 0.6F, 0F, 47F, 6F, 0.9F, 0F, -113F, -30F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_root_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 26F, 0F, 0.6F, 0F, 26F, 0F, 0.9F, -8F, -40F, 0F, 1.2F, 0F, 0F, 0F);
+        rot(b, "wing_root_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, -26F, 0F, 0.6F, 0F, -26F, 0F, 0.9F, -8F, 40F, 0F, 1.2F, 0F, 0F, 0F);
+        return b.build();
+    }
+
+    private static AnimationDefinition PhaseEnrage() {
+        AnimationDefinition.Builder b = AnimationDefinition.Builder.withLength(2F);
+        scale(b, "forehead_diamond_seal", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 0F, 0F, 0F, 0.9F, 0F, 0F, 0F, 1F, 0F, 0F, 0F, 1.25F, 0.15F, 0.15F, 0.15F, 1.5F, 0F, 0F, 0F, 2F, 0F, 0F, 0F);
+        scale(b, "sternum_seal", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 0F, 0F, 0F, 0.9F, 0F, 0F, 0F, 1F, 0F, 0F, 0F, 1.25F, 0.15F, 0.15F, 0.15F, 1.5F, 0F, 0F, 0F, 2F, 0F, 0F, 0F);
+        pos(b, "pelvis", SMOOTH, 0F, 0F, 1F, 0F, 0.4F, 0F, 1F, 0F, 0.6F, 0F, 1F, 0F, 0.7F, 0F, 1F, 0F, 0.8F, 0F, 1F, 0F, 0.9F, 0F, 1F, 0F, 1F, 0F, 1F, 0F, 1.25F, 0F, 1F, 0F, 1.5F, 0F, 1F, 0F, 2F, 0F, 1F, 0F);
+        rot(b, "arm_low_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 0F, 0F, 0F, 0.9F, 0F, 0F, -30F, 1F, 0F, 0F, -30F, 1.25F, 0F, 0F, -30F, 1.5F, 0F, 0F, -30F, 2F, 0F, 0F, 0F);
+        rot(b, "arm_low_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 0F, 0F, 0F, 0.9F, 0F, 0F, 30F, 1F, 0F, 0F, 30F, 1.25F, 0F, 0F, 30F, 1.5F, 0F, 0F, 30F, 2F, 0F, 0F, 0F);
+        rot(b, "arm_mid_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 0F, 0F, -30F, 0.9F, 0F, 0F, -30F, 1F, 0F, 0F, -30F, 1.25F, 0F, 0F, -30F, 1.5F, 0F, 0F, -30F, 2F, 0F, 0F, 0F);
+        rot(b, "arm_mid_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 0F, 0F, 30F, 0.9F, 0F, 0F, 30F, 1F, 0F, 0F, 30F, 1.25F, 0F, 0F, 30F, 1.5F, 0F, 0F, 30F, 2F, 0F, 0F, 0F);
+        rot(b, "arm_top_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, -5F, 0F, -30F, 0.8F, -5F, 0F, -30F, 0.9F, -5F, 0F, -30F, 1F, -5F, 0F, -30F, 1.25F, -5F, 0F, -30F, 1.5F, -5F, 0F, -30F, 2F, 0F, 0F, 0F);
+        rot(b, "arm_top_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, -5F, 0F, 30F, 0.8F, -5F, 0F, 30F, 0.9F, -5F, 0F, 30F, 1F, -5F, 0F, 30F, 1.25F, -5F, 0F, 30F, 1.5F, -5F, 0F, 30F, 2F, 0F, 0F, 0F);
+        rot(b, "elbow_low_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 0F, 0F, 0F, 0.9F, 55F, 0F, 0F, 1F, 55F, 0F, 0F, 1.25F, 55F, 0F, 0F, 1.5F, 55F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "elbow_low_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 0F, 0F, 0F, 0.9F, 55F, 0F, 0F, 1F, 55F, 0F, 0F, 1.25F, 55F, 0F, 0F, 1.5F, 55F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "elbow_mid_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 40F, 0F, 0F, 0.9F, 40F, 0F, 0F, 1F, 40F, 0F, 0F, 1.25F, 40F, 0F, 0F, 1.5F, 40F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "elbow_mid_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 40F, 0F, 0F, 0.9F, 40F, 0F, 0F, 1F, 40F, 0F, 0F, 1.25F, 40F, 0F, 0F, 1.5F, 40F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "elbow_top_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 70F, 0F, 0F, 0.8F, 70F, 0F, 0F, 0.9F, 70F, 0F, 0F, 1F, 70F, 0F, 0F, 1.25F, 70F, 0F, 0F, 1.5F, 70F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "elbow_top_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 70F, 0F, 0F, 0.8F, 70F, 0F, 0F, 0.9F, 70F, 0F, 0F, 1F, 70F, 0F, 0F, 1.25F, 70F, 0F, 0F, 1.5F, 70F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "head", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, -6F, 0F, -4F, 0.6F, -6F, 0F, -4F, 0.7F, -6F, 0F, -4F, 0.8F, -6F, 0F, -4F, 0.9F, -6F, 0F, -4F, 1F, -6F, 0F, -4F, 1.25F, -6F, 0F, -4F, 1.5F, -6F, 0F, -4F, 2F, 0F, 0F, 0F);
+        rot(b, "jaw", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 35F, 0F, 0F, 0.7F, 35F, 0F, 0F, 0.8F, 35F, 0F, 0F, 0.9F, 35F, 0F, 0F, 1F, 35F, 0F, 0F, 1.25F, 35F, 0F, 0F, 1.5F, 35F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "torso", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, -16F, 0F, 0F, 0.6F, -16F, 0F, 0F, 0.7F, -16F, 0F, 0F, 0.8F, -16F, 0F, 0F, 0.9F, -16F, 0F, 0F, 1F, -16F, 0F, 0F, 1.25F, -16F, 0F, 0F, 1.5F, -16F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_arm_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, -4F, 0.6F, 0F, 0F, -4F, 0.7F, 0F, 0F, -4F, 0.8F, 0F, 0F, -4F, 0.9F, 0F, 0F, -4F, 1F, 0F, 0F, -4F, 1.25F, 0F, 0F, -4F, 1.5F, 0F, 0F, -4F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_arm_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 4F, 0.6F, 0F, 0F, 4F, 0.7F, 0F, 0F, 4F, 0.8F, 0F, 0F, 4F, 0.9F, 0F, 0F, 4F, 1F, 0F, 0F, 4F, 1.25F, 0F, 0F, 4F, 1.5F, 0F, 0F, 4F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_1_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 2F, 0.6F, 0F, 0F, 2F, 0.7F, 0F, 0F, 2F, 0.8F, 0F, 0F, 2F, 0.9F, 0F, 0F, 2F, 1F, 0F, 0F, 2F, 1.25F, 0F, 0F, 2F, 1.5F, 0F, 0F, 2F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_1_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, -2F, 0.6F, 0F, 0F, -2F, 0.7F, 0F, 0F, -2F, 0.8F, 0F, 0F, -2F, 0.9F, 0F, 0F, -2F, 1F, 0F, 0F, -2F, 1.25F, 0F, 0F, -2F, 1.5F, 0F, 0F, -2F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_2_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, -2F, 0.6F, 0F, 0F, -2F, 0.7F, 0F, 0F, -2F, 0.8F, 0F, 0F, -2F, 0.9F, 0F, 0F, -2F, 1F, 0F, 0F, -2F, 1.25F, 0F, 0F, -2F, 1.5F, 0F, 0F, -2F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_2_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 2F, 0.6F, 0F, 0F, 2F, 0.7F, 0F, 0F, 2F, 0.8F, 0F, 0F, 2F, 0.9F, 0F, 0F, 2F, 1F, 0F, 0F, 2F, 1.25F, 0F, 0F, 2F, 1.5F, 0F, 0F, 2F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_3_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, -6F, 0.6F, 0F, 0F, -6F, 0.7F, 0F, 0F, -6F, 0.8F, 0F, 0F, -6F, 0.9F, 0F, 0F, -6F, 1F, 0F, 0F, -6F, 1.25F, 0F, 0F, -6F, 1.5F, 0F, 0F, -6F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_3_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 6F, 0.6F, 0F, 0F, 6F, 0.7F, 0F, 0F, 6F, 0.8F, 0F, 0F, 6F, 0.9F, 0F, 0F, 6F, 1F, 0F, 0F, 6F, 1.25F, 0F, 0F, 6F, 1.5F, 0F, 0F, 6F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_4_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, -12F, 0.6F, 0F, 0F, -12F, 0.7F, 0F, 0F, -12F, 0.8F, 0F, 0F, -12F, 0.9F, 0F, 0F, -12F, 1F, 0F, 0F, -12F, 1.25F, 0F, 0F, -12F, 1.5F, 0F, 0F, -12F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_finger_4_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 12F, 0.6F, 0F, 0F, 12F, 0.7F, 0F, 0F, 12F, 0.8F, 0F, 0F, 12F, 0.9F, 0F, 0F, 12F, 1F, 0F, 0F, 12F, 1.25F, 0F, 0F, 12F, 1.5F, 0F, 0F, 12F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_forearm_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, -47F, -6F, 0.6F, 0F, -47F, -6F, 0.7F, 0F, -47F, -6F, 0.8F, 0F, -47F, -6F, 0.9F, 0F, -47F, -6F, 1F, 0F, -47F, -6F, 1.25F, 0F, -47F, -6F, 1.5F, 0F, -47F, -6F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_forearm_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 47F, 6F, 0.6F, 0F, 47F, 6F, 0.7F, 0F, 47F, 6F, 0.8F, 0F, 47F, 6F, 0.9F, 0F, 47F, 6F, 1F, 0F, 47F, 6F, 1.25F, 0F, 47F, 6F, 1.5F, 0F, 47F, 6F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_root_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 26F, 0F, 0.6F, 0F, 26F, 0F, 0.7F, 0F, 26F, 0F, 0.8F, 0F, 26F, 0F, 0.9F, 0F, 26F, 0F, 1F, 0F, 26F, 0F, 1.25F, 0F, 26F, 0F, 1.5F, 0F, 26F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "wing_root_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, -26F, 0F, 0.6F, 0F, -26F, 0F, 0.7F, 0F, -26F, 0F, 0.8F, 0F, -26F, 0F, 0.9F, 0F, -26F, 0F, 1F, 0F, -26F, 0F, 1.25F, 0F, -26F, 0F, 1.5F, 0F, -26F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "wrist_low_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 0F, 0F, 0F, 0.9F, -15F, 0F, 0F, 1F, -15F, 0F, 0F, 1.25F, -15F, 0F, 0F, 1.5F, -15F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "wrist_low_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 0F, 0F, 0F, 0.9F, -15F, 0F, 0F, 1F, -15F, 0F, 0F, 1.25F, -15F, 0F, 0F, 1.5F, -15F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "wrist_mid_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 20F, 0F, 0F, 0.9F, 20F, 0F, 0F, 1F, 20F, 0F, 0F, 1.25F, 20F, 0F, 0F, 1.5F, 20F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "wrist_mid_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 0F, 0F, 0F, 0.8F, 20F, 0F, 0F, 0.9F, 20F, 0F, 0F, 1F, 20F, 0F, 0F, 1.25F, 20F, 0F, 0F, 1.5F, 20F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "wrist_top_left", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 10F, 0F, 0F, 0.8F, 10F, 0F, 0F, 0.9F, 10F, 0F, 0F, 1F, 10F, 0F, 0F, 1.25F, 10F, 0F, 0F, 1.5F, 10F, 0F, 0F, 2F, 0F, 0F, 0F);
+        rot(b, "wrist_top_right", SMOOTH, 0F, 0F, 0F, 0F, 0.4F, 0F, 0F, 0F, 0.6F, 0F, 0F, 0F, 0.7F, 10F, 0F, 0F, 0.8F, 10F, 0F, 0F, 0.9F, 10F, 0F, 0F, 1F, 10F, 0F, 0F, 1.25F, 10F, 0F, 0F, 1.5F, 10F, 0F, 0F, 2F, 0F, 0F, 0F);
         return b.build();
     }
 }
