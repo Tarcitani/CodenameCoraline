@@ -5,7 +5,7 @@ ModelPart.offsetRotation / offsetPos / offsetScale targets add."""
 from pathlib import Path
 
 import architect_clips as clips
-from architect_poses import BASE
+from architect_poses import BASE, RIG_SCALE
 
 OUT = Path(__file__).resolve().parent.parent / "src/main/java/com/codenamecoraline/client/architect/ArchitectAnimations.java"
 
@@ -97,7 +97,7 @@ def write():
         for key, points in tracks.items():
             if key.startswith("@"):
                 kind, part = "pos", key[1:]
-                vals = [(t, v) for t, v in points]
+                vals = [(t, tuple(c * RIG_SCALE for c in v)) for t, v in points]  # original pixels -> scaled body
             elif key.startswith("%"):
                 kind, part = "scale", key[1:]
                 vals = [(t, tuple(c - 1 for c in v)) for t, v in points]

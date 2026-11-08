@@ -12,4 +12,6 @@ public final class ArchitectRenderState extends LivingEntityRenderState {
     public Architect.State state = Architect.State.DORMANT;
     /** Whether the head may follow the target on top of the clip (idle, walking, guarding). */
     public boolean lookAtTarget = false;
+    /** How much of the gaze the shoulders take (1 when free, less in a locked blow or dodge). */
+    public float lookShare = 1.0F;
 }

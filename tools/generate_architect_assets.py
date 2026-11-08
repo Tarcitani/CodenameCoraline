@@ -10,10 +10,12 @@ Writes:
   * src/main/java/.../client/architect/ArchitectAnimations.java (GENERATED from tools/architect_clips.py)
   * build/architect-assets/atlas_preview.png    the atlas x3 with box names, for review
 
-Coordinates (spec §3.1): geometry is written in absolute Blockbench coordinates, pixels, origin on the ground,
-+Y up, front -Z, +X = the character's LEFT. The script converts to model space (y_model = 24 - Y) and to offsets
-relative to each part's pivot. Boxes marked with a density of 2 are drawn with twice the texels (declared at double
-size and shrunk back with a negative CubeDeformation): the face, the teeth, the mask and the forehead seal.
+Coordinates (spec §3.1): geometry is written in absolute Blockbench coordinates of the ORIGINAL 3.35-block body,
+pixels, origin on the ground, +Y up, front -Z, +X = the character's LEFT. The reform scales every coordinate by
+SCALE (1.4: the body is 4.7 blocks tall) when it is registered, then converts to model space (y_model = 24 - Y) and to
+offsets relative to each part's pivot. Every box is drawn at the texel density of its material (DENS: the face 3
+texels per model pixel, hood, torso and coat 2, limbs 1.5): the box is declared in whole texels and shrunk back to its
+real size with a negative CubeDeformation. The painters live in tools/architect_paint.py.
 
 Run:  python tools/generate_architect_assets.py
 """
@@ -29,28 +31,11 @@ ENTITY_DIR = ASSETS / "textures/entity"
 ITEM_DIR = ASSETS / "textures/item"
 JAVA_OUT = ROOT / "src/main/java/com/codenamecoraline/client/architect/ArchitectParts.java"
 PREVIEW = ROOT / "build/architect-assets/atlas_preview.png"
-ATLAS = 256
+ATLAS = 512
 GAP = 1  # empty texels between UV islands (anti-bleeding)
 
-CLEAR = (0, 0, 0, 0)
-# ---- palette (spec §8.3): (shadow, base, light, highlight)
-FACE = ((67, 72, 82, 255), (110, 117, 130, 255), (155, 163, 176, 255), (195, 201, 210, 255))
-GRANITE = ((73, 71, 79, 255), (119, 116, 122, 255), (170, 164, 160, 255), (201, 195, 188, 255))
-BASALT = ((21, 21, 29, 255), (40, 40, 49, 255), (85, 81, 91, 255), (110, 106, 116, 255))
-TABLET = ((110, 106, 103, 255), (161, 155, 145, 255), (199, 191, 176, 255), (214, 208, 196, 255))
-CRACK = (36, 35, 43, 255)
-DEEP = (18, 18, 23, 255)
-VOID = (11, 11, 16, 255)
-CORAL = (255, 96, 75, 255)
-CORAL_D = (169, 31, 50, 255)
-CORAL_HOT = (255, 208, 154, 255)
-LILAC = (216, 200, 255, 255)
-LILAC_D = (126, 100, 196, 255)
-LILAC_L = (247, 242, 255, 255)
-MASK_GLOW = (221, 244, 255, 255)
-MANA = (56, 189, 186, 255)
-MANA_D = (23, 106, 112, 255)
-MANA_L = (182, 255, 240, 255)
+from architect_paint import *  # noqa: E402,F401,F403  (palettes and the painters)
+from architect_poses import RIG_SCALE as SCALE  # noqa: E402
 
 # ---------------------------------------------------------------------------------------------------------------
 # Rig: name -> (parent, pivot X, pivot Y, pivot Z) in absolute Blockbench coordinates. Order = parents first.
@@ -58,15 +43,31 @@ PARTS = {}
 BOXES = []  # (name, part, x0, y0, z0, x1, y1, z1, material, density)
 
 
+# texel density of each material (texels per model pixel); the box is declared in whole texels and shrunk back
+DENS = {"face": 3, "jaw_face": 3, "teeth_up": 3, "teeth_low": 3, "seal": 3, "mask_left": 3, "mask_right": 3, "sternum": 3,
+        "face_stone": 2, "jaw_stone": 2, "hood": 2, "void": 1, "ribcage": 2, "abdomen": 2, "mount": 1.5, "mount_disc": 2,
+        "coat": 2, "coat_trim": 2, "collar": 2, "coat_hem": 2, "granite": 1.5, "granite_light": 2, "elbow": 2,
+        "forearm": 2, "forearm_chipped": 2, "wrist_cracked": 2, "hand": 2, "fingers": 2, "basalt_light": 2, "grip": 2,
+        "blade": 2, "blade_tip": 2, "wing_bone": 1.5, "wing_plate": 2, "wing_tip": 1.5, "tablet": 2}
+
+
 def part(name, parent, x, y, z):
     assert name not in PARTS, name
     assert parent is None or parent in PARTS, (name, parent)
+    if name != "root":
+        x, y, z = x * SCALE, y * SCALE, z * SCALE
     PARTS[name] = (parent, x, y, z)
 
 
-def box(name, owner, x0, y0, z0, x1, y1, z1, mat, density=1):
+def box(name, owner, x0, y0, z0, x1, y1, z1, mat, density=None):
     assert owner in PARTS, owner
-    BOXES.append((name, owner, x0, y0, z0, x1, y1, z1, mat, density))
+    BOXES.append((name, owner, x0 * SCALE, y0 * SCALE, z0 * SCALE, x1 * SCALE, y1 * SCALE, z1 * SCALE, mat,
+                  DENS.get(mat, 1.5)))
+
+
+def span(a, b, s):
+    """X range of a box on the side s (+1 left, -1 right) from magnitudes a < b."""
+    return (a * s, b * s) if s > 0 else (b * s, a * s)
 
 
 def build_rig():
@@ -74,16 +75,7 @@ def build_rig():
     # ---- pelvis, robe, legs
     part("pelvis", "root", 0, 22, 0)
     box("pelvis_plate", "pelvis", -5, 20, -3.5, 5, 24, 3.5, "granite")
-    part("robe_front", "pelvis", 0, 22, -4)
-    for i, x in enumerate((-4.5, -1.5, 1.5)):
-        box(f"robe_front_{i}", "robe_front", x, 6 + (i % 2) * 2, -4.6, x + 3, 22, -3.6, "robe")
-    part("robe_back_upper", "pelvis", 0, 22, 4)
-    box("robe_back_upper", "robe_back_upper", -5, 12, 3.6, 5, 22, 4.6, "robe")
-    part("robe_back_lower", "robe_back_upper", 0, 12, 4.1)
-    box("robe_back_lower", "robe_back_lower", -5, 3, 3.6, 5, 12, 4.6, "robe")
-    for side, s in (("left", 1), ("right", -1)):
-        part(f"robe_{side}", "pelvis", 5.5 * s, 22, 0)
-        box(f"robe_{side}", f"robe_{side}", min(5 * s, 6 * s), 8, -3, max(5 * s, 6 * s), 22, 3, "robe")
+    build_coat_skirt()
     for side, s in (("left", 1), ("right", -1)):
         x0, x1 = (3 * s - 2.25, 3 * s + 2.25)
         part(f"leg_{side}", "pelvis", 3 * s, 22, 0)
@@ -155,6 +147,7 @@ def build_rig():
         part(f"face_mask_{side}", "head", 3.5 * s, 48.5, -4.6)
         box(f"face_mask_{side}", f"face_mask_{side}", min(0, 3.5 * s), 44.5, -4.7, max(0, 3.5 * s), 52, -4.55,
             f"mask_{side}", 2)
+    build_coat_upper()
     # ---- six arms (spec §4.4): hanging chains, the idle pose comes from the animations' BASE
     for tier, (sx, sy, sz) in (("top", (10.5, 41, -1)), ("mid", (11.5, 35, 0.5)), ("low", (10, 30, 1.5))):
         for side, s in (("left", 1), ("right", -1)):
@@ -162,6 +155,61 @@ def build_rig():
     # ---- wings (spec §4.5): built open along +-X, folded by the animations
     for side, s in (("left", 1), ("right", -1)):
         wing(side, s)
+
+
+def build_coat_skirt():
+    """The long stone coat below the waist, in independent pieces so it can lag behind the body (reform 4.2): the front
+    panels end near the knees (two hinged segments and a jagged hem each), the back is longer (to the ankles), the
+    sides are thin flaps. All in original pixels; part() and box() apply the scale."""
+    for side, s in (("left", 1), ("right", -1)):
+        part(f"coat_front_{side}_upper", "pelvis", 3.9 * s, 24.4, -4.9)
+        a, b = span(1.3, 7.2, s)
+        box(f"coat_front_{side}_upper", f"coat_front_{side}_upper", a, 13.0, -5.6, b, 24.6, -4.2, "coat")
+        # an engraved trim band across the waist
+        box(f"coat_belt_{side}", f"coat_front_{side}_upper", a - 0.2 * s, 22.4, -5.8, b + 0.2 * s, 24.0, -4.0, "coat_trim")
+        part(f"coat_front_{side}_lower", f"coat_front_{side}_upper", 3.9 * s, 13.0, -4.9)
+        a, b = span(1.3, 7.4, s)
+        box(f"coat_front_{side}_lower", f"coat_front_{side}_lower", a, 8.6, -5.9, b, 13.2, -4.4, "coat")
+        # the hem breaks into three teeth of different lengths
+        for k, (x0, x1, y0) in enumerate(((1.3, 3.5, 6.4), (3.5, 5.6, 7.4), (5.6, 7.4, 6.9))):
+            a2, b2 = span(x0, x1, s)
+            box(f"coat_hem_front_{side}_{k}", f"coat_front_{side}_lower", a2, y0, -5.9, b2, 8.8, -4.4, "coat_hem")
+        part(f"coat_side_{side}", "pelvis", 5.2 * s, 24.4, 0)
+        a, b = span(5.0, 6.8, s)
+        box(f"coat_side_{side}", f"coat_side_{side}", a, 9.2, -3.6, b, 24.6, 3.8, "coat")
+        a, b = span(5.0, 6.6, s)
+        box(f"coat_side_hem_{side}", f"coat_side_{side}", a, 6.4, -2.4, b, 9.4, 2.8, "coat_hem")
+    part("coat_back_upper", "pelvis", 0, 24.4, 4.3)
+    box("coat_back_upper", "coat_back_upper", -5.7, 11.5, 3.7, 5.7, 24.6, 5.3, "coat")
+    box("coat_back_trim", "coat_back_upper", -5.9, 22.4, 3.5, 5.9, 24.0, 5.5, "coat_trim")
+    part("coat_back_lower", "coat_back_upper", 0, 11.5, 4.7)
+    box("coat_back_lower", "coat_back_lower", -5.9, 3.4, 4.2, 5.9, 11.7, 5.8, "coat")
+    for k, (x0, x1, y0) in enumerate(((-5.9, -3.0, 0.8), (-3.0, 0.0, 1.9), (0.0, 3.0, 0.4), (3.0, 5.9, 1.5))):
+        box(f"coat_hem_back_{k}", "coat_back_lower", x0, y0, 4.2, x1, 3.6, 5.8, "coat_hem")
+
+
+def build_coat_upper():
+    """The coat above the waist: a high stiff collar, panelled lapels on the chest and broad shoulder plates; static
+    with the torso (they follow it), the long pieces below are what moves."""
+    part("coat_collar", "torso", 0, 43, 2)
+    box("collar_back", "coat_collar", -6.6, 41.5, 5.1, 6.6, 49.6, 6.7, "collar")
+    for side, s in (("left", 1), ("right", -1)):
+        a, b = span(5.6, 7.3, s)
+        box(f"collar_{side}", "coat_collar", a, 41.0, -3.5, b, 48.4, 5.3, "collar")
+        a, b = span(3.8, 6.4, s)
+        box(f"collar_tip_{side}", "coat_collar", a, 43.0, -4.7, b, 49.2, -3.4, "collar")
+        part(f"coat_lapel_{side}", "torso", 5.2 * s, 43, -4.6)
+        a, b = span(2.6, 8.0, s)
+        box(f"lapel_{side}", f"coat_lapel_{side}", a, 33.0, -5.5, b, 44.0, -4.1, "coat")
+        a, b = span(2.1, 2.9, s)
+        box(f"lapel_edge_{side}", f"coat_lapel_{side}", a, 32.0, -5.9, b, 44.6, -4.3, "coat_trim")
+        a, b = span(6.6, 8.9, s)
+        box(f"lapel_peak_{side}", f"coat_lapel_{side}", a, 43.0, -5.4, b, 46.2, -3.6, "coat_trim")
+        part(f"coat_shoulder_{side}", "torso", 10.5 * s, 44, 0)
+        a, b = span(7.2, 13.9, s)
+        box(f"coat_shoulder_{side}", f"coat_shoulder_{side}", a, 43.4, -4.9, b, 46.0, 4.9, "coat_trim")
+        a, b = span(12.7, 14.5, s)
+        box(f"coat_shoulder_drop_{side}", f"coat_shoulder_{side}", a, 36.2, -4.3, b, 43.6, 4.3, "coat")
 
 
 SWORD_LENGTH = {("top", "right"): 20, ("top", "left"): 19, ("mid", "right"): 18, ("mid", "left"): 18,
@@ -239,9 +287,9 @@ def ceil(v):
 
 
 def dims(b):
-    """Declared (texel) size of a box: whole texels, doubled on 2x boxes; the CubeDeformation shrinks it to the real size."""
+    """Declared (texel) size of a box: whole texels at the material's density; the CubeDeformation shrinks it back."""
     _, _, x0, y0, z0, x1, y1, z1, _, k = b
-    return max(1, ceil((x1 - x0) * k - 1e-6)), max(1, ceil((y1 - y0) * k - 1e-6)), max(1, ceil((z1 - z0) - 1e-6))
+    return (max(1, ceil((x1 - x0) * k - 1e-6)), max(1, ceil((y1 - y0) * k - 1e-6)), max(1, ceil((z1 - z0) * k - 1e-6)))
 
 
 def footprint(w, h, d):
@@ -303,272 +351,67 @@ def paint(img, glows, b, u, v):
     w, h, d = dims(b)
     px = img.load()
     gl = {key: g.load() for key, g in glows.items()}
-    seed = sum(ord(c) for c in name)
-
-    def glow(x, y, color, which=("glow", "command")):
-        for key in which:
-            gl[key][x, y] = color
-
+    seed = sum((n + 1) * ord(c) for n, c in enumerate(name)) % 9973
     for face, (fx0, fy0, fw, fh) in faces_of(u, v, w, h, d).items():
-        side = face in ("front", "back", "left", "right")
+        f = Face(name, face, fw, fh, seed * 31 + sum(ord(c) for c in face))
         for j in range(fh):
             for i in range(fw):
                 x, y = fx0 + i, fy0 + j
-                n = noise(x // 2, y // 2, seed)
-                t = j / max(1, fh - 1)
-                pal = {"face_stone": FACE, "jaw_stone": FACE, "hood": FACE, "granite_light": GRANITE,
-                       "basalt_light": BASALT, "blade": BASALT, "blade_tip": BASALT, "grip": BASALT,
-                       "wing_tip": BASALT, "tablet": TABLET}.get(mat, GRANITE)
-                c = tone(pal, t, n) if side else (pal[2] if face == "top" else pal[0])
-                if mat == "granite_light" and side:
-                    c = pal[3] if t < 0.2 else pal[2] if n > 40 else pal[1]
-                if side and fw > 2 and (i == 0 or i == fw - 1) and mat not in ("face", "teeth_up", "teeth_low", "seal",
-                                                                                 "mask_left", "mask_right", "jaw_face"):
-                    c = pal[0]
-                if mat == "void" or (mat == "hood" and face in ("back",) and name.startswith("hood_side")):
-                    c = VOID
-                elif mat == "hood" and face == "bottom":
-                    c = VOID
-                elif mat == "robe" and side:
-                    c = (GRANITE[2] if (i // 2) % 2 == 0 else GRANITE[1]) if t < 0.85 else GRANITE[0]
-                    if j == fh - 1 and (i + seed) % 3 == 0:
-                        c = CLEAR  # broken lower tips
-                    if n < 6:
-                        c = CRACK
-                elif mat == "abdomen" and side:
-                    c = GRANITE[2] if j == 0 else GRANITE[0] if j == fh - 1 else GRANITE[1]
-                    if face == "front" and i in (0, fw - 1) and 0 < j < fh - 1:
-                        c = MANA_D
-                        glow(x, y, MANA)
-                elif mat == "ribcage":
-                    c = paint_ribcage(face, i, j, fw, fh, n, c, x, y, glow)
-                elif mat in ("mount", "mount_disc"):
-                    if face in ("left", "right", "front") and mat == "mount_disc":
-                        cx, cy = (fw - 1) / 2, (fh - 1) / 2
-                        r = max(abs(i - cx), abs(j - cy))
-                        if 1.0 <= r < 1.6:
-                            c = MANA_D
-                            glow(x, y, MANA)
-                        elif r < 1.0:
-                            c = DEEP
-                    elif mat == "mount" and side and j % 4 == 0:
-                        c = GRANITE[0]
-                elif mat == "sternum":
-                    c = paint_sternum(face, i, j, fw, fh, c, x, y, glow, gl)
-                elif mat in ("elbow", "wrist_cracked"):
-                    c = CRACK if side and j in (0, fh - 1) else GRANITE[1]
-                    if side and j == 1 and i % 6 == 2 and face == "front":
-                        c = MANA_D
-                        glow(x, y, MANA, ("command",))
-                    if mat == "wrist_cracked" and side and i == fw // 2:
-                        c = DEEP
-                elif mat in ("forearm", "forearm_chipped"):
-                    if side and (i + j) % 5 == 0 and n > 50:
-                        c = GRANITE[0]  # diagonal scratches
-                    if mat == "forearm_chipped" and face == "front" and 2 <= j <= 5 and i == fw // 2:
-                        c = MANA_D
-                        glow(x, y, MANA)
-                elif mat == "hand":
-                    c = GRANITE[1] if n > 30 else GRANITE[0]
-                elif mat == "fingers":
-                    c = GRANITE[0] if i % 2 == 1 else (GRANITE[3] if j == fh - 1 else GRANITE[2])
-                elif mat == "grip":
-                    c = BASALT[0] if j % 2 else BASALT[1]
-                elif mat == "blade":
-                    c = BASALT[1] if n > 20 else BASALT[0]
-                    if face in ("left", "right") and i == 0:
-                        c = BASALT[3]  # the lighter edge (-Z)
-                    if face in ("left", "right") and i == fw // 2 and 1 <= j <= fh - 2:
-                        c = BASALT[0]
-                        if j % 3 == 0:
-                            glow(x, y, MANA)  # mana groove
-                elif mat == "blade_tip":
-                    c = BASALT[1] if face != "top" else BASALT[2]
-                    if face in ("left", "right") and i == 0:
-                        c = BASALT[3]
-                elif mat == "wing_bone":
-                    c = tone(GRANITE, t, n) if side else GRANITE[2]
-                    if face == "top":
-                        c = FACE[2]  # a cold light along the leading edge
-                elif mat == "wing_plate":
-                    c = GRANITE[1] if (i // 2 + j // 3) % 2 == 0 else BASALT[2]
-                    if j >= fh - 2:
-                        c = BASALT[0]  # almost black tips
-                    if (i + j) % 7 == 0:
-                        c = CRACK
-                elif mat == "wing_tip":
-                    c = BASALT[0]
-                elif mat == "tablet":
-                    c = paint_tablet(name, face, i, j, fw, fh, n, c, x, y, gl)
-                elif mat == "face":
-                    c = paint_face(face, i, j, fw, fh, c, x, y, glow)
-                elif mat == "jaw_face":
-                    c = paint_jaw(face, i, j, fw, fh, c)
-                elif mat in ("teeth_up", "teeth_low"):
-                    c = paint_teeth(mat, face, i, j, fw, fh)
-                elif mat == "seal":
-                    c = LILAC_D
-                    if face == "front":
-                        cx, cy = (fw - 1) / 2, (fh - 1) / 2
-                        diamond = abs(i - cx) / (fw / 2) + abs(j - cy) / (fh / 2) <= 1.0
-                        c = LILAC_D if diamond else FACE[1]
-                        if diamond:
-                            glow(x, y, LILAC, ("glow", "command", "waking"))
-                elif mat in ("mask_left", "mask_right"):
-                    c = paint_mask(mat, face, i, j, fw, fh, n, x, y, gl)
-                elif mat == "jaw_stone" and face == "top":
-                    c = VOID
-                elif mat == "face_stone" and name == "cranium" and face == "bottom":
-                    c = VOID
+
+                def glow(key, color, x=x, y=y):
+                    gl[key][x, y] = color
+                c = texel(mat, name, f, i, j, glow)
                 if c is not None:
                     px[x, y] = c
 
 
-def paint_face(face, i, j, fw, fh, c, x, y, glow):
-    """The true face, 14x13 texels (2x): eyes, cheek slits, smile corners. Rows from the top (y=53) down."""
-    if face != "front":
-        return FACE[1]
-    c = FACE[1]
-    if j <= 1:
-        return FACE[0]  # the hood's shadow on the forehead
-    if j == 2 and (i < 2 or i > fw - 3):
-        return FACE[0]
-    # eyes: narrow almonds tilted up at the outer corner, sclera black, a coral ring iris
-    for ex0 in (1, 8):
-        outer_up = ex0 == 1
-        for di in range(5):
-            row = 6 if (di == (0 if outer_up else 4)) else 7
-            if j == row and i == ex0 + di:
-                return VOID
-            if j == 7 and i == ex0 + di and 0 < di < 4:
-                if di == 2:
-                    glow(x, y, CORAL_HOT)
-                    return CORAL_D
-                if di in (1, 3):
-                    glow(x, y, CORAL)
-                    return CORAL_D
-                return VOID
-        if j == 8 and ex0 < i < ex0 + 4:
-            return FACE[0]  # lower lid shadow
-    if j == 5 and 1 <= i <= 12 and i not in (6, 7):
-        return FACE[0]  # brow shadow
-    # cheek slits (zygomatic): from below the outer eye corner, diagonally down then out to the side
-    for (ci, cj) in ((1, 9), (0, 10), (12, 9), (13, 10)):
-        if (i, j) == (ci, cj):
-            return DEEP
-    if (j == 9 and i in (2, 11)) or (j == 10 and i in (1, 12)):
-        return FACE[2]  # light rim on the other side of the cut
-    # cheekbones catch the light
-    if j == 8 and i in (1, 12):
-        return FACE[2]
-    # smile corners pulled up, lips retracted (the teeth plate covers the mouth centre)
-    if j == 10 and (i in (2, 3, 10, 11)):
-        return CRACK
-    if j in (11, 12) and i in (0, 1, 12, 13):
-        return CRACK if j == 11 else FACE[0]
-    if j == 9 and 4 <= i <= 9:
-        return FACE[2] if i in (6, 7) else FACE[1]
-    return c
-
-
-def paint_jaw(face, i, j, fw, fh, c):
-    if face != "front":
-        return FACE[1]
-    if j == 0:
-        return VOID  # inside the open mouth line
-    if j == 1 and 1 <= i <= fw - 2:
-        return CRACK  # lower lip shadow
-    if i in (0, fw - 1) or (j >= 2 and i in (1, fw - 2) and j % 2 == 0):
-        return DEEP  # mandibular slits: the real joint of the jaw piece
-    if j in (3, 4) and 3 <= i <= fw - 4 and (i + j) % 3 == 0:
-        return FACE[0]  # chin tension lines
-    return FACE[2] if j == fh - 1 else FACE[1]
-
-
-def paint_teeth(mat, face, i, j, fw, fh):
-    """Two flat rows of human teeth: 2-texel teeth with 1-texel dark gaps, no points."""
-    if face != "front":
+def texel(mat, name, f, i, j, glow):
+    if mat == "face":
+        return paint_face(f, i, j, glow)
+    if mat == "jaw_face":
+        return paint_jaw(f, i, j, glow)
+    if mat in ("teeth_up", "teeth_low"):
+        return paint_teeth(mat, f, i, j, glow)
+    if mat == "seal":
+        return paint_seal(f, i, j, glow)
+    if mat in ("mask_left", "mask_right"):
+        return paint_mask(mat, f, i, j, glow)
+    if mat == "sternum":
+        return paint_sternum(f, i, j, glow)
+    if mat == "ribcage":
+        return paint_ribcage(f, i, j, glow)
+    if mat == "abdomen":
+        return paint_abdomen(f, i, j, glow)
+    if mat in ("mount", "mount_disc"):
+        return paint_mount(mat, f, i, j, glow)
+    if mat in ("granite", "granite_light", "elbow", "wrist_cracked", "forearm", "forearm_chipped", "hand", "fingers"):
+        return paint_limb(mat, f, i, j, glow, name)
+    if mat in ("blade", "blade_tip", "grip", "basalt_light"):
+        return paint_blade(mat, f, i, j, glow)
+    if mat in ("wing_bone", "wing_plate", "wing_tip"):
+        return paint_wing(mat, f, i, j, glow)
+    if mat == "tablet":
+        return paint_tablet(name, f, i, j, glow)
+    if mat in ("coat", "coat_trim", "collar", "coat_hem"):
+        return paint_coat(mat, name, f, i, j, glow)
+    if mat == "void":
         return VOID
-    gap = (i % 3 == 2) if mat == "teeth_up" else ((i + 1) % 3 == 2)  # the lower row is offset half a tooth
-    if gap:
-        return CRACK
-    if mat == "teeth_up":
-        return TABLET[2] if j == 0 else TABLET[1]
-    return TABLET[1] if j == fh - 1 else TABLET[2]
-
-
-def paint_mask(mat, face, i, j, fw, fh, n, x, y, gl):
-    """Serene angelic half-mask (inert stone); the waking glow lights it white-blue. Mirrored eye positions on purpose."""
-    c = TABLET[1] if n > 15 else TABLET[0]
-    if face != "front":
-        return TABLET[0]
-    left = mat == "mask_left"
-    inner = 0 if not left else fw - 1  # the column at the centre line of the face (cut edge)
-    centre = (fw - 1 - i) if left else i
-    if i == inner and j % 3 == 1:
-        c = CRACK  # jagged break along the vertical split
-    if j < 2:
-        c = TABLET[2]
-    if j == 6 and 2 <= centre <= 5:
-        c = TABLET[0]  # carved closed eye
-    if j == 5 and 2 <= centre <= 5:
-        c = TABLET[2]
-    if j in (11, 12) and centre <= 3 and centre >= 0 and (j == 12 or centre == 3):
-        c = TABLET[0]  # calm half-smile
-    if j >= 8 and j <= 10 and centre == 0:
-        c = TABLET[2]  # nose ridge
-    gl["waking"][x, y] = MASK_GLOW if c != CRACK else LILAC
-    return c
-
-
-def paint_sternum(face, i, j, fw, fh, c, x, y, glow, gl):
-    if face != "front":
-        return GRANITE[1]
-    c = GRANITE[2]
-    cx = (fw - 1) / 2
-    for cy in (1.5, 3, 4.5):
-        if abs(i - cx) + abs(j - cy) * 1.2 <= 1.1:
-            gl["command"][x, y] = LILAC
-            if cy == 3:
-                gl["glow"][x, y] = LILAC_D
-            return LILAC_D
-    if j in (0, fh - 1) or i in (0, fw - 1):
-        return GRANITE[0]
-    return c
-
-
-def paint_ribcage(face, i, j, fw, fh, n, c, x, y, glow):
-    if face == "front":
-        # rib plates without a skeleton look: horizontal grooves on the sides of the chest
-        if i < 4 or i > fw - 5:
-            if j % 3 == 2:
-                c = GRANITE[0]
-        # mana veins from the sternum (centre) to the six shoulder sockets, right-angled like a circuit
-        cx = fw // 2
-        for row in (3, 9, 13):  # top, mid, low socket heights (from the top of the ribcage)
-            if j == row and (i <= cx - 3 or i >= cx + 2) and (i < 2 or i > fw - 3 or True):
-                if 1 <= i <= fw - 2:
-                    glow(x, y, MANA, ("command",))
-                    if row == 9:
-                        glow(x, y, MANA, ("glow",))
-                    return MANA_D
-        if (i in (cx - 3, cx + 2)) and 3 <= j <= 13:
-            glow(x, y, MANA, ("command",))
-            return MANA_D
-    return c
-
-
-def paint_tablet(name, face, i, j, fw, fh, n, c, x, y, gl):
-    if face == "front" and not name.startswith("tablet_top"):
-        if j in (2, 5, 8) and 1 <= i <= fw - 2 and (i + j) % 3 != 0:
-            gl["waking"][x, y] = LILAC
-            return TABLET[0]  # three lines of glyphs: adoration, praise, proof of faith
-        inner = fw - 1 if name.endswith("left") else 0
-        if i == inner and j % 2 == 0:
-            return CRACK
-    if (i in (0, fw - 1) or j in (0, fh - 1)) and n < 30:
-        return (98, 93, 92, 255)  # mineral moss on the corners
-    return c
+    if mat == "hood":
+        # the inside of the hood is black; the outside is stacked plates of cold stone
+        inner = {"hood_side_left": "right", "hood_side_right": "left", "hood_shell_back": "front", "hood_crown": "front"}
+        if f.face == "bottom" or f.face == inner.get(name) or (name.startswith("hood_side") and f.face == "back"):
+            return VOID
+        return plates(FACE, f, i, j, 6, 7, 5, 3, -0.02)
+    if mat == "jaw_stone":
+        return VOID if f.face == "top" else stone(FACE, f, i, j, 2)
+    if mat == "face_stone":
+        if name == "cranium" and f.face == "bottom":
+            return VOID
+        c = stone(FACE, f, i, j, 2)
+        if name == "nose" and f.face == "front" and f.side:  # a lit ridge down the front of the statue's nose
+            return FACE[3] if i == f.fw // 2 else c
+        return c
+    return stone(GRANITE, f, i, j, 3)
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -583,12 +426,12 @@ def build_images(layout):
 
 
 def preview(img, layout):
-    big = img.resize((ATLAS * 3, ATLAS * 3), Image.Resampling.NEAREST).convert("RGBA")
+    big = img.resize((ATLAS * 2, ATLAS * 2), Image.Resampling.NEAREST).convert("RGBA")
     draw = ImageDraw.Draw(big)
     for b in BOXES:
         u, v = layout[b[0]]
         fw, fh = footprint(*dims(b))
-        draw.rectangle((u * 3, v * 3, (u + fw) * 3 - 1, (v + fh) * 3 - 1), outline=(255, 0, 255, 120))
+        draw.rectangle((u * 2, v * 2, (u + fw) * 2 - 1, (v + fh) * 2 - 1), outline=(255, 0, 255, 120))
     PREVIEW.parent.mkdir(parents=True, exist_ok=True)
     big.save(PREVIEW)
 

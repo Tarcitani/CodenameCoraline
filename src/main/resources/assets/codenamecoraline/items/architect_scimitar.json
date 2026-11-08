@@ -5,10 +5,7 @@
     "cases": [
       {
         "when": [
-          "gui",
-          "ground",
-          "fixed",
-          "on_shelf"
+          "gui"
         ],
         "model": {
           "type": "minecraft:condition",

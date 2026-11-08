@@ -43,9 +43,16 @@ public final class ArchitectStrikes {
         }
     }
 
+    /**
+     * The tables of {@link ArchitectAttack} are written in the spec's original blocks (the 3.35-block Architect). Every
+     * distance and height passes through {@link Architect#SCALE} here, so the volumes follow the 4.7-block body; angles,
+     * ticks and damage are untouched.
+     */
+    private static final double S = Architect.SCALE;
+
     public static Strike arc(int start, int end, double inner, double outer, double fromDeg, double toDeg,
                              double minY, double maxY, float damage, Variant variant) {
-        return new Strike(start, end, Shape.ARC, inner, outer, fromDeg, toDeg, minY, maxY, damage, variant);
+        return new Strike(start, end, Shape.ARC, inner * S, outer * S, fromDeg, toDeg, minY * S, maxY * S, damage, variant);
     }
 
     public static Strike arc(int start, int end, double outer, double fromDeg, double toDeg, double minY, double maxY,
@@ -59,7 +66,8 @@ public final class ArchitectStrikes {
 
     public static Strike corridor(int start, int end, double width, double fromDepth, double toDepth, double minY,
                                   double maxY, float damage, Variant variant) {
-        return new Strike(start, end, Shape.CORRIDOR, width, fromDepth, toDepth, 0.0D, minY, maxY, damage, variant);
+        return new Strike(start, end, Shape.CORRIDOR, width * S, fromDepth * S, toDepth * S, 0.0D, minY * S, maxY * S,
+                damage, variant);
     }
 
     /**

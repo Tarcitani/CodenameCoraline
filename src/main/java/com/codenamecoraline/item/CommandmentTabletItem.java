@@ -27,13 +27,16 @@ import org.jspecify.annotations.Nullable;
  */
 public final class CommandmentTabletItem extends Item {
     public static final double OTHER_BOSS_RADIUS = 96.0D;
+    /** The Architect is temporarily disabled awaiting redesign. In GameTests it is enabled. */
+    public static boolean ENABLED = Boolean.getBoolean("coraline.architectTests");
 
     public enum SummonResult {
         SUCCESS("entity.codenamecoraline.architect.summon.success"),
         WRONG_FACE("entity.codenamecoraline.architect.summon.wrong_face"),
         PEACEFUL("entity.codenamecoraline.architect.summon.peaceful"),
         NO_ROOM("entity.codenamecoraline.architect.summon.no_room"),
-        ALREADY_ACTIVE("entity.codenamecoraline.architect.summon.already_active");
+        ALREADY_ACTIVE("entity.codenamecoraline.architect.summon.already_active"),
+        DISABLED("entity.codenamecoraline.architect.summon.disabled");
 
         private final String translationKey;
 
@@ -71,6 +74,9 @@ public final class CommandmentTabletItem extends Item {
     }
 
     public static SummonResult evaluateConditions(ServerLevel level, BlockPos clicked, Direction face) {
+        if (!ENABLED) {
+            return SummonResult.DISABLED;
+        }
         if (face != Direction.UP || !level.getBlockState(clicked).isFaceSturdy(level, clicked, Direction.UP)) {
             return SummonResult.WRONG_FACE;
         }

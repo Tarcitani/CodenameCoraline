@@ -52,7 +52,25 @@ public enum ArchitectAttack {
             ring(34, 35, 1.5D, 3.5D, 0.0D, 0.8D, 0.5F))),
     /** G: the reprise after a successful parry; only the parried attacker can be hit (§11.3, §13.G). */
     PARRY_REPRISE(ArchitectAnim.PARRY_LEFT, Architect.Phase.DUELIST, 100, 17, 1, 99.0F, List.of(
-            arc(13, 14, 2.5D, -35.0D, 35.0D, 1.0D, 3.0D, 0.6F)));
+            arc(13, 14, 2.5D, -35.0D, 35.0D, 1.0D, 3.0D, 0.6F))),
+    /**
+     * K (reform): the Verdict Hammer. Both upper blades rise crossed over the hood (19 ticks of wind-up, the longest and most
+     * readable in the fight) and fall on a wide corridor. A shield that stops it is disabled for 5 s; this is the only
+     * volume of the boss that does that. 23 ticks of recovery after the slam are the opening for a counter-attack.
+     */
+    SHIELD_BREAKER(ArchitectAnim.SHIELD_BREAKER, Architect.Phase.DUELIST, 160, 28, 1, 1.4F, List.of(
+            corridor(19, 21, 2.4D, 0.3D, 3.4D, 0.0D, 3.6D, 1.3F, ALWAYS))),
+    /**
+     * L (reform): the False Verdict. A middle blade feints a thrust (no volume), the body holds for a beat, then the upper
+     * blades chop late and a low sweep closes. Built to punish the reflex of blocking or dodging on the first motion.
+     */
+    FALSE_VERDICT(ArchitectAnim.FALSE_VERDICT, Architect.Phase.DUELIST, 110, 31, 2, 1.6F, List.of(
+            corridor(22, 24, 1.4D, 0.3D, 3.2D, 0.6D, 3.4D, 1.0F, ALWAYS),
+            arc(28, 30, 2.8D, -60.0D, 60.0D, 0.0D, 1.1D, 0.5F))),
+    /** M (reform): the Rushing Rebuke. A real 4-block charge (no damage while running), an outward cut and a return cut. */
+    RUSHING_REBUKE(ArchitectAnim.RUSHING_REBUKE, Architect.Phase.DUELIST, 120, 32, 2, 1.5F, List.of(
+            arc(17, 19, 3.2D, -50.0D, 50.0D, 0.4D, 3.0D, 0.8F),
+            arc(23, 25, 3.0D, -70.0D, 70.0D, 0.0D, 2.6D, 0.7F)));
 
     public final ArchitectAnim anim;
     /** The first phase in which the brain may pick it (F also answers pillaring in any phase). */
@@ -92,6 +110,16 @@ public enum ArchitectAttack {
 
     public int ticks() {
         return this.anim.ticks;
+    }
+
+    /** Only the Verdict Hammer disables a blocked shield (the vanilla hook {@code getSecondsToDisableBlocking}). */
+    public boolean breaksShield() {
+        return this == SHIELD_BREAKER;
+    }
+
+    /** The two blows that cross the floor by hand: the Piercing Sentence's lunge and the Rushing Rebuke's charge. */
+    public boolean advances() {
+        return this == PIERCING_SENTENCE || this == RUSHING_REBUKE;
     }
 
     /** True while at least one volume of this attack exists on {@code tick}. */

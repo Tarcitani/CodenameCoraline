@@ -79,8 +79,8 @@ def render_plate(pose, width, height, yaw, out_name, fx=None):
                     i = py * w + px
                     if depth < zbuf[i]:
                         continue
-                    tu = min(255, max(0, int((u * ra[3] + v * rb[3] + t * rc[3]) * 256)))
-                    tv = min(255, max(0, int((u * ra[4] + v * rb[4] + t * rc[4]) * 256)))
+                    tu = min(SKIN.width - 1, max(0, int((u * ra[3] + v * rb[3] + t * rc[3]) * SKIN.width)))
+                    tv = min(SKIN.height - 1, max(0, int((u * ra[4] + v * rb[4] + t * rc[4]) * SKIN.height)))
                     s = SKIN.getpixel((tu, tv))
                     g = GLOW.getpixel((tu, tv))
                     if s[3] == 0 and g[3] == 0:

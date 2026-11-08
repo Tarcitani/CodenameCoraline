@@ -32,7 +32,21 @@ public enum ArchitectAnim {
     BACKSTEP(false, 16),
     IDLE_BLADE_INSPECT(false, 30),
     IDLE_WING_ADJUST(false, 24),
-    PHASE_ENRAGE(false, 40);
+    PHASE_ENRAGE(false, 40),
+    // ---- reform: footwork in combat (loops), the dodges (physical displacement, each with its own clip) and three new blows
+    STRAFE_LEFT(true, 16),
+    STRAFE_RIGHT(true, 16),
+    BACKPEDAL(true, 16),
+    DODGE_LEFT(false, 18),
+    DODGE_RIGHT(false, 18),
+    DODGE_BACK(false, 16),
+    DODGE_DIAG_LEFT(false, 18),
+    DODGE_DIAG_RIGHT(false, 18),
+    LEAN_LEFT(false, 10),
+    LEAN_RIGHT(false, 10),
+    SHIELD_BREAKER(false, 44),
+    FALSE_VERDICT(false, 40),
+    RUSHING_REBUKE(false, 42);
 
     public final boolean loops;
     public final int ticks;

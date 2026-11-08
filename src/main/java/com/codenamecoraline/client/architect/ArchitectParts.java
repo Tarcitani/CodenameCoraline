@@ -9,121 +9,129 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
  * parent in model pixels, and every cube with its UV origin in the 256x256 atlas. Parents come before children.
  */
 public final class ArchitectParts {
-    public static final int ATLAS = 256;
+    public static final int ATLAS = 512;
 
     /** One rig part: name, parent (null for the root's children), offset from the parent's pivot. */
     public record Part(String name, String parent, float x, float y, float z) {}
 
     public static final Part[] PARTS = {
-            new Part("pelvis", null, 0F, 2F, 0F),
-            new Part("robe_front", "pelvis", 0F, 0F, -4F),
-            new Part("robe_back_upper", "pelvis", 0F, 0F, 4F),
-            new Part("robe_back_lower", "robe_back_upper", 0F, 10F, 0.1F),
-            new Part("robe_left", "pelvis", 5.5F, 0F, 0F),
-            new Part("robe_right", "pelvis", -5.5F, 0F, 0F),
-            new Part("leg_left", "pelvis", 3F, 0F, 0F),
-            new Part("knee_left", "leg_left", 0F, 10F, -0.5F),
+            new Part("pelvis", null, 0F, -6.8F, 0F),
+            new Part("coat_front_left_upper", "pelvis", 5.46F, -3.36F, -6.86F),
+            new Part("coat_front_left_lower", "coat_front_left_upper", 0F, 15.96F, 0F),
+            new Part("coat_side_left", "pelvis", 7.28F, -3.36F, 0F),
+            new Part("coat_front_right_upper", "pelvis", -5.46F, -3.36F, -6.86F),
+            new Part("coat_front_right_lower", "coat_front_right_upper", 0F, 15.96F, 0F),
+            new Part("coat_side_right", "pelvis", -7.28F, -3.36F, 0F),
+            new Part("coat_back_upper", "pelvis", 0F, -3.36F, 6.02F),
+            new Part("coat_back_lower", "coat_back_upper", 0F, 18.06F, 0.56F),
+            new Part("leg_left", "pelvis", 4.2F, 0F, 0F),
+            new Part("knee_left", "leg_left", 0F, 14F, -0.7F),
             new Part("shin_left", "knee_left", 0F, 0F, 0F),
-            new Part("ankle_left", "shin_left", 0F, 10F, 1F),
+            new Part("ankle_left", "shin_left", 0F, 14F, 1.4F),
             new Part("foot_left", "ankle_left", 0F, 0F, 0F),
-            new Part("leg_right", "pelvis", -3F, 0F, 0F),
-            new Part("knee_right", "leg_right", 0F, 10F, -0.5F),
+            new Part("leg_right", "pelvis", -4.2F, 0F, 0F),
+            new Part("knee_right", "leg_right", 0F, 14F, -0.7F),
             new Part("shin_right", "knee_right", 0F, 0F, 0F),
-            new Part("ankle_right", "shin_right", 0F, 10F, 1F),
+            new Part("ankle_right", "shin_right", 0F, 14F, 1.4F),
             new Part("foot_right", "ankle_right", 0F, 0F, 0F),
-            new Part("torso", "pelvis", 0F, -7F, 0F),
+            new Part("torso", "pelvis", 0F, -9.8F, 0F),
             new Part("abdomen", "torso", 0F, 0F, 0F),
-            new Part("sternum_seal", "torso", 0F, -8F, -4.25F),
-            new Part("tablet_anchor", "torso", 0F, -3F, -8F),
+            new Part("sternum_seal", "torso", 0F, -11.2F, -5.95F),
+            new Part("tablet_anchor", "torso", 0F, -4.2F, -11.2F),
             new Part("mandament_tablet", "tablet_anchor", 0F, 0F, 0F),
-            new Part("tablet_half_left", "mandament_tablet", 0.25F, 10F, 0F),
-            new Part("tablet_half_right", "mandament_tablet", -0.25F, 10F, 0F),
-            new Part("neck", "torso", 0F, -14F, 0F),
-            new Part("head", "neck", 0F, -3F, 0F),
+            new Part("tablet_half_left", "mandament_tablet", 0.35F, 14F, 0F),
+            new Part("tablet_half_right", "mandament_tablet", -0.35F, 14F, 0F),
+            new Part("neck", "torso", 0F, -19.6F, 0F),
+            new Part("head", "neck", 0F, -4.2F, 0F),
             new Part("hood", "head", 0F, 0F, 0F),
             new Part("hood_shadow_inner", "head", 0F, 0F, 0F),
-            new Part("forehead_diamond_seal", "head", 0F, -5.75F, -3.75F),
-            new Part("brow_left", "head", 1.6F, -4.6F, -3.75F),
-            new Part("eye_socket_left", "head", 1.75F, -3.5F, -3.6F),
-            new Part("brow_right", "head", -1.6F, -4.6F, -3.75F),
-            new Part("eye_socket_right", "head", -1.75F, -3.5F, -3.6F),
-            new Part("nose_bridge", "head", 0F, -2.5F, -4F),
-            new Part("mouth_interior", "head", 0F, -0.5F, -2.5F),
-            new Part("teeth_upper", "head", 0F, -1F, -3.65F),
-            new Part("jaw", "head", 0F, -0.5F, 2F),
-            new Part("teeth_lower", "jaw", 0F, 0.5F, -5.65F),
-            new Part("face_mask_left", "head", 3.5F, -2.5F, -4.6F),
-            new Part("face_mask_right", "head", -3.5F, -2.5F, -4.6F),
-            new Part("arm_top_left", "torso", 10.5F, -12F, -1F),
+            new Part("forehead_diamond_seal", "head", 0F, -8.05F, -5.25F),
+            new Part("brow_left", "head", 2.24F, -6.44F, -5.25F),
+            new Part("eye_socket_left", "head", 2.45F, -4.9F, -5.04F),
+            new Part("brow_right", "head", -2.24F, -6.44F, -5.25F),
+            new Part("eye_socket_right", "head", -2.45F, -4.9F, -5.04F),
+            new Part("nose_bridge", "head", 0F, -3.5F, -5.6F),
+            new Part("mouth_interior", "head", 0F, -0.7F, -3.5F),
+            new Part("teeth_upper", "head", 0F, -1.4F, -5.11F),
+            new Part("jaw", "head", 0F, -0.7F, 2.8F),
+            new Part("teeth_lower", "jaw", 0F, 0.7F, -7.91F),
+            new Part("face_mask_left", "head", 4.9F, -3.5F, -6.44F),
+            new Part("face_mask_right", "head", -4.9F, -3.5F, -6.44F),
+            new Part("coat_collar", "torso", 0F, -19.6F, 2.8F),
+            new Part("coat_lapel_left", "torso", 7.28F, -19.6F, -6.44F),
+            new Part("coat_shoulder_left", "torso", 14.7F, -21F, 0F),
+            new Part("coat_lapel_right", "torso", -7.28F, -19.6F, -6.44F),
+            new Part("coat_shoulder_right", "torso", -14.7F, -21F, 0F),
+            new Part("arm_top_left", "torso", 14.7F, -16.8F, -1.4F),
             new Part("upper_arm_top_left", "arm_top_left", 0F, 0F, 0F),
-            new Part("elbow_top_left", "upper_arm_top_left", 0F, 8.5F, 0F),
+            new Part("elbow_top_left", "upper_arm_top_left", 0F, 11.9F, 0F),
             new Part("forearm_top_left", "elbow_top_left", 0F, 0F, 0F),
-            new Part("wrist_top_left", "forearm_top_left", 0F, 9F, 0F),
-            new Part("hand_top_left", "wrist_top_left", 0F, 1.5F, 0F),
-            new Part("tablet_grip_left", "hand_top_left", 0F, 1F, 0F),
-            new Part("sword_top_left", "hand_top_left", 0F, 1F, 0F),
-            new Part("blade_tip_top_left", "sword_top_left", 0F, 10F, 0F),
-            new Part("arm_top_right", "torso", -10.5F, -12F, -1F),
+            new Part("wrist_top_left", "forearm_top_left", 0F, 12.6F, 0F),
+            new Part("hand_top_left", "wrist_top_left", 0F, 2.1F, 0F),
+            new Part("tablet_grip_left", "hand_top_left", 0F, 1.4F, 0F),
+            new Part("sword_top_left", "hand_top_left", 0F, 1.4F, 0F),
+            new Part("blade_tip_top_left", "sword_top_left", 0F, 14F, 0F),
+            new Part("arm_top_right", "torso", -14.7F, -16.8F, -1.4F),
             new Part("upper_arm_top_right", "arm_top_right", 0F, 0F, 0F),
-            new Part("elbow_top_right", "upper_arm_top_right", 0F, 8.5F, 0F),
+            new Part("elbow_top_right", "upper_arm_top_right", 0F, 11.9F, 0F),
             new Part("forearm_top_right", "elbow_top_right", 0F, 0F, 0F),
-            new Part("wrist_top_right", "forearm_top_right", 0F, 9F, 0F),
-            new Part("hand_top_right", "wrist_top_right", 0F, 1.5F, 0F),
-            new Part("tablet_grip_right", "hand_top_right", 0F, 1F, 0F),
-            new Part("sword_top_right", "hand_top_right", 0F, 1F, 0F),
-            new Part("blade_tip_top_right", "sword_top_right", 0F, 10F, 0F),
-            new Part("arm_mid_left", "torso", 11.5F, -6F, 0.5F),
+            new Part("wrist_top_right", "forearm_top_right", 0F, 12.6F, 0F),
+            new Part("hand_top_right", "wrist_top_right", 0F, 2.1F, 0F),
+            new Part("tablet_grip_right", "hand_top_right", 0F, 1.4F, 0F),
+            new Part("sword_top_right", "hand_top_right", 0F, 1.4F, 0F),
+            new Part("blade_tip_top_right", "sword_top_right", 0F, 14F, 0F),
+            new Part("arm_mid_left", "torso", 16.1F, -8.4F, 0.7F),
             new Part("upper_arm_mid_left", "arm_mid_left", 0F, 0F, 0F),
-            new Part("elbow_mid_left", "upper_arm_mid_left", 0F, 8.5F, 0F),
+            new Part("elbow_mid_left", "upper_arm_mid_left", 0F, 11.9F, 0F),
             new Part("forearm_mid_left", "elbow_mid_left", 0F, 0F, 0F),
-            new Part("wrist_mid_left", "forearm_mid_left", 0F, 9F, 0F),
-            new Part("hand_mid_left", "wrist_mid_left", 0F, 1.5F, 0F),
-            new Part("palm_anchor_mid_left", "hand_mid_left", 0F, 1F, 0F),
-            new Part("sword_mid_left", "hand_mid_left", 0F, 1F, 0F),
-            new Part("blade_tip_mid_left", "sword_mid_left", 0F, 10F, 0F),
-            new Part("arm_mid_right", "torso", -11.5F, -6F, 0.5F),
+            new Part("wrist_mid_left", "forearm_mid_left", 0F, 12.6F, 0F),
+            new Part("hand_mid_left", "wrist_mid_left", 0F, 2.1F, 0F),
+            new Part("palm_anchor_mid_left", "hand_mid_left", 0F, 1.4F, 0F),
+            new Part("sword_mid_left", "hand_mid_left", 0F, 1.4F, 0F),
+            new Part("blade_tip_mid_left", "sword_mid_left", 0F, 14F, 0F),
+            new Part("arm_mid_right", "torso", -16.1F, -8.4F, 0.7F),
             new Part("upper_arm_mid_right", "arm_mid_right", 0F, 0F, 0F),
-            new Part("elbow_mid_right", "upper_arm_mid_right", 0F, 8.5F, 0F),
+            new Part("elbow_mid_right", "upper_arm_mid_right", 0F, 11.9F, 0F),
             new Part("forearm_mid_right", "elbow_mid_right", 0F, 0F, 0F),
-            new Part("wrist_mid_right", "forearm_mid_right", 0F, 9F, 0F),
-            new Part("hand_mid_right", "wrist_mid_right", 0F, 1.5F, 0F),
-            new Part("palm_anchor_mid_right", "hand_mid_right", 0F, 1F, 0F),
-            new Part("sword_mid_right", "hand_mid_right", 0F, 1F, 0F),
-            new Part("blade_tip_mid_right", "sword_mid_right", 0F, 10F, 0F),
-            new Part("arm_low_left", "torso", 10F, -1F, 1.5F),
+            new Part("wrist_mid_right", "forearm_mid_right", 0F, 12.6F, 0F),
+            new Part("hand_mid_right", "wrist_mid_right", 0F, 2.1F, 0F),
+            new Part("palm_anchor_mid_right", "hand_mid_right", 0F, 1.4F, 0F),
+            new Part("sword_mid_right", "hand_mid_right", 0F, 1.4F, 0F),
+            new Part("blade_tip_mid_right", "sword_mid_right", 0F, 14F, 0F),
+            new Part("arm_low_left", "torso", 14F, -1.4F, 2.1F),
             new Part("upper_arm_low_left", "arm_low_left", 0F, 0F, 0F),
-            new Part("elbow_low_left", "upper_arm_low_left", 0F, 8.5F, 0F),
+            new Part("elbow_low_left", "upper_arm_low_left", 0F, 11.9F, 0F),
             new Part("forearm_low_left", "elbow_low_left", 0F, 0F, 0F),
-            new Part("wrist_low_left", "forearm_low_left", 0F, 9F, 0F),
-            new Part("hand_low_left", "wrist_low_left", 0F, 1.5F, 0F),
-            new Part("palm_anchor_low_left", "hand_low_left", 0F, 1F, 0F),
-            new Part("sword_low_left", "hand_low_left", 0F, 1F, 0F),
-            new Part("blade_tip_low_left", "sword_low_left", 0F, 10F, 0F),
-            new Part("arm_low_right", "torso", -10F, -1F, 1.5F),
+            new Part("wrist_low_left", "forearm_low_left", 0F, 12.6F, 0F),
+            new Part("hand_low_left", "wrist_low_left", 0F, 2.1F, 0F),
+            new Part("palm_anchor_low_left", "hand_low_left", 0F, 1.4F, 0F),
+            new Part("sword_low_left", "hand_low_left", 0F, 1.4F, 0F),
+            new Part("blade_tip_low_left", "sword_low_left", 0F, 14F, 0F),
+            new Part("arm_low_right", "torso", -14F, -1.4F, 2.1F),
             new Part("upper_arm_low_right", "arm_low_right", 0F, 0F, 0F),
-            new Part("elbow_low_right", "upper_arm_low_right", 0F, 8.5F, 0F),
+            new Part("elbow_low_right", "upper_arm_low_right", 0F, 11.9F, 0F),
             new Part("forearm_low_right", "elbow_low_right", 0F, 0F, 0F),
-            new Part("wrist_low_right", "forearm_low_right", 0F, 9F, 0F),
-            new Part("hand_low_right", "wrist_low_right", 0F, 1.5F, 0F),
-            new Part("palm_anchor_low_right", "hand_low_right", 0F, 1F, 0F),
-            new Part("sword_low_right", "hand_low_right", 0F, 1F, 0F),
-            new Part("blade_tip_low_right", "sword_low_right", 0F, 10F, 0F),
-            new Part("wing_root_left", "torso", 4F, -11F, 5F),
+            new Part("wrist_low_right", "forearm_low_right", 0F, 12.6F, 0F),
+            new Part("hand_low_right", "wrist_low_right", 0F, 2.1F, 0F),
+            new Part("palm_anchor_low_right", "hand_low_right", 0F, 1.4F, 0F),
+            new Part("sword_low_right", "hand_low_right", 0F, 1.4F, 0F),
+            new Part("blade_tip_low_right", "sword_low_right", 0F, 14F, 0F),
+            new Part("wing_root_left", "torso", 5.6F, -15.4F, 7F),
             new Part("wing_arm_left", "wing_root_left", 0F, 0F, 0F),
-            new Part("wing_forearm_left", "wing_arm_left", 14F, -1F, 1.5F),
-            new Part("wing_tip_left", "wing_forearm_left", 14F, -0.75F, 0F),
-            new Part("wing_finger_1_left", "wing_forearm_left", 1F, 0F, 0F),
-            new Part("wing_finger_2_left", "wing_forearm_left", 5F, 0F, 0F),
-            new Part("wing_finger_3_left", "wing_forearm_left", 9F, 0F, 0F),
-            new Part("wing_finger_4_left", "wing_forearm_left", 13F, 0F, 0F),
-            new Part("wing_root_right", "torso", -4F, -11F, 5F),
+            new Part("wing_forearm_left", "wing_arm_left", 19.6F, -1.4F, 2.1F),
+            new Part("wing_tip_left", "wing_forearm_left", 19.6F, -1.05F, 0F),
+            new Part("wing_finger_1_left", "wing_forearm_left", 1.4F, 0F, 0F),
+            new Part("wing_finger_2_left", "wing_forearm_left", 7F, 0F, 0F),
+            new Part("wing_finger_3_left", "wing_forearm_left", 12.6F, 0F, 0F),
+            new Part("wing_finger_4_left", "wing_forearm_left", 18.2F, 0F, 0F),
+            new Part("wing_root_right", "torso", -5.6F, -15.4F, 7F),
             new Part("wing_arm_right", "wing_root_right", 0F, 0F, 0F),
-            new Part("wing_forearm_right", "wing_arm_right", -14F, -1F, 1.5F),
-            new Part("wing_tip_right", "wing_forearm_right", -14F, -0.75F, 0F),
-            new Part("wing_finger_1_right", "wing_forearm_right", -1F, 0F, 0F),
-            new Part("wing_finger_2_right", "wing_forearm_right", -5F, 0F, 0F),
-            new Part("wing_finger_3_right", "wing_forearm_right", -9F, 0F, 0F),
-            new Part("wing_finger_4_right", "wing_forearm_right", -13F, 0F, 0F),
+            new Part("wing_forearm_right", "wing_arm_right", -19.6F, -1.4F, 2.1F),
+            new Part("wing_tip_right", "wing_forearm_right", -19.6F, -1.05F, 0F),
+            new Part("wing_finger_1_right", "wing_forearm_right", -1.4F, 0F, 0F),
+            new Part("wing_finger_2_right", "wing_forearm_right", -7F, 0F, 0F),
+            new Part("wing_finger_3_right", "wing_forearm_right", -12.6F, 0F, 0F),
+            new Part("wing_finger_4_right", "wing_forearm_right", -18.2F, 0F, 0F),
     };
 
     private ArchitectParts() {}
@@ -133,379 +141,426 @@ public final class ArchitectParts {
         CubeListBuilder b = CubeListBuilder.create();
         switch (part) {
             case "pelvis" -> {
-                b.texOffs(163, 40).addBox(-5F, -2F, -3.5F, 10F, 4F, 7F); // pelvis_plate
+                b.texOffs(0, 277).addBox(-10.5F, -4.5F, -7.5F, 21F, 9F, 15F, new CubeDeformation(-3.5F, -1.7F, -2.6F)); // pelvis_plate
             }
-            case "robe_front" -> {
-                b.texOffs(169, 0).addBox(-4.5F, 0F, -0.6F, 3F, 16F, 1F); // robe_front_0
-                b.texOffs(21, 24).addBox(-1.5F, 0F, -0.6F, 3F, 14F, 1F); // robe_front_1
-                b.texOffs(178, 0).addBox(1.5F, 0F, -0.6F, 3F, 16F, 1F); // robe_front_2
+            case "coat_front_left_upper" -> {
+                b.texOffs(155, 114).addBox(-8.01F, -8.66F, -2F, 17F, 33F, 4F, new CubeDeformation(-4.37F, -8.38F, -1.02F)); // coat_front_left_upper (2x texels)
+                b.texOffs(0, 421).addBox(-8.51F, -0.82F, -3F, 18F, 5F, 6F, new CubeDeformation(-4.59F, -1.38F, -1.74F)); // coat_belt_left (2x texels)
             }
-            case "robe_back_upper" -> {
-                b.texOffs(198, 40).addBox(-5F, 0F, -0.4F, 10F, 10F, 1F); // robe_back_upper
+            case "coat_front_left_lower" -> {
+                b.texOffs(172, 350).addBox(-8.37F, -3.56F, -2.85F, 18F, 13F, 5F, new CubeDeformation(-4.73F, -3.28F, -1.45F)); // coat_front_left_lower (2x texels)
+                b.texOffs(379, 406).addBox(-5.6F, 4.06F, -2.85F, 7F, 7F, 5F, new CubeDeformation(-1.96F, -1.82F, -1.45F)); // coat_hem_front_left_0 (2x texels)
+                b.texOffs(235, 433).addBox(-2.09F, 4.86F, -2.85F, 6F, 4F, 5F, new CubeDeformation(-1.53F, -1.02F, -1.45F)); // coat_hem_front_left_1 (2x texels)
+                b.texOffs(248, 421).addBox(0.64F, 4.21F, -2.85F, 6F, 6F, 5F, new CubeDeformation(-1.74F, -1.67F, -1.45F)); // coat_hem_front_left_2 (2x texels)
             }
-            case "robe_back_lower" -> {
-                b.texOffs(156, 53).addBox(-5F, 0F, -0.5F, 10F, 9F, 1F); // robe_back_lower
+            case "coat_side_left" -> {
+                b.texOffs(143, 0).addBox(-2.02F, -11.5F, -10.36F, 6F, 44F, 21F, new CubeDeformation(-1.74F, -11.22F, -5.32F)); // coat_side_left (2x texels)
+                b.texOffs(367, 277).addBox(-1.66F, 18.6F, -7.22F, 5F, 9F, 15F, new CubeDeformation(-1.38F, -2.4F, -3.86F)); // coat_side_hem_left (2x texels)
             }
-            case "robe_left" -> {
-                b.texOffs(97, 0).addBox(-0.5F, 0F, -3F, 1F, 14F, 6F); // robe_left
+            case "coat_front_right_upper" -> {
+                b.texOffs(198, 114).addBox(-8.99F, -8.66F, -2F, 17F, 33F, 4F, new CubeDeformation(-4.37F, -8.38F, -1.02F)); // coat_front_right_upper (2x texels)
+                b.texOffs(49, 421).addBox(-8.49F, -0.82F, -3F, 16F, 5F, 6F, new CubeDeformation(-4.15F, -1.38F, -1.74F)); // coat_belt_right (2x texels)
             }
-            case "robe_right" -> {
-                b.texOffs(112, 0).addBox(-0.5F, 0F, -3F, 1F, 14F, 6F); // robe_right
+            case "coat_front_right_lower" -> {
+                b.texOffs(219, 350).addBox(-9.63F, -3.56F, -2.85F, 18F, 13F, 5F, new CubeDeformation(-4.73F, -3.28F, -1.45F)); // coat_front_right_lower (2x texels)
+                b.texOffs(404, 406).addBox(-1.4F, 4.06F, -2.85F, 7F, 7F, 5F, new CubeDeformation(-1.96F, -1.82F, -1.45F)); // coat_hem_front_right_0 (2x texels)
+                b.texOffs(258, 433).addBox(-3.91F, 4.86F, -2.85F, 6F, 4F, 5F, new CubeDeformation(-1.53F, -1.02F, -1.45F)); // coat_hem_front_right_1 (2x texels)
+                b.texOffs(271, 421).addBox(-6.64F, 4.21F, -2.85F, 6F, 6F, 5F, new CubeDeformation(-1.74F, -1.67F, -1.45F)); // coat_hem_front_right_2 (2x texels)
+            }
+            case "coat_side_right" -> {
+                b.texOffs(198, 0).addBox(-3.98F, -11.5F, -10.36F, 6F, 44F, 21F, new CubeDeformation(-1.74F, -11.22F, -5.32F)); // coat_side_right (2x texels)
+                b.texOffs(408, 277).addBox(-3.34F, 18.6F, -7.22F, 5F, 9F, 15F, new CubeDeformation(-1.38F, -2.4F, -3.86F)); // coat_side_hem_right (2x texels)
+            }
+            case "coat_back_upper" -> {
+                b.texOffs(248, 67).addBox(-16F, -9.61F, -2.22F, 32F, 37F, 5F, new CubeDeformation(-8.02F, -9.33F, -1.38F)); // coat_back_upper (2x texels)
+                b.texOffs(429, 406).addBox(-17F, -0.82F, -2.72F, 34F, 5F, 6F, new CubeDeformation(-8.74F, -1.38F, -1.6F)); // coat_back_trim (2x texels)
+            }
+            case "coat_back_lower" -> {
+                b.texOffs(155, 190).addBox(-17F, -6.47F, -2.08F, 34F, 24F, 5F, new CubeDeformation(-8.74F, -6.19F, -1.38F)); // coat_back_lower (2x texels)
+                b.texOffs(7, 406).addBox(-10.73F, 9.02F, -2.08F, 9F, 8F, 5F, new CubeDeformation(-2.47F, -2.04F, -1.38F)); // coat_hem_back_0 (2x texels)
+                b.texOffs(67, 433).addBox(-6.6F, 9.75F, -2.08F, 9F, 5F, 5F, new CubeDeformation(-2.4F, -1.31F, -1.38F)); // coat_hem_back_1 (2x texels)
+                b.texOffs(474, 388).addBox(-2.4F, 8.8F, -2.08F, 9F, 9F, 5F, new CubeDeformation(-2.4F, -2.26F, -1.38F)); // coat_hem_back_2 (2x texels)
+                b.texOffs(94, 421).addBox(1.73F, 9.53F, -2.08F, 9F, 6F, 5F, new CubeDeformation(-2.47F, -1.53F, -1.38F)); // coat_hem_back_3 (2x texels)
             }
             case "leg_left" -> {
-                b.texOffs(221, 0).addBox(-2.5F, 0F, -2.5F, 5F, 10F, 5F, new CubeDeformation(-0.25F, 0F, 0F)); // thigh_left
-                b.texOffs(132, 75).addBox(-1.5F, 2F, -3.25F, 3F, 7F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // thigh_shield_left
+                b.texOffs(393, 154).addBox(-5F, -3.5F, -5.5F, 10F, 21F, 11F, new CubeDeformation(-1.85F, -3.5F, -2F)); // thigh_left
+                b.texOffs(451, 302).addBox(-4.5F, -2.3F, -4.85F, 9F, 20F, 2F, new CubeDeformation(-2.4F, -5.1F, -0.65F)); // thigh_shield_left (2x texels)
             }
             case "knee_left" -> {
-                b.texOffs(62, 106).addBox(-2F, -1F, -2.5F, 4F, 2F, 2F); // knee_left
+                b.texOffs(131, 406).addBox(-6F, -3F, -5.1F, 12F, 6F, 6F, new CubeDeformation(-3.2F, -1.6F, -1.6F)); // knee_left (2x texels)
             }
             case "shin_left" -> {
-                b.texOffs(117, 24).addBox(-2F, 0F, -1.5F, 4F, 10F, 4F, new CubeDeformation(-0.25F, 0F, 0F)); // shin_left
-                b.texOffs(105, 65).addBox(-0.5F, 1F, -2.25F, 1F, 8F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // shin_crest_left
+                b.texOffs(0, 190).addBox(-4F, -3.5F, -3.8F, 8F, 21F, 9F, new CubeDeformation(-1.55F, -3.5F, -1.7F)); // shin_left
+                b.texOffs(376, 250).addBox(-1.5F, -4.5F, -3.45F, 3F, 23F, 2F, new CubeDeformation(-0.8F, -5.9F, -0.65F)); // shin_crest_left (2x texels)
             }
             case "foot_left" -> {
-                b.texOffs(150, 65).addBox(-2.5F, 0F, -3.75F, 5F, 2F, 6F, new CubeDeformation(0F, 0F, -0.25F)); // foot_left
-                b.texOffs(88, 106).addBox(-1.5F, 0F, 1.75F, 3F, 2F, 2F, new CubeDeformation(0F, 0F, -0.25F)); // heel_left
-                b.texOffs(176, 106).addBox(-2.75F, 0.25F, -5.5F, 2F, 2F, 2F, new CubeDeformation(-0.25F, -0.25F, 0F)); // toe_0_left
-                b.texOffs(185, 106).addBox(-1F, 0.25F, -5.5F, 2F, 2F, 2F, new CubeDeformation(-0.25F, -0.25F, 0F)); // toe_1_left
-                b.texOffs(194, 106).addBox(0.75F, 0.25F, -5.5F, 2F, 2F, 2F, new CubeDeformation(-0.25F, -0.25F, 0F)); // toe_2_left
+                b.texOffs(196, 370).addBox(-5.5F, -1.1F, -7.05F, 11F, 5F, 12F, new CubeDeformation(-2F, -1.1F, -2.15F)); // foot_left
+                b.texOffs(281, 433).addBox(-3.5F, -1.1F, 1.85F, 7F, 5F, 4F, new CubeDeformation(-1.4F, -1.1F, -0.95F)); // heel_left
+                b.texOffs(294, 421).addBox(-4.95F, -0.75F, -9.3F, 5F, 5F, 6F, new CubeDeformation(-1.45F, -1.45F, -1.6F)); // toe_0_left (2x texels)
+                b.texOffs(317, 421).addBox(-2.5F, -0.75F, -9.3F, 5F, 5F, 6F, new CubeDeformation(-1.45F, -1.45F, -1.6F)); // toe_1_left (2x texels)
+                b.texOffs(340, 421).addBox(-0.05F, -0.75F, -9.3F, 5F, 5F, 6F, new CubeDeformation(-1.45F, -1.45F, -1.6F)); // toe_2_left (2x texels)
             }
             case "leg_right" -> {
-                b.texOffs(0, 24).addBox(-2.5F, 0F, -2.5F, 5F, 10F, 5F, new CubeDeformation(-0.25F, 0F, 0F)); // thigh_right
-                b.texOffs(141, 75).addBox(-1.5F, 2F, -3.25F, 3F, 7F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // thigh_shield_right
+                b.texOffs(436, 154).addBox(-5F, -3.5F, -5.5F, 10F, 21F, 11F, new CubeDeformation(-1.85F, -3.5F, -2F)); // thigh_right
+                b.texOffs(474, 302).addBox(-4.5F, -2.3F, -4.85F, 9F, 20F, 2F, new CubeDeformation(-2.4F, -5.1F, -0.65F)); // thigh_shield_right (2x texels)
             }
             case "knee_right" -> {
-                b.texOffs(75, 106).addBox(-2F, -1F, -2.5F, 4F, 2F, 2F); // knee_right
+                b.texOffs(168, 406).addBox(-6F, -3F, -5.1F, 12F, 6F, 6F, new CubeDeformation(-3.2F, -1.6F, -1.6F)); // knee_right (2x texels)
             }
             case "shin_right" -> {
-                b.texOffs(134, 24).addBox(-2F, 0F, -1.5F, 4F, 10F, 4F, new CubeDeformation(-0.25F, 0F, 0F)); // shin_right
-                b.texOffs(110, 65).addBox(-0.5F, 1F, -2.25F, 1F, 8F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // shin_crest_right
+                b.texOffs(35, 190).addBox(-4F, -3.5F, -3.8F, 8F, 21F, 9F, new CubeDeformation(-1.55F, -3.5F, -1.7F)); // shin_right
+                b.texOffs(387, 250).addBox(-1.5F, -4.5F, -3.45F, 3F, 23F, 2F, new CubeDeformation(-0.8F, -5.9F, -0.65F)); // shin_crest_right (2x texels)
             }
             case "foot_right" -> {
-                b.texOffs(173, 65).addBox(-2.5F, 0F, -3.75F, 5F, 2F, 6F, new CubeDeformation(0F, 0F, -0.25F)); // foot_right
-                b.texOffs(99, 106).addBox(-1.5F, 0F, 1.75F, 3F, 2F, 2F, new CubeDeformation(0F, 0F, -0.25F)); // heel_right
-                b.texOffs(203, 106).addBox(-2.75F, 0.25F, -5.5F, 2F, 2F, 2F, new CubeDeformation(-0.25F, -0.25F, 0F)); // toe_0_right
-                b.texOffs(212, 106).addBox(-1F, 0.25F, -5.5F, 2F, 2F, 2F, new CubeDeformation(-0.25F, -0.25F, 0F)); // toe_1_right
-                b.texOffs(221, 106).addBox(0.75F, 0.25F, -5.5F, 2F, 2F, 2F, new CubeDeformation(-0.25F, -0.25F, 0F)); // toe_2_right
+                b.texOffs(243, 370).addBox(-5.5F, -1.1F, -7.05F, 11F, 5F, 12F, new CubeDeformation(-2F, -1.1F, -2.15F)); // foot_right
+                b.texOffs(304, 433).addBox(-3.5F, -1.1F, 1.85F, 7F, 5F, 4F, new CubeDeformation(-1.4F, -1.1F, -0.95F)); // heel_right
+                b.texOffs(363, 421).addBox(-4.95F, -0.75F, -9.3F, 5F, 5F, 6F, new CubeDeformation(-1.45F, -1.45F, -1.6F)); // toe_0_right (2x texels)
+                b.texOffs(386, 421).addBox(-2.5F, -0.75F, -9.3F, 5F, 5F, 6F, new CubeDeformation(-1.45F, -1.45F, -1.6F)); // toe_1_right (2x texels)
+                b.texOffs(409, 421).addBox(-0.05F, -0.75F, -9.3F, 5F, 5F, 6F, new CubeDeformation(-1.45F, -1.45F, -1.6F)); // toe_2_right (2x texels)
             }
             case "torso" -> {
-                b.texOffs(0, 0).addBox(-8F, -14F, -4F, 16F, 14F, 9F); // ribcage
-                b.texOffs(51, 0).addBox(7.75F, -14F, -3.5F, 4F, 15F, 7F, new CubeDeformation(-0.25F, 0F, 0F)); // mount_left
-                b.texOffs(74, 0).addBox(-11.75F, -14F, -3.5F, 4F, 15F, 7F, new CubeDeformation(-0.25F, 0F, 0F)); // mount_right
+                b.texOffs(0, 0).addBox(-22.5F, -29.8F, -12.3F, 45F, 40F, 26F, new CubeDeformation(-11.3F, -10.2F, -6.7F)); // ribcage (2x texels)
+                b.texOffs(367, 0).addBox(9.65F, -25.1F, -7.5F, 8F, 32F, 15F, new CubeDeformation(-1.55F, -5.5F, -2.6F)); // mount_left
+                b.texOffs(414, 0).addBox(-17.65F, -25.1F, -7.5F, 8F, 32F, 15F, new CubeDeformation(-1.55F, -5.5F, -2.6F)); // mount_right
             }
             case "abdomen" -> {
-                b.texOffs(10, 53).addBox(-7F, -0.125F, -4F, 14F, 2F, 8F, new CubeDeformation(0F, -0.125F, 0F)); // abdomen_0
-                b.texOffs(55, 53).addBox(-6.5F, 1.625F, -4F, 13F, 2F, 8F, new CubeDeformation(0F, -0.125F, -0.25F)); // abdomen_1
-                b.texOffs(0, 65).addBox(-6F, 3.375F, -3.5F, 12F, 2F, 7F, new CubeDeformation(0F, -0.125F, 0F)); // abdomen_2
-                b.texOffs(39, 65).addBox(-5.5F, 5.125F, -3.5F, 11F, 2F, 7F, new CubeDeformation(0F, -0.125F, -0.25F)); // abdomen_3
+                b.texOffs(0, 221).addBox(-20F, -1.275F, -11.5F, 40F, 5F, 23F, new CubeDeformation(-10.2F, -1.275F, -5.9F)); // abdomen_0 (2x texels)
+                b.texOffs(0, 250).addBox(-18.5F, 1.175F, -10.5F, 37F, 5F, 21F, new CubeDeformation(-9.4F, -1.275F, -5.25F)); // abdomen_1 (2x texels)
+                b.texOffs(190, 250).addBox(-17F, 3.625F, -10F, 34F, 5F, 20F, new CubeDeformation(-8.6F, -1.275F, -5.1F)); // abdomen_2 (2x texels)
+                b.texOffs(398, 250).addBox(-15.5F, 6.075F, -9.5F, 31F, 5F, 19F, new CubeDeformation(-7.8F, -1.275F, -4.95F)); // abdomen_3 (2x texels)
             }
             case "sternum_seal" -> {
-                b.texOffs(208, 84).addBox(-2F, -3F, -0.5F, 4F, 6F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // sternum_seal
+                b.texOffs(297, 190).addBox(-8.5F, -13F, -1.5F, 17F, 26F, 3F, new CubeDeformation(-5.7F, -8.8F, -1.15F)); // sternum_seal
             }
             case "tablet_half_left" -> {
-                b.texOffs(151, 24).addBox(-0.25F, -12F, -1F, 5F, 12F, 2F, new CubeDeformation(0F, 0F, -0.25F)); // tablet_left
-                b.texOffs(48, 92).addBox(-0.5F, -16F, -1F, 6F, 4F, 2F, new CubeDeformation(-0.25F, 0F, -0.25F)); // tablet_top_left
+                b.texOffs(77, 114).addBox(-3.85F, -25.4F, -2.5F, 14F, 34F, 5F, new CubeDeformation(-3.5F, -8.6F, -1.45F)); // tablet_left (2x texels)
+                b.texOffs(290, 370).addBox(-4.5F, -25.6F, -2.5F, 16F, 12F, 5F, new CubeDeformation(-4.15F, -3.2F, -1.45F)); // tablet_top_left (2x texels)
             }
             case "tablet_half_right" -> {
-                b.texOffs(166, 24).addBox(-4.75F, -12F, -1F, 5F, 12F, 2F, new CubeDeformation(0F, 0F, -0.25F)); // tablet_right
-                b.texOffs(65, 92).addBox(-5.5F, -16F, -1F, 6F, 4F, 2F, new CubeDeformation(-0.25F, 0F, -0.25F)); // tablet_top_right
+                b.texOffs(116, 114).addBox(-10.15F, -25.4F, -2.5F, 14F, 34F, 5F, new CubeDeformation(-3.5F, -8.6F, -1.45F)); // tablet_right (2x texels)
+                b.texOffs(333, 370).addBox(-11.5F, -25.6F, -2.5F, 16F, 12F, 5F, new CubeDeformation(-4.15F, -3.2F, -1.45F)); // tablet_top_right (2x texels)
             }
             case "neck" -> {
-                b.texOffs(211, 75).addBox(-3F, -1F, -3F, 6F, 1F, 6F); // neck_ring_0
-                b.texOffs(0, 84).addBox(-3F, -2F, -3F, 6F, 1F, 6F, new CubeDeformation(-0.25F, 0F, -0.25F)); // neck_ring_1
-                b.texOffs(27, 92).addBox(-2.5F, -3F, -2.5F, 5F, 1F, 5F); // neck_ring_2
+                b.texOffs(126, 327).addBox(-8.5F, -2.2F, -8.5F, 17F, 3F, 17F, new CubeDeformation(-4.3F, -0.8F, -4.3F)); // neck_ring_0 (2x texels)
+                b.texOffs(259, 327).addBox(-8F, -3.6F, -8F, 16F, 3F, 16F, new CubeDeformation(-4.15F, -0.8F, -4.15F)); // neck_ring_1 (2x texels)
+                b.texOffs(332, 350).addBox(-7F, -5F, -7F, 14F, 3F, 14F, new CubeDeformation(-3.5F, -0.8F, -3.5F)); // neck_ring_2 (2x texels)
             }
             case "head" -> {
-                b.texOffs(61, 24).addBox(-3.5F, -7.25F, -3.5F, 7F, 7F, 7F, new CubeDeformation(0F, -0.25F, 0F)); // cranium
-                b.texOffs(30, 24).addBox(-7F, -10.25F, -4.05F, 14F, 13F, 1F, new CubeDeformation(-3.5F, -3.25F, -0.45F)); // face (2x texels)
+                b.texOffs(357, 67).addBox(-10F, -14.75F, -10F, 20F, 19F, 20F, new CubeDeformation(-5.1F, -4.95F, -5.1F)); // cranium (2x texels)
+                b.texOffs(234, 190).addBox(-15F, -19.25F, -5.47F, 30F, 28F, 1F, new CubeDeformation(-10.1F, -9.45F, -0.43F)); // face
             }
             case "hood" -> {
-                b.texOffs(90, 24).addBox(-4.5F, -7.75F, 1F, 9F, 10F, 4F, new CubeDeformation(0F, -0.25F, 0F)); // hood_shell_back
-                b.texOffs(127, 0).addBox(3.5F, -8F, -4.5F, 2F, 10F, 8F, new CubeDeformation(-0.25F, 0F, 0F)); // hood_side_left
-                b.texOffs(148, 0).addBox(-5.5F, -8F, -4.5F, 2F, 10F, 8F, new CubeDeformation(-0.25F, 0F, 0F)); // hood_side_right
-                b.texOffs(98, 53).addBox(-3.5F, -8.75F, -4.5F, 7F, 2F, 8F, new CubeDeformation(0F, -0.25F, 0F)); // hood_crown
+                b.texOffs(0, 114).addBox(-13F, -17.35F, -1.8F, 26F, 27F, 12F, new CubeDeformation(-6.7F, -6.85F, -3.2F)); // hood_shell_back (2x texels)
+                b.texOffs(253, 0).addBox(3.8F, -18.2F, -12.2F, 5F, 28F, 23F, new CubeDeformation(-1.45F, -7F, -5.9F)); // hood_side_left (2x texels)
+                b.texOffs(310, 0).addBox(-8.8F, -18.2F, -12.2F, 5F, 28F, 23F, new CubeDeformation(-1.45F, -7F, -5.9F)); // hood_side_right (2x texels)
+                b.texOffs(127, 221).addBox(-10F, -13.35F, -12.2F, 20F, 5F, 23F, new CubeDeformation(-5.1F, -1.45F, -5.9F)); // hood_crown (2x texels)
             }
             case "hood_shadow_inner" -> {
-                b.texOffs(93, 111).addBox(-4F, -7.7F, -4.55F, 8F, 1F, 1F, new CubeDeformation(-0.25F, -0.3F, -0.05F)); // hood_cavity_top
-                b.texOffs(246, 53).addBox(3.125F, -7.25F, -4.55F, 1F, 9F, 1F, new CubeDeformation(-0.375F, -0.25F, -0.05F)); // hood_cavity_left
-                b.texOffs(251, 53).addBox(-4.125F, -7.25F, -4.55F, 1F, 9F, 1F, new CubeDeformation(-0.375F, -0.25F, -0.05F)); // hood_cavity_right
+                b.texOffs(351, 444).addBox(-5.5F, -10.58F, -6.67F, 11F, 1F, 2F, new CubeDeformation(-0.25F, -0.22F, -0.37F)); // hood_cavity_top
+                b.texOffs(503, 388).addBox(4.575F, -9.85F, -6.67F, 1F, 12F, 2F, new CubeDeformation(-0.325F, -0.05F, -0.37F)); // hood_cavity_left
+                b.texOffs(0, 406).addBox(-5.575F, -9.85F, -6.67F, 1F, 12F, 2F, new CubeDeformation(-0.325F, -0.05F, -0.37F)); // hood_cavity_right
             }
             case "forehead_diamond_seal" -> {
-                b.texOffs(34, 99).addBox(-1F, -2.5F, -0.5F, 2F, 5F, 1F, new CubeDeformation(-0.5F, -1.25F, -0.35F)); // forehead_seal (2x texels)
+                b.texOffs(61, 406).addBox(-2.5F, -5.5F, -1F, 5F, 11F, 2F, new CubeDeformation(-1.8F, -3.75F, -0.79F)); // forehead_seal
             }
             case "brow_left" -> {
-                b.texOffs(142, 111).addBox(-1.5F, -0.5F, -0.525F, 3F, 1F, 1F, new CubeDeformation(-0.1F, -0.1F, -0.325F)); // brow_left
+                b.texOffs(313, 444).addBox(-4F, -1.5F, -0.535F, 8F, 3F, 1F, new CubeDeformation(-2.04F, -0.94F, -0.255F)); // brow_left (2x texels)
             }
             case "brow_right" -> {
-                b.texOffs(151, 111).addBox(-1.5F, -0.5F, -0.525F, 3F, 1F, 1F, new CubeDeformation(-0.1F, -0.1F, -0.325F)); // brow_right
+                b.texOffs(332, 444).addBox(-4F, -1.5F, -0.535F, 8F, 3F, 1F, new CubeDeformation(-2.04F, -0.94F, -0.255F)); // brow_right (2x texels)
             }
             case "nose_bridge" -> {
-                b.texOffs(27, 111).addBox(-0.5F, -1.75F, -0.55F, 1F, 3F, 1F, new CubeDeformation(0F, -0.25F, -0.05F)); // nose
+                b.texOffs(222, 433).addBox(-1.5F, -3.85F, -1.57F, 3F, 7F, 3F, new CubeDeformation(-0.8F, -1.75F, -0.87F)); // nose (2x texels)
             }
             case "mouth_interior" -> {
-                b.texOffs(55, 99).addBox(-3F, -0.25F, -0.85F, 6F, 2F, 3F, new CubeDeformation(-0.25F, -0.25F, -0.15F)); // mouth_interior
+                b.texOffs(484, 433).addBox(-4F, -0.45F, -1.09F, 8F, 3F, 4F, new CubeDeformation(-0.15F, -0.45F, -0.11F)); // mouth_interior
             }
             case "teeth_upper" -> {
-                b.texOffs(32, 111).addBox(-6F, -1F, -0.525F, 12F, 2F, 1F, new CubeDeformation(-3F, -0.5F, -0.425F)); // teeth_upper (2x texels)
+                b.texOffs(0, 444).addBox(-13F, -2.5F, -0.535F, 26F, 5F, 1F, new CubeDeformation(-8.8F, -1.8F, -0.395F)); // teeth_upper
             }
             case "jaw" -> {
-                b.texOffs(129, 53).addBox(-3F, -0.25F, -5.75F, 6F, 3F, 7F, new CubeDeformation(0F, -0.25F, -0.25F)); // jaw
-                b.texOffs(0, 92).addBox(-6F, -1.25F, -6.05F, 12F, 5F, 1F, new CubeDeformation(-3F, -1.25F, -0.45F)); // jaw_front (2x texels)
-                b.texOffs(160, 111).addBox(-1.5F, 2F, -6.15F, 3F, 1F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // chin
+                b.texOffs(117, 250).addBox(-8.5F, -1.75F, -12.65F, 17F, 7F, 19F, new CubeDeformation(-4.3F, -1.75F, -4.95F)); // jaw (2x texels)
+                b.texOffs(76, 406).addBox(-13F, -3.75F, -8.27F, 26F, 11F, 1F, new CubeDeformation(-8.8F, -3.75F, -0.43F)); // jaw_front
+                b.texOffs(290, 444).addBox(-4.5F, 2F, -8.91F, 9F, 3F, 2F, new CubeDeformation(-2.4F, -0.8F, -0.65F)); // chin (2x texels)
             }
             case "teeth_lower" -> {
-                b.texOffs(59, 111).addBox(-6F, -1F, -0.525F, 12F, 2F, 1F, new CubeDeformation(-3F, -0.5F, -0.425F)); // teeth_lower (2x texels)
+                b.texOffs(55, 444).addBox(-13F, -2.5F, -0.535F, 26F, 5F, 1F, new CubeDeformation(-8.8F, -1.8F, -0.395F)); // teeth_lower
             }
             case "face_mask_left" -> {
-                b.texOffs(187, 0).addBox(-5.25F, -7.25F, -0.525F, 7F, 15F, 1F, new CubeDeformation(-1.75F, -3.75F, -0.425F)); // face_mask_left (2x texels)
+                b.texOffs(327, 154).addBox(-9.95F, -15.65F, -0.535F, 15F, 32F, 1F, new CubeDeformation(-5.05F, -10.75F, -0.395F)); // face_mask_left
             }
             case "face_mask_right" -> {
-                b.texOffs(204, 0).addBox(-1.75F, -7.25F, -0.525F, 7F, 15F, 1F, new CubeDeformation(-1.75F, -3.75F, -0.425F)); // face_mask_right (2x texels)
+                b.texOffs(360, 154).addBox(-5.05F, -15.65F, -0.535F, 15F, 32F, 1F, new CubeDeformation(-5.05F, -10.75F, -0.395F)); // face_mask_right
+            }
+            case "coat_collar" -> {
+                b.texOffs(214, 221).addBox(-18.5F, -15.07F, 2.96F, 37F, 23F, 5F, new CubeDeformation(-9.26F, -5.83F, -1.38F)); // collar_back (2x texels)
+                b.texOffs(126, 67).addBox(6.53F, -12.88F, -14.04F, 5F, 21F, 25F, new CubeDeformation(-1.31F, -5.32F, -6.34F)); // collar_left (2x texels)
+                b.texOffs(401, 302).addBox(3.14F, -13.34F, -10.47F, 8F, 18F, 4F, new CubeDeformation(-2.18F, -4.66F, -1.09F)); // collar_tip_left (2x texels)
+                b.texOffs(187, 67).addBox(-11.53F, -12.88F, -14.04F, 5F, 21F, 25F, new CubeDeformation(-1.31F, -5.32F, -6.34F)); // collar_right (2x texels)
+                b.texOffs(426, 302).addBox(-11.14F, -13.34F, -10.47F, 8F, 18F, 4F, new CubeDeformation(-2.18F, -4.66F, -1.09F)); // collar_tip_right (2x texels)
+            }
+            case "coat_lapel_left" -> {
+                b.texOffs(0, 154).addBox(-7.86F, -9.2F, -2.28F, 16F, 31F, 4F, new CubeDeformation(-4.22F, -7.8F, -1.02F)); // lapel_left (2x texels)
+                b.texOffs(323, 67).addBox(-5.28F, -11.42F, -3.2F, 3F, 36F, 5F, new CubeDeformation(-0.94F, -9.18F, -1.38F)); // lapel_edge_left (2x texels)
+                b.texOffs(96, 388).addBox(0.07F, -6.74F, -2.86F, 7F, 9F, 6F, new CubeDeformation(-1.89F, -2.26F, -1.74F)); // lapel_peak_left (2x texels)
+            }
+            case "coat_shoulder_left" -> {
+                b.texOffs(241, 114).addBox(-9.43F, -4.98F, -14F, 19F, 8F, 28F, new CubeDeformation(-4.81F, -2.18F, -7.14F)); // coat_shoulder_left (2x texels)
+                b.texOffs(0, 67).addBox(1.34F, -4.76F, -12.5F, 6F, 21F, 25F, new CubeDeformation(-1.74F, -5.32F, -6.48F)); // coat_shoulder_drop_left (2x texels)
+            }
+            case "coat_lapel_right" -> {
+                b.texOffs(41, 154).addBox(-8.14F, -9.2F, -2.28F, 16F, 31F, 4F, new CubeDeformation(-4.22F, -7.8F, -1.02F)); // lapel_right (2x texels)
+                b.texOffs(340, 67).addBox(2.28F, -11.42F, -3.2F, 3F, 36F, 5F, new CubeDeformation(-0.94F, -9.18F, -1.38F)); // lapel_edge_right (2x texels)
+                b.texOffs(123, 388).addBox(-7.07F, -6.74F, -2.86F, 7F, 9F, 6F, new CubeDeformation(-1.89F, -2.26F, -1.74F)); // lapel_peak_right (2x texels)
+            }
+            case "coat_shoulder_right" -> {
+                b.texOffs(336, 114).addBox(-9.57F, -4.98F, -14F, 19F, 8F, 28F, new CubeDeformation(-4.81F, -2.18F, -7.14F)); // coat_shoulder_right (2x texels)
+                b.texOffs(63, 67).addBox(-7.34F, -4.76F, -12.5F, 6F, 21F, 25F, new CubeDeformation(-1.74F, -5.32F, -6.48F)); // coat_shoulder_drop_right (2x texels)
             }
             case "arm_top_left" -> {
-                b.texOffs(0, 75).addBox(-2F, -2F, -2F, 4F, 4F, 4F); // shoulder_top_left
-                b.texOffs(25, 84).addBox(-2.5F, -3.25F, -2.5F, 5F, 2F, 5F, new CubeDeformation(0F, -0.25F, 0F)); // pauldron_top_left
+                b.texOffs(73, 277).addBox(-6F, -6F, -6F, 12F, 12F, 12F, new CubeDeformation(-3.2F, -3.2F, -3.2F)); // shoulder_top_left (2x texels)
+                b.texOffs(324, 327).addBox(-7F, -5.65F, -7F, 14F, 5F, 14F, new CubeDeformation(-3.5F, -1.45F, -3.5F)); // pauldron_top_left (2x texels)
             }
             case "upper_arm_top_left" -> {
-                b.texOffs(212, 24).addBox(-2F, 0.75F, -2F, 4F, 8F, 4F, new CubeDeformation(-0.25F, -0.25F, -0.25F)); // upper_top_left
+                b.texOffs(449, 277).addBox(-4F, -1.35F, -4F, 8F, 16F, 8F, new CubeDeformation(-1.55F, -2.75F, -1.55F)); // upper_top_left
             }
             case "elbow_top_left" -> {
-                b.texOffs(82, 92).addBox(-2F, -1F, -2F, 4F, 2F, 4F, new CubeDeformation(0F, -0.25F, 0F)); // elbow_top_left
+                b.texOffs(389, 350).addBox(-6F, -2.5F, -6F, 12F, 5F, 12F, new CubeDeformation(-3.2F, -1.45F, -3.2F)); // elbow_top_left (2x texels)
             }
             case "forearm_top_left" -> {
-                b.texOffs(229, 24).addBox(-2F, 0.625F, -2F, 4F, 8F, 4F, new CubeDeformation(0F, -0.125F, 0F)); // forearm_top_left
-                b.texOffs(150, 75).addBox(1.25F, 1.5F, -1F, 2F, 6F, 2F, new CubeDeformation(-0.25F, 0F, -0.25F)); // crest_top_left
+                b.texOffs(82, 154).addBox(-6F, -4.525F, -6F, 12F, 22F, 12F, new CubeDeformation(-3.2F, -5.575F, -3.2F)); // forearm_top_left (2x texels)
+                b.texOffs(0, 327).addBox(0.65F, -2.2F, -2.5F, 5F, 17F, 5F, new CubeDeformation(-1.45F, -4.3F, -1.45F)); // crest_top_left (2x texels)
             }
             case "wrist_top_left" -> {
-                b.texOffs(99, 92).addBox(-2F, -0.875F, -2F, 4F, 2F, 4F, new CubeDeformation(-0.25F, -0.375F, -0.25F)); // wrist_top_left
+                b.texOffs(228, 388).addBox(-5F, -1.825F, -5F, 10F, 4F, 10F, new CubeDeformation(-2.55F, -1.125F, -2.55F)); // wrist_top_left (2x texels)
             }
             case "hand_top_left" -> {
-                b.texOffs(130, 84).addBox(-0.9F, -1.125F, -1.5F, 3F, 4F, 3F, new CubeDeformation(-0.3F, -0.375F, -0.25F)); // palm_top_left
-                b.texOffs(74, 99).addBox(-1.5F, -0.5F, -2.25F, 3F, 3F, 2F, new CubeDeformation(-0.1F, -0.25F, -0.35F)); // fingers_top_left
-                b.texOffs(169, 111).addBox(-1F, 0F, 0.6F, 2F, 1F, 1F); // thumb_top_left
+                b.texOffs(376, 370).addBox(-2.66F, -3.775F, -3.5F, 7F, 10F, 7F, new CubeDeformation(-1.82F, -2.725F, -1.75F)); // palm_top_left (2x texels)
+                b.texOffs(123, 421).addBox(-4F, -2.1F, -3.75F, 8F, 7F, 4F, new CubeDeformation(-2.04F, -1.75F, -1.09F)); // fingers_top_left (2x texels)
+                b.texOffs(176, 444).addBox(-3F, -0.8F, 0.04F, 6F, 3F, 3F, new CubeDeformation(-1.6F, -0.8F, -0.8F)); // thumb_top_left (2x texels)
             }
             case "sword_top_left" -> {
-                b.texOffs(230, 106).addBox(-1F, -3.75F, -1F, 2F, 2F, 2F, new CubeDeformation(-0.25F, -0.25F, -0.25F)); // pommel_top_left
-                b.texOffs(140, 99).addBox(-0.5F, -2F, -0.5F, 1F, 4F, 1F); // grip_top_left
-                b.texOffs(110, 106).addBox(-1F, 2F, -1.5F, 2F, 1F, 3F, new CubeDeformation(-0.25F, 0F, 0F)); // guard_top_left
-                b.texOffs(201, 53).addBox(-0.5F, 3F, -2.5F, 1F, 7F, 3F); // blade_base_top_left
+                b.texOffs(96, 433).addBox(-2.5F, -6.35F, -2.5F, 5F, 5F, 5F, new CubeDeformation(-1.45F, -1.45F, -1.45F)); // pommel_top_left (2x texels)
+                b.texOffs(150, 388).addBox(-1.5F, -6F, -1.5F, 3F, 12F, 3F, new CubeDeformation(-0.8F, -3.2F, -0.8F)); // grip_top_left (2x texels)
+                b.texOffs(205, 406).addBox(-2.5F, 2F, -4.5F, 5F, 3F, 9F, new CubeDeformation(-1.45F, -0.8F, -2.4F)); // guard_top_left (2x texels)
+                b.texOffs(338, 190).addBox(-1.5F, -0.9F, -5.9F, 3F, 20F, 9F, new CubeDeformation(-0.8F, -5.1F, -2.4F)); // blade_base_top_left (2x texels)
             }
             case "blade_tip_top_left" -> {
-                b.texOffs(204, 75).addBox(-0.5F, -0.375F, -1.5F, 1F, 6F, 2F, new CubeDeformation(0F, -0.125F, 0F)); // blade_tip_top_left
+                b.texOffs(191, 302).addBox(-1.5F, -4.825F, -3.7F, 3F, 17F, 6F, new CubeDeformation(-0.8F, -4.475F, -1.6F)); // blade_tip_top_left (2x texels)
             }
             case "arm_top_right" -> {
-                b.texOffs(17, 75).addBox(-2F, -2F, -2F, 4F, 4F, 4F); // shoulder_top_right
-                b.texOffs(125, 65).addBox(-3F, -3.25F, -3F, 6F, 2F, 6F, new CubeDeformation(0F, -0.25F, 0F)); // pauldron_top_right
+                b.texOffs(122, 277).addBox(-6F, -6F, -6F, 12F, 12F, 12F, new CubeDeformation(-3.2F, -3.2F, -3.2F)); // shoulder_top_right (2x texels)
+                b.texOffs(210, 302).addBox(-8.5F, -5.65F, -8.5F, 17F, 5F, 17F, new CubeDeformation(-4.3F, -1.45F, -4.3F)); // pauldron_top_right (2x texels)
             }
             case "upper_arm_top_right" -> {
-                b.texOffs(0, 40).addBox(-2F, 0.75F, -2F, 4F, 8F, 4F, new CubeDeformation(-0.25F, -0.25F, -0.25F)); // upper_top_right
+                b.texOffs(0, 302).addBox(-4F, -1.35F, -4F, 8F, 16F, 8F, new CubeDeformation(-1.55F, -2.75F, -1.55F)); // upper_top_right
             }
             case "elbow_top_right" -> {
-                b.texOffs(116, 92).addBox(-2F, -1F, -2F, 4F, 2F, 4F, new CubeDeformation(0F, -0.25F, 0F)); // elbow_top_right
+                b.texOffs(438, 350).addBox(-6F, -2.5F, -6F, 12F, 5F, 12F, new CubeDeformation(-3.2F, -1.45F, -3.2F)); // elbow_top_right (2x texels)
             }
             case "forearm_top_right" -> {
-                b.texOffs(17, 40).addBox(-2F, 0.625F, -2F, 4F, 8F, 4F, new CubeDeformation(0F, -0.125F, 0F)); // forearm_top_right
-                b.texOffs(159, 75).addBox(-3.25F, 1.5F, -1F, 2F, 6F, 2F, new CubeDeformation(-0.25F, 0F, -0.25F)); // crest_top_right
+                b.texOffs(131, 154).addBox(-6F, -4.525F, -6F, 12F, 22F, 12F, new CubeDeformation(-3.2F, -5.575F, -3.2F)); // forearm_top_right (2x texels)
+                b.texOffs(21, 327).addBox(-5.65F, -2.2F, -2.5F, 5F, 17F, 5F, new CubeDeformation(-1.45F, -4.3F, -1.45F)); // crest_top_right (2x texels)
             }
             case "wrist_top_right" -> {
-                b.texOffs(133, 92).addBox(-2F, -0.875F, -2F, 4F, 2F, 4F, new CubeDeformation(-0.25F, -0.375F, -0.25F)); // wrist_top_right
+                b.texOffs(269, 388).addBox(-5F, -1.825F, -5F, 10F, 4F, 10F, new CubeDeformation(-2.55F, -1.125F, -2.55F)); // wrist_top_right (2x texels)
             }
             case "hand_top_right" -> {
-                b.texOffs(143, 84).addBox(-2.1F, -1.125F, -1.5F, 3F, 4F, 3F, new CubeDeformation(-0.3F, -0.375F, -0.25F)); // palm_top_right
-                b.texOffs(85, 99).addBox(-1.5F, -0.5F, -2.25F, 3F, 3F, 2F, new CubeDeformation(-0.1F, -0.25F, -0.35F)); // fingers_top_right
-                b.texOffs(176, 111).addBox(-1F, 0F, 0.6F, 2F, 1F, 1F); // thumb_top_right
+                b.texOffs(405, 370).addBox(-4.34F, -3.775F, -3.5F, 7F, 10F, 7F, new CubeDeformation(-1.82F, -2.725F, -1.75F)); // palm_top_right (2x texels)
+                b.texOffs(148, 421).addBox(-4F, -2.1F, -3.75F, 8F, 7F, 4F, new CubeDeformation(-2.04F, -1.75F, -1.09F)); // fingers_top_right (2x texels)
+                b.texOffs(195, 444).addBox(-3F, -0.8F, 0.04F, 6F, 3F, 3F, new CubeDeformation(-1.6F, -0.8F, -0.8F)); // thumb_top_right (2x texels)
             }
             case "sword_top_right" -> {
-                b.texOffs(239, 106).addBox(-1F, -3.75F, -1F, 2F, 2F, 2F, new CubeDeformation(-0.25F, -0.25F, -0.25F)); // pommel_top_right
-                b.texOffs(145, 99).addBox(-0.5F, -2F, -0.5F, 1F, 4F, 1F); // grip_top_right
-                b.texOffs(121, 106).addBox(-1F, 2F, -1.5F, 2F, 1F, 3F, new CubeDeformation(-0.25F, 0F, 0F)); // guard_top_right
-                b.texOffs(210, 53).addBox(-0.5F, 3F, -2.5F, 1F, 7F, 3F); // blade_base_top_right
+                b.texOffs(117, 433).addBox(-2.5F, -6.35F, -2.5F, 5F, 5F, 5F, new CubeDeformation(-1.45F, -1.45F, -1.45F)); // pommel_top_right (2x texels)
+                b.texOffs(163, 388).addBox(-1.5F, -6F, -1.5F, 3F, 12F, 3F, new CubeDeformation(-0.8F, -3.2F, -0.8F)); // grip_top_right (2x texels)
+                b.texOffs(234, 406).addBox(-2.5F, 2F, -4.5F, 5F, 3F, 9F, new CubeDeformation(-1.45F, -0.8F, -2.4F)); // guard_top_right (2x texels)
+                b.texOffs(363, 190).addBox(-1.5F, -0.9F, -5.9F, 3F, 20F, 9F, new CubeDeformation(-0.8F, -5.1F, -2.4F)); // blade_base_top_right (2x texels)
             }
             case "blade_tip_top_right" -> {
-                b.texOffs(98, 65).addBox(-0.5F, -0.375F, -1.5F, 1F, 7F, 2F, new CubeDeformation(0F, -0.125F, 0F)); // blade_tip_top_right
+                b.texOffs(357, 250).addBox(-1.5F, -5.125F, -3.7F, 3F, 19F, 6F, new CubeDeformation(-0.8F, -4.775F, -1.6F)); // blade_tip_top_right (2x texels)
             }
             case "arm_mid_left" -> {
-                b.texOffs(34, 75).addBox(-2F, -2F, -2F, 4F, 4F, 4F); // shoulder_mid_left
-                b.texOffs(46, 84).addBox(-2.5F, -3.25F, -2.5F, 5F, 2F, 5F, new CubeDeformation(0F, -0.25F, 0F)); // pauldron_mid_left
+                b.texOffs(171, 277).addBox(-6F, -6F, -6F, 12F, 12F, 12F, new CubeDeformation(-3.2F, -3.2F, -3.2F)); // shoulder_mid_left (2x texels)
+                b.texOffs(381, 327).addBox(-7F, -5.65F, -7F, 14F, 5F, 14F, new CubeDeformation(-3.5F, -1.45F, -3.5F)); // pauldron_mid_left (2x texels)
             }
             case "upper_arm_mid_left" -> {
-                b.texOffs(34, 40).addBox(-2F, 0.75F, -2F, 4F, 8F, 4F, new CubeDeformation(-0.25F, -0.25F, -0.25F)); // upper_mid_left
+                b.texOffs(33, 302).addBox(-4F, -1.35F, -4F, 8F, 16F, 8F, new CubeDeformation(-1.55F, -2.75F, -1.55F)); // upper_mid_left
             }
             case "elbow_mid_left" -> {
-                b.texOffs(150, 92).addBox(-2F, -1F, -2F, 4F, 2F, 4F, new CubeDeformation(0F, -0.25F, 0F)); // elbow_mid_left
+                b.texOffs(0, 370).addBox(-6F, -2.5F, -6F, 12F, 5F, 12F, new CubeDeformation(-3.2F, -1.45F, -3.2F)); // elbow_mid_left (2x texels)
             }
             case "forearm_mid_left" -> {
-                b.texOffs(51, 40).addBox(-2F, 0.625F, -2F, 4F, 8F, 4F, new CubeDeformation(0F, -0.125F, 0F)); // forearm_mid_left
-                b.texOffs(168, 75).addBox(1.25F, 1.5F, -1F, 2F, 6F, 2F, new CubeDeformation(-0.25F, 0F, -0.25F)); // crest_mid_left
+                b.texOffs(180, 154).addBox(-6F, -4.525F, -6F, 12F, 22F, 12F, new CubeDeformation(-3.2F, -5.575F, -3.2F)); // forearm_mid_left (2x texels)
+                b.texOffs(42, 327).addBox(0.65F, -2.2F, -2.5F, 5F, 17F, 5F, new CubeDeformation(-1.45F, -4.3F, -1.45F)); // crest_mid_left (2x texels)
             }
             case "wrist_mid_left" -> {
-                b.texOffs(167, 92).addBox(-2F, -0.875F, -2F, 4F, 2F, 4F, new CubeDeformation(-0.25F, -0.375F, -0.25F)); // wrist_mid_left
+                b.texOffs(310, 388).addBox(-5F, -1.825F, -5F, 10F, 4F, 10F, new CubeDeformation(-2.55F, -1.125F, -2.55F)); // wrist_mid_left (2x texels)
             }
             case "hand_mid_left" -> {
-                b.texOffs(156, 84).addBox(-0.9F, -1.125F, -1.5F, 3F, 4F, 3F, new CubeDeformation(-0.3F, -0.375F, -0.25F)); // palm_mid_left
-                b.texOffs(96, 99).addBox(-1.5F, -0.25F, -2.25F, 3F, 3F, 2F, new CubeDeformation(-0.1F, 0F, -0.35F)); // fingers_mid_left
-                b.texOffs(183, 111).addBox(-1F, 0F, 0.6F, 2F, 1F, 1F); // thumb_mid_left
+                b.texOffs(434, 370).addBox(-2.66F, -3.775F, -3.5F, 7F, 10F, 7F, new CubeDeformation(-1.82F, -2.725F, -1.75F)); // palm_mid_left (2x texels)
+                b.texOffs(36, 406).addBox(-4F, -2.75F, -3.75F, 8F, 9F, 4F, new CubeDeformation(-2.04F, -2.4F, -1.09F)); // fingers_mid_left (2x texels)
+                b.texOffs(214, 444).addBox(-3F, -0.8F, 0.04F, 6F, 3F, 3F, new CubeDeformation(-1.6F, -0.8F, -0.8F)); // thumb_mid_left (2x texels)
             }
             case "sword_mid_left" -> {
-                b.texOffs(248, 106).addBox(-1F, -3.75F, -1F, 2F, 2F, 2F, new CubeDeformation(-0.25F, -0.25F, -0.25F)); // pommel_mid_left
-                b.texOffs(150, 99).addBox(-0.5F, -2F, -0.5F, 1F, 4F, 1F); // grip_mid_left
-                b.texOffs(132, 106).addBox(-1F, 2F, -1.5F, 2F, 1F, 3F, new CubeDeformation(-0.25F, 0F, 0F)); // guard_mid_left
-                b.texOffs(219, 53).addBox(-0.5F, 3F, -2.25F, 1F, 7F, 3F, new CubeDeformation(0F, 0F, -0.25F)); // blade_base_mid_left
+                b.texOffs(138, 433).addBox(-2.5F, -6.35F, -2.5F, 5F, 5F, 5F, new CubeDeformation(-1.45F, -1.45F, -1.45F)); // pommel_mid_left (2x texels)
+                b.texOffs(176, 388).addBox(-1.5F, -6F, -1.5F, 3F, 12F, 3F, new CubeDeformation(-0.8F, -3.2F, -0.8F)); // grip_mid_left (2x texels)
+                b.texOffs(263, 406).addBox(-2.5F, 2F, -4.5F, 5F, 3F, 9F, new CubeDeformation(-1.45F, -0.8F, -2.4F)); // guard_mid_left (2x texels)
+                b.texOffs(357, 221).addBox(-1.5F, -0.9F, -4.55F, 3F, 20F, 7F, new CubeDeformation(-0.8F, -5.1F, -1.75F)); // blade_base_mid_left (2x texels)
             }
             case "blade_tip_mid_left" -> {
-                b.texOffs(241, 84).addBox(-0.5F, -0.375F, -1.5F, 1F, 5F, 2F, new CubeDeformation(0F, -0.125F, 0F)); // blade_tip_mid_left
+                b.texOffs(195, 327).addBox(-1.5F, -4.025F, -3.7F, 3F, 14F, 6F, new CubeDeformation(-0.8F, -3.675F, -1.6F)); // blade_tip_mid_left (2x texels)
             }
             case "arm_mid_right" -> {
-                b.texOffs(51, 75).addBox(-2F, -2F, -2F, 4F, 4F, 4F); // shoulder_mid_right
-                b.texOffs(67, 84).addBox(-2.5F, -3.25F, -2.5F, 5F, 2F, 5F, new CubeDeformation(0F, -0.25F, 0F)); // pauldron_mid_right
+                b.texOffs(220, 277).addBox(-6F, -6F, -6F, 12F, 12F, 12F, new CubeDeformation(-3.2F, -3.2F, -3.2F)); // shoulder_mid_right (2x texels)
+                b.texOffs(438, 327).addBox(-7F, -5.65F, -7F, 14F, 5F, 14F, new CubeDeformation(-3.5F, -1.45F, -3.5F)); // pauldron_mid_right (2x texels)
             }
             case "upper_arm_mid_right" -> {
-                b.texOffs(68, 40).addBox(-2F, 0.75F, -2F, 4F, 8F, 4F, new CubeDeformation(-0.25F, -0.25F, -0.25F)); // upper_mid_right
+                b.texOffs(66, 302).addBox(-4F, -1.35F, -4F, 8F, 16F, 8F, new CubeDeformation(-1.55F, -2.75F, -1.55F)); // upper_mid_right
             }
             case "elbow_mid_right" -> {
-                b.texOffs(184, 92).addBox(-2F, -1F, -2F, 4F, 2F, 4F, new CubeDeformation(0F, -0.25F, 0F)); // elbow_mid_right
+                b.texOffs(49, 370).addBox(-6F, -2.5F, -6F, 12F, 5F, 12F, new CubeDeformation(-3.2F, -1.45F, -3.2F)); // elbow_mid_right (2x texels)
             }
             case "forearm_mid_right" -> {
-                b.texOffs(181, 24).addBox(-2.5F, 0.625F, -2.5F, 5F, 8F, 5F, new CubeDeformation(-0.25F, -0.125F, -0.25F)); // forearm_mid_right
-                b.texOffs(177, 75).addBox(-3.5F, 1.5F, -1F, 2F, 6F, 2F, new CubeDeformation(-0.25F, 0F, -0.25F)); // crest_mid_right
+                b.texOffs(431, 114).addBox(-6.5F, -4.525F, -6.5F, 13F, 22F, 13F, new CubeDeformation(-3.35F, -5.575F, -3.35F)); // forearm_mid_right (2x texels)
+                b.texOffs(63, 327).addBox(-6F, -2.2F, -2.5F, 5F, 17F, 5F, new CubeDeformation(-1.45F, -4.3F, -1.45F)); // crest_mid_right (2x texels)
             }
             case "wrist_mid_right" -> {
-                b.texOffs(201, 92).addBox(-2F, -0.875F, -2F, 4F, 2F, 4F, new CubeDeformation(-0.25F, -0.375F, -0.25F)); // wrist_mid_right
+                b.texOffs(351, 388).addBox(-5F, -1.825F, -5F, 10F, 4F, 10F, new CubeDeformation(-2.55F, -1.125F, -2.55F)); // wrist_mid_right (2x texels)
             }
             case "hand_mid_right" -> {
-                b.texOffs(169, 84).addBox(-2.1F, -1.125F, -1.5F, 3F, 4F, 3F, new CubeDeformation(-0.3F, -0.375F, -0.25F)); // palm_mid_right
-                b.texOffs(107, 99).addBox(-1.5F, -0.5F, -2.25F, 3F, 3F, 2F, new CubeDeformation(-0.1F, -0.25F, -0.35F)); // fingers_mid_right
-                b.texOffs(190, 111).addBox(-1F, 0F, 0.6F, 2F, 1F, 1F); // thumb_mid_right
+                b.texOffs(463, 370).addBox(-4.34F, -3.775F, -3.5F, 7F, 10F, 7F, new CubeDeformation(-1.82F, -2.725F, -1.75F)); // palm_mid_right (2x texels)
+                b.texOffs(173, 421).addBox(-4F, -2.1F, -3.75F, 8F, 7F, 4F, new CubeDeformation(-2.04F, -1.75F, -1.09F)); // fingers_mid_right (2x texels)
+                b.texOffs(233, 444).addBox(-3F, -0.8F, 0.04F, 6F, 3F, 3F, new CubeDeformation(-1.6F, -0.8F, -0.8F)); // thumb_mid_right (2x texels)
             }
             case "sword_mid_right" -> {
-                b.texOffs(0, 111).addBox(-1F, -3.75F, -1F, 2F, 2F, 2F, new CubeDeformation(-0.25F, -0.25F, -0.25F)); // pommel_mid_right
-                b.texOffs(155, 99).addBox(-0.5F, -2F, -0.5F, 1F, 4F, 1F); // grip_mid_right
-                b.texOffs(143, 106).addBox(-1F, 2F, -1.5F, 2F, 1F, 3F, new CubeDeformation(-0.25F, 0F, 0F)); // guard_mid_right
-                b.texOffs(221, 40).addBox(-0.5F, 3F, -3.25F, 1F, 7F, 4F, new CubeDeformation(0F, 0F, -0.25F)); // blade_base_mid_right
+                b.texOffs(159, 433).addBox(-2.5F, -6.35F, -2.5F, 5F, 5F, 5F, new CubeDeformation(-1.45F, -1.45F, -1.45F)); // pommel_mid_right (2x texels)
+                b.texOffs(189, 388).addBox(-1.5F, -6F, -1.5F, 3F, 12F, 3F, new CubeDeformation(-0.8F, -3.2F, -0.8F)); // grip_mid_right (2x texels)
+                b.texOffs(292, 406).addBox(-2.5F, 2F, -4.5F, 5F, 3F, 9F, new CubeDeformation(-1.45F, -0.8F, -2.4F)); // guard_mid_right (2x texels)
+                b.texOffs(128, 190).addBox(-1.5F, -0.9F, -6.75F, 3F, 20F, 10F, new CubeDeformation(-0.8F, -5.1F, -2.55F)); // blade_base_mid_right (2x texels)
             }
             case "blade_tip_mid_right" -> {
-                b.texOffs(248, 84).addBox(-0.5F, -0.375F, -1.5F, 1F, 5F, 2F, new CubeDeformation(0F, -0.125F, 0F)); // blade_tip_mid_right
+                b.texOffs(214, 327).addBox(-1.5F, -4.025F, -3.7F, 3F, 14F, 6F, new CubeDeformation(-0.8F, -3.675F, -1.6F)); // blade_tip_mid_right (2x texels)
             }
             case "arm_low_left" -> {
-                b.texOffs(68, 75).addBox(-2F, -2F, -2F, 4F, 4F, 4F); // shoulder_low_left
-                b.texOffs(88, 84).addBox(-2.5F, -3.25F, -2.5F, 5F, 2F, 5F, new CubeDeformation(0F, -0.25F, 0F)); // pauldron_low_left
+                b.texOffs(269, 277).addBox(-6F, -6F, -6F, 12F, 12F, 12F, new CubeDeformation(-3.2F, -3.2F, -3.2F)); // shoulder_low_left (2x texels)
+                b.texOffs(0, 350).addBox(-7F, -5.65F, -7F, 14F, 5F, 14F, new CubeDeformation(-3.5F, -1.45F, -3.5F)); // pauldron_low_left (2x texels)
             }
             case "upper_arm_low_left" -> {
-                b.texOffs(85, 40).addBox(-2F, 0.75F, -2F, 4F, 8F, 4F, new CubeDeformation(-0.25F, -0.25F, -0.25F)); // upper_low_left
+                b.texOffs(99, 302).addBox(-4F, -1.35F, -4F, 8F, 16F, 8F, new CubeDeformation(-1.55F, -2.75F, -1.55F)); // upper_low_left
             }
             case "elbow_low_left" -> {
-                b.texOffs(218, 92).addBox(-2F, -1F, -2F, 4F, 2F, 4F, new CubeDeformation(0F, -0.25F, 0F)); // elbow_low_left
+                b.texOffs(98, 370).addBox(-6F, -2.5F, -6F, 12F, 5F, 12F, new CubeDeformation(-3.2F, -1.45F, -3.2F)); // elbow_low_left (2x texels)
             }
             case "forearm_low_left" -> {
-                b.texOffs(102, 40).addBox(-2F, 0.625F, -2F, 4F, 8F, 4F, new CubeDeformation(0F, -0.125F, 0F)); // forearm_low_left
-                b.texOffs(186, 75).addBox(1.25F, 1.5F, -1F, 2F, 6F, 2F, new CubeDeformation(-0.25F, 0F, -0.25F)); // crest_low_left
+                b.texOffs(229, 154).addBox(-6F, -4.525F, -6F, 12F, 22F, 12F, new CubeDeformation(-3.2F, -5.575F, -3.2F)); // forearm_low_left (2x texels)
+                b.texOffs(84, 327).addBox(0.65F, -2.2F, -2.5F, 5F, 17F, 5F, new CubeDeformation(-1.45F, -4.3F, -1.45F)); // crest_low_left (2x texels)
             }
             case "wrist_low_left" -> {
-                b.texOffs(235, 92).addBox(-2F, -0.875F, -2F, 4F, 2F, 4F, new CubeDeformation(-0.25F, -0.375F, -0.25F)); // wrist_low_left
+                b.texOffs(392, 388).addBox(-5F, -1.825F, -5F, 10F, 4F, 10F, new CubeDeformation(-2.55F, -1.125F, -2.55F)); // wrist_low_left (2x texels)
             }
             case "hand_low_left" -> {
-                b.texOffs(182, 84).addBox(-0.9F, -1.125F, -1.5F, 3F, 4F, 3F, new CubeDeformation(-0.3F, -0.375F, -0.25F)); // palm_low_left
-                b.texOffs(118, 99).addBox(-1.5F, -0.5F, -2.25F, 3F, 3F, 2F, new CubeDeformation(-0.1F, -0.25F, -0.35F)); // fingers_low_left
-                b.texOffs(197, 111).addBox(-1F, 0F, 0.6F, 2F, 1F, 1F); // thumb_low_left
+                b.texOffs(0, 388).addBox(-2.66F, -3.775F, -3.5F, 7F, 10F, 7F, new CubeDeformation(-1.82F, -2.725F, -1.75F)); // palm_low_left (2x texels)
+                b.texOffs(198, 421).addBox(-4F, -2.1F, -3.75F, 8F, 7F, 4F, new CubeDeformation(-2.04F, -1.75F, -1.09F)); // fingers_low_left (2x texels)
+                b.texOffs(252, 444).addBox(-3F, -0.8F, 0.04F, 6F, 3F, 3F, new CubeDeformation(-1.6F, -0.8F, -0.8F)); // thumb_low_left (2x texels)
             }
             case "sword_low_left" -> {
-                b.texOffs(9, 111).addBox(-1F, -3.75F, -1F, 2F, 2F, 2F, new CubeDeformation(-0.25F, -0.25F, -0.25F)); // pommel_low_left
-                b.texOffs(160, 99).addBox(-0.5F, -2F, -0.5F, 1F, 4F, 1F); // grip_low_left
-                b.texOffs(154, 106).addBox(-1F, 2F, -1.5F, 2F, 1F, 3F, new CubeDeformation(-0.25F, 0F, 0F)); // guard_low_left
-                b.texOffs(228, 53).addBox(-0.5F, 3F, -2.5F, 1F, 7F, 3F); // blade_base_low_left
+                b.texOffs(180, 433).addBox(-2.5F, -6.35F, -2.5F, 5F, 5F, 5F, new CubeDeformation(-1.45F, -1.45F, -1.45F)); // pommel_low_left (2x texels)
+                b.texOffs(202, 388).addBox(-1.5F, -6F, -1.5F, 3F, 12F, 3F, new CubeDeformation(-0.8F, -3.2F, -0.8F)); // grip_low_left (2x texels)
+                b.texOffs(321, 406).addBox(-2.5F, 2F, -4.5F, 5F, 3F, 9F, new CubeDeformation(-1.45F, -0.8F, -2.4F)); // guard_low_left (2x texels)
+                b.texOffs(388, 190).addBox(-1.5F, -0.9F, -5.9F, 3F, 20F, 9F, new CubeDeformation(-0.8F, -5.1F, -2.4F)); // blade_base_low_left (2x texels)
             }
             case "blade_tip_low_left" -> {
-                b.texOffs(41, 99).addBox(-0.5F, -0.375F, -1.5F, 1F, 4F, 2F, new CubeDeformation(0F, -0.125F, 0F)); // blade_tip_low_left
+                b.texOffs(58, 388).addBox(-1.5F, -3.225F, -3.7F, 3F, 11F, 6F, new CubeDeformation(-0.8F, -2.875F, -1.6F)); // blade_tip_low_left (2x texels)
             }
             case "arm_low_right" -> {
-                b.texOffs(85, 75).addBox(-2F, -2F, -2F, 4F, 4F, 4F); // shoulder_low_right
-                b.texOffs(109, 84).addBox(-2.5F, -3.25F, -2.5F, 5F, 2F, 5F, new CubeDeformation(0F, -0.25F, 0F)); // pauldron_low_right
+                b.texOffs(318, 277).addBox(-6F, -6F, -6F, 12F, 12F, 12F, new CubeDeformation(-3.2F, -3.2F, -3.2F)); // shoulder_low_right (2x texels)
+                b.texOffs(57, 350).addBox(-7F, -5.65F, -7F, 14F, 5F, 14F, new CubeDeformation(-3.5F, -1.45F, -3.5F)); // pauldron_low_right (2x texels)
             }
             case "upper_arm_low_right" -> {
-                b.texOffs(119, 40).addBox(-2F, 0.75F, -2F, 4F, 8F, 4F, new CubeDeformation(-0.25F, -0.25F, -0.25F)); // upper_low_right
+                b.texOffs(132, 302).addBox(-4F, -1.35F, -4F, 8F, 16F, 8F, new CubeDeformation(-1.55F, -2.75F, -1.55F)); // upper_low_right
             }
             case "elbow_low_right" -> {
-                b.texOffs(0, 99).addBox(-2F, -1F, -2F, 4F, 2F, 4F, new CubeDeformation(0F, -0.25F, 0F)); // elbow_low_right
-                b.texOffs(86, 111).addBox(-0.5F, -0.5F, 2F, 1F, 1F, 2F); // elbow_spur_low_right
+                b.texOffs(147, 370).addBox(-6F, -2.5F, -6F, 12F, 5F, 12F, new CubeDeformation(-3.2F, -1.45F, -3.2F)); // elbow_low_right (2x texels)
+                b.texOffs(327, 433).addBox(-1.5F, -1.5F, 1.2F, 3F, 3F, 6F, new CubeDeformation(-0.8F, -0.8F, -1.6F)); // elbow_spur_low_right (2x texels)
             }
             case "forearm_low_right" -> {
-                b.texOffs(136, 40).addBox(-2F, 0.625F, -2F, 4F, 8F, 4F, new CubeDeformation(0F, -0.125F, 0F)); // forearm_low_right
-                b.texOffs(195, 75).addBox(-3.25F, 1.5F, -1F, 2F, 6F, 2F, new CubeDeformation(-0.25F, 0F, -0.25F)); // crest_low_right
+                b.texOffs(278, 154).addBox(-6F, -4.525F, -6F, 12F, 22F, 12F, new CubeDeformation(-3.2F, -5.575F, -3.2F)); // forearm_low_right (2x texels)
+                b.texOffs(105, 327).addBox(-5.65F, -2.2F, -2.5F, 5F, 17F, 5F, new CubeDeformation(-1.45F, -4.3F, -1.45F)); // crest_low_right (2x texels)
             }
             case "wrist_low_right" -> {
-                b.texOffs(17, 99).addBox(-2F, -0.875F, -2F, 4F, 2F, 4F, new CubeDeformation(-0.25F, -0.375F, -0.25F)); // wrist_low_right
+                b.texOffs(433, 388).addBox(-5F, -1.825F, -5F, 10F, 4F, 10F, new CubeDeformation(-2.55F, -1.125F, -2.55F)); // wrist_low_right (2x texels)
             }
             case "hand_low_right" -> {
-                b.texOffs(195, 84).addBox(-2.1F, -1.125F, -1.5F, 3F, 4F, 3F, new CubeDeformation(-0.3F, -0.375F, -0.25F)); // palm_low_right
-                b.texOffs(129, 99).addBox(-1.5F, -0.5F, -2.25F, 3F, 3F, 2F, new CubeDeformation(-0.1F, -0.25F, -0.35F)); // fingers_low_right
-                b.texOffs(204, 111).addBox(-1F, 0F, 0.6F, 2F, 1F, 1F); // thumb_low_right
+                b.texOffs(29, 388).addBox(-4.34F, -3.775F, -3.5F, 7F, 10F, 7F, new CubeDeformation(-1.82F, -2.725F, -1.75F)); // palm_low_right (2x texels)
+                b.texOffs(223, 421).addBox(-4F, -2.1F, -3.75F, 8F, 7F, 4F, new CubeDeformation(-2.04F, -1.75F, -1.09F)); // fingers_low_right (2x texels)
+                b.texOffs(271, 444).addBox(-3F, -0.8F, 0.04F, 6F, 3F, 3F, new CubeDeformation(-1.6F, -0.8F, -0.8F)); // thumb_low_right (2x texels)
             }
             case "sword_low_right" -> {
-                b.texOffs(18, 111).addBox(-1F, -3.75F, -1F, 2F, 2F, 2F, new CubeDeformation(-0.25F, -0.25F, -0.25F)); // pommel_low_right
-                b.texOffs(165, 99).addBox(-0.5F, -2F, -0.5F, 1F, 4F, 1F); // grip_low_right
-                b.texOffs(165, 106).addBox(-1F, 2F, -1.5F, 2F, 1F, 3F, new CubeDeformation(-0.25F, 0F, 0F)); // guard_low_right
-                b.texOffs(237, 53).addBox(-0.5F, 3F, -2.5F, 1F, 7F, 3F); // blade_base_low_right
+                b.texOffs(201, 433).addBox(-2.5F, -6.35F, -2.5F, 5F, 5F, 5F, new CubeDeformation(-1.45F, -1.45F, -1.45F)); // pommel_low_right (2x texels)
+                b.texOffs(215, 388).addBox(-1.5F, -6F, -1.5F, 3F, 12F, 3F, new CubeDeformation(-0.8F, -3.2F, -0.8F)); // grip_low_right (2x texels)
+                b.texOffs(350, 406).addBox(-2.5F, 2F, -4.5F, 5F, 3F, 9F, new CubeDeformation(-1.45F, -0.8F, -2.4F)); // guard_low_right (2x texels)
+                b.texOffs(413, 190).addBox(-1.5F, -0.9F, -5.9F, 3F, 20F, 9F, new CubeDeformation(-0.8F, -5.1F, -2.4F)); // blade_base_low_right (2x texels)
             }
             case "blade_tip_low_right" -> {
-                b.texOffs(48, 99).addBox(-0.5F, -0.375F, -1.5F, 1F, 4F, 2F, new CubeDeformation(0F, -0.125F, 0F)); // blade_tip_low_right
+                b.texOffs(77, 388).addBox(-1.5F, -3.225F, -3.7F, 3F, 11F, 6F, new CubeDeformation(-0.8F, -2.875F, -1.6F)); // blade_tip_low_right (2x texels)
             }
             case "wing_root_left" -> {
-                b.texOffs(102, 75).addBox(-2F, -2.5F, 0F, 4F, 5F, 3F); // wing_root_left
+                b.texOffs(266, 350).addBox(-4.5F, -5.5F, -1.4F, 9F, 11F, 7F, new CubeDeformation(-1.7F, -2F, -1.4F)); // wing_root_left
             }
             case "wing_arm_left" -> {
-                b.texOffs(0, 106).addBox(1F, -2F, 0.5F, 13F, 2F, 2F); // wing_arm_left
-                b.texOffs(196, 65).addBox(1F, 0F, 1F, 10F, 7F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // wing_inner_plate_left
+                b.texOffs(432, 421).addBox(-3.5F, -3.9F, -0.4F, 28F, 5F, 5F, new CubeDeformation(-4.9F, -1.1F, -1.1F)); // wing_arm_left
+                b.texOffs(279, 302).addBox(-5.6F, -5.1F, 1.1F, 28F, 20F, 2F, new CubeDeformation(-7F, -5.1F, -0.65F)); // wing_inner_plate_left (2x texels)
             }
             case "wing_forearm_left" -> {
-                b.texOffs(170, 99).addBox(0F, -1.75F, -1F, 14F, 2F, 2F, new CubeDeformation(0F, -0.25F, -0.25F)); // wing_forearm_left
+                b.texOffs(346, 433).addBox(-5.2F, -3.05F, -2F, 30F, 4F, 4F, new CubeDeformation(-5.2F, -0.95F, -0.95F)); // wing_forearm_left
             }
             case "wing_tip_left" -> {
-                b.texOffs(112, 111).addBox(0F, -0.5F, -0.5F, 6F, 1F, 1F); // wing_tip_left
+                b.texOffs(110, 444).addBox(-2.3F, -1.5F, -1.5F, 13F, 3F, 3F, new CubeDeformation(-2.3F, -0.8F, -0.8F)); // wing_tip_left
             }
             case "wing_finger_1_left" -> {
-                b.texOffs(0, 53).addBox(-0.5F, 0F, -0.5F, 1F, 10F, 1F); // wing_finger_1_left
-                b.texOffs(76, 65).addBox(-4F, 0.5F, -0.5F, 4F, 8F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // wing_finger_1_left_plate
+                b.texOffs(165, 302).addBox(-1.5F, -3.5F, -1.5F, 3F, 21F, 3F, new CubeDeformation(-0.8F, -3.5F, -0.8F)); // wing_finger_1_left
+                b.texOffs(299, 250).addBox(-8.8F, -5.2F, -1F, 12F, 23F, 2F, new CubeDeformation(-3.2F, -5.9F, -0.65F)); // wing_finger_1_left_plate (2x texels)
             }
             case "wing_finger_2_left" -> {
-                b.texOffs(202, 24).addBox(-0.5F, 0F, -0.5F, 1F, 12F, 1F); // wing_finger_2_left
-                b.texOffs(232, 40).addBox(-4F, 0.5F, -0.5F, 4F, 10F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // wing_finger_2_left_plate
+                b.texOffs(438, 190).addBox(-1.5F, -4.6F, -1.5F, 3F, 26F, 3F, new CubeDeformation(-0.8F, -4.6F, -0.8F)); // wing_finger_2_left
+                b.texOffs(70, 190).addBox(-8.8F, -6.3F, -1F, 12F, 28F, 2F, new CubeDeformation(-3.2F, -7F, -0.65F)); // wing_finger_2_left_plate (2x texels)
             }
             case "wing_finger_3_left" -> {
-                b.texOffs(153, 40).addBox(-0.5F, 0F, -0.5F, 1F, 11F, 1F); // wing_finger_3_left
-                b.texOffs(179, 53).addBox(-4F, 0.5F, -0.5F, 4F, 9F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // wing_finger_3_left_plate
+                b.texOffs(378, 221).addBox(-1.5F, -4.3F, -1.5F, 3F, 24F, 3F, new CubeDeformation(-0.8F, -4.3F, -0.8F)); // wing_finger_3_left
+                b.texOffs(299, 221).addBox(-8.8F, -6F, -1F, 12F, 26F, 2F, new CubeDeformation(-3.2F, -6.7F, -0.65F)); // wing_finger_3_left_plate (2x texels)
             }
             case "wing_finger_4_left" -> {
-                b.texOffs(115, 65).addBox(-0.5F, 0F, -0.5F, 1F, 8F, 1F); // wing_finger_4_left
-                b.texOffs(219, 84).addBox(-4F, 0.5F, -0.5F, 4F, 6F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // wing_finger_4_left_plate
+                b.texOffs(233, 327).addBox(-1.5F, -2.9F, -1.5F, 3F, 17F, 3F, new CubeDeformation(-0.8F, -2.9F, -0.8F)); // wing_finger_4_left
+                b.texOffs(114, 350).addBox(-8.8F, -3.6F, -1F, 12F, 17F, 2F, new CubeDeformation(-3.2F, -4.3F, -0.65F)); // wing_finger_4_left_plate (2x texels)
             }
             case "wing_root_right" -> {
-                b.texOffs(117, 75).addBox(-2F, -2.5F, 0F, 4F, 5F, 3F); // wing_root_right
+                b.texOffs(299, 350).addBox(-4.5F, -5.5F, -1.4F, 9F, 11F, 7F, new CubeDeformation(-1.7F, -2F, -1.4F)); // wing_root_right
             }
             case "wing_arm_right" -> {
-                b.texOffs(31, 106).addBox(-14F, -2F, 0.5F, 13F, 2F, 2F); // wing_arm_right
-                b.texOffs(219, 65).addBox(-11F, 0F, 1F, 10F, 7F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // wing_inner_plate_right
+                b.texOffs(0, 433).addBox(-24.5F, -3.9F, -0.4F, 28F, 5F, 5F, new CubeDeformation(-4.9F, -1.1F, -1.1F)); // wing_arm_right
+                b.texOffs(340, 302).addBox(-22.4F, -5.1F, 1.1F, 28F, 20F, 2F, new CubeDeformation(-7F, -5.1F, -0.65F)); // wing_inner_plate_right (2x texels)
             }
             case "wing_forearm_right" -> {
-                b.texOffs(203, 99).addBox(-14F, -1.75F, -1F, 14F, 2F, 2F, new CubeDeformation(0F, -0.25F, -0.25F)); // wing_forearm_right
+                b.texOffs(415, 433).addBox(-24.8F, -3.05F, -2F, 30F, 4F, 4F, new CubeDeformation(-5.2F, -0.95F, -0.95F)); // wing_forearm_right
             }
             case "wing_tip_right" -> {
-                b.texOffs(127, 111).addBox(-6F, -0.5F, -0.5F, 6F, 1F, 1F); // wing_tip_right
+                b.texOffs(143, 444).addBox(-10.7F, -1.5F, -1.5F, 13F, 3F, 3F, new CubeDeformation(-2.3F, -0.8F, -0.8F)); // wing_tip_right
             }
             case "wing_finger_1_right" -> {
-                b.texOffs(5, 53).addBox(-0.5F, 0F, -0.5F, 1F, 10F, 1F); // wing_finger_1_right
-                b.texOffs(87, 65).addBox(0F, 0.5F, -0.5F, 4F, 8F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // wing_finger_1_right_plate
+                b.texOffs(178, 302).addBox(-1.5F, -3.5F, -1.5F, 3F, 21F, 3F, new CubeDeformation(-0.8F, -3.5F, -0.8F)); // wing_finger_1_right
+                b.texOffs(328, 250).addBox(-3.2F, -5.2F, -1F, 12F, 23F, 2F, new CubeDeformation(-3.2F, -5.9F, -0.65F)); // wing_finger_1_right_plate (2x texels)
             }
             case "wing_finger_2_right" -> {
-                b.texOffs(207, 24).addBox(-0.5F, 0F, -0.5F, 1F, 12F, 1F); // wing_finger_2_right
-                b.texOffs(243, 40).addBox(0F, 0.5F, -0.5F, 4F, 10F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // wing_finger_2_right_plate
+                b.texOffs(451, 190).addBox(-1.5F, -4.6F, -1.5F, 3F, 26F, 3F, new CubeDeformation(-0.8F, -4.6F, -0.8F)); // wing_finger_2_right
+                b.texOffs(99, 190).addBox(-3.2F, -6.3F, -1F, 12F, 28F, 2F, new CubeDeformation(-3.2F, -7F, -0.65F)); // wing_finger_2_right_plate (2x texels)
             }
             case "wing_finger_3_right" -> {
-                b.texOffs(158, 40).addBox(-0.5F, 0F, -0.5F, 1F, 11F, 1F); // wing_finger_3_right
-                b.texOffs(190, 53).addBox(0F, 0.5F, -0.5F, 4F, 9F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // wing_finger_3_right_plate
+                b.texOffs(391, 221).addBox(-1.5F, -4.3F, -1.5F, 3F, 24F, 3F, new CubeDeformation(-0.8F, -4.3F, -0.8F)); // wing_finger_3_right
+                b.texOffs(328, 221).addBox(-3.2F, -6F, -1F, 12F, 26F, 2F, new CubeDeformation(-3.2F, -6.7F, -0.65F)); // wing_finger_3_right_plate (2x texels)
             }
             case "wing_finger_4_right" -> {
-                b.texOffs(120, 65).addBox(-0.5F, 0F, -0.5F, 1F, 8F, 1F); // wing_finger_4_right
-                b.texOffs(230, 84).addBox(0F, 0.5F, -0.5F, 4F, 6F, 1F, new CubeDeformation(0F, 0F, -0.25F)); // wing_finger_4_right_plate
+                b.texOffs(246, 327).addBox(-1.5F, -2.9F, -1.5F, 3F, 17F, 3F, new CubeDeformation(-0.8F, -2.9F, -0.8F)); // wing_finger_4_right
+                b.texOffs(143, 350).addBox(-3.2F, -3.6F, -1F, 12F, 17F, 2F, new CubeDeformation(-3.2F, -4.3F, -0.65F)); // wing_finger_4_right_plate (2x texels)
             }
             default -> {
             }

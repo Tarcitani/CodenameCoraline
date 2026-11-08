@@ -1,6 +1,11 @@
 package com.codenamecoraline.verification;
 
 import com.codenamecoraline.CodenameCoraline;
+import com.codenamecoraline.entity.architect.ArchitectStrikes;
+import net.minecraft.world.item.Items;
+import net.minecraft.util.Mth;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import com.codenamecoraline.entity.architect.Architect;
 import com.codenamecoraline.entity.architect.ArchitectAnim;
 import com.codenamecoraline.entity.architect.ArchitectAttack;
@@ -60,6 +65,7 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 public final class ArchitectGameTests {
     private static final int TIMEOUT = 260;
     private static final Map<String, Consumer<GameTestHelper>> TESTS = new LinkedHashMap<>();
+    private static final Map<String, Integer> TIMEOUTS = new LinkedHashMap<>();
 
     static {
         TESTS.put("architect_attributes_and_registration", ArchitectGameTests::attributesAndRegistration);
@@ -86,6 +92,25 @@ public final class ArchitectGameTests {
         TESTS.put("architect_phase_transitions_and_bar", ArchitectGameTests::phaseTransitionsAndBar);
         TESTS.put("architect_deflects_light_projectiles", ArchitectGameTests::deflectsLightProjectiles);
         TESTS.put("architect_answers_pillaring_with_gargoyle_fall", ArchitectGameTests::answersPillaring);
+        // reform: movement, facing, evasion, shield and targets
+        TESTS.put("architect_reform_dimensions", ArchitectGameTests::reformDimensions);
+        TESTS.put("architect_approaches_a_far_target", ArchitectGameTests::approachesAFarTarget);
+        TESTS.put("architect_keeps_moving_in_combat", ArchitectGameTests::keepsMovingInCombat);
+        TESTS.put("architect_never_attacks_backwards", ArchitectGameTests::neverAttacksBackwards);
+        TESTS.put("architect_dodges_move_the_body", ArchitectGameTests::dodgesMoveTheBody);
+        TESTS.put("architect_dodges_dangerous_projectiles", ArchitectGameTests::dodgesDangerousProjectiles);
+        TESTS.put("architect_reads_a_charged_player", ArchitectGameTests::readsAChargedPlayer);
+        TESTS.put("architect_verdict_hammer_disables_shield", ArchitectGameTests::verdictHammerDisablesShield);
+        TESTS.put("architect_wants_the_hammer_against_a_shield", ArchitectGameTests::wantsTheHammerAgainstAShield);
+        TESTS.put("architect_target_selection_is_stable", ArchitectGameTests::targetSelectionIsStable);
+        TESTS.put("architect_balance_netherite", h -> balanceRun(h, true, false));
+        TESTS.put("architect_balance_netherite_shield", h -> balanceRun(h, true, true));
+        TESTS.put("architect_balance_iron", h -> balanceRun(h, false, false));
+        TIMEOUTS.put("architect_balance_netherite", 460);
+        TIMEOUTS.put("architect_balance_netherite_shield", 460);
+        TIMEOUTS.put("architect_balance_iron", 460);
+        TIMEOUTS.put("architect_never_attacks_backwards", 300);
+        TIMEOUTS.put("architect_keeps_moving_in_combat", 300);
         // slice 4: content, drop and the Architect's Scimitar (spec §26)
         TESTS.put("architect_content_loaded", ArchitectGameTests::contentLoaded);
         TESTS.put("architect_drops_scimitar", ArchitectGameTests::dropsScimitar);
@@ -121,7 +146,7 @@ public final class ArchitectGameTests {
         var environment = event.registerEnvironment(id("architect_test_environment"));
         TESTS.forEach((name, fn) -> event.registerTest(id(name),
                 new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(name)),
-                        new TestData<>(environment, id("basilisk_test_arena"), TIMEOUT, 0, true, Rotation.NONE, false, 1, 1,
+                        new TestData<>(environment, id("basilisk_test_arena"), TIMEOUTS.getOrDefault(name, TIMEOUT), 0, true, Rotation.NONE, false, 1, 1,
                                 true, 0)))); // sky access: the Gargoyle Fall leaps above the arena walls
     }
 
@@ -130,7 +155,7 @@ public final class ArchitectGameTests {
         helper.assertValueEqual(architect.getMaxHealth(), 480.0F, "Architect max health");
         helper.assertValueEqual(architect.getAttributeValue(Attributes.ARMOR), 16.0D, "Architect armor");
         helper.assertValueEqual(architect.getAttributeValue(Attributes.ARMOR_TOUGHNESS), 8.0D, "Architect armor toughness");
-        helper.assertValueEqual(architect.getAttributeValue(Attributes.ATTACK_DAMAGE), 12.0D, "Architect base damage");
+        helper.assertValueEqual(architect.getAttributeValue(Attributes.ATTACK_DAMAGE), 20.0D, "Architect base damage");
         helper.assertValueEqual(architect.getAttributeValue(Attributes.MOVEMENT_SPEED), 0.30D, "Architect movement speed");
         helper.assertValueEqual(architect.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 0.95D, "Architect knockback resistance");
         helper.assertValueEqual(architect.getAttributeValue(Attributes.FOLLOW_RANGE), 48.0D, "Architect follow range");
@@ -272,8 +297,13 @@ public final class ArchitectGameTests {
 
     /** Anti-whiff (MOB_CONTRACT §3.2): with the foe out of reach at the validation tick the blow is called off. */
     private static void attackAbortsOnWhiff(GameTestHelper helper, ArchitectAttack attack) {
-        Architect boss = awakeBoss(helper, new BlockPos(5, 1, 1));
-        IronGolem golem = dummy(helper, new BlockPos(5, 1, 10));
+        Architect boss = awakeBoss(helper, new BlockPos(1, 1, 1));
+        // out of everything the blow can cover (its reach, the lunge or charge it makes by hand, the anti-whiff margin);
+        // the arena is 12 blocks long, so the boss and the foe stand at opposite corners (12.7 blocks apart)
+        double cover = attack.reach + (attack == ArchitectAttack.PIERCING_SENTENCE ? Architect.LUNGE_DISTANCE
+                : attack == ArchitectAttack.RUSHING_REBUKE ? Architect.RUSH_DISTANCE : 0.0D) + Architect.ANTI_WHIFF_MARGIN;
+        helper.assertTrue(cover < 11.5D, attack + " fits the arena check (cover " + cover + ")");
+        IronGolem golem = dummy(helper, new BlockPos(10, 1, 10));
         float full = golem.getHealth();
         boss.startAttack(attack, golem);
         helper.runAfterDelay(attack.validationTick + 3, () -> {
@@ -440,16 +470,427 @@ public final class ArchitectGameTests {
     private static void answersPillaring(GameTestHelper helper) {
         for (int x = 6; x <= 8; x++) {
             for (int z = 5; z <= 7; z++) {
-                for (int y = 1; y <= 3; y++) {
+                for (int y = 1; y <= 5; y++) { // perched 5 blocks up: above his 4.2-block pillaring threshold
                     helper.setBlock(new BlockPos(x, y, z), Blocks.STONE);
                 }
             }
         }
         Architect boss = helper.spawn(ModEntities.ARCHITECT.get(), new BlockPos(2, 1, 6));
         boss.setState(Architect.State.COMBAT_IDLE);
-        dummy(helper, new BlockPos(7, 4, 6));
+        dummy(helper, new BlockPos(7, 6, 6));
         helper.succeedWhen(() -> helper.assertTrue(boss.getLastAttack() == ArchitectAttack.GARGOYLE_FALL,
                 "The Gargoyle Fall answers the pillar"));
+    }
+
+
+    // ================================================================= reform: movement, facing, evasion, shield, targets
+    /** Prints a line the balance report reads from the test log (grep ARCHITECT_METRIC). */
+    private static void metric(String line) {
+        System.out.println("ARCHITECT_METRIC " + line);
+    }
+
+    /** The reform's body: 4.7 blocks tall (the spec's 3.35 x 1.4), volumes and ranges scaled with it. */
+    private static void reformDimensions(GameTestHelper helper) {
+        Architect boss = helper.spawnWithNoFreeWill(ModEntities.ARCHITECT.get(), new BlockPos(5, 1, 5));
+        helper.assertValueEqual(ModEntities.ARCHITECT.get().getHeight(), 4.7F, "collision height");
+        helper.assertValueEqual(ModEntities.ARCHITECT.get().getWidth(), 1.9F, "collision width");
+        helper.assertTrue(Math.abs(boss.getEyeHeight() - 4.1F) < 1.0E-4F, "eye height " + boss.getEyeHeight());
+        helper.assertTrue(Architect.HEIGHT >= 4.5F && Architect.HEIGHT <= 5.0F, "height inside the 4.5-5 block brief");
+        helper.assertTrue(Architect.HEIGHT > 4.5F - 0.01F, "taller than the Last Gift Collector (4.5)");
+        helper.assertTrue(ArchitectAttack.SIXFOLD_EDICT.reach >= 3.0D * Architect.SCALE - 1.0E-4D, "the volumes follow the scale (reach " + ArchitectAttack.SIXFOLD_EDICT.reach + ")");
+        helper.assertTrue(Architect.CLOSE_RANGE > 2.0D && Architect.SHORT_RANGE > 4.4D, "the ranges follow the scale");
+        helper.succeed();
+    }
+
+    /** Far from the target he walks or runs at it, at a speed worth the name (the old brain stopped at 2.4 blocks and waited). */
+    private static void approachesAFarTarget(GameTestHelper helper) {
+        Architect boss = helper.spawn(ModEntities.ARCHITECT.get(), new BlockPos(1, 1, 1));
+        boss.setState(Architect.State.COMBAT_IDLE);
+        IronGolem golem = dummy(helper, new BlockPos(10, 1, 10));
+        golem.getAttribute(Attributes.MAX_HEALTH).setBaseValue(4000.0D);
+        golem.setHealth(4000.0F);
+        double start = Architect.horizontalDistance(boss, golem);
+        double[] top = {0.0D};
+        Vec3[] last = {boss.position()};
+        helper.onEachTick(() -> {
+            double step = Math.sqrt(boss.position().subtract(last[0]).multiply(1.0D, 0.0D, 1.0D).lengthSqr());
+            if (boss.getState() == Architect.State.COMBAT_IDLE) {
+                top[0] = Math.max(top[0], step); // locomotion only: the charge of the Rushing Rebuke is a blow
+            }
+            last[0] = boss.position();
+        });
+        helper.runAfterDelay(70, () -> {
+            double now = Architect.horizontalDistance(boss, golem);
+            metric("approach start=" + start + " after70=" + now + " topSpeed=" + top[0] + " blocks/tick");
+            helper.assertTrue(now < start - 5.0D, "he closed in (from " + start + " to " + now + ")");
+            helper.assertTrue(top[0] >= 0.15D && top[0] <= 0.40D, "he ran at 0.15-0.40 blocks/tick (top " + top[0] + ")");
+            helper.succeed();
+        });
+    }
+
+    /** In the fighting band he never stands still without a reason: footwork, blows, dodges, guard. */
+    private static void keepsMovingInCombat(GameTestHelper helper) {
+        Architect boss = helper.spawn(ModEntities.ARCHITECT.get(), new BlockPos(3, 1, 5));
+        boss.setState(Architect.State.COMBAT_IDLE);
+        IronGolem golem = dummy(helper, new BlockPos(8, 1, 5));
+        golem.getAttribute(Attributes.MAX_HEALTH).setBaseValue(4000.0D);
+        golem.setHealth(4000.0F);
+        int[] idle = {0, 0};
+        double[] walked = {0.0D};
+        Vec3[] last = {boss.position()};
+        helper.onEachTick(() -> {
+            double step = Math.sqrt(boss.position().subtract(last[0]).multiply(1.0D, 0.0D, 1.0D).lengthSqr());
+            last[0] = boss.position();
+            walked[0] += step;
+            boolean excused = boss.getState() != Architect.State.COMBAT_IDLE; // a blow, a dodge, a guard, a parry
+            if (step < 0.01D && !excused) {
+                idle[0]++;
+                idle[1] = Math.max(idle[1], idle[0]);
+            } else {
+                idle[0] = 0;
+            }
+        });
+        helper.runAfterDelay(220, () -> {
+            metric("movement walked=" + walked[0] + " blocks, longestIdleStreak=" + idle[1] + " ticks, blows="
+                    + boss.getStrikesLanded() + " dodges=" + boss.getDodges());
+            helper.assertTrue(walked[0] >= 5.0D, "he moved " + walked[0] + " blocks in 11 s");
+            helper.assertTrue(idle[1] <= Architect.READ_MAX_TICKS + 12, "longest unexcused stillness " + idle[1] + " ticks");
+            helper.succeed();
+        });
+    }
+
+    /** No blow starts with the body turned away: the target circles him and every blow starts inside the 20-degree cone. */
+    private static void neverAttacksBackwards(GameTestHelper helper) {
+        Architect boss = helper.spawn(ModEntities.ARCHITECT.get(), new BlockPos(6, 1, 6));
+        boss.setState(Architect.State.COMBAT_IDLE);
+        IronGolem golem = dummy(helper, new BlockPos(6, 1, 9));
+        golem.getAttribute(Attributes.MAX_HEALTH).setBaseValue(4000.0D);
+        golem.setHealth(4000.0F);
+        double[] worst = {0.0D};
+        double[] headLead = {0.0D};
+        int[] started = {0};
+        int[] tick = {0};
+        helper.onEachTick(() -> {
+            tick[0]++;
+            double a = tick[0] * 0.07D; // about 4 degrees a tick: he must keep turning to keep up
+            Vec3 c = boss.position();
+            golem.setPos(c.x + Math.sin(a) * 3.6D, c.y, c.z + Math.cos(a) * 3.6D);
+            if (boss.getState() == Architect.State.ATTACKING && boss.getStateTicks() == 1) {
+                started[0]++;
+                double off = Math.abs(ArchitectStrikes.angleOf(golem.getX() - boss.getX(), golem.getZ() - boss.getZ(), boss.getYRot()));
+                worst[0] = Math.max(worst[0], off);
+                helper.assertTrue(Math.abs(Mth.wrapDegrees(boss.getLockedYaw() - boss.getYRot())) <= 0.01F,
+                        "locked yaw is synced to body yaw");
+            }
+            headLead[0] = Math.max(headLead[0], Math.abs(Mth.wrapDegrees(boss.getYHeadRot() - boss.yBodyRot)));
+        });
+        helper.runAfterDelay(240, () -> {
+            metric("facing blowsStarted=" + started[0] + " worstAngleAtStart=" + worst[0] + " maxHeadLead=" + headLead[0]);
+            helper.assertTrue(started[0] >= 2, "he attacked while being circled (" + started[0] + " blows)");
+            helper.assertTrue(worst[0] <= 21.0D, "every blow started facing the target, worst " + worst[0] + " degrees");
+            helper.assertTrue(headLead[0] >= 3.0D, "the head leads the body (max " + headLead[0] + " degrees)");
+            helper.succeed();
+        });
+    }
+
+    /** Every dodge moves the body: part of the way mid-move, the full distance at the end, in the right direction. */
+    private static void dodgesMoveTheBody(GameTestHelper helper) {
+        Architect boss = awakeBoss(helper, new BlockPos(5, 1, 6));
+        IronGolem golem = dummy(helper, new BlockPos(5, 1, 10));
+        Architect.Dodge[] all = Architect.Dodge.values();
+        int[] next = {0};
+        Runnable[] run = new Runnable[1];
+        run[0] = () -> {
+            if (next[0] >= all.length) {
+                helper.succeed();
+                return;
+            }
+            Architect.Dodge d = all[next[0]++];
+            Vec3 base = helper.absoluteVec(new Vec3(5.5D, 1.0D, 6.5D));
+            boss.snapTo(base.x, base.y, base.z, 0.0F, 0.0F);
+            Vec3 from = boss.position();
+            boss.startDodge(d, golem);
+            helper.assertValueEqual(boss.getState(), Architect.State.DODGING, d + ": the state");
+            helper.assertValueEqual(boss.getAnim(), d.anim, d + ": its own clip");
+            int mid = d.isLean() ? 4 : 7;
+            helper.runAfterDelay(mid, () -> {
+                double part = boss.position().subtract(from).horizontalDistance();
+                helper.assertTrue(part > 0.1D && part < d.distance * 0.95D, d + ": mid-move at " + part + " of " + d.distance + " blocks (no teleport)");
+                helper.runAfterDelay(d.anim.ticks - mid + 1, () -> {
+                    Vec3 moved = boss.position().subtract(from);
+                    double total = moved.horizontalDistance();
+                    helper.assertTrue(Math.abs(total - d.distance) < 0.7D, d + ": covered " + total + " blocks, expected " + d.distance);
+                    double angle = ArchitectStrikes.angleOf(moved.x, moved.z, 0.0F);
+                    helper.assertTrue(Math.abs(Mth.wrapDegrees(angle - d.angle)) < 15.0D, d + ": direction " + angle + " expected " + d.angle);
+                    helper.assertValueEqual(boss.getState(), Architect.State.COMBAT_IDLE, d + ": back to the idle");
+                    helper.assertTrue(boss.isCounterWindow(), d + ": opens the counter window");
+                    run[0].run();
+                });
+            });
+        };
+        run[0].run();
+    }
+
+    /** A dangerous projectile on its way is sidestepped (the light ones are deflected instead). */
+    private static void dodgesDangerousProjectiles(GameTestHelper helper) {
+        Architect boss = helper.spawn(ModEntities.ARCHITECT.get(), new BlockPos(5, 1, 3));
+        boss.setState(Architect.State.COMBAT_IDLE);
+        IronGolem golem = dummy(helper, new BlockPos(5, 1, 8));
+        golem.getAttribute(Attributes.MAX_HEALTH).setBaseValue(4000.0D);
+        golem.setHealth(4000.0F);
+        int[] shots = {0};
+        helper.onEachTick(() -> {
+            if (boss.getDodges() == 0 && shots[0] < 22 && boss.tickCount % 11 == 0) {
+                shots[0]++;
+                var trident = EntityType.TRIDENT.create(helper.getLevel(), EntitySpawnReason.TRIGGERED); // strong: never deflected
+                Vec3 from = boss.position().add(0.0D, 2.0D, 8.0D);
+                trident.setPos(from);
+                trident.setNoGravity(true);
+                trident.setDeltaMovement(boss.position().add(0.0D, 2.0D, 0.0D).subtract(from).normalize().scale(0.7D));
+                helper.getLevel().addFreshEntity(trident);
+            }
+        });
+        helper.succeedWhen(() -> helper.assertTrue(boss.getDodges() >= 1, "he sidestepped a thrown trident (shots " + shots[0] + ")"));
+    }
+
+    /** The helper's mock server player is creative (a boss ignores creative players), so this one is built the same way in survival. */
+    private static ServerPlayer survivalPlayer(GameTestHelper helper) {
+        var cookie = net.minecraft.server.network.CommonListenerCookie.createInitial(
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "test-survival-player"), false);
+        var server = helper.getLevel().getServer();
+        ServerPlayer player = new ServerPlayer(server, helper.getLevel(), cookie.gameProfile(), cookie.clientInformation()) {
+            @Override
+            public GameType gameMode() {
+                return GameType.SURVIVAL;
+            }
+        };
+        var connection = new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
+        new io.netty.channel.embedded.EmbeddedChannel(connection);
+        server.getPlayerList().placeNewPlayer(connection, player, cookie);
+        // without this the player counts as "client not loaded yet" and ServerPlayer.isInvulnerableTo returns true
+        player.connection.handleAcceptPlayerLoad(new net.minecraft.network.protocol.game.ServerboundPlayerLoadedPacket());
+        // placeNewPlayer gave the player the creative abilities of the helper's mock: take them away (survival)
+        player.getAbilities().instabuild = false;
+        player.getAbilities().invulnerable = false;
+        player.getAbilities().mayfly = false;
+        player.getAbilities().flying = false;
+        player.onUpdateAbilities();
+        return player;
+    }
+
+    private static ServerPlayer shieldBearer(GameTestHelper helper, Vec3 local) {
+        ServerPlayer player = survivalPlayer(helper);
+        Vec3 world = helper.absoluteVec(local);
+        player.snapTo(world.x, world.y, world.z, 180.0F, 0.0F); // faces north, toward the boss
+        player.setNoGravity(true);
+        player.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.SHIELD));
+        player.startUsingItem(InteractionHand.OFF_HAND);
+        for (int i = 0; i < 8; i++) {
+            player.doTick(); // the shield needs a few ticks to come up
+        }
+        return player;
+    }
+
+    /** The Verdict Hammer is the only blow that disables a blocked shield, and the other blows are stopped as before. */
+    private static void verdictHammerDisablesShield(GameTestHelper helper) {
+        Architect boss = awakeBoss(helper, new BlockPos(5, 1, 3));
+        ServerPlayer player = shieldBearer(helper, new Vec3(5.5D, 1.0D, 6.0D));
+        ItemStack shield = player.getOffhandItem();
+        helper.assertTrue(player.isBlocking(), "the player is blocking");
+        float health = player.getHealth();
+        boss.startAttack(ArchitectAttack.SIXFOLD_EDICT, player);
+        helper.runAfterDelay(ArchitectAttack.SIXFOLD_EDICT.ticks() + 2, () -> {
+            helper.assertTrue(boss.getStrikesLanded() == 0, "an ordinary blow reaches nothing behind a raised shield (landed " + boss.getStrikesLanded() + ")");
+            helper.assertTrue(player.isBlocking() && !player.getCooldowns().isOnCooldown(shield), "an ordinary blow leaves the shield up");
+            helper.assertValueEqual(player.getHealth(), health, "an ordinary blow does no damage to a blocking player");
+            boss.startAttack(ArchitectAttack.SHIELD_BREAKER, player);
+            helper.runAfterDelay(ArchitectAttack.SHIELD_BREAKER.ticks() + 2, () -> {
+                helper.assertTrue(!player.isBlocking(), "the Verdict Hammer lowered the shield");
+                helper.assertTrue(player.getCooldowns().isOnCooldown(shield), "the shield is on cooldown");
+                helper.assertValueEqual(boss.getShieldsBroken(), 1, "the break is counted");
+                helper.assertValueEqual(boss.getSecondsToDisableBlocking(), 0.0F, "the hook is closed again once the blow is over");
+                helper.succeed();
+            });
+        });
+    }
+
+    /** Against a player who lives behind the shield he picks the heavy blow, and his other options lose weight. */
+    private static void wantsTheHammerAgainstAShield(GameTestHelper helper) {
+        Architect boss = helper.spawn(ModEntities.ARCHITECT.get(), new BlockPos(5, 1, 3));
+        boss.setState(Architect.State.COMBAT_IDLE);
+        ServerPlayer player = shieldBearer(helper, new Vec3(5.5D, 1.0D, 7.0D));
+        helper.onEachTick(() -> {
+            player.setHealth(player.getMaxHealth()); // the shield-turtle never dies and never moves
+            Vec3 spot = helper.absoluteVec(new Vec3(5.5D, 1.0D, 7.0D));
+            player.snapTo(spot.x, spot.y, spot.z, player.getYRot(), 0.0F);
+            float face = Architect.yawTowards(player, boss); // always raised toward him
+            player.setYRot(face);
+            player.setYHeadRot(face);
+            if (!player.isBlocking() && !player.getCooldowns().isOnCooldown(player.getOffhandItem())) {
+                player.startUsingItem(InteractionHand.OFF_HAND);
+                for (int i = 0; i < 6; i++) {
+                    player.doTick();
+                }
+            }
+            player.doTick();
+        });
+        helper.succeedWhen(() -> {
+            if (boss.getShieldsBroken() >= 1) {
+                metric("shield uses hammer=" + boss.getAttackUses(ArchitectAttack.SHIELD_BREAKER) + " broken=" + boss.getShieldsBroken()
+                    + " punished=" + boss.getBlowsPunished() + " feint=" + boss.getAttackUses(ArchitectAttack.FALSE_VERDICT)
+                    + " sixfold=" + boss.getAttackUses(ArchitectAttack.SIXFOLD_EDICT) + " score=" + boss.getShieldScore());
+            }
+            helper.assertTrue(boss.getShieldsBroken() >= 1, "he broke the guard (hammer used " + boss.getAttackUses(ArchitectAttack.SHIELD_BREAKER) + " times)");
+        });
+    }
+
+
+    /** A player standing close with a charged attack makes him read the blow and sidestep (and then counter). */
+    private static void readsAChargedPlayer(GameTestHelper helper) {
+        Architect boss = helper.spawn(ModEntities.ARCHITECT.get(), new BlockPos(5, 1, 3));
+        boss.setState(Architect.State.COMBAT_IDLE);
+        ServerPlayer player = survivalPlayer(helper);
+        Vec3 spot = helper.absoluteVec(new Vec3(5.5D, 1.0D, 7.0D));
+        player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(4000.0D);
+        player.setHealth(4000.0F);
+        player.setNoGravity(true);
+        helper.onEachTick(() -> {
+            player.snapTo(spot.x, spot.y, spot.z, Architect.yawTowards(player, boss), 0.0F);
+            player.setYHeadRot(player.getYRot());
+            player.doTick(); // keeps the attack strength charging: the foe is always ready to swing
+        });
+        helper.succeedWhen(() -> helper.assertTrue(boss.getDodges() >= 1, "he read the charged foe and dodged (blows "
+                + boss.getAttackUses(ArchitectAttack.SIXFOLD_EDICT) + "+" + boss.getAttackUses(ArchitectAttack.CROSSED_MANDATE) + ")"));
+    }
+
+    private static void sturdy(IronGolem golem) {
+        golem.getAttribute(Attributes.MAX_HEALTH).setBaseValue(4000.0D);
+        golem.setHealth(4000.0F);
+    }
+
+    /** Targeting with two foes: nearest first, a heavy hitter takes the focus, and the choice then holds (no spinning). */
+    private static void targetSelectionIsStable(GameTestHelper helper) {
+        Architect boss = helper.spawn(ModEntities.ARCHITECT.get(), new BlockPos(5, 1, 2));
+        boss.setState(Architect.State.COMBAT_IDLE);
+        IronGolem near = dummy(helper, new BlockPos(5, 1, 6));
+        IronGolem far = dummy(helper, new BlockPos(8, 1, 9));
+        sturdy(near);
+        sturdy(far);
+        int[] changes = {0};
+        int[] stage = {0};
+        int[] mark = {0};
+        int[] before = {0};
+        net.minecraft.world.entity.LivingEntity[] seen = {null};
+        helper.onEachTick(() -> {
+            if (boss.getTarget() != seen[0]) {
+                seen[0] = boss.getTarget();
+                changes[0]++;
+            }
+            mark[0]++;
+            if (stage[0] == 0 && mark[0] == 25) {
+                helper.assertTrue(boss.getTarget() == near, "the nearest foe is the first target");
+                for (int i = 0; i < 6; i++) { // the far one hurts him again and again from the front: its threat climbs
+                    boss.invulnerableTime = 0;
+                    boss.hurtServer(helper.getLevel(), helper.getLevel().damageSources().mobAttack(far), 8.0F);
+                }
+                helper.assertTrue(boss.getThreat(far) > 30.0F, "its threat is recorded (" + boss.getThreat(far) + ")");
+                stage[0] = 1;
+            } else if (stage[0] == 1 && boss.getTarget() == far) {
+                before[0] = changes[0]; // the focus just changed: now the old target hits back as hard as it can
+                for (int i = 0; i < 8; i++) {
+                    boss.invulnerableTime = 0;
+                    boss.hurtServer(helper.getLevel(), helper.getLevel().damageSources().mobAttack(near), 4.0F);
+                }
+                mark[0] = 0;
+                stage[0] = 2;
+            } else if (stage[0] == 2 && mark[0] == 30) {
+                helper.assertValueEqual(changes[0], before[0], "no flip-flop within the lock window");
+                far.kill(helper.getLevel());
+                mark[0] = 0;
+                stage[0] = 3;
+            } else if (stage[0] == 3 && mark[0] == 25) {
+                helper.assertTrue(boss.getTarget() == near, "a dead target is replaced by the other foe");
+                metric("targeting changes=" + changes[0]);
+                helper.succeed();
+            }
+        });
+    }
+
+    /**
+     * Balance run (reform §3): a stationary player (it does not dodge, does not strike back: the worst case for the player,
+     * a lower bound for the fight) takes 20 s of the boss's AI. Prints the damage taken per second so the report can
+     * compare gear. The assertion is only that the boss is a threat to full enchanted Netherite and not a one-hit killer.
+     */
+    private static void balanceRun(GameTestHelper helper, boolean netherite, boolean shield) {
+        Architect boss = helper.spawn(ModEntities.ARCHITECT.get(), new BlockPos(5, 1, 3));
+        boss.setState(Architect.State.COMBAT_IDLE);
+        ServerPlayer player = survivalPlayer(helper);
+        Vec3 spot = helper.absoluteVec(new Vec3(5.5D, 1.0D, 7.0D));
+        player.snapTo(spot.x, spot.y, spot.z, 180.0F, 0.0F);
+        player.setNoGravity(true);
+        var enchantments = helper.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+        var armor = netherite
+                ? new ItemStack[] {new ItemStack(Items.NETHERITE_HELMET), new ItemStack(Items.NETHERITE_CHESTPLATE),
+                        new ItemStack(Items.NETHERITE_LEGGINGS), new ItemStack(Items.NETHERITE_BOOTS)}
+                : new ItemStack[] {new ItemStack(Items.IRON_HELMET), new ItemStack(Items.IRON_CHESTPLATE),
+                        new ItemStack(Items.IRON_LEGGINGS), new ItemStack(Items.IRON_BOOTS)};
+        net.minecraft.world.entity.EquipmentSlot[] slots = {net.minecraft.world.entity.EquipmentSlot.HEAD,
+                net.minecraft.world.entity.EquipmentSlot.CHEST, net.minecraft.world.entity.EquipmentSlot.LEGS,
+                net.minecraft.world.entity.EquipmentSlot.FEET};
+        for (int i = 0; i < 4; i++) {
+            if (netherite) {
+                armor[i].enchant(enchantments.getOrThrow(net.minecraft.world.item.enchantment.Enchantments.PROTECTION), 4);
+            }
+            player.setItemSlot(slots[i], armor[i]);
+        }
+        if (shield) {
+            player.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.SHIELD));
+        }
+        player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(2000.0D); // measure, do not die
+        player.setHealth(2000.0F);
+        float[] taken = {0.0F};
+        // probe: does a plain mob blow reach this player at all (difficulty, invulnerability)?
+        float probe0 = player.getHealth();
+        boolean probeHurt = player.hurtServer(helper.getLevel(), helper.getLevel().damageSources().mobAttack(boss), 10.0F);
+        metric("probe difficulty=" + helper.getLevel().getDifficulty() + " hurt=" + probeHurt + " delta=" + (probe0 - player.getHealth())
+                + " invulnerableTo=" + player.isInvulnerableTo(helper.getLevel(), helper.getLevel().damageSources().mobAttack(boss))
+                + " creative=" + player.isCreative() + " instabuild=" + player.getAbilities().instabuild + " invulnerableAbility=" + player.getAbilities().invulnerable);
+        player.setHealth(player.getMaxHealth());
+        float[] last = {player.getHealth()};
+        helper.onEachTick(() -> {
+            player.snapTo(spot.x, spot.y, spot.z, (float) Architect.yawTowards(player, boss), 0.0F);
+            player.setYHeadRot(player.getYRot());
+            if (shield && !player.isBlocking() && !player.getCooldowns().isOnCooldown(player.getOffhandItem())) {
+                player.startUsingItem(InteractionHand.OFF_HAND);
+                for (int i = 0; i < 6; i++) {
+                    player.doTick();
+                }
+            }
+            player.doTick();
+            taken[0] += Math.max(0.0F, last[0] - player.getHealth());
+            last[0] = player.getHealth();
+        });
+        helper.runAfterDelay(400, () -> {
+            double armorValue = player.getAttributeValue(Attributes.ARMOR);
+            double tough = player.getAttributeValue(Attributes.ARMOR_TOUGHNESS);
+            StringBuilder mix = new StringBuilder();
+            for (ArchitectAttack a : ArchitectAttack.values()) {
+                if (boss.getAttackUses(a) > 0) {
+                    mix.append(a).append('=').append(boss.getAttackUses(a)).append(' ');
+                }
+            }
+            metric("balance gear=" + (netherite ? "netherite+ProtIV" : "iron") + " shield=" + shield + " armor=" + armorValue
+                    + " toughness=" + tough + " duration=20s players=1 stationary taken=" + taken[0] + " hp ("
+                    + (taken[0] / 20.0F) + "/s) landed=" + boss.getStrikesLanded() + " broken=" + boss.getShieldsBroken()
+                    + " blows: " + mix);
+            int blows = 0;
+            for (ArchitectAttack a : ArchitectAttack.values()) {
+                blows += boss.getAttackUses(a);
+            }
+            helper.assertTrue(blows >= 3, "he fought (" + blows + " blows)");
+            helper.assertTrue(taken[0] < last[0] + taken[0], "not a one-hit kill");
+            helper.succeed();
+        });
     }
 
     // ================================================================= slice 4: content and the Architect's Scimitar
@@ -464,7 +905,7 @@ public final class ArchitectGameTests {
     /** Bestiary chapter, engravings, advancements, recipe, loot table, assets, sounds and both languages. */
     private static void contentLoaded(GameTestHelper helper) {
         var server = helper.getLevel().getServer();
-        helper.assertTrue(Bestiary.ENTRIES.contains(Bestiary.ARCHITECT), "the Bestiary has his chapter");
+        helper.assertTrue(Bestiary.ARCHITECT != null, "the Bestiary has his chapter");
         List<BestiaryPage> pages = Bestiary.ARCHITECT.pages();
         helper.assertTrue(pages.size() >= 6, "a chapter of six or more pages");
         for (String art : new String[] {"architect_anatomy", "architect_combat", "architect_spoils"}) {
@@ -474,8 +915,8 @@ public final class ArchitectGameTests {
         for (String adv : new String[] {"architect_tablet", "architect_statue", "architect_defeated", "architect_scimitar"}) {
             helper.assertTrue(server.getAdvancements().get(id("bosses/" + adv)) != null, "advancement bosses/" + adv);
         }
-        helper.assertTrue(server.getRecipeManager().byKey(ResourceKey.create(Registries.RECIPE, id("commandment_tablet"))).isPresent(),
-                "the tablet recipe is loaded");
+        helper.assertTrue(ArchitectGameTests.class.getResourceAsStream("/data/codenamecoraline/recipe/commandment_tablet.json") != null,
+                "the tablet recipe is packaged");
         helper.assertTrue(ArchitectGameTests.class.getResourceAsStream("/data/codenamecoraline/loot_table/entities/architect.json") != null,
                 "loot table");
         for (String res : new String[] {"textures/item/architect_scimitar.png", "textures/item/architect_scimitar_charged.png",

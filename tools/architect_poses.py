@@ -10,6 +10,11 @@ the left side (+x) opens with a negative z, the right side with a positive z. Ri
 the left side and mirrored with mirror() as (x, -y, -z).
 """
 
+# The reform scales the whole body by 1.4 (3.35 -> 4.7 blocks): the rig is written in the original pixels and scaled when
+# it is registered (generate_architect_assets.py); position keys of the clips are in original pixels too, and the Java
+# emitter multiplies them by this factor.
+RIG_SCALE = 1.4
+
 TIERS = ("top", "mid", "low")
 SIDES = ("left", "right")
 

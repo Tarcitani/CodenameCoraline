@@ -30,6 +30,10 @@ public final class ExportArchitectModel {
             "e_aim=PIERCING_SENTENCE:8", "e_thrust=PIERCING_SENTENCE:16", "e_recover=PIERCING_SENTENCE:22",
             "f_load=GARGOYLE_FALL:8", "f_apex=GARGOYLE_FALL:20", "f_impact=GARGOYLE_FALL:35",
             "g_block=PARRY_LEFT:6", "g_riposte=PARRY_LEFT:14",
+            "h_strafe=STRAFE_LEFT:4", "h_backpedal=BACKPEDAL:4", "i_dodge_left=DODGE_LEFT:6", "i_dodge_back=DODGE_BACK:6",
+            "i_dodge_diag=DODGE_DIAG_LEFT:6", "i_lean=LEAN_LEFT:4",
+            "k_peak=SHIELD_BREAKER:15", "k_slam=SHIELD_BREAKER:20", "l_feint=FALSE_VERDICT:7", "l_chop=FALSE_VERDICT:23",
+            "m_charge=RUSHING_REBUKE:11", "m_cut=RUSHING_REBUKE:18", "m_return=RUSHING_REBUKE:24",
     };
 
     public static void main(String[] args) throws Exception {

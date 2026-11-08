@@ -97,13 +97,15 @@ public final class ArchitectCinematicDirector {
     /** The camera looks at the hooded face, then down to the tablet as it falls, then back up to the open jaw. */
     static Vec3 focalPoint(Architect boss, int t, float partialTick) {
         Vec3 base = boss.getPosition(partialTick);
+        double face = 3.0D * Architect.SCALE; // the heights were written for the 3.35-block body
+        double tablet = 1.6D * Architect.SCALE;
         double y;
         if (t < Architect.REVEAL_MASK_RIGHT_TICK) {
-            y = 3.0D;
+            y = face;
         } else if (t < Architect.REVEAL_TABLET_TICK + 6) {
-            y = Mth.lerp((t - Architect.REVEAL_MASK_RIGHT_TICK) / 20.0D, 3.0D, 1.6D);
+            y = Mth.lerp((t - Architect.REVEAL_MASK_RIGHT_TICK) / 20.0D, face, tablet);
         } else {
-            y = Mth.lerp(Mth.clamp((t - Architect.REVEAL_TABLET_TICK - 6) / 14.0D, 0.0D, 1.0D), 1.6D, 3.0D);
+            y = Mth.lerp(Mth.clamp((t - Architect.REVEAL_TABLET_TICK - 6) / 14.0D, 0.0D, 1.0D), tablet, face);
         }
         return base.add(0.0D, y, 0.0D);
     }

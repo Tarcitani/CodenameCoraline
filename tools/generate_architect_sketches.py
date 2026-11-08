@@ -15,8 +15,11 @@ SKETCH_DIR = ROOT / "build/architect-sketches"
 SKIN = Image.open(TEX / "architect.png").convert("RGBA")
 GLOW = Image.open(TEX / "architect_glow.png").convert("RGBA")
 SS = 2
-W, H = 200, 230
+W, H = int(__import__('os').environ.get('ARCHITECT_TILE_W', 260)), int(__import__('os').environ.get('ARCHITECT_TILE_H', 320))
 VIEWS = ((-0.55, 0.12), (math.pi / 2 * -1, 0.05))  # three-quarters from his left front, and his left side
+_front = __import__('os').environ.get('ARCHITECT_FRONT')  # "1": the second view is straight from the front instead of the side
+if _front:
+    VIEWS = ((-0.55, 0.12), (0.0, 0.03))
 
 
 def project(v, yaw, pitch):
@@ -58,8 +61,8 @@ def render(faces, yaw, pitch, bounds):
                     i = py * w + px
                     if depth < zbuf[i]:
                         continue
-                    tu = min(255, max(0, int((u * ra[3] + v * rb[3] + t * rc[3]) * 256)))
-                    tv = min(255, max(0, int((u * ra[4] + v * rb[4] + t * rc[4]) * 256)))
+                    tu = min(SKIN.width - 1, max(0, int((u * ra[3] + v * rb[3] + t * rc[3]) * SKIN.width)))
+                    tv = min(SKIN.height - 1, max(0, int((u * ra[4] + v * rb[4] + t * rc[4]) * SKIN.height)))
                     s = SKIN.getpixel((tu, tv))
                     g = GLOW.getpixel((tu, tv))
                     if s[3] == 0 and g[3] == 0:
@@ -83,12 +86,18 @@ def render(faces, yaw, pitch, bounds):
 
 def main():
     poses = json.loads((SKETCH_DIR / "model.json").read_text())
+    only = set(__import__('sys').argv[1:])  # optional: render only these poses
     tiles = []
     for name, faces in poses.items():
+        if only and name not in only:
+            continue
         views = []
         for yaw, pitch in VIEWS:
             pts = [project(v, yaw, pitch) for f in faces for v in f["vertices"]]
-            bounds = (-46, 46, min(-36, min(p[1] for p in pts)), 27)
+            bounds = (-68, 68, min(-36, min(p[1] for p in pts)) - 2, 27)
+            zoom = __import__('os').environ.get('ARCHITECT_ZOOM')  # "minx,maxx,miny,maxy" in model pixels (y up is negative)
+            if zoom:
+                bounds = tuple(float(v) for v in zoom.split(','))
             views.append(render(faces, yaw, pitch, bounds))
         tile = Image.new("RGB", (W * 2, H + 14), (232, 226, 214))
         tile.paste(views[0], (0, 14))

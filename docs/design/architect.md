@@ -1301,6 +1301,7 @@ Nada desta ficha foi testado no jogo. Nenhum comando de build foi necessário (s
 | 2. Visual e rigging | **concluída** | 2026-11-08 | `python tools/generate_architect_assets.py` (110 partes, 181 cubos, sem sobreposição de UV, 3 texturas glow, 16 clipes); `.\gradlew.bat compileJava` OK; `.\gradlew.bat runArchitectTest` → 5 testes do Arquiteto + 1 de outra suíte aprovados; `.\gradlew.bat -I tools/architect-sketches.gradle exportArchitectSketchModel` OK; `python tools/generate_architect_sketches.py` → `build/architect-sketches/architect_pose_sheet.png`. **O `runClient` ainda falta.** |
 | 2b. Revisão visual (humano) | **concluída** | 2026-11-08 | Poses da folha e barra temática aprovadas pelo usuário (fora do jogo); visual no jogo pendente de `runClient` |
 | 3. IA e combate | **concluída** (aguarda revisão do usuário) | 2026-11-08 | `python tools/generate_architect_assets.py` (22 clipes); `.\gradlew.bat compileJava` → BUILD SUCCESSFUL; `.\gradlew.bat runArchitectTest` → "All 26 required tests passed" (25 do Arquiteto + 1 de outra suíte) em **6 rodadas seguidas** (logs `build/logs/fatia3_test.log`, `fatia3_r2..r6.log`). Rodados pelo agente no terminal do app. **Sem `runClient`:** cinemática, partículas e sensação do combate não foram vistas. |
+| 5. Reforma (IA, escala, sobretudo, texturas, cimitarra) | **concluída no código** (aguarda `runClient`) | 2026-11-08 | ver §27: `build` verde, `runArchitectTest` 54/54 |
 | 4. Polimento e docs | **concluída** (aguarda revisão do usuário) | 2026-11-08 | `python tools/generate_architect_scimitar_assets.py` e `python tools/generate_architect_bestiary.py`; `.\gradlew.bat compileJava` → BUILD SUCCESSFUL; `.\gradlew.bat build` → BUILD SUCCESSFUL (`build/logs/fatia4_build.log`); `.\gradlew.bat runArchitectTest` → "All 35 required tests passed" (34 do Arquiteto + 1 de outra suíte) em **6 rodadas seguidas** (`build/logs/fatia4_round1..6.log`); regressão `runCrimsonCommanderTest` (34) e `runCanopyBreakerTest` (35) verdes. Rodados pelo agente no terminal do app. **Sem `runClient`:** sons, poses e efeitos da cimitarra, modelo na mão, ícones, gravuras e Bestiário não foram vistos no jogo. |
 
 Arquivos da fatia 1: `entity/architect/Architect.java`, `item/CommandmentTabletItem.java`, `verification/ArchitectGameTests.java`, registros em `ModEntities`/`ModItems`/`ModCreativeTabs`, `architectTest` em `build.gradle`, textos en_us/pt_br, `items/` e `models/item/` do ovo e da tábua, `tools/generate_architect_assets.py` (gera os ícones).
@@ -1430,3 +1431,97 @@ Como planejado, com três detalhes do código: o aparo corpo a corpo só vale pa
 ### 26.8 Opcional (fora por padrão)
 
 Passivo "Seis Mandamentos": 6 acertos seguidos no mesmo alvo acendem a lâmina e o 6º solta um ARCO de 3 bl / 120° com 50 % do dano. Só se o usuário pedir.
+
+## 27. Reforma do Arquiteto (2026-11-08): IA, combate, escala, sobretudo, texturas e cimitarra
+
+Pedido do usuário: o chefe estava parado, previsível, fácil, pequeno e feio. Esta seção registra o diagnóstico (causas comprovadas por leitura do código ou por teste, separadas das hipóteses), o que mudou, os números medidos e o que só o `runClient` pode julgar. **Nada aqui foi visto no jogo.**
+
+### 27.1 Diagnóstico
+
+| Problema | Causa | Status |
+|---|---|---|
+| Quase não se mexe | `decide()` só chamava `approach()`, que parava a 2,4 bl; sem andar lateral, recuo contínuo ou esquiva; só havia o recuo `BACKSTEP`, sorteado a 30 % só a ≤ 1,5 bl | comprovada (código) |
+| Cabeça nunca olha à parte do corpo | `face()` gravava `yaw` em corpo, cabeça e interpolação ao mesmo tempo; o ângulo cabeça-corpo que o renderer lê era sempre 0 | comprovada (código) |
+| "Ataca de costas" | a direção do golpe era travada no **início** do preparo e nunca mais corrigida (spec §13.0); quem circulava o chefe durante 30-50 ticks via lâminas apontadas para onde ele estivera. O giro limitado a 9°/tick e a regra de ≤ 20° antes de atacar existiam e funcionam | causa do efeito provável; o relato de "costas" em jogo não pôde ser reproduzido sem `runClient` (hipótese) |
+| Fácil | contra Netherite Proteção IV (armadura 20, resistência 12) um corte de 0,5 DB × 12 = 6 de dano bruto custava ~0,5 PV; medido na reforma: 5 PV em 20 s com o jogador parado | comprovada (cálculo e teste) |
+| Escudo seguro | nenhum golpe do Arquiteto chamava o gancho de desarme do vanilla (`getSecondsToDisableBlocking`, que o `Player.blockUsingItem` consulta); `grep shield` no pacote dava 0 | comprovada (código) |
+| Pequeno | corpo de 3,35 bl; Cobrador (o mais alto) tem 4,5 | comprovada |
+| Textura pobre | átomo de 1 texel por px de modelo, 256×256 com 22 mil texels usados, rosto de 14×13 texels | comprovada |
+| Drop achatado | em `items/architect_scimitar.json` o contexto `ground` (e `fixed`, `on_shelf`) usava o ícone 2D `handheld`, ou seja, a entidade dropada era um sprite achatado; o modelo 3D esticava um swatch inteiro por face e tinha só uma dobra de 14° | comprovada (JSON) |
+
+### 27.2 Escala
+
+`Architect.SCALE = 1.4` (tabela §3.2 passa a valer ×1,4): altura **4,7 bl** (meta 4,5-5; Cobrador 4,5, Comandante 3,5), colisão 1,9 × 4,7, olhos 4,1, passo 1,5. Todo volume de golpe (`ArchitectStrikes`), alcance (`CLOSE/SHORT/MEDIUM`), salto da Gárgula, avanços e alturas da cinemática passam pelo fator; ângulos, ticks e dano não. O rig (`tools/generate_architect_assets.py`) multiplica pivôs e caixas no registro; chaves de posição dos clipes (`@...`) são multiplicadas no emissor Java. Asas: envergadura ~7,3 bl; cimitarras de cerca de 1,75 bl.
+
+### 27.3 IA: estados, prioridades e transições
+
+Estados sincronizados (`Architect.State`): DORMANT, AWAKENING, COMBAT_IDLE, REPOSITION (recuo curto), ATTACKING, CHANNELING (reservado), GUARDING, PARRYING, STAGGERED, PHASE_TRANSITION, DYING e o novo **DODGING**. Dentro de COMBAT_IDLE o cérebro tem uma tática (`READ`, `ADVANCE`, `CIRCLE`, `RETREAT`), não sincronizada. Um estado por vez: só COMBAT_IDLE e GUARDING decidem; os demais rodam a sua linha do tempo em `tick()` e voltam a COMBAT_IDLE.
+
+Prioridade de `decide()` (a primeira camada que age ocupa o tick):
+
+1. **Aparo** (inalterado): o mesmo inimigo o golpeou de frente há ≤ 40 t e está a ≤ 3,5 bl.
+2. **Anti-pillaring** (inalterado, limites escalados).
+3. **Esquiva** (`tryReactiveDodge`): gatilhos lidos a cada 5 t: jogador próximo à frente com ataque carregado (`getAttackStrengthScale ≥ 0,9`), dois golpes sofridos em 20 t, e a cada 2 t um projétil forte vindo na direção dele (tridente, flecha perfurante, bola de fogo; os leves continuam sendo desviados). Sorteio por fase (28/36/44 %, metade disso quando ele prefere atacar), recarga 55/55/45/35 t, no máximo 2 esquivas seguidas (paga ao golpear). Sete esquivas: esquerda, direita, trás, diagonal trás-esq., diagonal trás-dir., e dois inclinados curtos; cada uma com clipe próprio, partida de 3 t, deslocamento de 8 t com desaceleração (4 bl; 1,1 bl no inclinado), sem teleporte e sem invulnerabilidade; só se o caminho for caminhável (`canStandAt`: colisão, solo a ≤ 1,6 bl, sem lava ou fogo, dentro do leash). Nunca a mesma esquiva duas vezes seguidas (peso ×0,4). Ao fim abre a **janela de contra-ataque** de 26 t (golpes rápidos e fechadores de distância ×1,6, recarga global quase zerada).
+4. **Virar antes de atacar**: nenhum golpe frontal começa com o alvo a mais de 20° da frente; o corpo gira a 12°/tick, a cabeça (servidor, `updateHead`) a 28°/tick e pode estar até 80° fora do eixo; o cliente reparte o desvio entre cabeça (55 %), pescoço (20 %) e tronco (22 %).
+5. **Escudo**: `shieldScore` sobe 2/tick com o alvo bloqueando e desce 1/tick; ≥ 36 vira pressão e, a ≤ 4,5 bl com o Martelo pronto, ele o escolhe com 70 % (o resto cai nos pesos, que também favorecem o Falso Veredito e cortam o Decreto pela metade).
+6. **Encadeamento** (`armChain`): ao fim de um golpe, com 50/60/75 % por fase, arma-se uma sequência conforme o que o alvo fez: Decreto → Cruzado ou Martelo (se bloqueia); Cruzado → Crescente (alvo no ar ou colado) ou Sentença/Investida (alvo longe); Crescente → Sentença (longe) ou Decreto; Sentença e Investida → Decreto/Cruzado/Crescente; Falso Veredito → Martelo ou Decreto. Escudo derrubado pelo Martelo: punição **sempre**. O encadeado ignora a recarga, é revalidado por distância e giro e cai em silêncio se não servir; cada golpe mantém o seu preparo.
+7. **Golpe normal** (`pickAttack`): pesos por distância e por situação (perto, médio, longe, alvo circulando, no ar, escudo, multidão), recarga por golpe, o mesmo golpe nunca duas vezes seguidas, peso ×0,5 por uso entre os últimos 4.
+8. **Pés** (`position`): longe → `ADVANCE` (andar ou correr, pathfinding); na faixa de combate → `CIRCLE` (desliza de lado, lado trocado a cada 18-52 t ou quando bate em parede/borda); perto demais → `RETREAT` (recuo de costas, de frente para o alvo). Depois de golpe, esquiva ou stagger ele fica em poise (`READ`) por poucos ticks, nunca mais de 12.
+
+O golpe agora **mira durante o preparo** (10°/tick) e trava a direção 6 ticks antes do primeiro volume: não corta onde o alvo estava há 1 s, e os últimos 6 ticks continuam sendo a janela justa para sair.
+
+**Velocidades** (medidas): andar ≈ 0,20 bl/t (4 b/s), correr ≈ 0,34 bl/t (6,8 b/s, acima do sprint do jogador, 5,6). Um primeiro valor (1,5) deu 0,44 bl/t e foi recusado por impedir qualquer fuga.
+
+### 27.4 Alvo e multijogador
+
+Tudo no servidor; o cliente só recebe `yHeadRot`/`yBodyRot` e o clipe, então todos veem o mesmo olhar. Pontuação por inimigo: proximidade (até 40), ameaça pelo dano causado (até 50, decai 4 %/s), agressor corpo a corpo recente (15), tempo sem ser alvo (1/s, até 25: ninguém é ignorado para sempre), jogador ferido (6) e fidelidade ao alvo atual (12). Troca só se o melhor superar o atual em ×1,25 + 4 e congela a escolha por 60 t. Um golpe em curso mantém o seu alvo até acabar. Alvo morto, desconectado, em criativo/espectador ou fora do leash (36 bl) é descartado.
+
+### 27.5 Dificuldade, escudo e balanceamento
+
+- Dano base 12 → **20**; **marejo de mana** 25 % de cada golpe como magia indireta (ignora armadura, não a Proteção); **teto de 50 % da vida máxima da vítima por golpe** (nada de apagar jogador pouco protegido num combo); dano ×1,1 (Administrador) e ×1,2 (Colapso). Recarga global 8/8/6/4, encadeamento mais frequente.
+- **Martelo do Veredito** (`SHIELD_BREAKER`, K): 19 t de preparo (as duas lâminas superiores cruzadas sobre o capuz, pico segurado), corredor largo de 3,4 bl, 1,3 DB, recarga 160 t, 23 t de recuperação aberta. É o **único** volume que sobrescreve `getSecondsToDisableBlocking()` (5 s, só durante o golpe ativo); o resto do jogo e dos golpes continua igual. Vimos no vanilla: `applyItemBlocking` → `Player.blockUsingItem` → `BlocksAttacks.disable`. Escudo desarmado: recarga do item, `stopUsingItem`, evento de partículas.
+- **Falso Veredito** (L): finta de lâmina média (sem volume), pausa, corte tardio dos braços superiores e varredura baixa. **Reprimenda em Investida** (M): corrida real de 4,2 bl sem dano, corte para fora e corte de retorno.
+
+Medido em GameTest (`ARCHITECT_METRIC` em `build/logs/reform_final.log`, 20 s, **1 jogador parado e sem reagir**, vida do jogador elevada para 2000 só para medir, bloco de 12 × 12 bl; variam de rodada para rodada porque a IA sorteia):
+
+| Equipamento | Dano em 20 s | Golpes iniciados / acertos |
+|---|---|---|
+| Netherite completa, Proteção IV (armadura 20, resistência 12) | 13,8 a 34 PV em 3 rodadas (24,3 na final), 0,7 a 1,7 PV/s | 4-9 / 7-19 |
+| Netherite + Proteção IV + escudo erguido | 3 a 11 PV (11,5 na final); Martelo usado 1-2 vezes e escudo desarmado 1-2 vezes | 4-9 / 4-6 |
+| Ferro sem encantamento (armadura 15) | 22 a 110 PV (110 na final; sem o teto de 50 %, que não atua com 2000 PV) | 3-6 / 4-12 |
+
+Leitura honesta: o jogador do teste **não desvia, não ataca e não cura**, então é o limite superior da pressão e o limite inferior da luta real; a esquiva do chefe, o escudo bem usado e a cura mudam muito o resultado. Contra Netherite o chefe passou de 5 PV em 20 s para um valor que mata um jogador de 20 PV parado em ~12-30 s, o que é ameaça real sem ser golpe único. Contra ferro, o teto por golpe evita morte de uma vez, mas dois combos completos matam. **Não foi testado**: multiplayer real com latência, jogador humano habilidoso, encantamentos de dano da arma, poções, totem, e a luta inteira de 480 PV. Esses números não substituem uma sessão de jogo.
+
+### 27.6 Modelo, sobretudo e texturas
+
+- **Sobretudo** (`build_coat_skirt`, `build_coat_upper`): substitui a saia `robe_*`. Gola alta (costas + duas laterais + duas pontas frontais), lapelas em painéis com friso e pico, ombreiras com placa lateral, painéis frontais em dois segmentos (cintura e joelho) com dentes irregulares na barra, abas laterais, costas em dois segmentos mais longas (até o tornozelo) com quatro dentes. Todas as peças soltas são partes do rig com pivô próprio. `coat_motion()` em `tools/architect_clips.py` anima o movimento secundário de **todos** os clipes automaticamente, com atraso de um quadro do corpo (painéis seguem as pernas, as costas sobem com a inclinação do tronco, as abas balançam contra a inclinação lateral, o giro da Roda joga tudo para fora).
+- **Texturas**: atlas 512 × 512 (188 mil texels usados de 262 mil), densidade por material (`DENS`): rosto, dentes, selo, máscara e esterno 3 texels por px de modelo (rosto de 30 × 28 texels, a região mais trabalhada); capuz, caixa torácica, abdômen, sobretudo, antebraços e lâminas 2; membros e asas 1,5. Pintores em `tools/architect_paint.py`, independentes de resolução (ruído em blocos de 3 oitavas, bisel, rachaduras por caminhada aleatória, estrias, placas empilhadas, inscrições em glifos, veios de mana). Rosto: esclera negra e íris coral em três tons com brilho, cavidades sob o capuz, sobrancelhas, maçãs do rosto claras, vincos de marionete e cantos do sorriso, dentes retangulares (nunca presas). Estilo pixel art, sem gradientes.
+- Ferramentas de revisão: `generate_architect_sketches.py` aceita poses por argumento e as variáveis `ARCHITECT_TILE_W/H`, `ARCHITECT_ZOOM` e `ARCHITECT_FRONT`; a folha ganhou 13 poses novas.
+- Sombra do renderer ×1,4, câmera da cinemática ×1,4, olhar com pescoço e tronco.
+
+### 27.7 Cimitarra dropada
+
+`items/architect_scimitar.json`: só o `gui` usa o ícone 2D; mãos, chão, moldura e prateleira usam o modelo 3D, com transformações de exibição próprias para cada contexto. Modelo regerado por `tools/generate_architect_scimitar_assets.py`: lâmina curva de quatro segmentos encadeados (24° de curva no total; uma primeira versão com 47° leu como lua crescente e foi recusada), costas grossas e irregulares, fio claro no lado convexo, canal com ranhura de mana emissiva nas duas faces, runa junto à guarda, guarda de pedra com pontas, anel e cabo, pomo facetado girado 45°. Atlas 64 × 64 a 4 texels por unidade, com a lâmina esticada inteira por face (leva o fio e o dorso) e a face norte espelhada. `tools/preview_architect_scimitar.py` desenha o JSON real em cada contexto e mostra onde caem o cabo e a ponta em relação a uma espada vanilla (o cabo cai a menos de 1 unidade do cabo de uma espada de ferro nas mãos). **Validação visual real (inventário, 1ª e 3ª pessoa, chão) só no `runClient`.**
+
+### 27.8 O que foi executado e o que falta
+
+- `.\gradlew.bat build runArchitectTest` → BUILD SUCCESSFUL, "All 54 required tests passed" (53 do Arquiteto + 1 de outra suíte sempre registrada; 19 a mais que os 35 anteriores: 12 escritos para a reforma e 6 gerados pelos três golpes novos, "acerta" e "cancela ao fugir"; log em `build/logs/reform_final.log`).
+- Novos testes: dimensões, aproximação, movimento contínuo (maior parada sem motivo 4-8 t), nunca ataca de costas (pior ângulo no início do golpe 4°, jogador orbitando), cabeça à frente do corpo (80° máx.), sete esquivas movem o corpo no sentido e na distância certos, projétil forte, jogador carregado, Martelo desarma e golpes comuns não, o Martelo é escolhido contra escudo, alvo estável com dois inimigos, três rodadas de balanceamento. Os testes de "golpe cancelado ao fugir" ganharam geometria na diagonal da arena de 12 bl.
+- **Pendências**: `runClient` (poses de esquiva e de passo, sobretudo, texturas em tamanho real, olhar, cimitarra em todas as mãos e no chão, partículas e sons das esquivas); balanceamento com humanos, 2+ clientes e latência; esquiva e investida não têm som próprio (reutilizam a batida de asa e o preparo genérico); o ícone 2D da cimitarra não foi redesenhado; o Bestiário usa as gravuras regeneradas mas não foi aberto no jogo; H e I (arena) continuam adiados.
+
+### 27.9 Correção de orientação travada e corrida frontal (2026-11-08)
+
+Identificado em jogo: o Arquiteto atacava de costas para o jogador e corria de lado durante o combate.
+- **Causa do ataque de costas:** `lockedYaw` (ângulo travado durante golpes, esquivas, aparos e recuo) era um campo privado do servidor sem sincronização (`SynchedEntityData`). No cliente, o valor padrão era `0.0F` (Sul). Durante todo ataque/esquiva/aparo (`locksFacing() == true`), `tick()` forçava `face(lockedYaw)` no cliente, virando as costas caso o jogador estivesse em qualquer direção diferente de Sul. Corrigido com `DATA_LOCKED_YAW` sincronizado via rede (`SynchedEntityData.defineId(Architect.class, EntityDataSerializers.FLOAT)`). Em `face(yaw)`, simplificado para encaixe direto de rotação de corpo e cabeça em poses travadas sem deslocamentos residuais.
+- **Causa da corrida de lado:** Em `position()`, a tática padrão entrava em `Tactic.CIRCLE` (strafe lateral a 0.17 vel e apenas 0.05 frontal) sempre que `dist <= SHORT_RANGE + 0.6D` (5,08 bl), mantendo o chefe andando de lado ao invés de avançar. Corrigido para priorizar `Tactic.ADVANCE` com `RUN_SPEED` (1.1) sempre que `dist > CLOSE_RANGE + 0.8D` (~2,9 m) ou quando pronto para engajar (`globalCooldown <= 0`), reservando `Tactic.CIRCLE` exclusivamente para recuperação de recarga em alcance corpo a corpo.
+- **Giro e alvo ativo:** A taxa de giro corporal em perseguição aumentou de 12° para 20°/tick (`TURN_DEGREES_PER_TICK`). Adicionada checagem em `tick()` para substituir imediatamente o alvo caso o alvo atual morra durante golpes prolongados.
+- **Validação:** 54/54 testes passando em 4 rodadas consecutivas de `runArchitectTest`, `build` verde.
+
+### 27.10 Desativação temporária do mob e drops (2026-11-08)
+
+A pedido do usuário ("não gostei do resultado geral desse mob + drops; desative ele por hora"), o Arquiteto e seus drops foram desativados do gameplay normal:
+- **Creative Tabs:** Removidos o ovo gerador (`ARCHITECT_SPAWN_EGG`), a cimitarra (`ARCHITECT_SCIMITAR`) e a tábua (`COMMANDMENT_TABLET`) de todas as abas criativas modded e vanilla em `ModCreativeTabs.java`.
+- **Bestiário:** Removida a entrada `ARCHITECT` de `Bestiary.ENTRIES` em `Bestiary.java` (o livro não exibe o capítulo do Arquiteto no jogo).
+- **Receita:** A receita de sobrevivência da tábua (`commandment_tablet.json`) foi bloqueada com condição `neoforge:false`.
+- **Invocação:** `CommandmentTabletItem.ENABLED` padrão `false` (mensagem de tábua inerte e fria caso usada).
+- **Preservação:** O código, assets e a suíte completa de 54 testes continuam íntegros no repositório (`runArchitectTest` 54/54 com `coraline.architectTests=true`), permitindo redesenho futuro do chefe e seus drops.

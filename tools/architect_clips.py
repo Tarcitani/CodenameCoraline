@@ -47,8 +47,37 @@ def tracks_of(frames):
     return out
 
 
+def coat_motion(frames):
+    """Secondary motion of the stone coat (reform 4.2): its pieces lag one keyframe behind the body that drives them.
+    The front panels follow the legs (the lower segment a frame later), the back flies up with the torso's lean and the
+    swing of the legs, the side flaps swing against a lateral lean or a dodge, and a spin throws the whole coat out."""
+    out = []
+    prev = None
+    for t, pose in frames:
+        lag = prev if prev is not None else pose
+        new = dict(pose)
+        d_now = {s: pose.get(f"leg_{s}", BASE[f"leg_{s}"])[0] - BASE[f"leg_{s}"][0] for s in ("left", "right")}
+        d_lag = {s: lag.get(f"leg_{s}", BASE[f"leg_{s}"])[0] - BASE[f"leg_{s}"][0] for s in ("left", "right")}
+        tz = lag.get("torso", BASE["torso"])[2]
+        tx = lag.get("torso", BASE["torso"])[0] - BASE["torso"][0]
+        pel = pose.get("pelvis", (0, 0, 0))[1]
+        pel_lag = lag.get("pelvis", (0, 0, 0))[1]
+        spin = abs(pel - pel_lag) > 20
+        for s in ("left", "right"):
+            new[f"coat_front_{s}_upper"] = (0.7 * d_now[s] - (25 if spin else 0), 0, 0)
+            new[f"coat_front_{s}_lower"] = (0.55 * d_lag[s] - (10 if spin else 0), 0, 0)
+            flare = (-30 if s == "left" else 30) if spin else 0
+            new[f"coat_side_{s}"] = (0, 0, 0.8 * tz + flare)
+        avg = (d_lag["left"] + d_lag["right"]) / 2.0
+        new["coat_back_upper"] = (4 + 0.5 * tx - 0.25 * avg + (22 if spin else 0), 0, 0)
+        new["coat_back_lower"] = (6 + 0.9 * tx - 0.45 * avg + (30 if spin else 0), 0, 0.3 * tz)
+        out.append((t, new))
+        prev = pose
+    return out
+
+
 def clip(name, ticks, loops, frames, smooth=True):
-    CLIPS[name] = (ticks, loops, smooth, tracks_of(frames))
+    CLIPS[name] = (ticks, loops, smooth, tracks_of(coat_motion(frames)))
 
 
 GUARD = P({
@@ -156,7 +185,7 @@ def locomotion():
                             (12, walk_frame("right", "left", True)), (18, walk_frame("right", "left", False)),
                             (24, walk_frame("left", "right", True))])
     run_base = P({"torso": (22, 0, 0), "head": (-18, 0, 0), "@pelvis": (0, 2, 0), "wing_root_left": (0, -30, 0),
-                  "robe_back_upper": (25, 0, 0)},
+                 },
                  lr("top", (40, 0, -20), (-40, 0, 0)), lr("mid", (-10, -90, -40), (-30, 0, 0)),
                  lr("low", (-40, 0, -20), (-40, 0, 0)))
 
@@ -320,9 +349,147 @@ def attacks():
                                       (43, impact), (48, flap), (56, BASE)], smooth=False)
 
 
+
+# ------------------------------------------------------------------------------------------------ reform: footwork, dodges, new blows
+def flip(pose):
+    """The whole pose seen in a mirror: sides swapped with (x, -y, -z), the centre parts turn the other way, position
+    offsets flip their X. The blades keep their own curvature (it is not mirrored)."""
+    out = {}
+    for key, value in pose.items():
+        bare = key.lstrip("@%")
+        if bare.startswith("blade_tip_"):
+            out[key] = value
+            continue
+        if key.startswith("%"):
+            twin = key.replace("_left", "_#").replace("_right", "_left").replace("_#", "_right")
+            out[twin] = value
+            continue
+        if bare.endswith("_left") or bare.endswith("_right"):
+            twin = key.replace("_left", "_#").replace("_right", "_left").replace("_#", "_right")
+            out[twin] = (-value[0], value[1], value[2]) if key.startswith("@") else (value[0], -value[1], -value[2])
+        else:
+            out[key] = (-value[0], value[1], value[2]) if key.startswith("@") else (value[0], -value[1], -value[2])
+    return out
+
+
+def sided(name, ticks, loops, frames, smooth=True):
+    """Authors the LEFT version of a lateral clip and registers the mirrored RIGHT one (NAME_LEFT / NAME_RIGHT)."""
+    clip(f"{name}_LEFT", ticks, loops, frames, smooth)
+    clip(f"{name}_RIGHT", ticks, loops, [(t, flip(f)) for t, f in frames], smooth)
+
+
+def footwork():
+    # ---- strafe (16, loop): the foot on the side of the movement leads out, the other follows without crossing; the
+    # torso leans into the move, the blades on the far side advance to cover the opening (spec 10.4)
+    cover = P(lr("mid", (-24, -90, -62), (-40, 0, 0)))
+
+    def strafe(lead_out, trail_in, bob, lean):
+        return P({"leg_left": (-8, 0, -lead_out), "knee_left": (14 + bob, 0, 0), "leg_right": (-8, 0, trail_in),
+                  "knee_right": (14 + bob, 0, 0), "@pelvis": (0, 1 + bob / 8, 0), "torso": (6, 0, lean),
+                  "head": (-2, 0, 4 - lean * 0.6), "wing_root_left": (0, -38, 0), "wing_root_right": (0, 44, 0)},
+                 base=cover, sym=False)
+    sided("STRAFE", 16, True, [(0, strafe(22, 4, 0, 6)), (4, strafe(14, 0, 14, 3)), (8, strafe(24, 8, 0, 6)),
+                              (12, strafe(14, 2, 14, 3)), (16, strafe(22, 4, 0, 6))])
+    # ---- backpedal (16, loop): short alternating back steps in the guard, the torso a little behind the hips
+    guard_ready = P({"torso": (4, 0, 0)}, lr("top", (-140, 0, -30), (-40, 0, 0)), lr("mid", (-24, -90, -65), (-40, 0, 0)),
+                    lr("low", (-40, 0, -28), (-55, 0, 0)))
+
+    def back_step(front, rear, low):
+        o = dict(guard_ready)
+        o.update({f"leg_{front}": (10, 0, BASE[f"leg_{front}"][2]), f"knee_{front}": (20, 0, 0),
+                  f"leg_{rear}": (-20, 0, BASE[f"leg_{rear}"][2]), f"knee_{rear}": (14, 0, 0),
+                  "@pelvis": (0, 3.0 if low else 1.0, 0), "head": (0, 0, 2)})
+        return o
+    clip("BACKPEDAL", 16, True, [(0, back_step("left", "right", False)), (4, back_step("left", "right", True)),
+                                 (8, back_step("right", "left", False)), (12, back_step("right", "left", True)),
+                                 (16, back_step("left", "right", False))])
+
+    # ---- the dodges (18): anticipation (0-3), the push (3-11), the landing and the return to the guard
+    crouch = P({"@pelvis": (0, 3, 0), "knee_left": (36, 0, 0), "leg_left": (-18, 0, -14), "torso": (14, 0, 12),
+                "head": (-2, 0, -8)}, lr("top", (-150, 0, -35), (-30, 0, 0)), lr("mid", (-24, -90, -80), (-30, 0, 0)))
+    push = P({"@pelvis": (1.5, 2, 0), "knee_left": (14, 0, 0), "leg_left": (-22, 0, -34), "knee_right": (44, 0, 0),
+              "leg_right": (-4, 0, -6), "torso": (12, 0, 16), "head": (-2, 0, -12)}, WING_OPEN, base=crouch)
+    land = P({"@pelvis": (0, 4, 0), "knee_left": (40, 0, 0), "leg_left": (-18, 0, -22), "knee_right": (34, 0, 0),
+              "leg_right": (-14, 0, 6), "torso": (10, 0, 6), "head": (-2, 0, -4)}, base=crouch)
+    sided("DODGE", 18, False, [(0, BASE), (3, crouch), (6, push), (11, push), (13, land), (18, BASE)], smooth=False)
+    # diagonal (back and to the side): the torso arches away
+    d_crouch = P({"@pelvis": (0, 3, 0), "knee_left": (34, 0, 0), "leg_left": (-14, 0, -14), "torso": (4, 0, 10),
+                  "head": (4, 0, -8)}, lr("top", (-150, 0, -35), (-30, 0, 0)), lr("mid", (-24, -90, -80), (-30, 0, 0)))
+    d_push = P({"@pelvis": (1.0, 1.5, 1.5), "knee_left": (12, 0, 0), "leg_left": (-4, 0, -30), "knee_right": (30, 0, 0),
+                "leg_right": (14, 0, -4), "torso": (-8, 0, 14), "head": (6, 0, -10)}, WING_OPEN, base=d_crouch)
+    d_land = P({"@pelvis": (0, 4, 0), "knee_left": (38, 0, 0), "leg_left": (-16, 0, -20), "knee_right": (34, 0, 0),
+                "leg_right": (-10, 0, 6), "torso": (6, 0, 4)}, base=d_crouch)
+    clip("DODGE_DIAG_LEFT", 18, False, [(0, BASE), (3, d_crouch), (6, d_push), (11, d_push), (13, d_land), (18, BASE)],
+         smooth=False)
+    clip("DODGE_DIAG_RIGHT", 18, False, [(t, flip(f)) for t, f in [(0, BASE), (3, d_crouch), (6, d_push), (11, d_push),
+                                                                   (13, d_land), (18, BASE)]], smooth=False)
+    # straight back (16): a hop away with the blades forward and the wings flared
+    b_load = P({"@pelvis": (0, 3, 0), "knee_left": (40, 0, 0), "leg_left": (-20, 0, -8), "torso": (14, 0, 0)},
+               lr("top", (-150, 0, -35), (-30, 0, 0)), lr("mid", (-24, -90, -80), (-30, 0, 0)),
+               lr("low", (-60, 0, -20), (-50, 0, 0)))
+    b_air = P({"@pelvis": (0, -1, 2), "knee_left": (8, 0, 0), "leg_left": (14, 0, -4), "knee_right": (8, 0, 0),
+               "leg_right": (14, 0, 4), "torso": (-10, 0, 0), "head": (6, 0, 0)}, WING_OPEN, base=b_load)
+    b_land = P({"@pelvis": (0, 5, 0), "knee_left": (50, 0, 0), "leg_left": (-26, 0, -9), "torso": (16, 0, 0)}, base=b_load)
+    clip("DODGE_BACK", 16, False, [(0, BASE), (3, b_load), (5, b_air), (9, b_air), (11, b_land), (16, BASE)], smooth=False)
+    # the lean (10): a quick shift of the shoulders and the head, the feet barely move
+    lean = P({"torso": (4, 0, 22), "head": (-2, 0, -16), "@pelvis": (1.0, 1, 0), "wing_root_left": (0, -34, 0)},
+             lr("top", (-150, 0, -35), (-30, 0, 0)))
+    sided("LEAN", 10, False, [(0, BASE), (3, lean), (6, lean), (10, BASE)], smooth=False)
+
+
+def new_blows():
+    # ---- K. Verdict Hammer (44): both upper blades rise crossed over the hood, a long held peak, then the slam (19-21)
+    up = P({"torso": (-10, 0, 0), "head": (-6, 0, 0), "knee_left": (24, 0, 0), "@pelvis": (0, 2, 0)}, WING_OPEN,
+           lr("top", (-170, 0, -28), (-30, 0, 0)), lr("mid", (-24, -90, -80), (-30, 0, 0)))
+    peak = P({"torso": (-16, 0, 0), "head": (-8, 0, 0), "knee_left": (32, 0, 0), "@pelvis": (0, 3, 0)},
+             lr("top", (-178, 28, 8), (-24, 0, 0)), base=up)
+    slam = P({"torso": (34, 0, 0), "head": (14, 0, 0), "knee_left": (46, 0, 0), "leg_left": (-34, 0, -8),
+              "@pelvis": (0, 6, 0)}, lr("top", (-62, 38, 10), (-8, 0, 0)), WING_OPEN, base=peak)
+    rebound = P({"torso": (30, 0, 0), "wing_root_left": (0, -18, -12)}, base=slam)
+    clip("SHIELD_BREAKER", 44, False, [(0, BASE), (8, up), (14, peak), (17, peak), (19, slam), (22, slam), (28, rebound),
+                                      (36, P({"torso": (14, 0, 0)})), (44, BASE)], smooth=False)
+
+    # ---- L. False Verdict (40): a feint with the middle right blade (6-10), a beat of stillness, then a late chop
+    #       (22-24) and a low sweep (28-30)
+    feint = P({"torso": (16, 0, 0), "knee_left": (26, 0, 0), "leg_left": (-30, 0, -6), "@pelvis": (0, 2, -1)},
+              {"arm_mid_right": (-98, 16, 0), "elbow_mid_right": (-8, 0, 0), "wrist_mid_right": (-6, 0, 0)}, sym=False)
+    hold = P({"torso": (6, 0, 0)}, {"arm_mid_right": (-30, -80, 20), "elbow_mid_right": (-30, 0, 0)}, sym=False)
+    lift = P(lr("top", (-170, 0, -22), (-26, 0, 0)), base=hold)
+    chop = P({"torso": (24, 0, 0), "knee_left": (34, 0, 0), "@pelvis": (0, 3, 0)}, lr("top", (-60, 36, 10), (-8, 0, 0)),
+             base=lift)
+    low_wind = P({"torso": (16, 0, 0)}, lr("low", (28, -50, -20), (-10, 0, 0)), base=chop)
+    sweep = P({"torso": (18, 0, 0)}, lr("low", (-50, 52, 0), (-10, 0, 0)), base=low_wind)
+    clip("FALSE_VERDICT", 40, False, [(0, BASE), (5, feint), (9, feint), (13, hold), (17, hold), (20, lift), (22, chop),
+                                      (25, chop), (27, low_wind), (29, sweep), (32, sweep), (40, BASE)], smooth=False)
+
+    # ---- M. Rushing Rebuke (42): load (5), the charge (8-16, running pose), an outward cut (17-19), a return cut (23-25)
+    load = P({"@pelvis": (0, 4, 0), "knee_left": (46, 0, 0), "leg_left": (-34, 0, -8), "torso": (26, 0, 0),
+              "head": (-14, 0, 0)}, lr("top", (40, 0, -20), (-40, 0, 0)), lr("mid", (-10, -90, -40), (-30, 0, 0)),
+             lr("low", (-40, 0, -20), (-40, 0, 0)))
+
+    def charge(front, back, low):
+        o = dict(load)
+        o.update({f"leg_{front}": (-52, 0, 0), f"knee_{front}": (32, 0, 0), f"leg_{back}": (32, 0, 0),
+                  f"knee_{back}": (42, 0, 0), "@pelvis": (0, 4 if low else 1, 0), "torso": (30, 0, 0),
+                  "wing_root_left": (0, -28, 0)})
+        return o
+    cut_out = P({"torso": (18, -30, 0), "knee_left": (40, 0, 0), "leg_left": (-36, 0, -8), "@pelvis": (0, 4, 0)},
+                {"arm_top_right": (-90, -58, 0), "elbow_top_right": (-10, 0, 0), "arm_top_left": (-150, 20, -30)},
+                sym=False, base=P(lr("mid", (-24, -90, -70), (-40, 0, 0))))
+    cut_back = P({"torso": (16, 34, 0)}, {"arm_top_left": (-92, 56, 0), "elbow_top_left": (-10, 0, 0),
+                                            "arm_top_right": (-150, -20, 30)}, sym=False, base=cut_out)
+    clip("RUSHING_REBUKE", 42, False, [(0, BASE), (5, load), (8, charge("left", "right", False)),
+                                       (10, charge("left", "right", True)), (13, charge("right", "left", False)),
+                                       (16, charge("right", "left", True)), (17, cut_out), (19, cut_out), (21, cut_out),
+                                       (23, cut_back), (26, cut_back), (32, P({"torso": (14, 0, 0)})), (42, BASE)],
+         smooth=False)
+
+
 presentation()
 locomotion()
 defence()
 attacks()
 idles()
 transition()
+footwork()
+new_blows()

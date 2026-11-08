@@ -34,7 +34,6 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.TEN_THREADS_WITCH_SPAWN_EGG.get());
                         output.accept(ModItems.FEY_RAVEN_SPAWN_EGG.get());
                         output.accept(ModItems.BRIMSTONE_SALAMANDER_SPAWN_EGG.get());
-                        output.accept(ModItems.ARCHITECT_SPAWN_EGG.get());
                     })
                     .build());
 
@@ -46,7 +45,6 @@ public final class ModCreativeTabs {
             event.accept(ModItems.RENEGADE_GREATAXE.get());
             event.accept(ModItems.DEADROOT_CLUB.get());
             event.accept(ModItems.CRIMSON_OATH_GREATSWORD.get());
-            event.accept(ModItems.ARCHITECT_SCIMITAR.get());
             event.accept(ModItems.TEN_THREADS_STAFF.get());
             event.accept(ModItems.REDCAP_DAGGER.get());
             event.accept(ModItems.REDCAP_PIKESTAFF.get());
@@ -57,7 +55,6 @@ public final class ModCreativeTabs {
             event.accept(ModItems.HOLLOW_TRUNK_IDOL.get());
             event.accept(ModItems.STAINED_OATH_CREST.get());
             event.accept(ModItems.CURSED_SPINDLE.get());
-            event.accept(ModItems.COMMANDMENT_TABLET.get());
         } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.REDCAP_NAIL.get());
             event.accept(ModItems.REDCAP_TOOTH.get());
@@ -87,7 +84,6 @@ public final class ModCreativeTabs {
             event.accept(ModItems.TEN_THREADS_WITCH_SPAWN_EGG.get());
             event.accept(ModItems.FEY_RAVEN_SPAWN_EGG.get());
             event.accept(ModItems.BRIMSTONE_SALAMANDER_SPAWN_EGG.get());
-            event.accept(ModItems.ARCHITECT_SPAWN_EGG.get());
         }
     }
 

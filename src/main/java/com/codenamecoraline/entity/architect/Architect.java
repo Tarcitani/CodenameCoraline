@@ -60,22 +60,41 @@ import org.jspecify.annotations.Nullable;
  * decisions (target, attack choice, chase, guard, rest). The client only reads the synchronized state and clip.</p>
  */
 public final class Architect extends Monster {
-    public static final float WIDTH = 1.55F;
-    public static final float HEIGHT = 3.35F;
-    public static final float EYE_HEIGHT = 2.95F;
+    /**
+     * Reform scale: the body grew from 3.35 to 4.7 blocks (x1.4; the Last Gift Collector, the tallest boss, is 4.5). The
+     * volumes, ranges and heights of the spec are written for the old body and pass through this factor
+     * ({@link ArchitectStrikes}, the range constants below, the rig in tools/generate_architect_assets.py).
+     */
+    public static final float SCALE = 1.4F;
+    public static final float WIDTH = 1.9F;
+    public static final float HEIGHT = 4.7F;
+    public static final float EYE_HEIGHT = 4.1F;
+    /** Height of the sternum seal above his feet, where the mana pulses come from. */
+    public static final double STERNUM_Y = 2.3D * SCALE;
 
     public static final double MAX_HEALTH = 480.0D;
     public static final double ARMOR = 16.0D;
     public static final double ARMOR_TOUGHNESS = 8.0D;
-    public static final double BASE_DAMAGE = 12.0D;
+    /**
+     * Reform (spec §23, balance in design/architect.md §27): 12 -> 20. Against full Netherite with Protection IV (armor 20,
+     * toughness 12, 64 % from the enchantment) a 12-point blow did about 1 HP per cut and the fight had no teeth; at 20 plus
+     * the mana rend below a cut costs that player about 2 HP and a whole Sixfold Edict about 8.
+     */
+    public static final double BASE_DAMAGE = 20.0D;
+    /** Share of every blow that arrives as mana (indirect magic): it ignores armor but not the Protection enchantments. */
+    public static final float MANA_REND = 0.25F;
+    /** One blow never takes more than half of a victim's maximum health (no deleting a lightly armored player in a combo). */
+    public static final float BLOW_HEALTH_CAP = 0.5F;
+    /** Damage multiplier by Phase ordinal: the Administrator hits 10 % harder and the Collapse 20 %. */
+    public static final float[] PHASE_DAMAGE = {1.0F, 1.0F, 1.1F, 1.2F};
     public static final double BASE_SPEED = 0.30D;
     public static final double KNOCKBACK_RESISTANCE = 0.95D;
     public static final double FOLLOW_RANGE = 48.0D;
     public static final int XP_REWARD = 500;
-    public static final double STEP_HEIGHT = 1.1D;
+    public static final double STEP_HEIGHT = 1.5D;
 
     /** Falls shorter than this are absorbed by the wings (spec §11.1). */
-    public static final double SAFE_FALL_BLOCKS = 6.0D;
+    public static final double SAFE_FALL_BLOCKS = 8.0D;
 
     /** Health fractions where the fight changes phase (spec §12.2). */
     public static final float PHASE_ADMINISTRATOR_BELOW = 0.70F;
@@ -102,24 +121,36 @@ public final class Architect extends Monster {
     public static final int DEFLECT_COOLDOWN = 40;
     public static final float WINGS_OPEN_BACK_BONUS = 1.25F;
     public static final double BACK_ANGLE = 120.0D;
-    public static final double BACKSTEP_DISTANCE = 1.5D;
+    public static final double BACKSTEP_DISTANCE = 1.5D * SCALE;
     public static final int BACKSTEP_MOVE_TICKS = 12;
 
     // ---- attack flow (spec §12.1, §13)
-    private static final int[] GLOBAL_COOLDOWN = {10, 10, 8, 6}; // by Phase ordinal
+    private static final int[] GLOBAL_COOLDOWN = {8, 8, 6, 4}; // by Phase ordinal
     private static final int[] PARRY_COOLDOWN = {100, 100, 80, 120};
     public static final float COLLAPSE_RECOVERY_FACTOR = 1.3F;
     public static final float COLLAPSE_COMBO_CHANCE = 0.5F;
     public static final int COMBO_PAUSE = 8;
+    public static final float[] CHAIN_CHANCE = {0.0F, 0.50F, 0.60F, 0.75F}; // by Phase ordinal
+    public static final int CHAIN_WINDOW = 14;
     public static final double ATTACK_FACING_DEGREES = 20.0D;
-    public static final float TURN_DEGREES_PER_TICK = 9.0F;
-    public static final double ANTI_WHIFF_MARGIN = 1.0D;
-    public static final double CLOSE_RANGE = 1.5D;
-    public static final double SHORT_RANGE = 3.2D;
-    public static final double MEDIUM_RANGE = 7.0D;
-    public static final double SIEGE_RADIUS = 4.0D;
-    public static final double WHEEL_CLEARANCE = 3.0D;
-    public static final double LUNGE_DISTANCE = 1.5D;
+    public static final float TURN_DEGREES_PER_TICK = 20.0F;
+    /** The head leads the body (spec §10): it turns faster and may sit this far off the body axis. */
+    public static final float HEAD_TURN_DEGREES_PER_TICK = 28.0F;
+    public static final float HEAD_MAX_OFFSET = 80.0F;
+    /** A blow tracks its target through the wind-up and locks its direction this many ticks before the first volume. */
+    public static final int AIM_LOCK_LEAD = 6;
+    public static final float AIM_DEGREES_PER_TICK = 10.0F;
+    public static final double ANTI_WHIFF_MARGIN = 1.0D * SCALE;
+    public static final double CLOSE_RANGE = 1.5D * SCALE;
+    public static final double SHORT_RANGE = 3.2D * SCALE;
+    public static final double MEDIUM_RANGE = 7.0D * SCALE;
+    public static final double SIEGE_RADIUS = 4.0D * SCALE;
+    public static final double WHEEL_CLEARANCE = 3.0D * SCALE;
+    public static final double LUNGE_DISTANCE = 1.5D * SCALE;
+    /** The Rushing Rebuke's charge: covered over ticks RUSH_FROM..RUSH_TO without any damage volume. */
+    public static final double RUSH_DISTANCE = 4.2D;
+    public static final int RUSH_FROM = 8;
+    public static final int RUSH_TO = 16;
     public static final int LUNGE_FROM = 9;
     public static final int LUNGE_TO = 12;
 
@@ -128,23 +159,41 @@ public final class Architect extends Monster {
     public static final int LEAP_APEX_TICK = 17;
     public static final int LEAP_DIVE_TICK = 24;
     public static final int LEAP_LAND_TICK = 32;
-    public static final double LEAP_MAX_HORIZONTAL = 5.0D;
-    public static final double LEAP_MIN_APEX = 4.0D;
-    public static final double LEAP_RUNE_RADIUS = 1.5D;
+    public static final double LEAP_MAX_HORIZONTAL = 5.0D * SCALE;
+    public static final double LEAP_MIN_APEX = 4.0D * SCALE;
+    public static final double LEAP_RUNE_RADIUS = 1.5D * SCALE;
 
     // ---- targeting, leash and rest (spec §12.3; leash [ADP] until the arena exists)
-    public static final double LEASH_RADIUS = 32.0D;
+    public static final double LEASH_RADIUS = 36.0D;
     public static final int TARGET_SCAN_INTERVAL = 10;
-    public static final float CHALLENGER_SWITCH_FRACTION = 0.15F;
+    /** A target switch needs a clearly better candidate and then freezes the choice for a while (no spinning on players). */
+    public static final float TARGET_SWITCH_MARGIN = 1.25F;
+    public static final int TARGET_SWITCH_LOCK = 60;
     public static final int REST_AFTER_TICKS = 200;
     public static final int IDLE_VARIANT_MIN = 100;
     public static final int IDLE_VARIANT_SPREAD = 100;
-    public static final double PILLAR_MIN_HEIGHT = 3.0D;
+    public static final double PILLAR_MIN_HEIGHT = 3.0D * SCALE;
     public static final int PILLAR_TICKS = 60;
     public static final double REVEAL_PROTECTION_RADIUS = 24.0D;
-    public static final double WALK_SPEED = 0.8D;
-    public static final double RUN_SPEED = 1.4D;
-    public static final double ENRAGE_PUSH_RADIUS = 4.0D;
+    /** Speed modifiers on BASE_SPEED (0.30), top speed is about 1.04 x BASE_SPEED x modifier blocks/tick: walking 0.2 (4 b/s), running 0.34 (6.8 b/s, above a sprinting player at 5.6; 1.5 gave 0.44 and was too fast to kite). */
+    public static final double WALK_SPEED = 0.65D;
+    public static final double RUN_SPEED = 1.1D;
+
+    // ---- footwork and evasion (reform): blocks per tick and tick counts of the by-hand movements
+    public static final double STRAFE_SPEED = 0.17D;
+    public static final double BACKPEDAL_SPEED = 0.15D;
+    public static final int DODGE_STARTUP = 3;
+    public static final int DODGE_MOVE_TICKS = 8;
+    public static final int COUNTER_WINDOW = 26;
+    public static final int[] DODGE_COOLDOWN = {55, 55, 45, 35}; // by Phase ordinal
+    public static final float[] DODGE_CHANCE = {0.0F, 0.28F, 0.36F, 0.44F}; // per read (every 5 ticks) when threatened
+    public static final int MAX_DODGES_IN_ROW = 2;
+    /** He never stays in the pose reading the fight for longer than this when nothing else is chosen. */
+    public static final int READ_MAX_TICKS = 12;
+    /** Shield pressure: the points a player blocking accumulates before the Verdict Hammer is wanted. */
+    public static final int SHIELD_PRESSURE_THRESHOLD = 36;
+    public static final float DISABLE_SHIELD_SECONDS = 5.0F;
+    public static final double ENRAGE_PUSH_RADIUS = 4.0D * SCALE;
     /** The three rest idles drawn out of combat (MOB_CONTRACT §3.2). */
     private static final ArchitectAnim[] REST_IDLES = {
             ArchitectAnim.MANIACAL_LAUGH, ArchitectAnim.IDLE_BLADE_INSPECT, ArchitectAnim.IDLE_WING_ADJUST};
@@ -166,6 +215,8 @@ public final class Architect extends Monster {
     public static final byte EVENT_PARRY = (byte) 170;
     public static final byte EVENT_STAGGER = (byte) 171;
     public static final byte EVENT_GARGOYLE_IMPACT = (byte) 172;
+    public static final byte EVENT_DODGE = (byte) 173;
+    public static final byte EVENT_SHIELD_BREAK = (byte) 174;
     public static final byte EVENT_ENRAGE = (byte) 177;
     public static final byte EVENT_DEATH = (byte) 178;
 
@@ -182,6 +233,8 @@ public final class Architect extends Monster {
             SynchedEntityData.defineId(Architect.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DATA_ANIM =
             SynchedEntityData.defineId(Architect.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> DATA_LOCKED_YAW =
+            SynchedEntityData.defineId(Architect.class, EntityDataSerializers.FLOAT);
 
     /** Client-side clock of the current clip, restarted whenever the server changes the clip. */
     public final AnimationState animState = new AnimationState();
@@ -204,12 +257,40 @@ public final class Architect extends Monster {
     private final Map<Integer, float[]> hitsByVictim = new HashMap<>(); // id -> {hits, damage in DB, strike bitmask}
     private final int[] cooldowns = new int[ArchitectAttack.values().length];
     private final float[] weights = new float[ArchitectAttack.values().length];
-    private final ArchitectAttack[] recentAttacks = new ArchitectAttack[3];
+    private final ArchitectAttack[] recentAttacks = new ArchitectAttack[4];
+    private final int[] attackUses = new int[ArchitectAttack.values().length];
     private int recentIndex;
     private @Nullable ArchitectAttack lastAttack;
     private int globalCooldown;
     private boolean comboArmed;
     private boolean staggerPending;
+
+    // ---- tactics (reform): footwork, dodges, chains and the reading of the shield
+    private Tactic tactic = Tactic.READ;
+    private int tacticTicks;
+    private int tacticLimit;
+    private int strafeSide = 1; // +1 = his left
+    private int sideSwitchTick;
+    private @Nullable Dodge dodge;
+    private int dodgeCooldown;
+    private int dodgesInRow;
+    private int counterTicks;
+    private double dodgeStepX;
+    private double dodgeStepZ;
+    private int shieldScore;
+    private int idleTicks;
+    private int unreachableTicks;
+    private final java.util.EnumSet<ArchitectAttack> chain = java.util.EnumSet.noneOf(ArchitectAttack.class);
+    private int chainTicks;
+    private boolean lastBlow;
+    private float attackYaw;
+    private @Nullable Dodge lastDodge;
+    private @Nullable LivingEntity dodgeTarget;
+    private int footworkTick = -1000;
+    private int recentHits;
+    private int dodges;
+    private int shieldsBroken;
+    private int blowsPunished;
 
     // ---- Gargoyle Fall
     private Vec3 leapFrom = Vec3.ZERO;
@@ -239,8 +320,9 @@ public final class Architect extends Monster {
     private int noTargetTicks;
     private int nextIdleVariantTick;
     private int pillarTicks;
-    private @Nullable UUID challenger;
-    private float challengerDamage;
+    /** Threat table of the targeting (spec reform §12.4): damage dealt, decayed, and when each foe was last the target. */
+    private final Map<UUID, float[]> threats = new HashMap<>(); // uuid -> {damage, last targeted tick}
+    private int retargetLockUntil;
     private int lastAggressionTick = -1000;
     private int aggressorId = -1;
     private Phase reachedPhase = Phase.DUELIST;
@@ -265,7 +347,46 @@ public final class Architect extends Monster {
         PARRYING,
         STAGGERED,
         PHASE_TRANSITION,
-        DYING
+        DYING,
+        /** A physical evasive move (side step, back step, diagonal, lean) with its own clip, run by tickDodge. */
+        DODGING
+    }
+
+    /** What he does with his feet while the state is COMBAT_IDLE (the brain's sub-state; never synchronized). */
+    private enum Tactic {
+        /** Poised and reading the opponent, for at most READ_MAX_TICKS. */
+        READ,
+        /** Closing the distance on foot (walk or run by distance). */
+        ADVANCE,
+        /** Sliding sideways around the target, facing it. */
+        CIRCLE,
+        /** Backing away to open the distance, facing the target. */
+        RETREAT
+    }
+
+    /** The evasive moves: direction as seen from his body (0 ahead, positive to his left), distance in blocks. */
+    public enum Dodge {
+        LEFT(90.0D, 4.0D, ArchitectAnim.DODGE_LEFT),
+        RIGHT(-90.0D, 4.0D, ArchitectAnim.DODGE_RIGHT),
+        BACK(180.0D, 3.8D, ArchitectAnim.DODGE_BACK),
+        DIAG_LEFT(135.0D, 4.2D, ArchitectAnim.DODGE_DIAG_LEFT),
+        DIAG_RIGHT(-135.0D, 4.2D, ArchitectAnim.DODGE_DIAG_RIGHT),
+        LEAN_LEFT(90.0D, 1.1D, ArchitectAnim.LEAN_LEFT),
+        LEAN_RIGHT(-90.0D, 1.1D, ArchitectAnim.LEAN_RIGHT);
+
+        public final double angle;
+        public final double distance;
+        public final ArchitectAnim anim;
+
+        Dodge(double angle, double distance, ArchitectAnim anim) {
+            this.angle = angle;
+            this.distance = distance;
+            this.anim = anim;
+        }
+
+        public boolean isLean() {
+            return this == LEAN_LEFT || this == LEAN_RIGHT;
+        }
     }
 
     /** Fight phases; MONUMENT is the disguise, the rest follow health (spec §12.2). */
@@ -300,6 +421,7 @@ public final class Architect extends Monster {
         super.defineSynchedData(builder);
         builder.define(DATA_STATE, State.DORMANT.ordinal());
         builder.define(DATA_ANIM, ArchitectAnim.DORMANT_STATUE.ordinal());
+        builder.define(DATA_LOCKED_YAW, 0.0F);
     }
 
     @Override
@@ -337,6 +459,15 @@ public final class Architect extends Monster {
             this.entityData.set(DATA_ANIM, anim.ordinal());
             this.animStartTick = this.tickCount;
         }
+    }
+
+    public float getLockedYaw() {
+        return this.entityData.get(DATA_LOCKED_YAW);
+    }
+
+    public void setLockedYaw(float yaw) {
+        this.lockedYaw = yaw;
+        this.entityData.set(DATA_LOCKED_YAW, yaw);
     }
 
     @Override
@@ -440,6 +571,7 @@ public final class Architect extends Monster {
                 case PHASE_TRANSITION -> this.tickTransition();
                 case GUARDING -> this.tickGuard();
                 case REPOSITION -> this.tickBackstep();
+                case DODGING -> this.tickDodge(level);
                 case COMBAT_IDLE -> this.tickIdleClip();
                 default -> {
                 }
@@ -451,31 +583,67 @@ public final class Architect extends Monster {
             this.setDeltaMovement(0.0D, this.airborne ? 0.0D : Math.min(0.0D, this.getDeltaMovement().y), 0.0D);
         }
         if (this.locksFacing()) {
-            this.face(this.lockedYaw);
+            this.face(this.getLockedYaw());
         } else if (this.isDormant() || this.getState() == State.AWAKENING) {
             this.face(this.getYRot());
+        }
+        if (!this.level().isClientSide() && this.isAlive()) {
+            this.updateHead();
         }
     }
 
     /** States in which he does not walk (the lunge, the backstep and the leap move him by hand). */
     private boolean isRooted() {
         return switch (this.getState()) {
-            case DORMANT, AWAKENING, ATTACKING, PARRYING, STAGGERED, PHASE_TRANSITION, REPOSITION, DYING -> true;
+            case DORMANT, AWAKENING, ATTACKING, PARRYING, STAGGERED, PHASE_TRANSITION, REPOSITION, DYING, DODGING -> true;
             default -> false;
         };
     }
 
     private boolean locksFacing() {
         State s = this.getState();
-        return s == State.ATTACKING || s == State.PARRYING || s == State.REPOSITION;
+        return s == State.ATTACKING || s == State.PARRYING || s == State.REPOSITION || s == State.DODGING;
     }
 
+    /** Snaps body, head and the interpolation to {@code yaw}: only for locked poses (a blow in flight, a dodge). */
     private void face(float yaw) {
         this.setYRot(yaw);
         this.yRotO = yaw;
-        this.setYHeadRot(yaw);
         this.yBodyRot = yaw;
         this.yBodyRotO = yaw;
+        this.setYHeadRot(yaw);
+        this.yHeadRotO = yaw;
+    }
+
+    /** Turns the body toward {@code yaw} by at most {@code step} degrees, keeping the interpolation smooth. */
+    private void turnBody(float yaw, float step) {
+        float next = Mth.approachDegrees(this.getYRot(), yaw, step);
+        this.setYRot(next);
+        this.yBodyRot = next;
+    }
+
+    /**
+     * The head leads the body (spec §10: head first, then shoulders, torso and hips): it follows the target faster than
+     * the body and may sit up to HEAD_MAX_OFFSET degrees off the body axis. The renderer turns the difference into the
+     * neck, the head and a little of the torso. The head is server state, so every client sees the same gaze.
+     */
+    private void updateHead() {
+        LivingEntity target = this.getTarget();
+        if (this.isNoAi() || target == null || !this.isFoe(target) || this.isDormant()
+                || this.getState() == State.AWAKENING || this.getState() == State.DYING
+                || this.getState() == State.STAGGERED) {
+            if (this.getState() == State.STAGGERED || this.getState() == State.DYING) {
+                this.setYHeadRot(this.yBodyRot);
+            }
+            return;
+        }
+        float wanted = yawTowards(this, target);
+        float offset = Mth.clamp(Mth.wrapDegrees(wanted - this.yBodyRot), -HEAD_MAX_OFFSET, HEAD_MAX_OFFSET);
+        float goal = this.yBodyRot + offset;
+        this.setYHeadRot(Mth.approachDegrees(this.getYHeadRot(), goal, HEAD_TURN_DEGREES_PER_TICK));
+        double dy = target.getEyeY() - this.getEyeY();
+        double flat = Math.max(1.0E-3D, horizontalDistance(this, target));
+        this.setXRot(Mth.clamp((float) -(Mth.atan2(dy, flat) * Mth.RAD_TO_DEG), -25.0F, 25.0F));
     }
 
     private void tickCounters() {
@@ -498,6 +666,22 @@ public final class Architect extends Monster {
         }
         if (this.tickCount - this.lastHurtTick > 20 && this.posture > 0.0F) {
             this.posture = Math.max(0.0F, this.posture - POSTURE_DECAY_PER_TICK);
+        }
+        if (this.dodgeCooldown > 0) {
+            this.dodgeCooldown--;
+        }
+        if (this.counterTicks > 0) {
+            this.counterTicks--;
+        }
+        if (this.tickCount - this.lastHurtTick > 20) {
+            this.recentHits = 0;
+        }
+        if (this.tickCount % 20 == 0) {
+            this.decayThreats();
+        }
+        LivingEntity watched = this.getTarget();
+        if (watched != null) {
+            this.watchShield(watched);
         }
     }
 
@@ -531,8 +715,13 @@ public final class Architect extends Monster {
         if (variantPlaying) {
             return;
         }
+        if (this.isStepping()) { // by-hand footwork: the clip names the direction of the feet
+            this.setAnim(this.tactic == Tactic.RETREAT ? ArchitectAnim.BACKPEDAL
+                    : this.strafeSide > 0 ? ArchitectAnim.STRAFE_LEFT : ArchitectAnim.STRAFE_RIGHT);
+            return;
+        }
         double speed = this.getDeltaMovement().horizontalDistanceSqr();
-        this.setAnim(speed > 0.04D ? ArchitectAnim.RUN : speed > 1.0E-4D ? ArchitectAnim.WALK : ArchitectAnim.BATTLE_IDLE);
+        this.setAnim(speed > 0.06D ? ArchitectAnim.RUN : speed > 1.0E-4D ? ArchitectAnim.WALK : ArchitectAnim.BATTLE_IDLE);
     }
 
     private void tickGuard() {
@@ -548,25 +737,31 @@ public final class Architect extends Monster {
     private void tickStagger() {
         if (this.stateTicks >= ArchitectAnim.STAGGER.ticks) {
             this.setState(State.COMBAT_IDLE);
+            this.pause(0, 3);
         }
     }
 
     // ================================================================= attacks: the four phases
     /**
-     * Starts an attack against {@code target} now: the direction is locked here and never corrected afterwards (spec
-     * §13.0). The brain calls it after its checks; the GameTests call it directly.
+     * Starts an attack against {@code target} now. The blow aims at the target through its wind-up (AIM_DEGREES_PER_TICK)
+     * and locks the direction AIM_LOCK_LEAD ticks before the first volume (spec §13.0, reform): he never swings at where
+     * the target was a second ago, and the last 6 ticks are the fair window to sidestep. The brain calls it after its
+     * checks; the GameTests call it directly.
      */
     public void startAttack(ArchitectAttack type, LivingEntity target) {
         this.attack = type;
         this.attackTarget = target;
-        this.lockedYaw = yawTowards(this, target);
+        this.setLockedYaw(yawTowards(this, target));
         this.face(this.lockedYaw);
+        this.lastBlow = false;
+        this.dodge = null;
         this.attackVariant = this.variantFor(type, target);
         this.extraRecovery = this.reachedPhase == Phase.COLLAPSE
                 ? Math.round((type.ticks() - type.recoveryStart) * (COLLAPSE_RECOVERY_FACTOR - 1.0F)) : 0;
         this.hitsByVictim.clear();
         this.staggerPending = false;
         this.cooldowns[type.ordinal()] = type.cooldown;
+        this.attackUses[type.ordinal()]++;
         this.recentAttacks[this.recentIndex] = type;
         this.recentIndex = (this.recentIndex + 1) % this.recentAttacks.length;
         this.lastAttack = type;
@@ -621,6 +816,7 @@ public final class Architect extends Monster {
             return;
         }
         int t = this.stateTicks;
+        this.trackAim(a, t);
         if (a == ArchitectAttack.GARGOYLE_FALL) {
             if (!this.tickLeap(level, t)) {
                 return;
@@ -631,6 +827,9 @@ public final class Architect extends Monster {
         }
         if (a == ArchitectAttack.PIERCING_SENTENCE && t >= LUNGE_FROM && t <= LUNGE_TO) {
             this.moveAlong(this.lockedYaw, LUNGE_DISTANCE / (LUNGE_TO - LUNGE_FROM + 1));
+        }
+        if (a == ArchitectAttack.RUSHING_REBUKE && t >= RUSH_FROM && t <= RUSH_TO) {
+            this.rush(level);
         }
         if (a == ArchitectAttack.SIXFOLD_EDICT && this.attackVariant && t >= 14 && t <= 16) {
             this.moveAlong(this.lockedYaw, -1.0D / 3.0D); // the pelvis steps back before the bilateral sweep
@@ -656,6 +855,28 @@ public final class Architect extends Monster {
         }
     }
 
+    /** Until the lock tick the blow turns toward its target (limited, so a sidestep during the wind-up still works). */
+    private void trackAim(ArchitectAttack a, int t) {
+        LivingEntity target = this.attackTarget;
+        if (target == null || !target.isAlive() || a == ArchitectAttack.GARGOYLE_FALL || this.isNoAi()
+                || t >= Math.max(1, a.firstActiveTick - AIM_LOCK_LEAD)) {
+            return;
+        }
+        this.setLockedYaw(Mth.approachDegrees(this.lockedYaw, yawTowards(this, target), AIM_DEGREES_PER_TICK));
+        this.face(this.lockedYaw);
+    }
+
+    /** The Rushing Rebuke's charge: a real run along the locked direction, stopping short of the target and of walls. */
+    private void rush(ServerLevel level) {
+        double step = RUSH_DISTANCE / (RUSH_TO - RUSH_FROM + 1);
+        LivingEntity target = this.attackTarget;
+        if (target != null) {
+            double gap = horizontalDistance(this, target) - (target.getBbWidth() + this.getBbWidth()) / 2.0D - 0.3D;
+            step = Math.min(step, Math.max(0.0D, gap));
+        }
+        this.moveSafely(level, this.lockedYaw, step, 0.0D);
+    }
+
     /** Index of a Sixfold cut among the six (the close variation replaces the third one). */
     private int sixfoldCutIndex(int strikeIndex) {
         return strikeIndex <= 2 ? strikeIndex : strikeIndex - 1;
@@ -663,7 +884,7 @@ public final class Architect extends Monster {
 
     /** Anti-whiff (MOB_CONTRACT §3.2): the blow only lands if some foe is still within its reach and arc. */
     private boolean anyFoeReachable(ServerLevel level, ArchitectAttack a) {
-        double extra = a == ArchitectAttack.PIERCING_SENTENCE ? LUNGE_DISTANCE : 0.0D;
+        double extra = a == ArchitectAttack.PIERCING_SENTENCE ? LUNGE_DISTANCE : 0.0D; // the charge of M is over by tick 16
         double reach = a.reach + extra + ANTI_WHIFF_MARGIN;
         boolean anyAngle = a == ArchitectAttack.CARTENON_WHEEL;
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class,
@@ -671,7 +892,7 @@ public final class Architect extends Monster {
             double d = horizontalDistance(this, e) - e.getBbWidth() / 2.0D;
             double dy = e.getY() - this.getY();
             double angle = ArchitectStrikes.angleOf(e.getX() - this.getX(), e.getZ() - this.getZ(), this.lockedYaw);
-            if (d <= reach && dy > -2.0D && dy < 4.0D && (anyAngle || Math.abs(angle) <= 100.0D)) {
+            if (d <= reach && dy > -2.0D * SCALE && dy < 4.0D * SCALE && (anyAngle || Math.abs(angle) <= 100.0D)) {
                 return true;
             }
         }
@@ -687,6 +908,8 @@ public final class Architect extends Monster {
     }
 
     private void finishAttack() {
+        ArchitectAttack done = this.attack;
+        LivingEntity victim = this.attackTarget;
         this.attack = null;
         this.attackTarget = null;
         if (this.staggerPending) {
@@ -696,10 +919,74 @@ public final class Architect extends Monster {
         this.setState(State.COMBAT_IDLE);
         this.globalCooldown = GLOBAL_COOLDOWN[this.reachedPhase.ordinal()];
         this.comboArmed = false;
-        if (this.reachedPhase == Phase.COLLAPSE && this.random.nextFloat() < COLLAPSE_COMBO_CHANCE) {
+        this.dodgesInRow = 0; // a blow thrown: the evasion budget is paid back
+        this.pause(1, 3);
+        this.armChain(done, victim);
+        if (this.chain.isEmpty() && this.reachedPhase == Phase.COLLAPSE && this.random.nextFloat() < COLLAPSE_COMBO_CHANCE) {
             this.globalCooldown = COMBO_PAUSE; // spec §12.2: two physical blows chained with an 8-tick pause
             this.comboArmed = true;
         }
+    }
+
+    /**
+     * Combat transitions (reform §12.5): after a blow he may follow with a specific one, chosen from what the target did,
+     * not at random. The follow-up ignores its own cooldown, is re-validated against distance and facing when it is
+     * picked, and is dropped silently when it no longer makes sense. Telegraphs are never skipped: every blow of the
+     * chain has its own wind-up.
+     */
+    private void armChain(@Nullable ArchitectAttack done, @Nullable LivingEntity victim) {
+        this.chain.clear();
+        this.chainTicks = 0;
+        boolean punish = done == ArchitectAttack.SHIELD_BREAKER && victim != null && !victim.isBlocking(); // the shield is down: always
+        if (done == null || victim == null || !victim.isAlive()
+                || !punish && this.random.nextFloat() >= CHAIN_CHANCE[this.reachedPhase.ordinal()]) {
+            return;
+        }
+        boolean jumped = isInAir(victim);
+        boolean shielding = victim.isBlocking();
+        double dist = horizontalDistance(this, victim);
+        switch (done) {
+            case SIXFOLD_EDICT -> this.chainFor(shielding ? ArchitectAttack.SHIELD_BREAKER : ArchitectAttack.CROSSED_MANDATE,
+                    ArchitectAttack.SPLITTER_CRESCENT);
+            case CROSSED_MANDATE -> {
+                if (jumped || dist <= CLOSE_RANGE) {
+                    this.chainFor(ArchitectAttack.SPLITTER_CRESCENT);
+                } else {
+                    this.chainFor(ArchitectAttack.PIERCING_SENTENCE, ArchitectAttack.RUSHING_REBUKE);
+                }
+            }
+            case SPLITTER_CRESCENT -> this.chainFor(dist > SHORT_RANGE ? ArchitectAttack.PIERCING_SENTENCE : ArchitectAttack.SIXFOLD_EDICT);
+            case PIERCING_SENTENCE -> this.chainFor(ArchitectAttack.SIXFOLD_EDICT, ArchitectAttack.CROSSED_MANDATE);
+            case RUSHING_REBUKE -> this.chainFor(ArchitectAttack.SIXFOLD_EDICT, ArchitectAttack.SPLITTER_CRESCENT);
+            case FALSE_VERDICT -> this.chainFor(shielding ? ArchitectAttack.SHIELD_BREAKER : ArchitectAttack.SIXFOLD_EDICT);
+            case SHIELD_BREAKER -> {
+                if (!victim.isBlocking()) { // the shield is down: punish it before it comes back
+                    this.blowsPunished++;
+                    this.chainFor(ArchitectAttack.SIXFOLD_EDICT, ArchitectAttack.CROSSED_MANDATE);
+                }
+            }
+            default -> {
+            }
+        }
+        if (!this.chain.isEmpty()) {
+            this.chainTicks = CHAIN_WINDOW;
+            this.globalCooldown = COMBO_PAUSE;
+        }
+    }
+
+    private void chainFor(ArchitectAttack... options) {
+        for (ArchitectAttack a : options) {
+            if (a.minPhase.ordinal() <= this.reachedPhase.ordinal()) {
+                this.chain.add(a);
+            }
+        }
+    }
+
+    /** The vanilla hook that makes a blocked blow disable the shield: only the Verdict Hammer carries it (spec reform §13.K). */
+    @Override
+    public float getSecondsToDisableBlocking() {
+        ArchitectAttack a = this.attack;
+        return this.getState() == State.ATTACKING && a != null && a.breaksShield() ? DISABLE_SHIELD_SECONDS : 0.0F;
     }
 
     /**
@@ -708,7 +995,7 @@ public final class Architect extends Monster {
      */
     private void applyStrike(ServerLevel level, ArchitectAttack a, int index, Strike s, @Nullable LivingEntity only) {
         double r = s.reach() + 1.0D;
-        float base = (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        float base = (float) this.getAttributeValue(Attributes.ATTACK_DAMAGE) * PHASE_DAMAGE[this.reachedPhase.ordinal()];
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class,
                 this.getBoundingBox().inflate(r, 1.0D, r), this.foeInLeash)) {
             if (only != null && e != only) {
@@ -717,9 +1004,10 @@ public final class Architect extends Monster {
             if (!ArchitectStrikes.hits(s, this.getX(), this.getY(), this.getZ(), this.lockedYaw, e.getBoundingBox())) {
                 continue;
             }
-            float[] record = this.hitsByVictim.computeIfAbsent(e.getId(), id -> new float[3]);
+            float[] record = this.hitsByVictim.computeIfAbsent(e.getId(), id -> new float[4]);
             int mask = (int) record[2];
-            if ((mask & (1 << index)) != 0 || record[0] >= a.maxHitsPerTarget || record[1] >= a.maxDamagePerTarget) {
+            if ((mask & (1 << index)) != 0 || record[0] >= a.maxHitsPerTarget || record[1] >= a.maxDamagePerTarget
+                    || record[3] >= e.getMaxHealth() * BLOW_HEALTH_CAP) {
                 continue;
             }
             float db = Math.min(s.damage(), a.maxDamagePerTarget - record[1]);
@@ -727,10 +1015,23 @@ public final class Architect extends Monster {
             record[1] += db;
             record[2] = mask | (1 << index);
             e.invulnerableTime = 0; // each cut of a combo is its own blow (the spec's per-victim limits apply instead)
-            if (e.hurtServer(level, this.damageSources().mobAttack(this), db * base)) {
+            boolean wasBlocking = e.isBlocking();
+            float before = e.getHealth() + e.getAbsorptionAmount();
+            float raw = db * base;
+            if (e.hurtServer(level, this.damageSources().mobAttack(this), raw * (1.0F - MANA_REND))) {
                 this.strikesLanded++;
                 level.sendParticles(ParticleTypes.CRIT, e.getX(), e.getY() + e.getBbHeight() * 0.6D, e.getZ(),
                         6, 0.2D, 0.2D, 0.2D, 0.15D);
+                if (e.isAlive() && !wasBlocking) { // the mana part, only when the steel got through
+                    e.invulnerableTime = 0;
+                    e.hurtServer(level, this.damageSources().indirectMagic(this, this), raw * MANA_REND);
+                }
+            }
+            record[3] += Math.max(0.0F, before - (e.getHealth() + e.getAbsorptionAmount()));
+            if (a.breaksShield() && wasBlocking && !e.isBlocking()) { // the vanilla hook disabled the shield (getSecondsToDisableBlocking)
+                this.shieldsBroken++;
+                this.shieldScore = 0;
+                level.broadcastEntityEvent(this, EVENT_SHIELD_BREAK);
             }
             if (a == ArchitectAttack.GARGOYLE_FALL && index == 0) {
                 this.throwAway(e, 1.1D, 0.45D);
@@ -886,7 +1187,8 @@ public final class Architect extends Monster {
         this.parryLeft = angle > 0.0D;
         this.parried = false;
         this.parryAttacker = null;
-        this.lockedYaw = yawTowards(this, attacker);
+        this.setLockedYaw(yawTowards(this, attacker));
+        this.face(this.lockedYaw);
         this.parryCooldown = PARRY_COOLDOWN[this.reachedPhase.ordinal()];
         this.hitsByVictim.clear();
         this.getNavigation().stop();
@@ -974,6 +1276,7 @@ public final class Architect extends Monster {
         if (!hurt || !this.isAlive()) {
             return hurt;
         }
+        this.recentHits = this.tickCount - this.lastHurtTick <= 20 ? this.recentHits + 1 : 1;
         this.lastHurtTick = this.tickCount;
         this.addPosture(dealt, strong);
         this.noteAggression(attacker, dealt, melee && frontal);
@@ -1039,7 +1342,7 @@ public final class Architect extends Monster {
         this.setAnim(ArchitectAnim.STAGGER);
         this.level().broadcastEntityEvent(this, EVENT_STAGGER);
         if (this.level() instanceof ServerLevel level) {
-            level.sendParticles(ERROR_DUST, this.getX(), this.getY() + 2.3D, this.getZ(), 14, 0.3D, 0.3D, 0.3D, 0.05D);
+            level.sendParticles(ERROR_DUST, this.getX(), this.getY() + STERNUM_Y, this.getZ(), 14, 0.3D, 0.3D, 0.3D, 0.05D);
         }
         this.playSound(ModSounds.ARCHITECT_STAGGER.get(), 1.0F, 1.0F);
     }
@@ -1104,7 +1407,7 @@ public final class Architect extends Monster {
         this.setAnim(now == Phase.ADMINISTRATOR ? ArchitectAnim.PHASE_ENRAGE : ArchitectAnim.MANIACAL_LAUGH);
         level.broadcastEntityEvent(this, EVENT_ENRAGE);
         this.playSound(ModSounds.ARCHITECT_ENRAGE.get(), 1.0F, 1.0F);
-        level.sendParticles(MANA_DUST, this.getX(), this.getY() + 2.3D, this.getZ(), 24, 0.6D, 0.6D, 0.6D, 0.12D);
+        level.sendParticles(MANA_DUST, this.getX(), this.getY() + STERNUM_Y, this.getZ(), 24, 0.6D, 0.6D, 0.6D, 0.12D);
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class,
                 this.getBoundingBox().inflate(ENRAGE_PUSH_RADIUS), this.foeInLeash)) {
             this.throwAway(e, 0.8D, 0.3D); // a light push, no damage
@@ -1122,6 +1425,11 @@ public final class Architect extends Monster {
     }
 
     // ================================================================= the brain (decisions only)
+    /**
+     * One decision per tick while he is free (COMBAT_IDLE or GUARDING). The order is the priority:
+     * parry, anti-pillaring, evasion, chain or counter blow, a normal blow, then footwork. Each layer either takes the
+     * tick (and changes the state, so the next tick is the timeline of that state) or hands it down.
+     */
     @Override
     protected void customServerAiStep(ServerLevel level) {
         super.customServerAiStep(level);
@@ -1138,76 +1446,355 @@ public final class Architect extends Monster {
             return;
         }
         this.noTargetTicks = 0;
-        float wanted = yawTowards(this, target);
-        if (this.getNavigation().isDone()) {
-            this.face(Mth.approachDegrees(this.getYRot(), wanted, TURN_DEGREES_PER_TICK));
-        }
         if (s == State.COMBAT_IDLE) {
             this.decide(level, target);
         }
+        this.turnBodyToward(target);
+    }
+
+    /** Body follows the target at TURN_DEGREES_PER_TICK, unless he is walking a path that bends away from it. */
+    private void turnBodyToward(LivingEntity target) {
+        State s = this.getState();
+        if (s != State.COMBAT_IDLE && s != State.GUARDING) {
+            return;
+        }
+        float wanted = yawTowards(this, target);
+        boolean pathing = !this.getNavigation().isDone();
+        if (pathing && Math.abs(Mth.wrapDegrees(wanted - this.getYRot())) > 70.0F) {
+            return; // going around an obstacle: the move control aims the body along the path
+        }
+        this.turnBody(wanted, TURN_DEGREES_PER_TICK);
     }
 
     private void decide(ServerLevel level, LivingEntity target) {
         double dist = horizontalDistance(this, target);
         double dy = target.getY() - this.getY();
         double angle = ArchitectStrikes.angleOf(target.getX() - this.getX(), target.getZ() - this.getZ(), this.getYRot());
+        if (this.tactic != Tactic.READ) {
+            this.tacticTicks++;
+        } else if (this.tacticTicks++ >= this.tacticLimit) {
+            this.tactic = Tactic.ADVANCE;
+            this.tacticTicks = 0;
+        }
+        if (this.chainTicks > 0 && --this.chainTicks == 0) {
+            this.chain.clear();
+        }
+        // 1. the parry answers a foe that just struck him from the front
         if (this.tickCount - this.lastAggressionTick <= PARRY_REACTION_TICKS && target.getId() == this.aggressorId
                 && dist <= SHORT_RANGE + 0.3D && this.startParry(target)) {
             return;
         }
+        // 2. a target perched out of reach
         if (this.tickPillaring(level, target, dist, dy)) {
             return;
         }
-        if (this.globalCooldown > 0) {
-            this.approach(target, dist);
+        // 3. evasion: reads the foe's charged blow, a dangerous projectile or a beating
+        if (this.tryReactiveDodge(level, target, dist, angle)) {
             return;
         }
-        if (Math.abs(angle) > ATTACK_FACING_DEGREES) {
-            this.getNavigation().stop(); // turning on the spot first (pivot): never a blow straight backwards
-            return;
+        // 4. never a frontal blow without facing the target: the body turns first (the head already follows)
+        boolean facing = Math.abs(angle) <= ATTACK_FACING_DEGREES;
+        if (this.globalCooldown <= 0 && facing) {
+            ArchitectAttack pick = null;
+            if (this.isPressuringShield() && dist <= SHORT_RANGE && this.cooldowns[ArchitectAttack.SHIELD_BREAKER.ordinal()] <= 0
+                    && this.random.nextFloat() < 0.7F) {
+                pick = ArchitectAttack.SHIELD_BREAKER; // a player who lives behind the shield gets the blow built for it
+            }
+            if (pick == null && !this.chain.isEmpty()) {
+                pick = this.pickChained(level, target, dist, dy);
+            }
+            if (pick == null) {
+                if (dist <= CLOSE_RANGE && this.globalCooldown <= 0 && this.random.nextFloat() < 0.15F && this.dodgeCooldown <= 0
+                        && this.startBackstepIfRoom(level)) {
+                    return;
+                }
+                pick = this.pickAttack(level, target, dist, dy);
+            }
+            if (pick != null) {
+                this.chain.clear();
+                this.chainTicks = 0;
+                this.startAttack(pick, target);
+                return;
+            }
         }
-        if (dist <= CLOSE_RANGE && this.random.nextFloat() < 0.3F) {
-            this.startBackstep();
-            return;
-        }
-        ArchitectAttack pick = this.pickAttack(level, target, dist, dy);
-        if (pick != null) {
-            this.startAttack(pick, target);
-            return;
-        }
-        if (dist <= SHORT_RANGE && this.random.nextFloat() < 0.04F) {
+        if (dist <= SHORT_RANGE && this.globalCooldown <= 0 && this.counterTicks <= 0 && this.random.nextFloat() < 0.03F) {
             this.raiseGuard(GUARD_TICKS);
             return;
         }
-        this.approach(target, dist);
+        // 5. footwork: never stands still without a reason
+        this.position(level, target, dist);
     }
 
-    /** Weighted choice by position (spec §12.3), with the repetition penalty of §12.1. */
+    // ---------------------------------------------------------------- reading the opponent
+    /** Shield pressure: grows while the target blocks, shrinks when it does not. */
+    private void watchShield(LivingEntity target) {
+        if (target.isBlocking()) {
+            this.shieldScore = Math.min(120, this.shieldScore + 2);
+        } else if (this.shieldScore > 0) {
+            this.shieldScore--;
+        }
+    }
+
+    public boolean isPressuringShield() {
+        return this.shieldScore >= SHIELD_PRESSURE_THRESHOLD;
+    }
+
+    /** A foe that could land a blow on him in a moment: a charged melee attacker close in front of him. */
+    private boolean foeAboutToStrike(ServerLevel level) {
+        for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class,
+                this.getBoundingBox().inflate(SHORT_RANGE + 1.5D, 2.0D, SHORT_RANGE + 1.5D), this.foeInLeash)) {
+            if (!(e instanceof Player p) || horizontalDistance(this, p) > SHORT_RANGE + 0.5D) {
+                continue;
+            }
+            double toMe = ArchitectStrikes.angleOf(this.getX() - p.getX(), this.getZ() - p.getZ(), p.getYRot());
+            if (p.getAttackStrengthScale(0.0F) >= 0.9F && Math.abs(toMe) <= 50.0D) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** The nearest dangerous projectile (not the light ones he deflects) flying at him, or null. */
+    private @Nullable Projectile incomingProjectile(ServerLevel level) {
+        for (Projectile p : level.getEntitiesOfClass(Projectile.class, this.getBoundingBox().inflate(14.0D, 6.0D, 14.0D))) {
+            if (isLightProjectile(p) || p.getOwner() == this) {
+                continue;
+            }
+            Vec3 v = p.getDeltaMovement();
+            Vec3 toMe = this.position().add(0.0D, this.getBbHeight() / 2.0D, 0.0D).subtract(p.position());
+            double speed = v.length();
+            if (speed < 0.3D || toMe.length() > 14.0D || v.normalize().dot(toMe.normalize()) < 0.92D) {
+                continue;
+            }
+            if (toMe.length() / speed <= 12.0D) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    // ---------------------------------------------------------------- evasion
+    /**
+     * Evasion (reform §2.1.D). Triggers, read every 5 ticks: a charged foe about to strike; a dangerous projectile on
+     * its way; two hits taken inside a second. A draw against the phase's chance, a cooldown and a budget of two dodges
+     * in a row (paid back by throwing a blow) keep him hittable: he dodges the reflex, not the whole fight.
+     */
+    private boolean tryReactiveDodge(ServerLevel level, LivingEntity target, double dist, double angle) {
+        if (this.dodgeCooldown > 0 || this.dodgesInRow >= MAX_DODGES_IN_ROW || this.reachedPhase == Phase.MONUMENT) {
+            return false;
+        }
+        Projectile incoming = this.tickCount % 2 == 0 ? this.incomingProjectile(level) : null;
+        boolean slow = this.tickCount % 5 == 0;
+        boolean battered = slow && this.recentHits >= 2;
+        boolean about = slow && incoming == null && this.foeAboutToStrike(level);
+        if (incoming == null && !battered && !about) {
+            return false;
+        }
+        float chance = DODGE_CHANCE[this.reachedPhase.ordinal()];
+        if (incoming != null) {
+            chance = 0.75F;
+        } else if (battered) {
+            chance = Math.min(0.9F, chance * 2.0F);
+        } else if (this.globalCooldown <= 0 && Math.abs(angle) <= ATTACK_FACING_DEGREES) {
+            chance *= 0.5F; // he would rather strike first
+        }
+        if (this.random.nextFloat() >= chance) {
+            return false;
+        }
+        Dodge pick = this.chooseDodge(level, target, dist, incoming != null);
+        if (pick == null) {
+            return false;
+        }
+        this.startDodge(pick, target);
+        return true;
+    }
+
+    private @Nullable Dodge chooseDodge(ServerLevel level, LivingEntity target, double dist, boolean projectile) {
+        float[] w = new float[Dodge.values().length];
+        for (Dodge d : Dodge.values()) {
+            float weight;
+            if (projectile) {
+                weight = d == Dodge.LEFT || d == Dodge.RIGHT ? 3.0F : d.isLean() ? 1.5F : d == Dodge.BACK ? 0.0F : 1.0F;
+            } else if (dist <= CLOSE_RANGE) {
+                weight = d == Dodge.BACK ? 3.0F : d == Dodge.DIAG_LEFT || d == Dodge.DIAG_RIGHT ? 2.5F : d.isLean() ? 0.5F : 1.5F;
+            } else {
+                weight = d == Dodge.LEFT || d == Dodge.RIGHT ? 3.0F : d == Dodge.DIAG_LEFT || d == Dodge.DIAG_RIGHT ? 2.0F
+                        : d.isLean() ? 1.0F : 1.5F;
+            }
+            if (this.lastDodge != null && d == this.lastDodge) {
+                weight *= 0.4F; // never the same step twice: no pattern to learn
+            }
+            if (weight > 0.0F && !this.dodgeFeasible(level, d)) {
+                weight = 0.0F;
+            }
+            w[d.ordinal()] = weight;
+        }
+        float total = 0.0F;
+        for (float v : w) {
+            total += v;
+        }
+        if (total <= 0.0F) {
+            return null;
+        }
+        float roll = this.random.nextFloat() * total;
+        for (Dodge d : Dodge.values()) {
+            roll -= w[d.ordinal()];
+            if (w[d.ordinal()] > 0.0F && roll <= 0.0F) {
+                return d;
+            }
+        }
+        return null;
+    }
+
+    /** The step vector (blocks) of a dodge in the world, for a body facing {@code yaw}. */
+    private static Vec3 dodgeVector(Dodge d, float yaw) {
+        double a = Math.toRadians(d.angle);
+        double fwd = Math.cos(a) * d.distance;
+        double left = Math.sin(a) * d.distance;
+        double rad = yaw * Mth.DEG_TO_RAD;
+        return new Vec3(-Math.sin(rad) * fwd + Math.cos(rad) * left, 0.0D, Math.cos(rad) * fwd + Math.sin(rad) * left);
+    }
+
+    /** Room to dodge: a clear body-sized path, solid ground at the end (no cliff, no lava) and inside the leash. */
+    private boolean dodgeFeasible(ServerLevel level, Dodge d) {
+        Vec3 v = dodgeVector(d, this.getYRot());
+        for (int i = 1; i <= 4; i++) {
+            Vec3 at = this.position().add(v.scale(i / 4.0D));
+            if (!this.canStandAt(level, at)) {
+                return false;
+            }
+        }
+        Vec3 end = this.position().add(v);
+        return this.inLeash(end);
+    }
+
+    private boolean inLeash(Vec3 p) {
+        return !this.hasAnchor || p.distanceToSqr(this.anchorX, this.anchorY, this.anchorZ) <= LEASH_RADIUS * LEASH_RADIUS;
+    }
+
+    /** Whether the body fits at {@code at} (feet position) with ground within one step and no lava or fire below. */
+    private boolean canStandAt(ServerLevel level, Vec3 at) {
+        AABB box = this.getDimensions(this.getPose()).makeBoundingBox(at.x, at.y + 0.05D, at.z);
+        if (!level.noBlockCollision(this, box)) {
+            return false;
+        }
+        double ground = groundBelow(level, at.x, at.y + 0.6D, at.z);
+        if (Double.isNaN(ground) || at.y - ground > 1.6D || ground - at.y > STEP_HEIGHT) {
+            return false;
+        }
+        BlockPos below = BlockPos.containing(at.x, ground - 0.5D, at.z);
+        return !level.getFluidState(below).is(net.minecraft.tags.FluidTags.LAVA)
+                && !level.getFluidState(below.above()).is(net.minecraft.tags.FluidTags.LAVA)
+                && !level.getBlockState(below.above()).is(net.minecraft.tags.BlockTags.FIRE);
+    }
+
+    /** Starts the evasive move: public so the GameTests can drive it with the AI off. */
+    public void startDodge(Dodge d, LivingEntity target) {
+        this.dodge = d;
+        this.setLockedYaw(this.isNoAi() || target == null ? this.getYRot() : yawTowards(this, target));
+        this.face(this.lockedYaw);
+        Vec3 v = dodgeVector(d, this.lockedYaw);
+        this.dodgeStepX = v.x;
+        this.dodgeStepZ = v.z;
+        this.dodgeTarget = target;
+        this.getNavigation().stop();
+        this.setState(State.DODGING);
+        this.setAnim(d.anim);
+        this.dodges++;
+        this.lastDodge = d;
+        this.dodgeCooldown = DODGE_COOLDOWN[this.reachedPhase.ordinal()];
+        if (this.level() instanceof ServerLevel level) {
+            level.broadcastEntityEvent(this, EVENT_DODGE);
+        }
+        this.playSound(ModSounds.ARCHITECT_WING_FLAP.get(), 0.8F, 1.2F);
+    }
+
+    /**
+     * The dodge: DODGE_STARTUP ticks of anticipation (the clip's lean), then the body slides along the vector with an
+     * ease-out over DODGE_MOVE_TICKS (a lean: 4), then the clip settles. No teleport, no invulnerability: the escape is
+     * the distance. Afterwards the counter window opens (COUNTER_WINDOW ticks, global cooldown nearly spent).
+     */
+    private void tickDodge(ServerLevel level) {
+        Dodge d = this.dodge;
+        if (d == null) {
+            this.setState(State.COMBAT_IDLE);
+            return;
+        }
+        int t = this.stateTicks;
+        int moveTicks = d.isLean() ? 4 : DODGE_MOVE_TICKS;
+        int start = d.isLean() ? 2 : DODGE_STARTUP;
+        if (t >= start && t < start + moveTicks) {
+            int i = t - start;
+            double weight = (moveTicks - i) / (moveTicks * (moveTicks + 1) / 2.0D); // 8,7,6,...,1 over the total
+            double sx = this.dodgeStepX * weight;
+            double sz = this.dodgeStepZ * weight;
+            Vec3 next = this.position().add(sx, 0.0D, sz);
+            if (this.canStandAt(level, next)) {
+                this.move(MoverType.SELF, new Vec3(sx, 0.0D, sz));
+            }
+            if (t % 2 == 0) {
+                level.sendParticles(STONE_DUST, this.getX(), this.getY() + 0.1D, this.getZ(), 3, 0.5D, 0.05D, 0.5D, 0.01D);
+            }
+        }
+        if (t >= d.anim.ticks) {
+            this.dodge = null;
+            this.dodgesInRow++;
+            this.counterTicks = COUNTER_WINDOW;
+            this.globalCooldown = Math.min(this.globalCooldown, 3);
+            this.pause(2, 6);
+            this.setState(State.COMBAT_IDLE);
+        }
+    }
+
+    // ---------------------------------------------------------------- choosing the blow
+    /** Weighted choice by position and by what the target is doing (spec §12.3 and reform §12.5), with anti-repetition. */
     private @Nullable ArchitectAttack pickAttack(ServerLevel level, LivingEntity target, double dist, double dy) {
         java.util.Arrays.fill(this.weights, 0.0F);
         boolean inAir = isInAir(target) && dy < PILLAR_MIN_HEIGHT;
+        boolean shield = this.isPressuringShield();
         int crowd = this.foesWithin(level, SIEGE_RADIUS);
+        double lateral = lateralSpeed(this, target);
         if (inAir && dist <= SHORT_RANGE) {
-            this.weigh(ArchitectAttack.SPLITTER_CRESCENT, 3.0F);
+            this.weigh(ArchitectAttack.SPLITTER_CRESCENT, 3.5F);
             this.weigh(ArchitectAttack.GARGOYLE_FALL, 2.0F);
         } else if (dist <= CLOSE_RANGE) {
             this.weigh(ArchitectAttack.SPLITTER_CRESCENT, 3.0F);
-            this.weigh(ArchitectAttack.SIXFOLD_EDICT, 2.0F);
+            this.weigh(ArchitectAttack.SIXFOLD_EDICT, 2.5F);
+            this.weigh(ArchitectAttack.FALSE_VERDICT, 1.5F);
         } else if (dist <= SHORT_RANGE) {
             this.weigh(ArchitectAttack.SIXFOLD_EDICT, 3.0F);
-            this.weigh(ArchitectAttack.CROSSED_MANDATE, 2.0F);
+            this.weigh(ArchitectAttack.CROSSED_MANDATE, 2.5F);
             this.weigh(ArchitectAttack.SPLITTER_CRESCENT, 2.0F);
+            this.weigh(ArchitectAttack.FALSE_VERDICT, 2.0F);
+            this.weigh(ArchitectAttack.RUSHING_REBUKE, dist >= SHORT_RANGE * 0.75D ? 1.5F : 0.0F);
         } else if (dist <= MEDIUM_RANGE) {
             this.weigh(ArchitectAttack.PIERCING_SENTENCE, isRetreating(this, target) ? 5.0F : 3.0F);
-            this.weigh(ArchitectAttack.GARGOYLE_FALL, dist >= 3.0D && dist <= LEAP_MAX_HORIZONTAL + 1.0D ? 2.0F : 0.0F);
+            this.weigh(ArchitectAttack.RUSHING_REBUKE, 3.5F);
+            this.weigh(ArchitectAttack.GARGOYLE_FALL, dist >= 3.0D * SCALE && dist <= LEAP_MAX_HORIZONTAL + 1.0D ? 2.0F : 0.0F);
         }
-        if (crowd >= 2 && dist <= 3.4D) {
+        if (shield && dist <= SHORT_RANGE) {
+            // a player living behind the shield: the heavy blow built to open it, and the feint that baits the raise
+            this.weigh(ArchitectAttack.SHIELD_BREAKER, 9.0F);
+            this.weigh(ArchitectAttack.FALSE_VERDICT, 3.0F);
+            this.weights[ArchitectAttack.SIXFOLD_EDICT.ordinal()] *= 0.5F;
+        }
+        if (lateral > 0.12D && dist <= SHORT_RANGE) { // circling him: the wide, sweeping blows
+            this.weigh(ArchitectAttack.CROSSED_MANDATE, 2.0F);
+            this.weigh(ArchitectAttack.SPLITTER_CRESCENT, 1.0F);
+        }
+        if (crowd >= 2 && dist <= 3.4D * SCALE) {
             this.weigh(ArchitectAttack.CARTENON_WHEEL, 4.0F); // anti-siege
+        }
+        if (this.counterTicks > 0) { // right after a dodge: the fast blows and the gap closers
+            for (ArchitectAttack a : new ArchitectAttack[] {ArchitectAttack.SIXFOLD_EDICT, ArchitectAttack.CROSSED_MANDATE,
+                    ArchitectAttack.PIERCING_SENTENCE, ArchitectAttack.RUSHING_REBUKE}) {
+                this.weights[a.ordinal()] *= 1.6F;
+            }
         }
         float total = 0.0F;
         for (ArchitectAttack a : ArchitectAttack.values()) {
             int i = a.ordinal();
-            if (this.weights[i] <= 0.0F || !this.allowed(level, a, target)) {
+            if (this.weights[i] <= 0.0F || !this.allowed(level, a, target, false)) {
                 this.weights[i] = 0.0F;
                 continue;
             }
@@ -1217,8 +1804,7 @@ public final class Architect extends Monster {
             }
             for (ArchitectAttack recent : this.recentAttacks) {
                 if (recent == a) {
-                    this.weights[i] *= 0.5F;
-                    break;
+                    this.weights[i] *= 0.5F; // each use in the last four halves the weight again
                 }
             }
             total += this.weights[i];
@@ -1236,15 +1822,37 @@ public final class Architect extends Monster {
         return null;
     }
 
+    /** The follow-up armed by the blow that just ended: the first valid one, re-checked against where the target is now. */
+    private @Nullable ArchitectAttack pickChained(ServerLevel level, LivingEntity target, double dist, double dy) {
+        java.util.List<ArchitectAttack> options = new java.util.ArrayList<>(this.chain);
+        java.util.Collections.shuffle(options, new java.util.Random(this.random.nextLong()));
+        for (ArchitectAttack a : options) {
+            if (this.fitsRange(a, dist) && this.allowed(level, a, target, true)) {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    private boolean fitsRange(ArchitectAttack a, double dist) {
+        return switch (a) {
+            case SIXFOLD_EDICT, CROSSED_MANDATE, SPLITTER_CRESCENT, FALSE_VERDICT -> dist <= SHORT_RANGE + 0.5D;
+            case SHIELD_BREAKER -> dist <= SHORT_RANGE;
+            case PIERCING_SENTENCE -> dist <= MEDIUM_RANGE;
+            case RUSHING_REBUKE -> dist >= SHORT_RANGE * 0.7D && dist <= MEDIUM_RANGE;
+            default -> false;
+        };
+    }
+
     private void weigh(ArchitectAttack a, float w) {
         this.weights[a.ordinal()] += w;
     }
 
-    private boolean allowed(ServerLevel level, ArchitectAttack a, LivingEntity target) {
+    private boolean allowed(ServerLevel level, ArchitectAttack a, LivingEntity target, boolean chained) {
         if (a == ArchitectAttack.PARRY_REPRISE) {
             return false;
         }
-        if (this.cooldowns[a.ordinal()] > 0 && !this.comboArmed) {
+        if (this.cooldowns[a.ordinal()] > 0 && !this.comboArmed && !chained) {
             return false;
         }
         if (this.reachedPhase.ordinal() < a.minPhase.ordinal()) {
@@ -1259,6 +1867,20 @@ public final class Architect extends Monster {
         }
         if (a == ArchitectAttack.GARGOYLE_FALL) {
             return this.landingFor(level, target) != null;
+        }
+        if (a == ArchitectAttack.RUSHING_REBUKE) {
+            return this.runwayClear(level, RUSH_DISTANCE);
+        }
+        return true;
+    }
+
+    /** The straight line ahead (the body's facing) is walkable for {@code distance} blocks: the charge never runs off an edge. */
+    private boolean runwayClear(ServerLevel level, double distance) {
+        Vec3 f = Vec3.directionFromRotation(0.0F, this.getYRot());
+        for (int i = 1; i <= 4; i++) {
+            if (!this.canStandAt(level, this.position().add(f.scale(distance * i / 4.0D)))) {
+                return false;
+            }
         }
         return true;
     }
@@ -1282,18 +1904,116 @@ public final class Architect extends Monster {
         return true;
     }
 
-    private void approach(LivingEntity target, double dist) {
-        if (dist <= 2.4D) {
+    // ---------------------------------------------------------------- footwork
+    /**
+     * Footwork between blows (reform §2.1): close the distance when far, slide around the target inside the fighting
+     * band, back away when crowded. After a blow or a dodge he first reads the fight for a few ticks (a poise, never
+     * longer than READ_MAX_TICKS); afterwards he is always doing one of the three.
+     */
+    private void position(ServerLevel level, LivingEntity target, double dist) {
+        if (this.tactic == Tactic.READ) {
             this.getNavigation().stop();
+            this.idleTicks++;
+            if (this.idleTicks > READ_MAX_TICKS) { // the guard that nothing keeps him still
+                this.pause(0, 0);
+            }
             return;
         }
-        if (this.tickCount % 10 == 0 || this.getNavigation().isDone()) {
-            this.getNavigation().moveTo(target, dist > MEDIUM_RANGE ? RUN_SPEED : WALK_SPEED);
+        this.idleTicks = 0;
+        boolean wantsToEngage = this.globalCooldown <= 0;
+        Tactic wanted;
+        if (dist < CLOSE_RANGE - 0.3D) {
+            wanted = Tactic.RETREAT;
+        } else if (dist > CLOSE_RANGE + 0.8D || wantsToEngage) {
+            wanted = Tactic.ADVANCE;
+        } else {
+            wanted = Tactic.CIRCLE;
+        }
+        if (wanted != this.tactic) {
+            this.tactic = wanted;
+            this.tacticTicks = 0;
+            this.getNavigation().stop();
+        }
+        float toward = yawTowards(this, target);
+        switch (this.tactic) {
+            case ADVANCE -> this.advance(target, dist);
+            case CIRCLE -> {
+                if (this.tickCount >= this.sideSwitchTick) {
+                    this.strafeSide = this.random.nextInt(5) == 0 ? this.strafeSide : -this.strafeSide;
+                    this.sideSwitchTick = this.tickCount + 18 + this.random.nextInt(34);
+                }
+                double radial = dist > SHORT_RANGE * 0.9D ? 0.05D : dist < CLOSE_RANGE + 0.5D ? -0.05D : 0.0D;
+                if (!this.moveSafely(level, toward, radial, this.strafeSide * STRAFE_SPEED)) {
+                    this.strafeSide = -this.strafeSide; // wall or edge on that side: the other way
+                    this.sideSwitchTick = this.tickCount + 18;
+                }
+            }
+            case RETREAT -> {
+                if (!this.moveSafely(level, toward, -BACKPEDAL_SPEED, this.strafeSide * 0.04D)) {
+                    this.tactic = Tactic.CIRCLE; // cornered: stop backing and fight from here
+                }
+            }
+            default -> {
+            }
         }
     }
 
+    private void advance(LivingEntity target, double dist) {
+        if (this.tickCount % 10 == 0 || this.getNavigation().isDone()) {
+            boolean ok = this.getNavigation().moveTo(target, dist > CLOSE_RANGE + 0.8D ? RUN_SPEED : WALK_SPEED);
+            this.unreachableTicks = ok ? 0 : this.unreachableTicks + 10;
+        }
+        if (this.unreachableTicks >= 40) { // no path (a wall, a gap): hold the guard instead of grinding on it
+            this.unreachableTicks = 0;
+            this.raiseGuard(GUARD_TICKS);
+        }
+    }
+
+    /** Enters the reading poise for {@code min + random(spread)} ticks. */
+    private void pause(int min, int spread) {
+        this.tactic = Tactic.READ;
+        this.tacticTicks = 0;
+        this.idleTicks = 0;
+        this.tacticLimit = min + (spread > 0 ? this.random.nextInt(spread + 1) : 0);
+    }
+
+    /**
+     * One by-hand step relative to the body facing {@code yaw}: {@code forward} and {@code left} in blocks. False when the
+     * spot is not standable (wall, ledge, lava): the move is refused, never half done.
+     */
+    private boolean moveSafely(ServerLevel level, float yaw, double forward, double left) {
+        double rad = yaw * Mth.DEG_TO_RAD;
+        double dx = -Math.sin(rad) * forward + Math.cos(rad) * left;
+        double dz = Math.cos(rad) * forward + Math.sin(rad) * left;
+        if (dx == 0.0D && dz == 0.0D) {
+            return true;
+        }
+        Vec3 next = this.position().add(dx, 0.0D, dz);
+        if (!this.canStandAt(level, next) || !this.inLeash(next)) {
+            return false;
+        }
+        this.move(MoverType.SELF, new Vec3(dx, 0.0D, dz));
+        this.footworkTick = this.tickCount;
+        return true;
+    }
+
+    /** True when the last by-hand step happened within the last 2 ticks (the clip follows what the feet do). */
+    private boolean isStepping() {
+        return this.tickCount - this.footworkTick <= 2;
+    }
+
+    private boolean startBackstepIfRoom(ServerLevel level) {
+        Vec3 back = dodgeVector(Dodge.BACK, this.getYRot()).normalize().scale(BACKSTEP_DISTANCE);
+        if (!this.canStandAt(level, this.position().add(back))) {
+            return false;
+        }
+        this.startBackstep();
+        return true;
+    }
+
     private void startBackstep() {
-        this.lockedYaw = this.getYRot();
+        this.setLockedYaw(this.getYRot());
+        this.face(this.lockedYaw);
         this.getNavigation().stop();
         this.setState(State.REPOSITION);
         this.setAnim(ArchitectAnim.BACKSTEP);
@@ -1306,6 +2026,7 @@ public final class Architect extends Monster {
         if (this.stateTicks >= ArchitectAnim.BACKSTEP.ticks) {
             this.setState(State.COMBAT_IDLE);
             this.cooldowns[ArchitectAttack.SIXFOLD_EDICT.ordinal()] = 0; // spec §12.3: backstep, then the Decree
+            this.pause(0, 4);
         }
     }
 
@@ -1350,30 +2071,65 @@ public final class Architect extends Monster {
         return this.isFoe(target) && super.canAttack(target);
     }
 
-    /** Keeps the current target while it is valid; a challenger takes over only after 15 % of his health in damage. */
+    /**
+     * Target selection (reform §12.4), server side only; the clients just receive the head and body angles. Each foe in
+     * range gets a score: proximity (up to 40), threat from the damage it dealt (up to 50, decaying), a recent melee
+     * aggressor (15), how long it has gone without being the target (1 per second, up to 25: nobody is ignored for good),
+     * a wounded player (6) and a stickiness bonus for the current target (12). The choice is reviewed every
+     * TARGET_SWITCH scan, but the target only changes when the best foe beats the current one by TARGET_SWITCH_MARGIN
+     * (x1.25 plus 4), then it is frozen for TARGET_SWITCH_LOCK ticks. A blow keeps its own target until it ends.
+     */
     private @Nullable LivingEntity selectTarget(ServerLevel level) {
         LivingEntity current = this.getTarget();
         boolean valid = current != null && this.isFoeInLeash(current);
-        if (valid && this.tickCount % TARGET_SCAN_INTERVAL != 0) {
-            return current;
-        }
         if (valid) {
-            return current;
+            this.markTargeted(current);
+            if (this.tickCount % TARGET_SCAN_INTERVAL != 0 || this.tickCount < this.retargetLockUntil) {
+                return current;
+            }
         }
         LivingEntity best = null;
-        double bestDist = Double.MAX_VALUE;
+        double bestScore = -1.0D;
         for (LivingEntity e : level.getEntitiesOfClass(LivingEntity.class,
                 this.getBoundingBox().inflate(FOLLOW_RANGE, 16.0D, FOLLOW_RANGE), this.foeInLeash)) {
-            double d = this.distanceToSqr(e);
-            if (d < bestDist) {
-                bestDist = d;
+            double score = this.scoreFoe(e, current);
+            if (score > bestScore) {
+                bestScore = score;
                 best = e;
             }
         }
-        this.setTarget(best);
-        this.challenger = null;
-        this.challengerDamage = 0.0F;
+        if (valid && (best == null || best == current || bestScore < this.scoreFoe(current, current) * TARGET_SWITCH_MARGIN + 4.0D)) {
+            return current;
+        }
+        if (best != current) {
+            this.setTarget(best);
+            this.retargetLockUntil = this.tickCount + TARGET_SWITCH_LOCK;
+        }
+        if (best != null) {
+            this.markTargeted(best);
+        }
         return best;
+    }
+
+    private void markTargeted(LivingEntity e) {
+        this.threats.computeIfAbsent(e.getUUID(), k -> new float[] {0.0F, this.tickCount})[1] = this.tickCount;
+    }
+
+    private double scoreFoe(LivingEntity e, @Nullable LivingEntity current) {
+        double proximity = 40.0D * (1.0D - Mth.clamp(Math.sqrt(this.distanceToSqr(e)) / FOLLOW_RANGE, 0.0D, 1.0D));
+        float[] t = this.threats.get(e.getUUID());
+        double threat = t == null ? 0.0D : Math.min(50.0D, 50.0D * t[0] / (this.getMaxHealth() * 0.15D));
+        double aggressor = this.tickCount - this.lastAggressionTick <= 100 && e.getId() == this.aggressorId ? 15.0D : 0.0D;
+        double neglect = t == null ? 10.0D : Math.min(25.0D, (this.tickCount - t[1]) / 20.0D);
+        double wounded = e instanceof Player && e.getHealth() < e.getMaxHealth() * 0.4F ? 6.0D : 0.0D;
+        double sticky = e == current ? 12.0D : 0.0D;
+        return proximity + threat + aggressor + neglect + wounded + sticky;
+    }
+
+    /** Threat decays 4 % a second; entries of foes long gone are dropped. */
+    private void decayThreats() {
+        this.threats.values().forEach(t -> t[0] *= 0.96F);
+        this.threats.values().removeIf(t -> t[0] < 0.5F && this.tickCount - t[1] > 1200);
     }
 
     private void noteAggression(@Nullable Entity attacker, float damage, boolean meleeFront) {
@@ -1384,24 +2140,18 @@ public final class Architect extends Monster {
             this.lastAggressionTick = this.tickCount;
             this.aggressorId = living.getId();
         }
+        this.threats.computeIfAbsent(living.getUUID(), k -> new float[] {0.0F, -2000.0F})[0] += damage;
         LivingEntity current = this.getTarget();
         if (current == null || !this.isFoeInLeash(current)) {
             this.setTarget(living);
-            return;
+            this.retargetLockUntil = this.tickCount + TARGET_SWITCH_LOCK;
         }
-        if (current == living) {
-            return;
-        }
-        if (!living.getUUID().equals(this.challenger)) {
-            this.challenger = living.getUUID();
-            this.challengerDamage = 0.0F;
-        }
-        this.challengerDamage += damage;
-        if (this.challengerDamage >= this.getMaxHealth() * CHALLENGER_SWITCH_FRACTION) {
-            this.setTarget(living);
-            this.challenger = null;
-            this.challengerDamage = 0.0F;
-        }
+    }
+
+    /** Public for the GameTests: the damage a foe has dealt (decayed), the base of its threat score. */
+    public float getThreat(LivingEntity e) {
+        float[] t = this.threats.get(e.getUUID());
+        return t == null ? 0.0F : t[0];
     }
 
     private int foesWithin(ServerLevel level, double radius) {
@@ -1412,6 +2162,17 @@ public final class Architect extends Monster {
             }
         }
         return n;
+    }
+
+    /** How fast the target moves sideways across his line of sight, blocks per tick (circling him). */
+    private static double lateralSpeed(Entity self, LivingEntity target) {
+        Vec3 away = target.position().subtract(self.position()).multiply(1.0D, 0.0D, 1.0D);
+        if (away.lengthSqr() < 1.0E-4D) {
+            return 0.0D;
+        }
+        Vec3 dir = away.normalize();
+        Vec3 v = target.getDeltaMovement().multiply(1.0D, 0.0D, 1.0D);
+        return Math.abs(v.x * -dir.z + v.z * dir.x);
     }
 
     // ================================================================= anchor and geometry helpers
@@ -1508,6 +2269,35 @@ public final class Architect extends Monster {
         return this.cooldowns[a.ordinal()];
     }
 
+    public int getDodges() {
+        return this.dodges;
+    }
+
+    public @Nullable Dodge getDodge() {
+        return this.dodge;
+    }
+
+    public boolean isCounterWindow() {
+        return this.counterTicks > 0;
+    }
+
+    public int getShieldsBroken() {
+        return this.shieldsBroken;
+    }
+
+    public int getBlowsPunished() {
+        return this.blowsPunished;
+    }
+
+    public int getShieldScore() {
+        return this.shieldScore;
+    }
+
+    /** How many times each blow was started (read by the GameTests and the balance runs). */
+    public int getAttackUses(ArchitectAttack a) {
+        return this.attackUses[a.ordinal()];
+    }
+
     // ================================================================= dormant statue and stone constitution (§11.1)
     @Override
     public boolean isPushable() {
@@ -1573,7 +2363,7 @@ public final class Architect extends Monster {
         if (id == EVENT_AWAKEN_START || id == EVENT_ENRAGE) {
             for (int k = 0; k < 16; k++) { // the mana pulse from the sternum
                 double a = k * Math.PI / 8.0D;
-                level.addParticle(MANA_DUST, x, y + 2.3D, z, Math.cos(a) * 0.15D, 0.0D, Math.sin(a) * 0.15D);
+                level.addParticle(MANA_DUST, x, y + STERNUM_Y, z, Math.cos(a) * 0.15D, 0.0D, Math.sin(a) * 0.15D);
             }
         } else if (id == EVENT_MASK_RIGHT || id == EVENT_MASK_LEFT || id == EVENT_TABLET_FALL) {
             double side = id == EVENT_MASK_RIGHT ? -0.4D : id == EVENT_MASK_LEFT ? 0.4D : 0.0D;
@@ -1587,8 +2377,18 @@ public final class Architect extends Monster {
             }
         } else if (id == EVENT_STAGGER || id == EVENT_DEATH) {
             for (int k = 0; k < 10; k++) { // mana errors flicker on the sternum
-                level.addParticle(ERROR_DUST, x + (this.random.nextDouble() - 0.5D) * 0.5D, y + 2.3D,
+                level.addParticle(ERROR_DUST, x + (this.random.nextDouble() - 0.5D) * 0.5D, y + STERNUM_Y,
                         z + (this.random.nextDouble() - 0.5D) * 0.5D, 0.0D, 0.02D, 0.0D);
+            }
+        } else if (id == EVENT_DODGE) {
+            for (int k = 0; k < 8; k++) { // a puff of stone dust where the feet pushed off
+                level.addParticle(ParticleTypes.POOF, x + (this.random.nextDouble() - 0.5D) * 1.2D, y + 0.1D,
+                        z + (this.random.nextDouble() - 0.5D) * 1.2D, 0.0D, 0.02D, 0.0D);
+            }
+        } else if (id == EVENT_SHIELD_BREAK) {
+            for (int k = 0; k < 12; k++) {
+                level.addParticle(ParticleTypes.CRIT, x + (this.random.nextDouble() - 0.5D) * 2.0D,
+                        y + 1.4D + this.random.nextDouble(), z + (this.random.nextDouble() - 0.5D) * 2.0D, 0.0D, 0.1D, 0.0D);
             }
         } else if (id == EVENT_GARGOYLE_IMPACT) {
             for (int k = 0; k < 24; k++) { // a ring of dust hugging the ground

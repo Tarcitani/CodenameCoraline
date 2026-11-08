@@ -33,7 +33,7 @@ Os últimos commits entregam a Salamandra de Enxofre (`brimstone_salamander`, pe
 
 | Sistema | Resumo | Design |
 |---|---|---|
-| O Arquiteto (Kandiaru) | Boss de seis braços, disfarce de estátua; fatias 1 (fundação), 2 (visual, aprovada na 2b) 3 (IA e combate) e 4 (sons, receita da tábua, Cimitarra do Arquiteto como drop, conquistas, Bestiário; 34 GameTests em 6 rodadas, `build` verde) concluídas; nada visto no jogo ainda (próximo: `runClient`, depois a arena com H e I) | `design/architect.md` |
+| O Arquiteto (Kandiaru) | Boss e drops desativados por hora (aguardando redesenho geral a pedido do usuário): removido das Creative Tabs e do Bestiário, receita da tábua bloqueada via condição (`neoforge:false`), uso da tábua inerte (`CommandmentTabletItem.ENABLED = false`). Código, assets e testes (54/54) preservados no repo | `design/architect.md` |
 
 ## Pendências recorrentes
 - **Nada de Comandante, Bruxa e Matriarca foi visto no jogo** (`runClient`): aparência, animações, sons, barra, gravuras.

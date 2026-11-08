@@ -17,9 +17,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 
 /**
- * The Architect, drawn at real size (3.4 blocks): a hooded stone statue with a two-piece mask, a hinged jaw with its own
- * row of teeth, six arms in three tiers (shoulder, upper arm, elbow, forearm, wrist, hand and a scimitar each), two
- * gargoyle wings, a mineral robe and the Tablet of the Commandments. The rig and the cubes come from the generated
+ * The Architect, drawn at real size (4.7 blocks since the reform): a hooded stone statue with a two-piece mask, a hinged
+ * jaw with its own row of teeth, six arms in three tiers (shoulder, upper arm, elbow, forearm, wrist, hand and a
+ * scimitar each), two gargoyle wings, a long stone coat in independent pieces and the Tablet of the Commandments. The rig and the cubes come from the generated
  * {@link ArchitectParts}; the battle idle {@link ArchitectAnimations#BASE} is baked into the parts and every clip is a
  * set of deltas on top of it (spec docs/design/architect.md §5, §15).
  */
@@ -29,6 +29,7 @@ public final class ArchitectModel extends EntityModel<ArchitectRenderState> {
 
     private final ModelPart head;
     private final ModelPart neck;
+    private final ModelPart torso;
     private final ModelPart maskLeft;
     private final ModelPart maskRight;
     private final ModelPart tablet;
@@ -39,6 +40,7 @@ public final class ArchitectModel extends EntityModel<ArchitectRenderState> {
         var lookup = root.createPartLookup();
         this.head = lookup.apply("head");
         this.neck = lookup.apply("neck");
+        this.torso = lookup.apply("torso");
         this.maskLeft = lookup.apply("face_mask_left");
         this.maskRight = lookup.apply("face_mask_right");
         this.tablet = lookup.apply("tablet_anchor");
@@ -70,11 +72,15 @@ public final class ArchitectModel extends EntityModel<ArchitectRenderState> {
         this.maskRight.visible = disguise;
         this.tablet.visible = disguise;
         if (state.lookAtTarget) {
-            // the head turns first and the neck follows a little (spec §10)
-            float yaw = Mth.clamp(state.yRot, -45.0F, 45.0F) * Mth.DEG_TO_RAD;
+            // The gaze is server state (the head leads the body by up to 80 degrees). The head turns first, the neck and
+            // the shoulders follow, so the difference between head and hips is shared out instead of snapping (spec §10).
+            // In a blow or a dodge the body is locked and the share of the shoulders is smaller.
+            float share = state.lookShare;
+            float yaw = Mth.clamp(state.yRot, -80.0F, 80.0F) * Mth.DEG_TO_RAD;
             float pitch = Mth.clamp(state.xRot, -25.0F, 25.0F) * Mth.DEG_TO_RAD;
-            this.head.yRot += yaw * 0.7F;
-            this.neck.yRot += yaw * 0.3F;
+            this.head.yRot += yaw * 0.55F;
+            this.neck.yRot += yaw * 0.20F;
+            this.torso.yRot += yaw * 0.22F * share;
             this.head.xRot += pitch * 0.6F;
         }
     }

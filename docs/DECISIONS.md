@@ -2,6 +2,14 @@
 
 Registro apenas de decisões relevantes: contexto, decisão e consequências. Não é diário de mudanças (isso é o Git).
 
+## D-039 — Reforma do Arquiteto: escala 1,4, IA tática, dano contra armadura e Martelo do Veredito
+
+**Contexto.** O chefe ficava parado, repetia golpes, era pequeno (3,35 bl), deixava o escudo inteiramente seguro e causava ~0,5 PV por corte contra Netherite Proteção IV.
+
+**Decisão.** (1) `Architect.SCALE = 1.4` aplicado ao rig, aos volumes e aos alcances na origem (fábricas de `ArchitectStrikes`, constantes de alcance), em vez de um `scale` no renderer. (2) A IA continua em `Architect` (timelines em `tick()`, decisões em `customServerAiStep`), agora com estado `DODGING`, táticas `READ/ADVANCE/CIRCLE/RETREAT`, cabeça servidor-autoritativa, mira durante o preparo com trava 6 t antes do primeiro volume, alvo por pontuação com histerese e encadeamento por condição; documentada em `design/architect.md` §27.3. (3) Desarme de escudo só pelo gancho vanilla `getSecondsToDisableBlocking()`, sobrescrito para um único golpe (`SHIELD_BREAKER`), sem tocar em propriedades globais do escudo. (4) Dano base 20, 25 % de cada golpe em magia indireta, teto de 50 % da vida máxima da vítima por golpe e multiplicador por fase. (5) Texturas a 512 × 512 com densidade por material e pintores independentes de resolução; sobretudo em peças soltas com movimento secundário gerado.
+
+**Consequências.** O dano e o ritmo foram calibrados contra um jogador parado em GameTest (limite inferior da luta real); precisam de sessão de jogo. Volumes e testes agora dependem de `SCALE`. O atlas ficou 4× maior (PNG de 512²). O arquivo `Architect.java` passou de 1,7 mil para ~2,3 mil linhas; se crescer mais, separar o cérebro (`ArchitectBrain`) é o próximo passo natural.
+
 ## D-037 — Verificação de modelos opt-in e câmera de montaria anatômica
 
 **Contexto.** A inspeção no cliente mostrou que a câmera frontal padrão entrava na cabeça longa do Adulto. O primeiro servidor dedicado real também detectou que a reflexão do registro automático das suítes de geometria tentava resolver `PoseStack.Pose`, ausente na distribuição dedicada, mesmo com os testes desabilitados.
