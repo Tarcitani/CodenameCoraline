@@ -1,69 +1,171 @@
-# Codename Coraline
+<p align="center">
+  <h1 align="center">Coraline</h1>
+  <p align="center">
+    <em>Um conto feérico de cinzas, névoa e antigas barganhas.</em>
+  </p>
+</p>
 
-Mod de Minecraft Java para NeoForge. Nome provisório. Contém o Redcap, o Basilisco, o Litófago, os bosses opcionais Cobrador da Última Dádiva, Quebra-Copas e Comandante Carmesim e um Bestiário com capítulos em português e inglês.
+<p align="center">
+  <img src="src/main/resources/assets/codenamecoraline/textures/gui/bestiary/ten_threads_witch_anatomy.png" width="360" alt="Coraline - O Livro dos Segredos Antigos" />
+</p>
 
-## Versões
+<p align="center">
+  <em>"Não saia da trilha batida. Não aceite presentes sem barganha.<br>E nunca, sob hipótese alguma, apague a chama na borda do charco."</em><br>
+  <sub>— anotação na margem do Bestiário, em letra trêmula e apressada</sub>
+</p>
 
-| Componente | Versão | Observação |
+---
+
+Atravessei a fronteira num fim de tarde cinzento, quando o horizonte ainda parecia familiar. O mundo além do limiar não é feito de monstros comuns; ele obedece a uma corte antiga, caprichosa e indiferente, onde a beleza e o pavor compartilham a mesma raiz retorcida. 
+
+Voltei com este diário para registrar o que vi nas matas, nas pedras e no fogo. Se você pretende atravessar a mesma fronteira, guarde consigo as três leis que os viajantes de antanho sussurravam antes de anoitecer:
+
+> **I. O ferro fere o Povo Antigo.** Carregar o metal frio é insulto e blasfêmia aos olhos dos que dançam na névoa.  
+> **II. Toda dádiva cobra seu preço.** O que parece ouro sob a folhagem cobra seu peso em sangue ou fôlego antes do amanhecer.  
+> **III. O que tem nome pode ser chamado.** Certas coisas dormem no escuro; tocar em suas relíquias esquecidas é convidá-las a despertar.
+
+·  ·  ·
+
+### Capítulo I — Ao Entardecer
+
+<p align="center">
+  <img src="src/main/resources/assets/codenamecoraline/textures/gui/bestiary/redcap_spear.png" width="280" alt="O Barrete Vermelho" />
+</p>
+
+O primeiro sinal nunca é a criatura, mas o riso rouco que ecoa entre as ruínas esquecidas.
+
+Pertencentes à Corte Sombria das velhas fronteiras, os **Barretes Vermelhos** (*Redcaps*) não conhecem o arrependimento. Calçam botas de ferro pesado — o próprio metal que fere as fadas, transformado em escárnio — e nunca andam sozinhos. O barrete de pano que trazem sobre a cabeça precisa ser banhado em sangue fresco para não definhar; por isso, avançam em bando em torno de suas vítimas. Se você avistar um barrete rubro jogado na relva úmida, passe ao largo: certas mortalhas não devem ser vestidas.
+
+Nas bordas das velhas árvores, o riso às vezes dá lugar ao farfalhar seco dos **Micos de Casca**, pequenas sentinelas de madeira viva que vigiam a marcha dos intrusos com olhos reluzentes.
+
+·  ·  ·
+
+### Capítulo II — Charcos e Cavernas
+
+<p align="center">
+  <img src="src/main/resources/assets/codenamecoraline/textures/gui/bestiary/basilisk_anatomy.png" width="280" alt="O Basilisco da Praga" />
+</p>
+
+Onde a água apodrece e a luz não alcança, o ar se torna pesado.
+
+Nos pântanos densos e nas galerias sem céu, o **Basilisco da Praga** rasteja sobre a lama com ventre viscoso e dois cistos dourados colossais que nunca piscam. Seus olhos verdadeiros são quase cegos, mas seu papo infla com sibilos profundos antes de golfar uma névoa escura que apodrece a carne e rouba a visão em instantes. Os antigos aprenderam a erguer tochas ou lanternas de fogo das almas: diante da chama espectral, o réptil recua acuado — a menos que seja ferido, momento em que seu medo se extingue na fúria.
+
+Mais fundo ainda, onde o gotejamento ecoa nas fendas verdejantes e estalactites pontiagudas, o **Litófago** repousa fundido à rocha. Criatura de placas de escória e garras de pedra, ele não se move por malícia, mas por peso e ressonância; quando vários despertam juntos, seus passos cantam na terra em ondas de choque tectônicas.
+
+·  ·  ·
+
+### Capítulo III — A Noite nas Árvores
+
+<p align="center">
+  <img src="src/main/resources/assets/codenamecoraline/textures/gui/bestiary/canopy_breaker_anatomy.png" width="280" alt="O Quebra-Copas" />
+</p>
+
+Há coisas que dormem nas florestas escuras e antigas porque os séculos esqueceram seus nomes. Mas os rituais permanecem.
+
+Se você erguer o *Ídolo do Tronco Oco* sob a copa fechada de uma taiga à meia-noite, a floresta responde. O **Quebra-Copas** não caminha pelo chão como os homens: ele corre pelas alturas, dobra galhos centenários e despenca sobre a terra com a violência de uma tempestade, brandindo o Porrete de Raiz-Morta contra qualquer um que profane o silêncio da madeira ancestral.
+
+E ainda mais adentro, onde as teias se misturam à névoa de jardins pálidos, um fuso solitário gira sem mãos.
+
+<p align="center">
+  <img src="src/main/resources/assets/codenamecoraline/textures/gui/bestiary/ten_threads_witch_combat.png" width="280" alt="A Bruxa dos Dez Fios" />
+</p>
+
+Tocar o *Fuso Amaldiçoado* sob o dossel noturno convoca **Ester, a Matriarca Costureira**. A Bruxa dos Dez Fios não luta de imediato com suas próprias mãos: ela ergue uma arena de agulhas e comanda, uma a uma, dez marionetes nascidas de suas tragédias — a Noiva Oca, o Cão de Porcelana, a Mãe das Raízes, o Gigante do Berço. Cada alma é amarrada por um fio carmesim visível apenas no momento do golpe. Somente cortando cada fio com paciência e ferro o viajante poderá alcançar o coração do tear.
+
+·  ·  ·
+
+### Capítulo IV — Onde a Neve Escuta
+
+<p align="center">
+  <img src="src/main/resources/assets/codenamecoraline/textures/gui/bestiary/last_gift_collector_anatomy.png" width="280" alt="O Cobrador da Última Dádiva" />
+</p>
+
+Na taiga nevada, o silêncio do gelo é tão denso que parece engolir os passos.
+
+Existe um objeto conhecido como o *Sino Mudo*. Ele não tem badalo e não emite som que ouvidos humanos possam escutar; mas, repousado sobre o gelo compactado na calada da noite, ele reverbera no Outro Lado.
+
+O céu se parte e, pelo ar gélido, desce em um trenó colossal o **Cobrador da Última Dádiva**. Ele não vem por ira, nem por ódio: vem exigir o tributo solene de quem colheu do mundo mais do que deixou para trás. Em duas fases coreografadas sob nevascas implacáveis, a batalha é um teste de fôlego e respeito às leis do inverno eterno.
+
+·  ·  ·
+
+### Capítulo V — Fundo, Mais Fundo
+
+<p align="center">
+  <img src="src/main/resources/assets/codenamecoraline/textures/gui/bestiary/crimson_commander_anatomy.png" width="280" alt="O Comandante Carmesim" />
+</p>
+
+Abaixo de onde as raízes terminam, nos salões esquecidos de ardósia profunda, descansa a *Insígnia do Juramento Manchada*.
+
+Oferecida sobre os tijolos escuros, ela convoca o **Comandante Carmesim**: um cavaleiro colossal sem corte e sem rei, cuja armadura partida ainda ecoa juramentos de sangue. Seus ataques não admitem descuido: cada golpe de sua espada larga exige leitura paciente de fintas, aparadas e contra-ataques precisos contra suas sentinelas de cinza.
+
+E quando a terra finalmente cede lugar às fornalhas do Nether, as margens de basalto e lagos incandescentes revelam a **Salamandra de Enxofre**:
+
+<p align="center">
+  <img src="src/main/resources/assets/codenamecoraline/textures/gui/bestiary/brimstone_salamander_anatomy.png" width="280" alt="A Salamandra de Enxofre" />
+</p>
+
+Criaturas nascidas do fogo primordial, elas rastejam pelas margens de cinzas cuspindo alcatrão viscoso sobre invasores. Seus bandos protegem ninhadas de filhotes tenros com fúria cega; qualquer ameaça às crias desperta os adultos em perseguição implacável, enquanto os pequenos aprendem a mergulhar nos rios de magma velozes como faíscas.
+
+·  ·  ·
+
+### Capítulo VI — Os que Caminham ao Seu Lado
+
+<p align="center">
+  <img src="src/main/resources/assets/codenamecoraline/textures/gui/bestiary/baby_dragon_anatomy.png" width="280" alt="O Dragão Bebê" />
+</p>
+
+Nem toda sombra do Outro Mundo deseja sangue; algumas buscam lealdade e pactos firmados à beira do fogo.
+
+- **O Dragão Bebê — *A Chama Adormecida*:** Pequeno, curioso e frágil, ele é conquistado com salmão fresco e escolhe descansar sobre o ombro de seu protetor. Através de uma jornada de aprendizado e experiência, ele cresce: de um filhote que brinca com brasas a um jovem impetuoso, até desdobrar asas adultas como montaria majestosa de sopro infernal. *(Em forja e refinamento contínuo nas oficinas feéricas)*.
+- **O Corvo Feérico — *A Sentinela Mística*:** Pássaro de plumagem crepuscular atraído pelo brilho das bagas luminosas. Quando firma pacto com um viajante, voa em busca de relíquias cintilantes e empoleira-se nas frestas para sussurrar alertas contra presenças invisíveis que espreitam no ar.
+
+·  ·  ·
+
+### Capítulo VII — O Tomo das Sombras
+
+<p align="center">
+  <img src="src/main/resources/assets/codenamecoraline/textures/gui/bestiary/fey_raven_anatomy.png" width="260" alt="Páginas do Bestiário" />
+</p>
+
+O conhecimento é a única armadura que não atrai a ira das fadas.
+
+Nas páginas do **Bestiário** in-game, encadernado em couro e pergaminho rústico, o viajante encontrará gravuras talhadas à mão, estudos anatômicos, conselhos de sobrevivência e as lendas de cada criatura que caminha por este mundo. Carregue-o consigo; no escuro das matas, quem não sabe o que enfrenta já perdeu a caminhada.
+
+---
+
+<details>
+<summary><strong>✦ Para quem forja o mundo (Informações Técnicas e Instalação)</strong></summary>
+
+<br />
+
+### Requisitos e Versões
+| Componente | Versão | Notas |
 |---|---|---|
-| Minecraft | 26.1.2 | `minecraft_version` em `gradle.properties` |
-| NeoForge | 26.1.2.124 | `neo_version` em `gradle.properties` |
-| Java (toolchain) | 25 | Exigido pelo Minecraft 26.1.2 |
-| Gradle Wrapper | 9.2.1 | `gradle/wrapper/gradle-wrapper.properties` |
-| Plugin ModDevGradle | `net.neoforged.moddev` 2.0.148 | `build.gradle` |
+| **Minecraft** | `26.1.2` | Java Edition |
+| **Mod Loader** | `NeoForge 26.1.2.124` | Obrigatório |
+| **Java Toolchain** | `Java 25` | Provisionado automaticamente pelo Gradle |
+| **Gradle Wrapper** | `9.2.1` | Plugin `net.neoforged.moddev 2.0.148` |
+| **Mod ID Interno** | `codenamecoraline` | Nome de projeto provisório |
 
-Decisões e motivos: [docs/DECISIONS.md](docs/DECISIONS.md).
-
-## Pré-requisitos
-
-- Windows 10/11 (ambiente de referência).
-- Git.
-- Java 25 **ou** conexão com a internet para o Gradle provisionar o JDK 25 automaticamente (plugin `foojay-resolver`).
-- Conexão com a internet no primeiro build (Minecraft, NeoForge e dependências são baixados).
-- Não é necessário instalar o Gradle: use o wrapper (`gradlew`).
-
-## Preparação do ambiente
-
+### Como Executar em Desenvolvimento
 ```bash
-git clone <url-do-repositório>
-cd CodenameCoraline
+# Compilar e empacotar o mod:
+./gradlew build
+
+# Iniciar o cliente de testes com o mod carregado:
+./gradlew runClient
+
+# Executar suítes de testes de validação lógica (GameTests):
+./gradlew runBrimstoneSalamanderTest
+./gradlew runTenThreadsWitchTest
+./gradlew runBabyDragonTest
 ```
+*(No Windows PowerShell, utilize `.\gradlew.bat <comando>`)*
 
-Não há configuração global exigida. Caches do Gradle ficam em `%USERPROFILE%\.gradle`.
+### Documentação e Arquitetura do Repositório
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Filosofia técnica e organização de pacotes.
+- [docs/DECISIONS.md](docs/DECISIONS.md) — Registro imutável de decisões de engenharia.
+- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) — Manual de comandos, validação e GameTests.
+- [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md) — Resumo de estado do desenvolvimento.
 
-## Comandos básicos
-
-```bash
-./gradlew build        # compila e gera o jar em build/libs
-./gradlew compileJava  # compila o código-fonte
-./gradlew runClient    # instância de desenvolvimento do cliente
-./gradlew runServer    # servidor de desenvolvimento
-```
-
-No PowerShell use `.\gradlew.bat build`. Detalhes, testes e diagnóstico de erros: [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
-
-## Estrutura
-
-Resumo em [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Instruções para sessões de IA: [CLAUDE.md](CLAUDE.md).
-
-## Estado atual
-
-**Dragões em desenvolvimento:** os três estágios ainda não estão finalizados e precisam de muitas alterações e refinamentos, incluindo aparência, animações, combate, voo e validação em multiplayer. O estado e as pendências estão em [docs/ROADMAP.md](docs/ROADMAP.md) e [docs/design/dragon_remodel.md](docs/design/dragon_remodel.md).
-
-- Build configurado com NeoForge 26.1.2 e Java 25.
-- Redcap com variantes, coordenação em grupo, itens e touca de disfarce.
-- Basilisco hostil e comum em pântanos e cavernas, com grupos de 4–8, saltos, sopro antecipado, névoa de Decomposição III, repulsão por luz das almas e drops de perna/olho/rabo usados no suporte vanilla para preparar resistência ao efeito. Detalhes em [docs/design/basilisk.md](docs/design/basilisk.md).
-- Dragão companheiro domesticável com salmão: mesma entidade `baby_dragon`, evolui Bebê → Jovem → Adulto com XP próprio (500 e mais 1500), bolas progressivas, magma temporário seguro, Sopro Infernal, montaria e inventário vanilla (0/9/18 slots). Três anatomias próprias com pescoços, asas articuladas e caudas diferentes, mesma paleta original, texturas e emissão por idade e 17 animações próprias por estágio. Preserva acompanhamento, defesa, ombro do Bebê e geração natural. Controles em [docs/design/dragon_evolution.md](docs/design/dragon_evolution.md), remodelagem/prévias em [docs/design/dragon_remodel.md](docs/design/dragon_remodel.md); testes: `.\gradlew.bat runBabyDragonTest`.
-- Litófago (Lithophage) hostil e incomum em Lush Caves e Dripstone Caves (`Y = -20` a `20`), com 7 estados de IA, 3 ataques sincronizados (Golpe de Escória, Varredura Tectônica, Estilhaço de Âmbar), 13 animações, ressonância sísmica em grupo, ovo personalizado e drops minerais. Detalhes em [docs/design/lithophage.md](docs/design/lithophage.md).
-- Cobrador da Última Dádiva (Collector of the Last Gift) — boss colossal opcional de folclore invernal (~4,5 blocos), invocado à noite com o Sino Mudo (`silent_bell`) sobre gelo compactado em Taiga Nevada ou Bosque Nevado, com cinemática de chegada em trenó pelo céu (9,5 s), diretor de câmera e HUD no cliente com tecla de pulo, 2 fases, 4 ataques coreografados, 18 animações, conquista *A Última Entrega* e saque exclusivo. Detalhes em [docs/design/last_gift_collector.md](docs/design/last_gift_collector.md).
-- O Quebra-Copas (The Canopy Breaker) — boss opcional de floresta antiga: fera simiesca arborícola de 3,1 blocos com o Porrete de Raiz-Morta, invocada à noite com o Ídolo do Tronco Oco em taiga antiga ou floresta sombria. Anda no chão, escala troncos, atravessa copas com saltos balísticos reais e despenca sobre o jogador (Queda da Copa). 200 PV, três estágios (60% e 25%), 6 ataques, 88 animações por keyframe, barra de vida temática, Bestiário de 6 páginas, quatro conquistas e saque exclusivo. Detalhes em [docs/design/canopy_breaker.md](docs/design/canopy_breaker.md).
-- Comandante Carmesim (Crimson Commander) — boss opcional das câmaras profundas: cavaleiro carmesim de 3,5 blocos com espada larga, raro abaixo da camada 0 no escuro ou invocado com a Insígnia do Juramento Manchada sobre tijolos de ardósia. 220 PV, três estágios (60% e 25%), 5 ataques mais guarda com riposta, duas Sentinelas de Cinza no segundo estágio, 35 animações, barra de vida temática, Bestiário de 6 páginas, quatro conquistas e a Espada Larga do Juramento Carmesim (Investida Carmesim). Detalhes em [docs/design/crimson_commander.md](docs/design/crimson_commander.md); testes: `.\gradlew.bat runCrimsonCommanderTest`.
-- A Bruxa dos Dez Fios (The Witch of Ten Threads) — boss composto de floresta antiga: Ester, a Matriarca Costureira (150 PV, 1,15 bloco), invocada com o Fuso Amaldiçoado em floresta escura, jardim pálido, taiga antiga ou floresta densa à noite. Dez marionetes (Aracnídea, Cão de Porcelana, Sino Oco, Cervo, Gralha, Noiva Oca, Centopeia, Mãe das Raízes, Carrasco, Gigante do Berço) lutam **uma por vez** enquanto ela é intocável; antes de cada especial o fio fica carmesim e pode ser cortado (marionete enroscada, ×1,75). Depois da décima, a Matriarca luta sozinha. Arena de 28 blocos com anti-pilar e anti-buraco, 13 animações por criatura, barra de vida temática, Bestiário de 8 páginas, cinco conquistas e o Cajado dos Dez Fios (três posturas). Detalhes em [docs/design/ten_threads_witch.md](docs/design/ten_threads_witch.md); testes: `.\gradlew.bat runTenThreadsWitchTest`.
-- Bestiário ilustrado com informações de combate, habitat e recompensas das criaturas.
-- Metadados `neoforge.mods.toml` gerados a partir de `gradle.properties`.
-- Testes de integração: `.\gradlew.bat runBasiliskTest`, `.\gradlew.bat runLithophageTest` e `.\gradlew.bat runLastGiftCollectorTest`, em mundos descartáveis dentro de `build/`.
-- Status de validação por comando: ver [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) e [docs/ROADMAP.md](docs/ROADMAP.md).
-
-## Licença
-
-Todos os direitos reservados (provisório; ver pendências em [docs/ROADMAP.md](docs/ROADMAP.md)).
+</details>
