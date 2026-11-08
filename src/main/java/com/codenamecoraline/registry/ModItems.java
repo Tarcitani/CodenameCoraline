@@ -4,6 +4,7 @@ import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.item.BestiaryItem;
 import com.codenamecoraline.item.CatacombLilyItem;
 import com.codenamecoraline.item.CrimsonOathGreatswordItem;
+import com.codenamecoraline.item.CommandmentTabletItem;
 import com.codenamecoraline.item.CursedSpindleItem;
 import com.codenamecoraline.item.TenThreadsStaffItem;
 import com.codenamecoraline.item.DeadrootClubItem;
@@ -192,6 +193,12 @@ public final class ModItems {
     /** Tough basaltic plate shed by the Brimstone Salamander, used in fey thermal infusions. */
     public static final DeferredItem<Item> BRIMSTONE_SCALE = ITEMS.registerSimpleItem("brimstone_scale",
             () -> new Item.Properties().rarity(Rarity.UNCOMMON));
+
+    public static final DeferredItem<Item> ARCHITECT_SPAWN_EGG = ITEMS.registerItem("architect_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.ARCHITECT.get()));
+    /** Raises the Architect as a dormant statue on a sturdy block. */
+    public static final DeferredItem<Item> COMMANDMENT_TABLET = ITEMS.registerItem("commandment_tablet", CommandmentTabletItem::new,
+            properties -> properties.stacksTo(1).rarity(Rarity.EPIC));
 
     // Retired rewards stay registered to preserve items in existing worlds; no drops or recipes.
     public static final DeferredItem<Item> CATACOMB_LILY = ITEMS.registerItem("catacomb_lily", CatacombLilyItem::new);

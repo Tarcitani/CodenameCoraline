@@ -569,5 +569,13 @@
   "advancements.codenamecoraline.bosses.find_brimstone_salamander.title": "Spirit of the Primordial Forges",
   "advancements.codenamecoraline.bosses.find_brimstone_salamander.description": "Encounter a living Brimstone Salamander along the lava shores of the Nether.",
   "advancements.codenamecoraline.bosses.brimstone_scale.title": "Hide That Does Not Burn",
-  "advancements.codenamecoraline.bosses.brimstone_scale.description": "Obtain an intact Brimstone Scale from the fiery amphibian."
+  "advancements.codenamecoraline.bosses.brimstone_scale.description": "Obtain an intact Brimstone Scale from the fiery amphibian.",
+  "entity.codenamecoraline.architect": "The Architect",
+  "item.codenamecoraline.architect_spawn_egg": "Architect Spawn Egg",
+  "item.codenamecoraline.commandment_tablet": "Tablet of the Commandments",
+  "entity.codenamecoraline.architect.summon.success": "A statue rises. It holds the Commandments... and waits.",
+  "entity.codenamecoraline.architect.summon.wrong_face": "The tablet must rest on top of a solid block.",
+  "entity.codenamecoraline.architect.summon.peaceful": "No god answers in a peaceful world.",
+  "entity.codenamecoraline.architect.summon.no_room": "There is no room for the statue here (it needs 2 x 4 free blocks).",
+  "entity.codenamecoraline.architect.summon.already_active": "Another Architect already watches over this place."
 }

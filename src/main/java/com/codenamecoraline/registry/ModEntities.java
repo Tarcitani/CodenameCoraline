@@ -14,6 +14,7 @@ import com.codenamecoraline.entity.basilisk.MistFlask;
 import com.codenamecoraline.entity.lithophage.AmberShard;
 import com.codenamecoraline.entity.lithophage.Lithophage;
 import com.codenamecoraline.entity.canopy.CanopyBreaker;
+import com.codenamecoraline.entity.architect.Architect;
 import com.codenamecoraline.entity.crimson.CrimsonAshVanguard;
 import com.codenamecoraline.entity.ten_threads_witch.MatriarchWitchEntity;
 import com.codenamecoraline.entity.ten_threads_witch.PuppetEntity;
@@ -205,6 +206,12 @@ public final class ModEntities {
                     .clientTrackingRange(8)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<Architect>> ARCHITECT = ENTITY_TYPES.register("architect",
+            id -> EntityType.Builder.of(Architect::new, MobCategory.MONSTER)
+                    .sized(Architect.WIDTH, Architect.HEIGHT).eyeHeight(Architect.EYE_HEIGHT)
+                    .clientTrackingRange(10)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
     /** Ballistic sulfurous tar globule hurled by the Brimstone Salamander. */
     public static final DeferredHolder<EntityType<?>, EntityType<BrimstoneSpit>> BRIMSTONE_SPIT = ENTITY_TYPES.register("brimstone_spit",
             id -> EntityType.Builder.<BrimstoneSpit>of(BrimstoneSpit::new, MobCategory.MISC)
@@ -243,6 +250,7 @@ public final class ModEntities {
         }
         event.put(FEY_RAVEN.get(), FeyRaven.createAttributes().build());
         event.put(BRIMSTONE_SALAMANDER.get(), BrimstoneSalamander.createAttributes().build());
+        event.put(ARCHITECT.get(), Architect.createAttributes().build());
     }
 
     private static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {

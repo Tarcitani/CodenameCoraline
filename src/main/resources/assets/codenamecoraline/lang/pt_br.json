@@ -569,5 +569,13 @@
   "advancements.codenamecoraline.bosses.find_brimstone_salamander.title": "Espírito das Forjas Primordiais",
   "advancements.codenamecoraline.bosses.find_brimstone_salamander.description": "Encontre uma Salamandra de Enxofre viva nas margens de lava do Nether.",
   "advancements.codenamecoraline.bosses.brimstone_scale.title": "Couro que não Arde",
-  "advancements.codenamecoraline.bosses.brimstone_scale.description": "Obtenha uma Escama de Enxofre intacta do anfíbio ígneo."
+  "advancements.codenamecoraline.bosses.brimstone_scale.description": "Obtenha uma Escama de Enxofre intacta do anfíbio ígneo.",
+  "entity.codenamecoraline.architect": "O Arquiteto",
+  "item.codenamecoraline.architect_spawn_egg": "Ovo Gerador de Arquiteto",
+  "item.codenamecoraline.commandment_tablet": "Tábua dos Mandamentos",
+  "entity.codenamecoraline.architect.summon.success": "Uma estátua se ergue. Ela segura os Mandamentos... e espera.",
+  "entity.codenamecoraline.architect.summon.wrong_face": "A tábua precisa repousar sobre o topo de um bloco sólido.",
+  "entity.codenamecoraline.architect.summon.peaceful": "Nenhum deus responde num mundo pacífico.",
+  "entity.codenamecoraline.architect.summon.no_room": "Não há espaço para a estátua aqui (ela precisa de 2 x 4 blocos livres).",
+  "entity.codenamecoraline.architect.summon.already_active": "Outro Arquiteto já vigia este lugar."
 }

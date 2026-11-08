@@ -107,6 +107,12 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
             systemProperty 'coraline.brimstoneSalamanderTests', 'true'
         }
+        architectTest {
+            type = 'gameTestServer'
+            gameDirectory = file('build/architect-gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'coraline.architectTests', 'true'
+        }
         // Applies to all run configurations above.
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
