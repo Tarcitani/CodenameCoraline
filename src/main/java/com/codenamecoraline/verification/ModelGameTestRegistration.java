@@ -11,7 +11,6 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 public final class ModelGameTestRegistration {
     @SubscribeEvent
     public static void functions(RegisterEvent event) {
-        if (Boolean.getBoolean("coraline.babyDragonTests")) DragonModelGameTests.functions(event);
         if (Boolean.getBoolean("coraline.canopyTests")) CanopyBreakerGameTests.functions(event);
         if (Boolean.getBoolean("coraline.crimsonTests")) CrimsonCommanderGameTests.functions(event);
         if (Boolean.getBoolean("coraline.tenThreadsTests")) TenThreadsWitchGameTests.functions(event);
@@ -20,7 +19,6 @@ public final class ModelGameTestRegistration {
 
     @SubscribeEvent
     public static void tests(RegisterGameTestsEvent event) {
-        if (Boolean.getBoolean("coraline.babyDragonTests")) DragonModelGameTests.tests(event);
         if (Boolean.getBoolean("coraline.canopyTests")) CanopyBreakerGameTests.tests(event);
         if (Boolean.getBoolean("coraline.crimsonTests")) CrimsonCommanderGameTests.tests(event);
         if (Boolean.getBoolean("coraline.tenThreadsTests")) TenThreadsWitchGameTests.tests(event);

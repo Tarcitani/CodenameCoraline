@@ -28,7 +28,6 @@ public final class CodenameCoraline {
         ModPotions.register(modEventBus);
         ModEntities.register(modEventBus);
         ModItems.register(modEventBus);
-        com.codenamecoraline.registry.ModDragonSystems.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         LOGGER.info("{} loaded (entities, companions, effects and Bestiary registered)", MOD_ID);
     }

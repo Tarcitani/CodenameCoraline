@@ -71,12 +71,6 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
             systemProperty 'coraline.deadrootTests', 'true'
         }
-        babyDragonTest {
-            type = 'gameTestServer'
-            gameDirectory = file('build/baby-dragon-gametest')
-            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
-            systemProperty 'coraline.babyDragonTests', 'true'
-        }
         crimsonCommanderTest {
             type = 'gameTestServer'
             gameDirectory = file('build/crimson-gametest')

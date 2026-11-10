@@ -18,30 +18,6 @@ Registro apenas de decisões relevantes: contexto, decisão e consequências. N�
 
 **Consequências.** A câmera continua usando a proteção vanilla contra paredes. Servidores normais não carregam classes de renderização dos testes, e os testes continuam exercitando os modelos reais no GameTestServer de desenvolvimento. Build, 81 testes do dragão, 35 do Quebra-Copas e 34 do Carmesim aprovados; servidor dedicado iniciado em loopback. Sem alteração dos ataques desses bosses.
 
-## D-036 — Anatomias próprias com rig de ataque comum entre cliente e servidor
-
-**Contexto.** A evolução anterior ampliava a mesma geometria. A nova ficha exige silhuetas, proporções, asas e caudas diferentes, preservando identidade cromática, gameplay e entidade.
-
-**Decisão.** Três modelos nativos e atlas próprios, com hierarquia de nomes comum e 17 animações por estágio. Geometria é reproduzível por Python/Pillow, com paleta extraída da textura Bebê e snapshot de origem com hash. Torso chanfrado por seções, asas com braço/cotovelo/punho/dedos e membranas recortadas, pescoço hierárquico, garras e caudas de 3/4/6 segmentos. O gerador produz também `DragonRig`, única fonte dos pivôs usados por `DragonAnatomy`; as mesmas rotações posicionam a cabeça no modelo e calculam boca/eixo do fogo no servidor. O renderer escolhe a instância por estado no momento de submissão, preservando o desenho de múltiplas idades no mesmo quadro. Máscaras emissivas e uma brasa ocasional complementam o Adulto sem cobrir a pele.
-
-**Consequências.** Sem nova entidade, biblioteca ou alteração de balanceamento. Dimensões físicas e assento passam a seguir anatomias reais, além da escala; preparos e disparo mantêm os tempos de gameplay. A mira usa o pivô articulado, e um teste compara o ponto e o eixo com a matriz da cabeça real. A comparação com a imagem de referência permanece impossível enquanto ela não estiver disponível: o anexo recebido contém só texto. As versões de corpo/UV anteriores são substituídas pelas novas, mas registros, identidade, vínculo e persistência permanecem.
-
-## D-033 — Evolução do companheiro existente, montaria de servidor e inventário vanilla
-
-**Contexto.** Expandir `baby_dragon` para três idades preservando mundos, UUID, dono, modelo, domesticação e comandos anteriores, sem bibliotecas de runtime.
-
-**Decisão.** Estágios e XP próprios sincronizados/persistentes na mesma entidade. Crescimento 1/1,8/3 afeta dimensões, olhos, boca, modelo e assento; a evolução dura 60 ticks e espera espaço livre. Crédito de XP usa dano efetivo contra hostis, teto por vítima e bônus único de participação na morte. Inventário nativo com 18 posições persistentes por índice, ativadas por idade; apenas o dono acessa; morte derruba itens uma vez e downgrade administrativo recusa conteúdo em posições que seriam ocultadas. Montaria usa pacote de intenção validado e física no servidor, sem aceitar coordenadas do cliente; X desce, G desmonta, R dispara e B sopra (V já era usado pelas cinemáticas). Graveto normal preserva ficar/seguir em qualquer idade; agachar com livro abre a tela sem substituir o ombro Bebê.
-
-**Consequências.** O registro e os recursos existentes continuam; não se cria outra entidade de dragão, reprodução ou ressurreição. Transferência automática entre dimensões continua fora do sistema. O ledger guarda até 1024 vítimas, mais que o necessário para alcançar o teto de 2000 XP; após isso recusa novos créditos. Aparência em movimento, sensação de voo e latência exigem validação humana.
-
-## D-034 — Magma temporário sem substituição de terreno
-
-**Contexto.** A bola colossal precisa deixar magma que expire mesmo com chunks descarregados, sem apagar construções ou alterações posteriores.
-
-**Decisão.** Bloco próprio sem item nem loot, aparência do magma vanilla e sem o dano indiscriminado de `MagmaBlock`. Colocação exclusivamente em ar sobre lista curta de terreno natural, atrás do projétil. Diário `SavedData` por dimensão com posição, prazo em tempo de jogo e UUID do dragão. Não forçar chunks; ao voltar, restaurar o ar somente se ainda houver o bloco temporário. Dano usa o filtro de aliados do mestre; se ele não está disponível, não há dano.
-
-**Consequências.** Nenhum bloco existente é substituído. Pausar o servidor pausa o tempo de expiração; chunks descarregados conservam o prazo e são limpos ao carregar. O rastro tem cap de 4096 posições por dimensão. Quebrar ou substituir uma posição invalida sua restauração, preservando mudanças posteriores.
-
 ## D-035 — JUnit apenas para os testes unitários existentes
 
 **Contexto.** O build completo falhava em `compileTestJava`: `ThreadSafeLruCacheTest` já importava Jupiter, mas não havia dependência declarada.
@@ -251,14 +227,6 @@ Registro apenas de decisões relevantes: contexto, decisão e consequências. N�
 **Decisão.** (1) Interface `PlayerSummon`: invocações de jogador formam um lado só; nunca se miram, nunca se ferem, e o golpe do porrete as poupa. (2) O porrete puxa na direção exata do olhar com empuxo sustentado (estilo martelo arremessado); o mergulho passou a ser opcional, com Shift no ar. (3) Intro de 6 s com batida no peito, rugido e diretor de câmera próprio, reaproveitando a tecla e o formato do Cobrador. (4) A morte libera um espírito: o modelo do boss translúcido e azul subindo e se apagando, como entidade visual com renderizador próprio por boss.
 
 **Consequências.** O espírito é desenhado com `entityTranslucent` e só pode ser julgado no `runClient`, assim como a câmera e os tremores da intro. Os GameTests da intro do Quebra-Copas e dos lacaios aguardam o fim da intro de 120 ticks.
-
-## D-031 — Dragão companheiro com ombro sem substituição da entidade
-
-**Contexto.** O Dragão Bebê precisa andar, voar, orbitar e pousar no ombro preservando a mesma criatura. Na API 26.1.2, `ShoulderRidingEntity` salva NBT no jogador e descarta o papagaio; a renderização vanilla do ombro é específica para papagaios. O requisito do dragão exige preservar a entidade ativa, além dos dados.
-
-**Decisão.** Usar `TamableAnimal` para o vínculo UUID e comandos persistentes, um único `DragonBrain` para arbitrar movimentos/defesa e navegações terrestre/aérea nativas com controle de velocidade gradual. No ombro, a entidade continua salva e rastreada no mundo, presa a uma âncora validada junto ao dono; o mesmo renderer usa escala menor. Não transformar em NBT do jogador, passageiro ou entidade substituta. Ocultar apenas o próprio dragão no ombro em primeira pessoa, preservando a visão do dono. A saída valida espaço e conserva identidade. O projétil é próprio, derivado de `ThrowableItemProjectile`, com dano direto e sem rotinas de incêndio/explosão.
-
-**Consequências.** Não há duplicação por reconstrução de snapshots nem necessidade de uma camada especial de jogador. A entidade deixa o ombro quando o dono deixa de estar disponível no mesmo mundo; não implementa transferência automática entre dimensões. `PlayerSummon` reaproveita a regra de aliados dos Micos e Presentes. Arte usa modelo nativo, 12 animações por keyframe, atlas procedural reproduzível e gravuras exportadas da geometria real. Nenhuma dependência adicional.
 
 ## D-031 — Golpes de gorila, guarda quebrada e salto de chão do Quebra-Copas
 

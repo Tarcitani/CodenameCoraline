@@ -1,8 +1,6 @@
 package com.codenamecoraline.registry;
 
 import com.codenamecoraline.CodenameCoraline;
-import com.codenamecoraline.entity.babydragon.BabyDragon;
-import com.codenamecoraline.entity.babydragon.DragonEmber;
 import com.codenamecoraline.entity.raven.FeyRaven;
 import com.codenamecoraline.entity.salamander.BrimstoneSalamander;
 import com.codenamecoraline.entity.salamander.BrimstoneSpit;
@@ -62,13 +60,6 @@ public final class ModEntities {
             id -> EntityType.Builder.of(Basilisk::new, MobCategory.MONSTER)
                     .sized(1.3F, 0.85F).eyeHeight(0.35F).clientTrackingRange(8)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
-
-    public static final DeferredHolder<EntityType<?>, EntityType<BabyDragon>> BABY_DRAGON = ENTITY_TYPES.register("baby_dragon",
-            id -> EntityType.Builder.of(BabyDragon::new, MobCategory.CREATURE).sized(0.45F, 0.72F).eyeHeight(0.53F)
-                    .fireImmune().clientTrackingRange(10).updateInterval(1).build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
-    public static final DeferredHolder<EntityType<?>, EntityType<DragonEmber>> DRAGON_EMBER = ENTITY_TYPES.register("dragon_ember",
-            id -> EntityType.Builder.<DragonEmber>of(DragonEmber::new, MobCategory.MISC).sized(0.15F, 0.15F)
-                    .fireImmune().clientTrackingRange(6).updateInterval(1).build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
     // Legacy entity ID preserves clouds already saved in worlds.
     public static final DeferredHolder<EntityType<?>, EntityType<WitherMistCloud>> WITHER_MIST_CLOUD = ENTITY_TYPES.register("death_blight_cloud",
@@ -232,7 +223,6 @@ public final class ModEntities {
 
     private static void onEntityAttributeCreation(EntityAttributeCreationEvent event) {
         event.put(REDCAP.get(), Redcap.createAttributes().build());
-        event.put(BABY_DRAGON.get(), BabyDragon.createAttributes().build());
         event.put(BASILISK.get(), Basilisk.createAttributes().build());
         event.put(LITHOPHAGE.get(), Lithophage.createAttributes().build());
         event.put(LAST_GIFT_COLLECTOR.get(), LastGiftCollector.createAttributes().build());
@@ -254,8 +244,6 @@ public final class ModEntities {
     }
 
     private static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {
-        event.register(BABY_DRAGON.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                BabyDragon::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(BASILISK.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 Basilisk::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(LITHOPHAGE.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,

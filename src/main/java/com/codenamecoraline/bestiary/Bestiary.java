@@ -52,13 +52,6 @@ public final class Bestiary {
             BestiaryPage.sketch("combat", "canopy_breaker_combat", 112, 72),
             BestiaryPage.sketch("spoils", "canopy_breaker_spoils", 112, 64)));
 
-    public static final BestiaryEntry BABY_DRAGON = new BestiaryEntry("baby_dragon", List.of(
-            BestiaryPage.sketch("intro", "baby_dragon_anatomy", 112, 80),
-            BestiaryPage.text("habitat"), BestiaryPage.text("behavior"), BestiaryPage.text("taming"),
-            BestiaryPage.sketch("companion", "baby_dragon_flight", 112, 72),
-            BestiaryPage.sketch("defense", "baby_dragon_defense", 112, 72),
-            BestiaryPage.text("growth"), BestiaryPage.text("inferno"), BestiaryPage.text("riding"), BestiaryPage.text("inventory")));
-
     public static final BestiaryEntry CRIMSON_COMMANDER = new BestiaryEntry("crimson_commander", List.of(
             BestiaryPage.text("kingless"),
             BestiaryPage.sketch("anatomy", "crimson_commander_anatomy", 112, 80),
@@ -103,7 +96,7 @@ public final class Bestiary {
             BestiaryPage.sketch("spoils", "architect_spoils", 112, 64),
             BestiaryPage.text("scimitar")));
 
-    public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK, LITHOPHAGE, LAST_GIFT_COLLECTOR, CANOPY_BREAKER, BABY_DRAGON,
+    public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK, LITHOPHAGE, LAST_GIFT_COLLECTOR, CANOPY_BREAKER,
             CRIMSON_COMMANDER, TEN_THREADS_WITCH, FEY_RAVEN, BRIMSTONE_SALAMANDER);
 
     private Bestiary() {}

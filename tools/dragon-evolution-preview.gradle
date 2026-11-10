@@ -1,9 +1,0 @@
-// Isolated client smoke inspection. Never opens run/saves or a campaign world.
-allprojects {
-    afterEvaluate {
-        neoForge.runs.named('client') {
-            gameDirectory = file('build/dragon-evolution-preview')
-            programArguments.addAll('--quickPlaySingleplayer', 'DragonInspection')
-        }
-    }
-}

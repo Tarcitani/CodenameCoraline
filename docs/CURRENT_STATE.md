@@ -7,6 +7,8 @@ Resumo de uma página para começar sessões novas. **Não é fonte de verdade:*
 ## Stack
 Minecraft 26.1.2 · NeoForge 26.1.2.124 · Java 25 · Gradle 9.2.1. Mod ID `codenamecoraline`. Tema: folclore feérico tradicional.
 
+A implementação anterior do dragão foi removida para recriação futura.
+
 ## Conteúdo implementado
 
 | Sistema | Resumo | Design |
@@ -18,15 +20,13 @@ Minecraft 26.1.2 · NeoForge 26.1.2.124 · Java 25 · Gradle 9.2.1. Mod ID `code
 | Quebra-Copas | Boss arbóreo, Micos de Casca, Porrete de Raiz-Morta | `design/canopy_breaker.md` |
 | Comandante Carmesim | Boss de 3 estágios, spawn raro em cavernas | `design/crimson_commander.md` |
 | Bruxa dos Dez Fios | Boss composto (Matriarca + 10 marionetes), 33 ataques, sistema de animação próprio | `design/ten_threads_witch.md`, `design/matriarch_animation.md` |
-| Dragão Bebê Companheiro | Domesticável; evolui Bebê → Jovem → Adulto; montaria, inventário, sopro | `design/baby_dragon.md`, `design/dragon_evolution.md`, `design/dragon_remodel.md`, `design/baby_dragon_roadmap.md` |
 | Corvo Feérico Companheiro | Domesticável com bagas brilhantes; ombro, coleta de itens brilhantes (1 slot), Sentinela Mística contra invisíveis | `design/fey_raven.md` |
 | Salamandra de Enxofre | Predador vulcânico do Nether, 8 estados, 3 ataques, 3 variantes de textura (Brimstone, Soulflame, Crimson) e estágio filhote com dinâmica familiar, combate juvenil e 6 texturas dedicadas | `design/brimstone_salamander.md` |
 | Bestiário | Livro com capítulo ilustrado por mob/boss | `ARCHITECTURE.md` |
 
-Os últimos commits entregam a Salamandra de Enxofre (`brimstone_salamander`, perfil `hostil` no Nether com estágio filhote completo), o Corvo Feérico Companheiro (`fey_raven`, perfil `aliado`) e as etapas do Baby Dragon.
 
 ## Validação
-- Os GameTests rodam por tarefas `run<Mob>Test` (lista em `build.gradle`). Contagens recentes: Dragão Bebê 81, Comandante 34, Quebra-Copas 35, Bruxa 30, Salamandra de Enxofre 23, Matriarca 20, Cobrador 18, Basilisco 17, Litófago 11, Porrete 9, Corvo Feérico 8.
+- Os GameTests rodam por tarefas `run<Mob>Test` (lista em `build.gradle`). Contagens recentes: Comandante 34, Quebra-Copas 35, Bruxa 30, Salamandra de Enxofre 23, Matriarca 20, Cobrador 18, Basilisco 17, Litófago 11, Porrete 9, Corvo Feérico 8.
 - Em 2026-11-05 o `build` e o `runTenThreadsWitchTest` ainda não tinham sido executados pelo agente (o Gradle não roda no shell de alguns agentes; ver `DEVELOPMENT.md`). Confirme no seu terminal.
 
 ## Em desenvolvimento
@@ -38,7 +38,6 @@ Os últimos commits entregam a Salamandra de Enxofre (`brimstone_salamander`, pe
 ## Pendências recorrentes
 - **Nada de Comandante, Bruxa e Matriarca foi visto no jogo** (`runClient`): aparência, animações, sons, barra, gravuras.
 - Balanceamento real contra jogador, em terreno real e com multiplayer (2 clientes e latência).
-- Dragões: aceite humano de voo, combate e áudio. Comparação com a imagem de referência ficou sem resposta.
 - Gravuras do Bestiário da Matriarca não regeneradas com o rig novo.
 - Licença real a definir antes de publicar (provisório: All Rights Reserved).
 - Redcap: geração natural e voz original em `.ogg` não existem.

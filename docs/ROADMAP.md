@@ -1,32 +1,6 @@
 # Roadmap técnico
 
-## Remodelagem das três anatomias — 2026-11-04
-
-**Em desenvolvimento:** os dragões ainda não estão finalizados. Há muitas mudanças e refinamentos pela frente, tanto na aparência e nas animações quanto no combate, no voo e na experiência multiplayer; os itens concluídos abaixo registram apenas o trabalho já implementado e verificado.
-
-- [x] Bebê refinado, Jovem alongado e Adulto robusto de pescoço arqueado, com modelos/atlas próprios, asas de braço/cotovelo/punho/dedos e membranas seccionadas, garras, armadura natural e caudas de 3/4/6 segmentos. Paleta extraída da textura original, sem nova entidade ou biblioteca.
-- [x] 17 animações por idade, emissão seletiva e fogo ancorado à cabeça por matemática comum; corpo físico, olhos e assento acompanham a anatomia. XP, danos, recargas, interface, inventário e vínculo preservados.
-- [x] Build e 15 unitários aprovados; **81 GameTests em seis rodadas consecutivas** após isolar fixtures de mecânica da IA própria. Dez testes novos verificam modelos reais, UV, eixo/boca, movimento, assento, recursos e paredes. Regressões aprovadas; uma falha isolada do Cobrador passou na repetição.
-- [x] Oito perspectivas por modelo e comparação sem textura exportadas da geometria real, além de 612 amostras/GIF e gravuras atualizadas. Inspeção de cliente em mundo descartável, com evidências no relatório.
-- [ ] Comparação com a imagem de referência: o anexo recebido continha só texto. Nenhuma equivalência visual com imagem indisponível foi declarada.
-- [x] Verificação complementar no cliente: três modelos, evolução por XP no mesmo UUID, inventário/persistência e montaria; câmera de terceira pessoa corrigida; ataques, asas, cauda e avanço/subida observados em servidor dedicado. Registro opt-in de testes gráficos corrigido para inicialização dedicada; build e suítes 81/35/34 aprovados.
-- [ ] Aceite humano de voo/combate em terreno real, áudio, desempenho e dois clientes sob latência. Dois perfis conectaram ao servidor local, mas a inspeção visual simultânea foi impedida por duas quedas nativas de GLFW ao alternar janelas; a inspeção com um cliente remoto foi concluída.
-
-Especificação, prévias e relatório A–J: [design/dragon_remodel.md](design/dragon_remodel.md).
-
-## Evolução do dragão existente — 2026-11-04
-
-- [x] Mesmo registro/UUID e domesticação, agora com Bebê/Jovem/Adulto, XP próprio persistente, evolução de 60 ticks, dimensões reais e atributos por idade. Modelo e atlas preservados; detalhes progressivos, 17 animações nativas, boca e assento escalados.
-- [x] Esferas por estágio, impacto em área com oclusão, esfera colossal com magma temporário de diário persistente e Sopro Infernal contínuo de servidor com efeitos no cliente. Regras de dono/aliados preservadas.
-- [x] Montaria do dono, intenções validadas por servidor, teclas configuráveis, GUI vanilla e inventário persistente 0/9/18, entrega de itens uma vez na morte e comandos administrativos com seleção única. Bestiário e traduções ampliados.
-- [x] Build completo e **15 testes unitários + 71 GameTests** aprovados em **seis rodadas forçadas consecutivas** (`coraline-dragon-evolution-verified-1..6.log` no TEMP). Testes antigos preservados, exceto novos valores exigidos pela ficha e correção da faixa de chaves da fixture concorrente do cache. Regressões: seis aprovações de cada suíte (Basilisco e Cobrador em sete tentativas; demais em seis), com falhas intermediárias registradas no relatório.
-- [x] 612 amostras exportadas do modelo real; pranchas de crescimento e ataques inspecionadas offline. Cliente isolado em `build/dragon-evolution-preview`: interface/inventário, montagem, dorso e G observados; inspeção levou a corrigir espaçamento, toques rápidos e excesso de fumaça do sopro.
-- [ ] Aceite humano com `runClient`: qualidade final de movimento/arte/sopro, áudio, balanceamento, voo prolongado em relevo real e comportamento em combate.
-- [ ] Sessão com dois clientes reais/latência e teste operacional de descarregar chunks/reiniciar servidor com rastros ativos. Automação cobre codecs, persistência, oclusão, aliança, acesso e rejeição de intenções inválidas; não substitui essas sessões.
-
-Especificação atual: [design/dragon_evolution.md](design/dragon_evolution.md). Evidências, limites e relatório A–J: [design/dragon_evolution_validation.md](design/dragon_evolution_validation.md).
-
-Estado da fundação, verificações realizadas e pendências. Não contém escopo criativo do mod: ele ainda não foi definido.
+O dragão anterior foi removido; uma nova implementação será planejada do zero.
 
 ## Estado inicial (fundação)
 
@@ -165,19 +139,6 @@ Estado da fundação, verificações realizadas e pendências. Não contém esco
 
 - Névoa aplica Cegueira por cinco segundos junto de Decomposição III. A poção existente cura e bloqueia ambos durante os mesmos três/oito minutos; nomes e Bestiário atualizados em português e inglês.
 - `.\gradlew.bat build runBasiliskTest`: **VALIDADO**, todos os testes obrigatórios aprovados, incluindo Cegueira na névoa, paredes, cura, proteção, expiração e leite.
-
-## Dragão Bebê Companheiro — 2026-10-29
-
-- Implementados `baby_dragon`, domesticação/cura por salmão, comandos de ficar/seguir/defesa, navegação terrestre/aérea, órbita variável, ombro preservando a entidade original, saída segura, persistência e centelhas defensivas sem fogo amigo, incêndios ou destruição. Spawn raro em florestas/montanhas/taigas/bosques e ovo nas abas criativas.
-- Modelo original com quatro patas, mandíbula, olhos, chifres, asas membranosas articuladas, cauda e atlas detalhado. Doze animações nativas, oito sons com eventos vanilla, capítulo de seis páginas-base em pt-BR/en-US e três gravuras exportadas da geometria real. Índice do Bestiário ajustado para o sexto capítulo.
-- Gradle `build` e `runBabyDragonTest`: **VALIDADOS**, suíte final **31/31 em três execuções consecutivas**. Regressões: Basilisco 17/17, Litófago 11/11, Cobrador 18/18, Quebra-Copas 27/27 e Porrete 9/9, com pelo menos duas aprovações de cada suíte. Falhas intermitentes anteriores registradas no relatório; testes antigos preservados.
-- Duas sessões reais de `runClient` em mundo descartável: modelo/textura, voo, domesticação, felicidade, ombro e permanência ao reabrir, primeira pessoa desobstruída e capítulo completo nos dois idiomas conferidos. Prévias estáticas e animadas geradas. **Ainda dependem de avaliação:** áudio, combate prolongado/balanceamento, terreno florestal denso e multijogador sob latência. A expansão do peito no carregamento foi validada offline após a inspeção.
-- Especificação: [design/baby_dragon.md](design/baby_dragon.md). Matriz de conformidade, testes, decisões, arquivos e evidências: [design/baby_dragon_validation.md](design/baby_dragon_validation.md).
-
-
-- Correcao posterior do Dragao Bebe: removido impulso lateral no ombro e conflito do disparo com o evento vanilla do Sniffer; dois testes reproduziram os defeitos e a versao corrigida passou **33/33 GameTests e build**. Detalhes em [relatorio](design/baby_dragon_validation.md).
-
-- Dragao Bebe agora auxilia contra mobs pacificos atingidos pelo dono, incluindo galinhas, vacas e porcos, preservando aliados e animais sem envolvimento. Build e **38/38 GameTests aprovados**.
 
 ## Quebra-Copas: golpes de gorila, guarda quebrada e salto de chão — 2026-10-31
 

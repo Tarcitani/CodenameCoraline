@@ -180,10 +180,6 @@ public final class ModItems {
     public static final DeferredItem<Item> TEN_THREADS_WITCH_PORTRAIT = ITEMS.registerSimpleItem("ten_threads_witch_portrait",
             () -> new Item.Properties().stacksTo(1));
 
-    public static final DeferredItem<Item> BABY_DRAGON_SPAWN_EGG = ITEMS.registerItem("baby_dragon_spawn_egg", SpawnEggItem::new,
-            () -> new Item.Properties().spawnEgg(ModEntities.BABY_DRAGON.get()));
-    /** Render-only sprite for the companion's ember. */
-    public static final DeferredItem<Item> DRAGON_EMBER = ITEMS.registerSimpleItem("dragon_ember");
 
     public static final DeferredItem<Item> FEY_RAVEN_SPAWN_EGG = ITEMS.registerItem("fey_raven_spawn_egg", SpawnEggItem::new,
             () -> new Item.Properties().spawnEgg(ModEntities.FEY_RAVEN.get()));
