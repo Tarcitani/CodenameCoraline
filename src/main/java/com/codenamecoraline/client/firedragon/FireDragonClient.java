@@ -19,6 +19,7 @@ public final class FireDragonClient {
 
     @SubscribeEvent
     static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(ModEntities.DRAGON_FIREBALL.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
         event.registerEntityRenderer(ModEntities.FIRE_DRAGON.get(), FireDragonRenderer::new);
     }
 }

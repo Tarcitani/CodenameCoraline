@@ -3,6 +3,7 @@ package com.codenamecoraline.registry;
 import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.entity.raven.FeyRaven;
 import com.codenamecoraline.entity.firedragon.FireDragon;
+import com.codenamecoraline.entity.firedragon.DragonFireball;
 import com.codenamecoraline.entity.salamander.BrimstoneSalamander;
 import com.codenamecoraline.entity.salamander.BrimstoneSpit;
 import com.codenamecoraline.entity.redcap.Redcap;
@@ -214,6 +215,11 @@ public final class ModEntities {
             id -> EntityType.Builder.of(FireDragon::new, MobCategory.CREATURE)
                     .sized(FireDragon.WIDTH, FireDragon.HEIGHT).eyeHeight(FireDragon.EYE_HEIGHT)
                     .fireImmune().clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<DragonFireball>> DRAGON_FIREBALL = ENTITY_TYPES.register("dragon_fireball",
+            id -> EntityType.Builder.<DragonFireball>of(DragonFireball::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F).fireImmune().clientTrackingRange(8).updateInterval(1)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
     private ModEntities() {}

@@ -28,13 +28,56 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jspecify.annotations.Nullable;
 
-/** Baby-only entity with persistent appearance and server-selected visual idles; companion AI comes later. */
+/** Baby-only entity with persistent appearance and server-selected visual idles; companion logic remains server-authoritative. */
 public final class FireDragon extends TamableAnimal {
     public static final float WIDTH = 0.55F;
     public static final float HEIGHT = 0.65F;
     public static final float EYE_HEIGHT = 0.48F;
 
-    public enum State { WILD_IDLE }
+    public enum State { WILD_IDLE, FOLLOWING, SITTING, SHOULDER, HUNTING, DEFENDING, SOCIAL }
+    private static final State[] STATES = State.values();
+    private static final EntityDataAccessor<Integer> STATE = SynchedEntityData.defineId(FireDragon.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> SHOULDER = SynchedEntityData.defineId(FireDragon.class, EntityDataSerializers.INT);
+    private final FireDragonCompanion companion = new FireDragonCompanion(this);
+    private int satiety = 100;
+    private int hungerTicks;
+    private int growthRemaining = 72000;
+    private boolean hatched;
+    public int getSatiety() { return satiety; }
+    public int getGrowthRemaining() { return growthRemaining; }
+    public boolean isHatched() { return hatched; }
+    public int getShoulderSide() { return entityData.get(SHOULDER); }
+    public boolean isOnShoulder() { return getShoulderSide() != 0; }
+    void setShoulderSide(int side) { entityData.set(SHOULDER, side); }
+    void setState(State state) { entityData.set(STATE, state.ordinal()); }
+    public void feedSalmon() {
+        heal(4);
+        satiety = Math.min(100, satiety + 25);
+        growthRemaining = Math.max(0, growthRemaining - Math.max(1, (growthRemaining + 9) / 10));
+        playVisual(FireDragonAnimation.EAT);
+    }
+    void eatMeat() { satiety = Math.min(100, satiety + 25); playVisual(FireDragonAnimation.EAT); }
+    public boolean canDamage(net.minecraft.world.entity.Entity target) {
+        if (!(target instanceof net.minecraft.world.entity.LivingEntity living) || target == this || !living.isAlive()
+                || living.isInvulnerable() || isAlliedTo(target)) return false;
+        var owner = getOwner();
+        if (target == owner) return false;
+        if (target instanceof TamableAnimal pet && getOwnerReference() != null
+                && getOwnerReference().equals(pet.getOwnerReference())) return false;
+        if (target instanceof Player player) {
+            if (!isTame() || player.isCreative() || player.isSpectator()) return false;
+            if (owner instanceof Player own && (!own.canHarmPlayer(player)
+                    || !((ServerLevel) level()).isPvpAllowed())) return false;
+        }
+        return true;
+    }
+    void companionSocial(FireDragon other, FireDragonAnimation clip) { companion.acceptSocial(other, clip); }
+    public boolean landOnShoulder(Player player) { return companion.perch(player); }
+    private void tickNutrition() {
+        if (++hungerTicks >= 600) { hungerTicks = 0; satiety = Math.max(0, satiety - 1); }
+        if (satiety > 0 && growthRemaining > 0) --growthRemaining;
+        // Stay a baby at zero until the young stage is implemented.
+    }
     private static final FireDragonAnimation[] VISUAL_CLIPS = FireDragonAnimation.values();
     private static final EntityDataAccessor<Integer> COLORS = SynchedEntityData.defineId(FireDragon.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CLIP = SynchedEntityData.defineId(FireDragon.class, EntityDataSerializers.INT);
@@ -45,6 +88,8 @@ public final class FireDragon extends TamableAnimal {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
+        builder.define(STATE, State.WILD_IDLE.ordinal());
+        builder.define(SHOULDER, 0);
         builder.define(COLORS, 70);
         builder.define(CLIP, 0);
         builder.define(CLIP_START, 0L);
@@ -65,7 +110,7 @@ public final class FireDragon extends TamableAnimal {
         float ticks = Math.max(0, level().getGameTime() - entityData.get(CLIP_START) + partialTick);
         return isVisualPreview() ? ticks % (getVisualAnimation().ticks + 10) : ticks;
     }
-    private void playVisual(FireDragonAnimation animation) {
+    void playVisual(FireDragonAnimation animation) {
         entityData.set(CLIP_START, level().getGameTime());
         entityData.set(CLIP, animation.ordinal());
     }
@@ -74,11 +119,13 @@ public final class FireDragon extends TamableAnimal {
     public void tick() {
         super.tick();
         if (level().isClientSide() || isVisualPreview() || !isAlive()) return;
+        tickNutrition();
+        if (!isNoAi()) companion.tick();
         if (getVisualAnimation() != FireDragonAnimation.NONE
                 && getVisualAnimationTicks(0) >= getVisualAnimation().ticks) playVisual(FireDragonAnimation.NONE);
         if (--nextIdleTicks > 0) return;
         nextIdleTicks = 100 + random.nextInt(101);
-        if (getTarget() == null && onGround() && !isInSittingPose() && getDeltaMovement().horizontalDistanceSqr() < 0.001D) {
+        if ((getState() == State.WILD_IDLE || getState() == State.FOLLOWING) && getVisualAnimation() == FireDragonAnimation.NONE && getTarget() == null && onGround() && !isInSittingPose() && getDeltaMovement().horizontalDistanceSqr() < 0.001D) {
             playVisual(switch (random.nextInt(3)) {
                 case 0 -> FireDragonAnimation.IDLE_SNIFF;
                 case 1 -> FireDragonAnimation.IDLE_WINGS;
@@ -100,6 +147,11 @@ public final class FireDragon extends TamableAnimal {
     @Override
     protected void addAdditionalSaveData(ValueOutput output) {
         super.addAdditionalSaveData(output);
+        output.putInt("Satiety", satiety);
+        output.putInt("HungerTicks", hungerTicks);
+        output.putInt("GrowthRemaining", growthRemaining);
+        output.putBoolean("Hatched", hatched);
+        output.putInt("DragonShoulder", getShoulderSide());
         output.putInt("PrimaryColor", getPrimaryColor());
         output.putInt("SecondaryColor", getSecondaryColor());
         output.putInt("AccentColor", getAccentColor());
@@ -109,6 +161,12 @@ public final class FireDragon extends TamableAnimal {
     @Override
     protected void readAdditionalSaveData(ValueInput input) {
         super.readAdditionalSaveData(input);
+        satiety = Math.clamp(input.getIntOr("Satiety", 100), 0, 100);
+        hungerTicks = Math.clamp(input.getIntOr("HungerTicks", 0), 0, 599);
+        growthRemaining = Math.clamp(input.getIntOr("GrowthRemaining", 72000), 0, 72000);
+        hatched = input.getBooleanOr("Hatched", false);
+        setShoulderSide(isTame() ? Math.clamp(input.getIntOr("DragonShoulder", 0), -1, 1) : 0);
+        companion.resetAfterLoad();
         setAppearance(input.getIntOr("PrimaryColor", 2), input.getIntOr("SecondaryColor", 4), input.getIntOr("AccentColor", 0));
         FireDragonAnimation preview = FireDragonAnimation.fromName(input.getStringOr("VisualPreview", "none"));
         entityData.set(PREVIEW, preview != FireDragonAnimation.NONE);
@@ -134,12 +192,12 @@ public final class FireDragon extends TamableAnimal {
     }
 
     public State getState() {
-        return State.WILD_IDLE;
+        return STATES[entityData.get(STATE)];
     }
 
     @Override
     protected void registerGoals() {
-        // Deliberately inert until the companion AI slice.
+        // Companion priorities are coordinated by FireDragonCompanion on the server.
     }
 
     public static boolean checkSpawnRules(EntityType<FireDragon> type, ServerLevelAccessor level,
@@ -154,8 +212,32 @@ public final class FireDragon extends TamableAnimal {
 
     @Override
     public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
-        if (source.is(DamageTypeTags.IS_FALL)) return false;
-        return super.hurtServer(level, source, amount);
+        if (source.is(DamageTypeTags.IS_FALL) || (source.getEntity() != null && source.getEntity() == getOwner())
+                || (source.getEntity() instanceof TamableAnimal pet && getOwnerReference() != null
+                && getOwnerReference().equals(pet.getOwnerReference()))) return false;
+        boolean accepted = super.hurtServer(level, source, amount);
+        if (accepted && source.getEntity() instanceof net.minecraft.world.entity.LivingEntity attacker) {
+            companion.onDamaged(attacker);
+        }
+        return accepted;
+    }
+
+    @Override
+    public boolean isPushable() { return !isOnShoulder() && super.isPushable(); }
+
+    @Override
+    public void push(net.minecraft.world.entity.Entity other) {
+        if (!isOnShoulder()) super.push(other);
+    }
+
+    @Override
+    protected void doPush(net.minecraft.world.entity.Entity other) {
+        if (!isOnShoulder()) super.doPush(other);
+    }
+
+    @Override
+    public boolean canCollideWith(net.minecraft.world.entity.Entity other) {
+        return !isOnShoulder() && super.canCollideWith(other);
     }
 
     @Override
@@ -165,8 +247,33 @@ public final class FireDragon extends TamableAnimal {
 
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
-        // Prevent vanilla feeding/breeding from substituting the future growth contract.
-        return InteractionResult.PASS;
+        ItemStack held = player.getItemInHand(hand);
+        if (isTame() && !isOwnedBy(player)) return InteractionResult.PASS;
+        if (!isTame() && !held.is(Items.SALMON)) return InteractionResult.PASS;
+        if (level().isClientSide()) return InteractionResult.SUCCESS;
+        if (isTame() && player.isShiftKeyDown()) {
+            landOnShoulder(player);
+            return InteractionResult.SUCCESS;
+        }
+        if (held.is(Items.SALMON)) {
+            if (!player.getAbilities().instabuild) held.shrink(1);
+            if (!isTame()) {
+                if (random.nextFloat() < (hatched ? 0.5F : 0.33F)) {
+                    tame(player);
+                    setOrderedToSit(false);
+                    level().broadcastEntityEvent(this, (byte) 7);
+                } else level().broadcastEntityEvent(this, (byte) 6);
+            }
+            feedSalmon();
+            return InteractionResult.SUCCESS;
+        }
+        if (!isOnShoulder()) {
+            setOrderedToSit(!isOrderedToSit());
+            setInSittingPose(isOrderedToSit());
+            getNavigation().stop();
+            setTarget(null);
+        }
+        return InteractionResult.SUCCESS;
     }
 
     @Override
