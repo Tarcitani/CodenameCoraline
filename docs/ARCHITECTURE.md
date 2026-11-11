@@ -129,6 +129,14 @@ Tomando o Litófago como exemplo (`<id>` = `lithophage`, `<pkg>` = `lithophage`)
 
 Subsistemas compartilhados: `entity/PlayerSummon` (invocações do jogador), `entity/spirit/BossSpirit` (espírito pós-boss), `util/`, `inventory/`, `item/`. Fluxo de uma entidade nova: registrar tipo → atributos/spawn → cliente (modelo, animação, render) → dados → textos → testes.
 
+### Dragão de Fogo (bebê): fundação e visual
+
+`entity/firedragon/FireDragon` estende `TamableAnimal`, seguindo a base do `FeyRaven`. Sem goals de companheiro nesta etapa. `ModEntities` registra tipo, atributos e restrição de spawn natural; `ModItems` e abas expõem o ovo criativo (distinto do ovo incubável ainda pendente). Cores e início do clipe visual são sincronizados por `SynchedEntityData`; cores persistem no save, e o relógio usa tempo do mundo para funcionar quando o cliente começa a rastrear uma entidade já existente. `FireDragonAnimation` mantém metadados comuns sem importar classes do cliente.
+
+`client/firedragon/` contém Model, Geometry, Animations, RenderState, Renderer, EyesLayer e Client. Model reutiliza os mesmos clipes no renderizador e no exportador; a fonte de geometria/UV é `tools/generate_fire_dragon_assets.py`, que gera `FireDragonGeometry.java`, 125 texturas 128×128 e o ícone 16×16. `tools/generate_fire_dragon_animations.py` gera o enum comum, keyframes Java e documentação de ângulos; editar esses scripts e regenerar, sem alterar os arquivos gerados diretamente. `VisualPreview` em NBT é uma ferramenta de diagnóstico de pose, sem efeito em gameplay. Não há evento customizado de rede.
+
+`FireDragonGameTests` é habilitado por `coraline.fireDragonTests` (`runFireDragonTest`): registro, spawn, dano, aparência persistente e idles do servidor. `tools/fire-dragon-sketches.gradle` exporta o modelo com todas as animações para revisão; jovem/adulto/ninhos, vínculo, voo funcional, fogo e ombro do jogador continuam pendentes.
+
 ## Animação do Redcap
 
 - **Base:** a cada quadro o modelo volta à pose definida em `createBodyLayer` (inclinações fixas ficam em partes filhas). Nomes de partes são únicos, com prefixo de lado (`right_forearm`, `left_boot`...), porque as animações por keyframe buscam ossos pelo nome.

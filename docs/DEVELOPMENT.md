@@ -28,6 +28,8 @@ Verificado pela ferramenta: nenhuma sobreposição de UV entre cubos diferentes;
 
 ## Testes
 
+- `.\gradlew.bat runFireDragonTest` executa os 3 testes próprios da fundação do Dragão de Fogo (registro/atributos/recursos, spawn e dano), além do teste do framework, em `build/fire-dragon-gametest/` (`coraline.fireDragonTests=true`). **VALIDADO em 2026-11-11** pelo agente: `compileJava`, `build` e quatro rodadas consecutivas de `.\gradlew.bat runFireDragonTest runFeyRavenTest runBrimstoneSalamanderTest` aprovadas (totais do servidor: 4/4, 9/9, 23/23 por rodada). Logs em `build/logs/fire_dragon_fatia1_round_1.log` até `fire_dragon_fatia1_round_4.log`. Na fundação ainda não havia renderizador; a inspeção visual foi feita depois, na fatia 2 (seção abaixo). Ícone: `python tools/generate_fire_dragon_assets.py`, executado com sucesso.
+
 - `.\gradlew.bat runBasiliskTest` executa os Game Tests do Basilisco em `build/basilisk-gametest/`, sem abrir os mundos do usuário. Não exige um framework externo (D-017).
 - `.\gradlew.bat runDeadrootClubTest` executa os 7 testes da habilidade do Porrete de Raiz-Morta (carga, dano por altura, invocação com cap, aliados) em `build/deadroot-gametest/` (propriedade `coraline.deadrootTests=true`).
 - `.\gradlew.bat runCanopyBreakerTest` executa os 17 testes do Quebra-Copas em `build/canopy-gametest/` (propriedade `coraline.canopyTests=true`). O terreno é construído por cada teste a Y relativo 100 e todos os chunks dele são forçados.
@@ -245,3 +247,15 @@ Os testes de servidor não medem frequência de geração em uma campanha de sob
   - Receita da Tábua dos Mandamentos bloqueada (`commandment_tablet.json` com `neoforge:false`).
   - Invocação manual inerte em ambiente normal (`CommandmentTabletItem.ENABLED = false`).
 - **Status dos testes:** O código e assets continuam íntegros no repositório; `.\gradlew.bat build` verde e `runArchitectTest` (54/54) mantido operacional com ativação de testes (`coraline.architectTests=true`).
+
+## Dragão de Fogo — visual em revisão (2026-11-11)
+
+Executados pelo agente com sucesso:
+
+1. `python tools/generate_fire_dragon_assets.py`: modelo Java, ícone e 125 skins; 63 retângulos UV sem sobreposição, atlas 128×128 e emissivo alinhado/transparente.
+2. `python tools/generate_fire_dragon_animations.py`: 22 clipes, enum comum e tabela de ângulos/pivôs em `docs/design/fire_dragon_animation.md`.
+3. `.\gradlew.bat compileJava -I tools/fire-dragon-sketches.gradle exportFireDragonSketchModel`: modelo real; validação de juntas em todos os ticks e exportação de 75 poses. `python tools/generate_fire_dragon_sketches.py`: três pranchas, 23 poses individuais e quatro GIFs, em `build/fire-dragon-sketches/`.
+4. `build` e quatro rodadas de `.\gradlew.bat runFireDragonTest runFeyRavenTest runBrimstoneSalamanderTest`: 6/6, 9/9, 23/23 por rodada. Agora são 5 testes próprios do dragão mais 1 do framework. Logs `build/logs/fire_dragon_fatia2_round_1.log` a `_4.log`.
+5. `.\gradlew.bat runClient`: inspecionados vermelho/dourado e preto/dourado, voo em prévia, preparo de fogo e escala junto ao jogador no mundo novo “Fire Dragon Visual Review”; encerramento normal, sem crash. Log `build/logs/fire_dragon_fatia2_client_final.log`. Aprovação visual humana ainda pendente; os comportamentos não foram implementados nesta fatia.
+
+Comandos `/summon` e `VisualPreview` ficam na ficha. Não use `--quickPlaySingleplayer` como opção direta do Gradle: não é uma opção da tarefa; a inspeção usou o menu normal do jogo. O exportador Java deve estar em UTF-8 sem BOM (`javac` rejeita U+FEFF no início do arquivo).

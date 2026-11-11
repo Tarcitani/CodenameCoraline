@@ -2,12 +2,12 @@
 
 Resumo de uma página para começar sessões novas. **Não é fonte de verdade:** detalhes e evidências estão em `ROADMAP.md`, `DECISIONS.md` e `design/`. O código real prevalece. Atualize este arquivo ao concluir ou mudar algo relevante.
 
-Última revisão: 2026-11-08 (a partir do `ROADMAP.md`).
+Última revisão: 2026-11-11 (visual do Dragão de Fogo em revisão).
 
 ## Stack
 Minecraft 26.1.2 · NeoForge 26.1.2.124 · Java 25 · Gradle 9.2.1. Mod ID `codenamecoraline`. Tema: folclore feérico tradicional.
 
-A implementação anterior do dragão foi removida para recriação futura.
+A implementação anterior do dragão foi removida. Novo Dragão de Fogo bebê: fundação validada, modelo/cores e 22 clipes em revisão visual humana (`design/fire_dragon.md`, `design/fire_dragon_animation.md`). Compilação/build, exportador e runClient executados; 4 rodadas Dragão/Corvo/Salamandra aprovadas (6/6, 9/9, 23/23). IA, ombro, fogo funcional, incubação, jovem/adulto e ninhos continuam pendentes.
 
 ## Conteúdo implementado
 

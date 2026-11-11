@@ -1,6 +1,17 @@
 # Roadmap técnico
 
-O dragão anterior foi removido; uma nova implementação será planejada do zero.
+O dragão anterior foi removido. Nova ficha em `design/fire_dragon.md`.
+
+## Dragão de Fogo — fundação do bebê (2026-11-11)
+
+- [x] Revisão do escopo isolado do bebê e plano autorizado pelo usuário.
+- [x] `FireDragon` em `entity/firedragon/`: estado inicial, atributos, imunidade a fogo/lava/queda; sem goals ou interação de alimentação nesta fatia.
+- [x] Registro, bloqueio de spawn natural, ovo criativo, ícone por script, abas e nomes pt_br/en_us.
+- [x] `compileJava` e `build` executados com sucesso pelo agente; 4 rodadas consecutivas de `runFireDragonTest runFeyRavenTest runBrimstoneSalamanderTest`, resultados do servidor 4/4, 9/9 e 23/23 em cada rodada. Logs `build/logs/fire_dragon_fatia1_round_1.log` a `fire_dragon_fatia1_round_4.log`.
+- [ ] Aprovação visual humana da fatia 2: modelo/rig/renderizador e 22 clipes implementados, 125 combinações de cores com persistência. Exportador e runClient executados em 2026-11-11; 4 rodadas Dragão/Corvo/Salamandra aprovadas (6/6, 9/9, 23/23). Pranchas/GIFs em `build/fire-dragon-sketches/`; revisão humana ainda pendente. Ver `design/fire_dragon.md`.
+- [ ] Domesticação, ombro, alimentação/crescimento, caça, voo, fogo e socialização.
+- [ ] Ovo incubável/ninhos e especificação/implementação do jovem e adulto.
+
 
 ## Estado inicial (fundação)
 

@@ -18,6 +18,8 @@ Scripts em Python (utilizando a biblioteca `Pillow`) responsáveis por criar as 
 - `generate_crimson_commander_assets.py`: armadura carmesim e espada larga do Comandante.
 - `generate_ten_threads_witch_assets.py`: texturas da Matriarca e das 10 marionetes.
 
+- `generate_fire_dragon_assets.py`: geometria Java do bebê, 125 skins 128×128, emissivo e ícone; valida 63 retângulos UV. `generate_fire_dragon_animations.py`: gera clipes Java, enum comum e documentação de ângulos. Edite os scripts para alterar os arquivos gerados.
+
 ### 1.2 Exportadores de Geometria Java (`Export<Mob>Model.java`)
 Classes Java executáveis que instanciam a hierarquia real de `ModelPart` da entidade e exportam os vértices, normais e coordenadas de faces para arquivos temporários. Isso permite que os scripts de gravura desenhem as criaturas a partir do modelo real:
 - `ExportBabyDragonModel.java`
@@ -70,3 +72,7 @@ python tools/generate_boss_bar_crimson_commander.py
 python tools/generate_crimson_commander_sketches.py
 ```
 
+
+## Revisão visual do novo Dragão de Fogo
+
+Execute, nesta ordem: `python tools/generate_fire_dragon_assets.py`, `python tools/generate_fire_dragon_animations.py`, `.\gradlew.bat -I tools/fire-dragon-sketches.gradle exportFireDragonSketchModel`, `python tools/generate_fire_dragon_sketches.py`. Saídas em `build/fire-dragon-sketches/`: `anatomy.png`, `colors.png`, `poses.png`, 23 `pose_*.png` e `animation_{idle,walk,fly,fire}.gif`. Exporta o modelo real e testa todos os ticks de todos os clipes. GIFs amostram 12 quadros por ciclo com câmera fixa, não são capturas do cliente. Revisão humana e runClient continuam necessários.
