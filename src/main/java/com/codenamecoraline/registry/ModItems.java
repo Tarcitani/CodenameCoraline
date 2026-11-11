@@ -181,6 +181,9 @@ public final class ModItems {
             () -> new Item.Properties().stacksTo(1));
 
 
+    public static final DeferredItem<Item> FIRE_DRAGON_SPAWN_EGG = ITEMS.registerItem("fire_dragon_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.FIRE_DRAGON.get()));
+
     public static final DeferredItem<Item> FEY_RAVEN_SPAWN_EGG = ITEMS.registerItem("fey_raven_spawn_egg", SpawnEggItem::new,
             () -> new Item.Properties().spawnEgg(ModEntities.FEY_RAVEN.get()));
     /** Rare luminescent feather shed by the Fey Raven. */

@@ -31,6 +31,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.CRIMSON_COMMANDER_SPAWN_EGG.get());
                         output.accept(ModItems.CRIMSON_ASH_VANGUARD_SPAWN_EGG.get());
                         output.accept(ModItems.TEN_THREADS_WITCH_SPAWN_EGG.get());
+                        output.accept(ModItems.FIRE_DRAGON_SPAWN_EGG.get());
                         output.accept(ModItems.FEY_RAVEN_SPAWN_EGG.get());
                         output.accept(ModItems.BRIMSTONE_SALAMANDER_SPAWN_EGG.get());
                     })
@@ -80,6 +81,7 @@ public final class ModCreativeTabs {
             event.accept(ModItems.CRIMSON_COMMANDER_SPAWN_EGG.get());
             event.accept(ModItems.CRIMSON_ASH_VANGUARD_SPAWN_EGG.get());
             event.accept(ModItems.TEN_THREADS_WITCH_SPAWN_EGG.get());
+            event.accept(ModItems.FIRE_DRAGON_SPAWN_EGG.get());
             event.accept(ModItems.FEY_RAVEN_SPAWN_EGG.get());
             event.accept(ModItems.BRIMSTONE_SALAMANDER_SPAWN_EGG.get());
         }

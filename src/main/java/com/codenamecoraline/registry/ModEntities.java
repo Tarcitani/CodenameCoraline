@@ -2,6 +2,7 @@ package com.codenamecoraline.registry;
 
 import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.entity.raven.FeyRaven;
+import com.codenamecoraline.entity.firedragon.FireDragon;
 import com.codenamecoraline.entity.salamander.BrimstoneSalamander;
 import com.codenamecoraline.entity.salamander.BrimstoneSpit;
 import com.codenamecoraline.entity.redcap.Redcap;
@@ -209,6 +210,12 @@ public final class ModEntities {
                     .sized(0.35F, 0.35F).fireImmune().clientTrackingRange(6).updateInterval(10)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<FireDragon>> FIRE_DRAGON = ENTITY_TYPES.register("fire_dragon",
+            id -> EntityType.Builder.of(FireDragon::new, MobCategory.CREATURE)
+                    .sized(FireDragon.WIDTH, FireDragon.HEIGHT).eyeHeight(FireDragon.EYE_HEIGHT)
+                    .fireImmune().clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
     private ModEntities() {}
 
     public static EntityType<PuppetEntity> puppet(PuppetKind kind) {
@@ -238,12 +245,15 @@ public final class ModEntities {
         for (PuppetKind kind : PuppetKind.values()) {
             event.put(puppet(kind), PuppetEntity.createAttributes(kind).build());
         }
+        event.put(FIRE_DRAGON.get(), FireDragon.createAttributes().build());
         event.put(FEY_RAVEN.get(), FeyRaven.createAttributes().build());
         event.put(BRIMSTONE_SALAMANDER.get(), BrimstoneSalamander.createAttributes().build());
         event.put(ARCHITECT.get(), Architect.createAttributes().build());
     }
 
     private static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {
+        event.register(FIRE_DRAGON.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                FireDragon::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(BASILISK.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 Basilisk::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(LITHOPHAGE.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
