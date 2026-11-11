@@ -259,3 +259,27 @@ Executados pelo agente com sucesso:
 5. `.\gradlew.bat runClient`: inspecionados vermelho/dourado e preto/dourado, voo em prévia, preparo de fogo e escala junto ao jogador no mundo novo “Fire Dragon Visual Review”; encerramento normal, sem crash. Log `build/logs/fire_dragon_fatia2_client_final.log`. Aprovação visual humana ainda pendente; os comportamentos não foram implementados nesta fatia.
 
 Comandos `/summon` e `VisualPreview` ficam na ficha. Não use `--quickPlaySingleplayer` como opção direta do Gradle: não é uma opção da tarefa; a inspeção usou o menu normal do jogo. O exportador Java deve estar em UTF-8 sem BOM (`javac` rejeita U+FEFF no início do arquivo).
+
+## Dragão de Fogo — testes exclusivos do usuário (2026-11-11)
+
+Por instrução explícita do usuário, TODOS os testes são feitos por ele, incluindo compileJava/build, GameTests e runClient. Não executar esses comandos como agente. Evidências anteriores permanecem históricas. Fatia 3 escrita sem compilação ou testes: executar primeiro `.\gradlew.bat compileJava`, depois `.\gradlew.bat runFireDragonTest` e `.\gradlew.bat runClient`. Suíte ampliada de 5 para 9 testes próprios, ainda não executada. Roteiro manual, limitações e regressões em `design/fire_dragon.md`, seção 3. Não marcar aceito antes dos resultados humanos. Ombro usa a entidade no mundo; incluir save/load, logout, dois dragões, papagaios/corvo e teto baixo nos testes.
+
+### Ajustes de ombro/combate após relato do usuário
+
+Causas no código: faltava excluir o bebê no ombro dos empurrões de `LivingEntity`; a seleção do mesmo agressor podia zerar novamente o preparo; aquisição dependia apenas de timestamps e a mira apontava para olhos sem antecipação. Alterações: bloqueios condicionais de empurrão/colisão, callback após dano aceito, manutenção do preparo, recuo em recarga, mira ao torso com previsão limitada e nova pose de ombro pelo gerador. Gerador de animações executado para atualizar os arquivos; **compileJava, GameTests e runClient não executados pelo agente**. Três regressões adicionais escritas (12 testes próprios no total), pendentes. Roteiro detalhado em `design/fire_dragon.md`, seção 4. Só marcar resolvido após resultados do usuário.
+
+### Acompanhamento do ombro — ajuste visual pendente de teste
+
+Usuário aprovou defesa, mira e pose do ombro; relatou atraso do dragão ao andar. O renderer agora compensa a posição interpolada atrasada da entidade com a posição interpolada atual do dono, por `getRenderOffset`, e acompanha a rotação corporal do jogador. A posição/colisão e a autoridade do servidor permanecem na entidade. Offset zerado fora do ombro para não afetar voo ou desembarque. Nenhuma compilação ou teste executado pelo agente. Usuário deve conferir andar/correr, girar e desembarcar, nos dois lados e com outro jogador em multiplayer. Nível recomendado: Medium. Sem commit.
+
+### Visibilidade em primeira pessoa — aguardando usuário
+
+Renderer reduz para 60% o tamanho visual do dragão no ombro apenas quando a câmera em primeira pessoa pertence ao dono. Terceira pessoa, câmera de outro jogador, tamanho real/colisão e comportamento permanecem iguais. A escala é recalculada a cada extração de render state para restaurar o tamanho ao alternar câmera ou desembarcar. Sem compilação, testes ou runClient pelo agente. Usuário deve conferir os dois ombros em primeira pessoa e alternar F5, além de observar outro jogador. Nível recomendado: Medium. Sem commit.
+
+### Altura da miniatura em primeira pessoa — aguardando teste humano
+
+Usuário relatou que a redução deixou o bebê baixo demais. A escala visual continua em 60%, mas o renderer compensa a altura usando uma âncora de 10/16 bloco junto ao pescoço: deslocamento vertical de (1 − escala) × altura da âncora × escala base, ou +0,25 bloco na escala base 1. Assim a miniatura encolhe em torno da região do pescoço, em vez dos pés. Compensação exclusiva da primeira pessoa do dono; posição real e terceira pessoa não mudam. Sem compilação ou testes pelo agente. Conferir altura e campo de visão ao andar/girar e alternar F5.
+
+### Estabilização do ombro ao caminhar — teste humano pendente
+
+Usuário aprovou o tamanho atual, mas ainda observou glitches durante a caminhada. A primeira pessoa agora ancora posição e yaw na própria câmera (`Camera.position()`/`yRot()`), em vez da interpolação do dono e do yaw corporal que varia ao andar/strafe. A rotação relativa residual da cabeça é zerada nessa visão. Escala 60% e compensação vertical anteriores preservadas; terceira pessoa continua presa ao corpo do dono. Nenhuma compilação ou teste executado pelo agente. Conferir caminhada frontal, corrida, movimento lateral e giro nos dois ombros, alternando F5; relatar se a oscilação persiste. Nível recomendado: High. Sem commit.

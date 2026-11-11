@@ -2,12 +2,14 @@
 
 Resumo de uma página para começar sessões novas. **Não é fonte de verdade:** detalhes e evidências estão em `ROADMAP.md`, `DECISIONS.md` e `design/`. O código real prevalece. Atualize este arquivo ao concluir ou mudar algo relevante.
 
-Última revisão: 2026-11-11 (visual do Dragão de Fogo em revisão).
+Última revisão: 2026-11-11 (IA do bebê escrita, aguardando testes do usuário).
 
 ## Stack
 Minecraft 26.1.2 · NeoForge 26.1.2.124 · Java 25 · Gradle 9.2.1. Mod ID `codenamecoraline`. Tema: folclore feérico tradicional.
 
-A implementação anterior do dragão foi removida. Novo Dragão de Fogo bebê: fundação validada, modelo/cores e 22 clipes em revisão visual humana (`design/fire_dragon.md`, `design/fire_dragon_animation.md`). Compilação/build, exportador e runClient executados; 4 rodadas Dragão/Corvo/Salamandra aprovadas (6/6, 9/9, 23/23). IA, ombro, fogo funcional, incubação, jovem/adulto e ninhos continuam pendentes.
+A implementação anterior do dragão foi removida. Novo bebê: fundação validada anteriormente; modelo/idles aprovados pelo usuário. Fatia 3 escrita (vínculo, comida, comandos, ombro, voo, defesa, fogo, caça e socialização), **sem compilação/testes nesta etapa**. Ficha/roteiro em `design/fire_dragon.md`. Todos os testes agora são feitos exclusivamente pelo usuário, inclusive compileJava/GameTests/runClient. Nível recomendado para IA: High; informar nível antes de novas etapas. Demais animações, comportamentos e regressões aguardam execução humana; jovem/adulto/incubação ainda pendentes.
+
+Ajustes posteriores ao teste humano: ombro sem empurrão e pose enrolada, mira preditiva e autodefesa imediata com recuo; escritos, ainda não compilados/testados pelo agente. Roteiro na seção 4 da ficha.
 
 ## Conteúdo implementado
 
@@ -46,3 +48,11 @@ A implementação anterior do dragão foi removida. Novo Dragão de Fogo bebê: 
 ## Onde procurar
 `AGENTS.md` (regras) · `ROADMAP.md` (histórico detalhado) · `DECISIONS.md` (D-001 a D-037) · `DEVELOPMENT.md` (comandos, falhas conhecidas) · `PROCESSO_MOB.md` (fluxo de criação de mob), `PROMPT_NOVO_MOB.md` (índice), `MOB_CONTRACT.md` (contratos) e `prompts/` (um prompt por fatia).
 
+
+Dragão: usuário aprovou defesa, mira e pose do ombro. Compensação visual para acompanhar o dono ao andar escrita no renderer, aguardando teste humano; demais comportamentos preservados.
+
+Dragão no ombro: redução visual para 60% exclusivamente na primeira pessoa do dono, aguardando teste humano; terceira pessoa preservada.
+
+Miniatura no ombro em primeira pessoa: compensação vertical de +0,25 bloco na escala padrão para manter a região do pescoço na altura anterior; tamanho continua 60%, teste humano pendente.
+
+Tamanho do dragão no ombro aprovado pelo usuário; ancoragem à câmera em primeira pessoa escrita para reduzir glitches ao caminhar, mantendo escala/altura. Aguardando teste humano.

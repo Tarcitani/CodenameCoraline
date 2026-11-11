@@ -9,7 +9,8 @@ O dragão anterior foi removido. Nova ficha em `design/fire_dragon.md`.
 - [x] Registro, bloqueio de spawn natural, ovo criativo, ícone por script, abas e nomes pt_br/en_us.
 - [x] `compileJava` e `build` executados com sucesso pelo agente; 4 rodadas consecutivas de `runFireDragonTest runFeyRavenTest runBrimstoneSalamanderTest`, resultados do servidor 4/4, 9/9 e 23/23 em cada rodada. Logs `build/logs/fire_dragon_fatia1_round_1.log` a `fire_dragon_fatia1_round_4.log`.
 - [ ] Aprovação visual humana da fatia 2: modelo/rig/renderizador e 22 clipes implementados, 125 combinações de cores com persistência. Exportador e runClient executados em 2026-11-11; 4 rodadas Dragão/Corvo/Salamandra aprovadas (6/6, 9/9, 23/23). Pranchas/GIFs em `build/fire-dragon-sketches/`; revisão humana ainda pendente. Ver `design/fire_dragon.md`.
-- [ ] Domesticação, ombro, alimentação/crescimento, caça, voo, fogo e socialização.
+- [ ] Validar a fatia 3 do bebê: código de domesticação, ombro, alimentação/progresso, caça, voo, fogo e socialização escrito em 2026-11-11; usuário executa TODOS os testes. Nenhuma compilação ou execução nesta etapa. Progresso em zero não transforma em jovem até sua implementação.
+- [ ] Validar ajustes relatados pelo usuário: sem empurrão no ombro, pose enrolada, mira preditiva e reação imediata/sem reinício do preparo por dano repetido. Código e três regressões adicionais escritos; todos os testes continuam exclusivos do usuário.
 - [ ] Ovo incubável/ninhos e especificação/implementação do jovem e adulto.
 
 
@@ -212,3 +213,11 @@ O dragão anterior foi removido. Nova ficha em `design/fire_dragon.md`.
 - **Pendente:** `runClient` de todo o boss e da cimitarra; arena (Q-06) com os ataques H e I; J desligado na v1.
 - **Pendente:** `runClient` (cinemática, partículas e sensação do combate nunca vistas), polimento (sons próprios, Bestiário, conquistas, drops), receita da tábua. Arena (Estátua de Deus, estruturas comandáveis, nós) sem projeto; os ataques H e I dependem dela. Relatório `validacao_alteracoes_arquiteto_kandiaru.md` não encontrado na máquina; atributos numéricos, drops, conquistas e Bestiário a definir (ver §21 da ficha).
 - **Reforma (2026-11-08):** IA tática (esquivas, passos laterais, recuo, olhar, mira, alvo por pontuação, encadeamento), Martelo do Veredito contra escudo, dano contra Netherite, corpo de 4,7 bl, sobretudo de pedra, atlas 512 e cimitarra 3D no chão e nas mãos. `build` verde e `runArchitectTest` 54/54; **sem `runClient`**. Ver `design/architect.md` §27 e D-039.
+
+- [ ] Validar compensação visual do bebê no ombro ao andar/correr: ajuste no renderer escrito após aprovação humana da defesa, mira e pose; testes exclusivos do usuário.
+
+- [ ] Validar redução visual do dragão no ombro para 60% apenas na primeira pessoa do dono; alternar câmera e conferir outro jogador. Testes exclusivos do usuário.
+
+- [ ] Conferir compensação de altura da miniatura no ombro em primeira pessoa; redução de 60% preservada, terceira pessoa intacta.
+
+- [ ] Validar estabilização do bebê no ombro em primeira pessoa pela câmera: usuário aprovou tamanho, ainda relatou glitches ao andar; escala e altura preservadas, teste humano pendente.

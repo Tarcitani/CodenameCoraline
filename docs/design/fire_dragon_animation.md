@@ -105,18 +105,33 @@ Rotações: deltas x/y/z em graus em relação ao bind pose; `KeyframeAnimations
 | stand | 12 | neck_base / rot | 0 → 12,0,0; 12 → 0,0,0 | pendente de revisão visual |
 | stand | 12 | tail_1 / rot | 0 → 12,0,0; 12 → 0,0,0 | pendente de revisão visual |
 | stand | 12 | torso / pos | 0 → 0,-1,0; 12 → 0,0,0 | pendente de revisão visual |
-| shoulder | 40 | torso / rot | 0 → -12,0,0; 40 → -12,0,0 | pendente de revisão visual |
-| shoulder | 40 | left_hind_upper / rot | 0 → -50,0,0; 40 → -50,0,0 | pendente de revisão visual |
-| shoulder | 40 | right_hind_upper / rot | 0 → -50,0,0; 40 → -50,0,0 | pendente de revisão visual |
-| shoulder | 40 | left_hind_lower / rot | 0 → 70,0,0; 40 → 70,0,0 | pendente de revisão visual |
-| shoulder | 40 | right_hind_lower / rot | 0 → 70,0,0; 40 → 70,0,0 | pendente de revisão visual |
-| shoulder | 40 | neck_base / rot | 0 → 12,0,0; 40 → 12,0,0 | pendente de revisão visual |
-| shoulder | 40 | tail_1 / rot | 0 → 18,0,0; 40 → 18,0,0 | pendente de revisão visual |
-| shoulder | 40 | left_wing_upper / rot | 0 → 0,-12,8; 40 → 0,-12,8 | pendente de revisão visual |
-| shoulder | 40 | right_wing_upper / rot | 0 → 0,12,-8; 40 → 0,12,-8 | pendente de revisão visual |
-| shoulder | 40 | tail_2 / rot | 0 → 20,0,0; 40 → 20,0,0 | pendente de revisão visual |
-| shoulder | 40 | tail_3 / rot | 0 → 15,0,0; 40 → 15,0,0 | pendente de revisão visual |
-| shoulder | 40 | torso / pos | 0 → 0,-1,0; 40 → 0,-1,0 | pendente de revisão visual |
+| shoulder | 40 | torso / rot | 0 → 6,-10,-8; 20 → 7,-10,-8; 40 → 6,-10,-8 | pendente de revisão visual |
+| shoulder | 40 | neck_base / rot | 0 → 12,-18,6; 40 → 12,-18,6 | pendente de revisão visual |
+| shoulder | 40 | neck_mid / rot | 0 → 6,-12,0; 20 → 7,-12,0; 40 → 6,-12,0 | pendente de revisão visual |
+| shoulder | 40 | head / rot | 0 → 12,-12,8; 40 → 12,-12,8 | pendente de revisão visual |
+| shoulder | 40 | tail_1 / rot | 0 → 4,42,-8; 40 → 4,42,-8 | pendente de revisão visual |
+| shoulder | 40 | tail_2 / rot | 0 → -2,48,0; 40 → -2,48,0 | pendente de revisão visual |
+| shoulder | 40 | tail_3 / rot | 0 → -4,45,0; 40 → -4,45,0 | pendente de revisão visual |
+| shoulder | 40 | tail_4 / rot | 0 → -6,38,0; 20 → -6,40,0; 40 → -6,38,0 | pendente de revisão visual |
+| shoulder | 40 | left_wing_upper / rot | 0 → 5,-20,12; 40 → 5,-20,12 | pendente de revisão visual |
+| shoulder | 40 | right_wing_upper / rot | 0 → 5,20,-12; 40 → 5,20,-12 | pendente de revisão visual |
+| shoulder | 40 | left_wing_forearm / rot | 0 → 0,55,-28; 40 → 0,55,-28 | pendente de revisão visual |
+| shoulder | 40 | right_wing_forearm / rot | 0 → 0,-55,28; 40 → 0,-55,28 | pendente de revisão visual |
+| shoulder | 40 | left_wing_tip / rot | 0 → 0,25,10; 40 → 0,25,10 | pendente de revisão visual |
+| shoulder | 40 | right_wing_tip / rot | 0 → 0,-25,-10; 40 → 0,-25,-10 | pendente de revisão visual |
+| shoulder | 40 | left_front_upper / rot | 0 → -65,0,0; 40 → -65,0,0 | pendente de revisão visual |
+| shoulder | 40 | left_front_lower / rot | 0 → 95,0,0; 40 → 95,0,0 | pendente de revisão visual |
+| shoulder | 40 | left_front_foot / rot | 0 → -30,0,0; 40 → -30,0,0 | pendente de revisão visual |
+| shoulder | 40 | left_hind_upper / rot | 0 → -65,0,0; 40 → -65,0,0 | pendente de revisão visual |
+| shoulder | 40 | left_hind_lower / rot | 0 → 95,0,0; 40 → 95,0,0 | pendente de revisão visual |
+| shoulder | 40 | left_hind_foot / rot | 0 → -30,0,0; 40 → -30,0,0 | pendente de revisão visual |
+| shoulder | 40 | right_front_upper / rot | 0 → -65,0,0; 40 → -65,0,0 | pendente de revisão visual |
+| shoulder | 40 | right_front_lower / rot | 0 → 95,0,0; 40 → 95,0,0 | pendente de revisão visual |
+| shoulder | 40 | right_front_foot / rot | 0 → -30,0,0; 40 → -30,0,0 | pendente de revisão visual |
+| shoulder | 40 | right_hind_upper / rot | 0 → -65,0,0; 40 → -65,0,0 | pendente de revisão visual |
+| shoulder | 40 | right_hind_lower / rot | 0 → 95,0,0; 40 → 95,0,0 | pendente de revisão visual |
+| shoulder | 40 | right_hind_foot / rot | 0 → -30,0,0; 40 → -30,0,0 | pendente de revisão visual |
+| shoulder | 40 | torso / pos | 0 → 0,1,0; 20 → 0,1.15,0; 40 → 0,1,0 | pendente de revisão visual |
 | eat | 24 | neck_base / rot | 0 → 0,0,0; 12.0 → 20,0,0; 24 → 0,0,0 | pendente de revisão visual |
 | eat | 24 | head / rot | 0 → 0,0,0; 12.0 → 12,0,0; 24 → 0,0,0 | pendente de revisão visual |
 | eat | 24 | jaw / rot | 0 → 0,0,0; 6 → 18,0,0; 10 → 0,0,0; 14 → 18,0,0; 18 → 0,0,0; 24 → 0,0,0 | pendente de revisão visual |
@@ -140,6 +155,10 @@ Rotações: deltas x/y/z em graus em relação ao bind pose; `KeyframeAnimations
 | rest_together | 100 | tail_2 / rot | 0 → 0,0,0; 30 → 0,25,0; 100 → 0,25,0 | pendente de revisão visual |
 | rest_together | 100 | tail_3 / rot | 0 → 0,0,0; 30 → 0,20,0; 100 → 0,20,0 | pendente de revisão visual |
 | rest_together | 100 | torso / pos | 0 → 0,0,0; 30 → 0,-1.3,0; 100 → 0,-1.3,0 | pendente de revisão visual |
+
+## Ombro: referência enrolada
+
+Clipe de 40 ticks: patas recolhidas, asas fechadas sobre o dorso, cabeça acomodada e cauda curvada para dentro. Pequena respiração no tronco/pescoço e ajuste da ponta da cauda. No ombro direito, o renderizador espelha Y/Z das juntas centrais (tronco, pescoço, cabeça e cauda), incluindo a rotação de bind. Sem espelhar UVs ou escalar negativamente a malha. Pose e altura ainda aguardam teste visual do usuário.
 
 ## Bind pose e pivôs
 

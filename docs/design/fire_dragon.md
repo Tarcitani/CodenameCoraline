@@ -1,6 +1,6 @@
 # Dragão de Fogo — bebê (`fire_dragon`)
 
-> Rascunho de design consolidado em 2026-11-11. Fundação validada; visual e 22 clipes implementados e inspecionados no runClient, em revisão humana. IA e funcionalidades de gameplay ainda pendentes. Decisões explícitas do usuário estão registradas; números e detalhes criativos propostos pelo agente são sugestões de balanceamento. Escopo desta ficha: bebê. Jovem, adulto e ninho têm requisitos registrados, mas precisam de especificação antes de implementar a evolução completa.
+> Rascunho de design consolidado em 2026-11-11. Fundação validada anteriormente. Usuário aprovou modelo e animações paradas e autorizou iniciar comportamentos. Fatia 3 escrita, sem compilação ou testes nesta etapa: TODOS os testes são executados pelo usuário. Outras animações permanecem sujeitas à revisão no jogo. Decisões explícitas do usuário estão registradas; números e detalhes criativos propostos pelo agente são sugestões de balanceamento. Escopo desta ficha: bebê. Jovem, adulto e ninho têm requisitos registrados, mas precisam de especificação antes de implementar a evolução completa.
 
 ## 1. Ficha
 
@@ -44,7 +44,7 @@
 |---|---|---|---|---|---|---|---|---|
 | Bola de fogo (sugestão numérica) | 12 | 12 | 1 | 15 | 3 direto + fogo por 60 ticks | 1 projétil a 0,8 bloco/tick; sem explosão, quebra ou incêndio de terreno | peito infla, cabeça recua e boca mostra brasas | sair da linha de tiro ou usar cobertura |
 
-- **Validação:** no tick 12 verificar alvo vivo, distância, linha de visão e aliados na trajetória; abortar sem disparo quando inválido. Intervalo mínimo entre disparos: 60 ticks; recuperação não elimina o restante da recarga. Projétil extingue em água (sugestão).
+- **Validação:** no tick 12 verificar alvo vivo, distância, linha de visão e aliados na trajetória; abortar sem disparo quando inválido. Intervalo mínimo entre disparos: 60 ticks; recuperação não elimina o restante da recarga. Para permitir a caça aos peixes exigida pelo usuário, o projétil não é descartado apenas por entrar na água; mantém vida máxima de 30 ticks. Caça aquática precisa de teste no jogo.
 - **Drops cozidos:** aplicar morte por fogo às presas para obter versões cozidas quando disponíveis; sem duplicar drops. Carne alimenta saciedade, só salmão cru acelera crescimento.
 - **Boss:** não se aplica; sem cinemática, barra, estágios por vida ou lacaios.
 - **Escala multiplayer:** não. **Leash (sugestão):** caça e brincadeira até 16 blocos do dono; abandonar perseguição ao exceder. Seguir prioritariamente a partir de 8 blocos; teletransportar a partir de 24 para posição segura na mesma dimensão quando seguindo e sem ombro. Nunca teleportar para lava.
@@ -110,13 +110,13 @@
 |---|---|---|---|
 | 0. Ficha revisada | concluída para fundação do bebê | 2026-11-11 | revisão documental e plano autorizado pelo usuário; sem execução de gameplay |
 | 1. Fundação | concluída | 2026-11-11 | agente: `compileJava` e `build` aprovados; `runFireDragonTest runFeyRavenTest runBrimstoneSalamanderTest` em 4 rodadas consecutivas: 4/4, 9/9, 23/23 por rodada (contagens do servidor incluem teste do framework) |
-| 2. Visual e rigging | em revisão | 2026-11-11 | geradores, compileJava/build, exportador de 75 poses e runClient executados; 4 rodadas Dragão/Corvo/Salamandra aprovadas (6/6, 9/9, 23/23 por rodada) |
-| 2b. Revisão visual (humano) | aguardando usuário | 2026-11-11 | agente inspecionou no runClient; pranchas e GIFs entregues, aprovação humana pendente |
-| 3. IA e combate | pendente | não iniciada | não executado |
+| 2. Visual e rigging | modelo/idles aprovados; demais clipes em revisão | 2026-11-11 | geradores, compileJava/build, exportador de 75 poses e runClient executados; 4 rodadas Dragão/Corvo/Salamandra aprovadas (6/6, 9/9, 23/23 por rodada) |
+| 2b. Revisão visual (humano) | modelo e animações paradas aprovados pelo usuário | 2026-11-11 | usuário autorizou continuar a IA; demais clipes precisam ser observados durante seus testes |
+| 3. IA e combate | escrita; aguardando compilação e testes do usuário | 2026-11-11 | nenhum comando de teste/compilação executado pelo agente nesta etapa |
 | 4. Polimento e docs | pendente | não iniciada | não executado |
 | 5. Relatório | pendente | não iniciada | não executado |
 
-- **Próximo passo:** usuário revisar cores, anatomia, poses e GIFs; registrar aprovação ou ajustes antes de concluir 2/2b. Depois iniciar fatia 3 do bebê (IA, ombro, alimentação, voo real e fogo). Jovem/adulto continuam pendentes. Não avançar sem aprovação visual.
+- **Próximo passo:** usuário rodar compileJava, runFireDragonTest e runClient; enviar resultado/erros. Corrigir e repetir conforme resultado. Não marcar fatia 3 concluída antes das evidências. Jovem, adulto e incubação ficam para depois.
 - **Escopo autorizado da fundação:** bebê de tamanho fixo, atributos, imunidades, registro e ovo de spawn criativo (não é o ovo incubável). Sem spawn natural, incubação, evolução, reprodução, domesticação, IA, cores ou renderizador nesta fatia. Jovem/adulto/ninho não bloqueiam este esqueleto isolado. Estado inicial WILD_IDLE; estágio bebê é conceitual, sem usar idade vanilla ou sua redução adicional de escala. Velocidade aérea é apenas atributo 0,2; meta de 4 blocos/s depende da navegação futura e medição.
 - **Decisões:** cores permanentes; bebê com ataque único; Shift+direito embarca, novo Shift desembarca; caça automática; apenas adulto montável; salmão cru domestica/cura/acelera; alimento de caça também sacia. O usuário delegou atributos, animações, sons e visual ao agente.
 - **Ovo confirmado:** lava diretamente 1 bloco abaixo; 12.000 ticks aquecidos (10 min), progresso pausa sem lava e com chunk descarregado; nasce somente bebê não domesticado; chance de domesticação 50%. Cor e origem precisam persistir ao mover o ovo; regras de coleta e bloco do ovo ainda pendentes.
@@ -160,3 +160,73 @@
 - `e47337c` — `feat(fire_dragon): adicionar bebe com modelo e animacoes`.
 - `4351b7b` — `test(fire_dragon): cobrir fundacao cores e animacoes ociosas`.
 - Ficha, arquitetura, desenvolvimento, estado e ferramentas reunidos em commit `docs(fire_dragon)`. Aprovação visual humana continua pendente; autorização de commit não aprova o visual. Sem push.
+
+## 3. Fatia 3 — código escrito, testes exclusivos do usuário
+
+**Nível de raciocínio recomendado: High.** Autorização: usuário aprovou modelo/idles, pediu continuidade e determinou que TODOS os testes, incluindo compilação, são feitos por ele. Esta orientação prevalece sobre os prompts de fatia e sobre evidências históricas executadas pelo agente.
+
+### Alterações desta etapa (não validadas)
+
+- `FireDragon`: interação autoritativa no servidor; salmão cru com 33% ou 50% (`Hatched`), cura 4, saciedade +25 e redução de 10% do crescimento restante. Clique direito senta/segue; Shift+direito tem prioridade para ombro. Dono salvo pelo `TamableAnimal`; alimento/comando de terceiros recusados.
+- `FireDragonCompanion`: coordenação de estados sem goals concorrentes. Defesa interrompe caça/socialização; limites de 16 blocos do dono, retorno/teletransporte a partir de 24 com chão e espaço seguros. Busca de presas e itens escalonada. Lista de presas da ficha; não caça filhotes, nomeados ou domesticados.
+- Caça automática ativa com fome até saciar em 55; coleta uma unidade de carne por vez e deixa o restante. Carne de caça sacia; salmão oferecido diretamente também cura e acelera crescimento. Histerese de fome é transitória; após reload ela recomeça quando atingir 30.
+- Ombro não remove, recria nem serializa o dragão dentro do jogador: a própria entidade mantém UUID, cores e dono, como no corvo. Dois lados, verificação de papagaios/corvo e outros dragões no embarque. Novo pressionamento de Shift desembarca após soltar o Shift do embarque; sem lugar seguro, tenta novamente. Não dispara do ombro. Sem montaria.
+- `DragonFireball`: tipo próprio registrado, item visual vanilla FIRE_CHARGE, vida de 30 ticks, 3 de dano, ignição antes do dano para loot cozido; sem explosão, fogo em blocos ou duplicação de loot. Proteção ao dono/pets e equipes/PvP. Preparo 12, liberação 1, recuperação 15 ticks, intervalo 60; revalidação de alvo/linha/aliados antes do disparo.
+- Saciedade e temporizadores persistentes; crescimento natural só carregado e alimentado. **Ao zerar, permanece bebê**, conservando o progresso até a implementação do jovem. Não existem ovo incubável ou ninho nesta entrega.
+- Clipes de alimentação, ombro, fogo e interações sociais conectados; quatro interações sociais sorteadas entre dragões do mesmo dono. Decolagem/pouso ainda usam o voo genérico, sem transição dedicada. Sons e polimento continuam na fatia 4.
+- GameTests escritos para domesticação/alimentação/comandos, persistência de dono/nutrição, proteção, Shift e UUID no ombro e morte de porco com carne cozida. Suíte agora contém 9 testes próprios; número efetivo e resultados só após execução do usuário. **Nenhum teste novo foi executado.**
+
+### Roteiro de aceite para o usuário
+
+```powershell
+.\gradlew.bat compileJava
+.\gradlew.bat runFireDragonTest
+.\gradlew.bat runClient
+```
+
+1. Domesticar com salmão; alimentar ferido e conferir cura. Alternar sentar/seguir com mão vazia. Recarregar mundo e conferir dono, cores, ordem e crescimento.
+2. Shift+direito no bebê próprio, inclusive com salmão: deve subir sem gastar comida. Manter Shift não pode derrubar imediatamente; soltar e pressionar de novo deve desembarcar. Testar dois bebês, ombros ocupados e teto baixo; repetir após salvar/carregar.
+3. Seguir o dono em terra, desníveis e água. Afastar-se mais de 24 blocos e conferir retorno seguro; testar áreas sem pouso seguro, sem teletransporte para lava/parede. Voo pretende 4 blocos/s, velocidade real precisa ser medida.
+4. Com fome, observar caça, consumo e retorno. Usar bebê de teste com `Satiety:0` e domesticar; porcos/ovelhas/vacas, depois peixes. Carne cozida deve vir do loot vanilla, sem item duplicado.
+5. Durante caça/brincadeira, atacar o dono com um hostil: deve priorizar defesa. Conferir alvo atacado pelo dono, autodefesa, cobertura antes do disparo e alvo acima de pilar. Dono e pets não podem receber dano/fogo do dragão; bebê selvagem não ataca jogador.
+6. Dois domesticados do mesmo dono, saciados e seguindo: observar brincadeiras sem dano e limite de distância. Conferir sentar interrompe caça e brincadeira. Testar morte/logout do dono e PvP desativado.
+7. Verificar animações de fogo, voo, ombro e comida. Movimentos reais e interações com corvo/papagaio precisam de teste humano; não estão aprovados por terem código escrito.
+
+Depois da primeira execução bem-sucedida, rodar também regressões `runFeyRavenTest`/`runBrimstoneSalamanderTest`; requisito de quatro rodadas consecutivas permanece, executado pelo usuário. Enviar só resultado final ou trecho do erro. Sem novo commit/push nesta etapa.
+
+## 4. Ajustes após teste do usuário — ombro, mira e autodefesa
+
+**Nível recomendado: High. Estado: alterações escritas, sem compilação ou testes do agente.** O usuário relatou empurrão no ombro, pontaria insuficiente e ausência de reação a ataques; enviou referência de dragão enrolado para a pose de ombro. Isso não equivale à validação completa da fatia 3.
+
+- **Empurrão:** a entidade no ombro ainda participava da resolução de empurrões. `FireDragon` agora bloqueia `isPushable`, `push(Entity)`, `doPush` e `canCollideWith` enquanto estiver no ombro; fora dele, delega ao comportamento normal. Sem `noPhysics` global e sem remover a entidade.
+- **Pose:** ponto de apoio mais próximo/baixo (deslocamento lateral 0,32 e altura do jogador menos 0,75 bloco). Patas recolhidas, asas fechadas, cabeça acomodada e cauda curvada junto ao pescoço; ciclo de respiração de 40 ticks. Lado direito espelha as rotações Y/Z centrais; pose não se desfaz com hurt visual. Fonte no gerador de animações e tabela regenerada em `fire_dragon_animation.md`. Apenas geração dos arquivos foi executada; nenhuma pose nova foi renderizada/validada pelo agente.
+- **Mira:** disparo aponta para o centro do corpo e antecipa deslocamento observado, com limite de previsão, correção para arrasto aéreo vanilla e previsão vertical curta. Sem dispersão aleatória e sem projétil teleguiado. Parede e aliados são revalidados na trajetória prevista. Precisão contra corrida/saltos/água depende do teste humano.
+- **Autodefesa:** dano aceito chama a aquisição do agressor imediatamente, inclusive no primeiro tick. Golpes repetidos do mesmo alvo não reiniciam o preparo. Durante a recarga, busca afastamento quando o inimigo está a menos de 4 blocos. Autodefesa próxima (8 blocos) não é descartada só porque o dono ficou longe; caça e defesa do dono continuam limitadas ao dono.
+- **Bebê selvagem:** continua sem atacar jogadores; reage a agressor não jogador e preserva fuga diante de jogador. Domesticado não retalia dono/pets protegidos nem jogadores em Criativo/Espectador. No ombro permanece sem disparar. Para testar defesa, usar zumbi ou outro agressor válido, não golpear o próprio bebê domesticado com o dono.
+- **Regressões escritas, não executadas:** ombro sem impulso no dono, aquisição imediata de agressor e disparo sob golpes repetidos, antecipação de alvo lateral. Agora são 12 testes próprios escritos; resultado/contagem do servidor ainda dependem de execução do usuário.
+
+### Verificação solicitada ao usuário
+
+1. Rodar `compileJava`, `runFireDragonTest`, depois `runClient` (comandos da seção 3).
+2. Embarcar, soltar as teclas e verificar que o jogador fica parado sem deslizar; andar, girar, agachar para sair e repetir nos dois ombros. Conferir retorno da colisão normal depois de desembarcar.
+3. Ver a nova pose em terceira pessoa, parado e girando: cauda próxima ao pescoço, asas/patas recolhidas e sem atravessar cabeça/armadura. Essa aproximação da referência ainda precisa de revisão humana.
+4. Com bebê domesticado fora do ombro, deixar um zumbi atingi-lo repetidamente: deve adquirir o alvo, completar o disparo e buscar distância durante a recarga; repetir sentado e enquanto caçava.
+5. Conferir acerto em alvo parado e andando lateralmente, sem atingir dono/pets que entrem na linha de tiro. No ombro, nenhum disparo.
+
+Sem novo commit/push. A imagem de referência está na conversa; os ângulos e a intenção foram registrados aqui para continuidade.
+
+### Acompanhamento do ombro — ajuste visual pendente de teste
+
+Usuário aprovou defesa, mira e pose do ombro; relatou atraso do dragão ao andar. O renderer agora compensa a posição interpolada atrasada da entidade com a posição interpolada atual do dono, por `getRenderOffset`, e acompanha a rotação corporal do jogador. A posição/colisão e a autoridade do servidor permanecem na entidade. Offset zerado fora do ombro para não afetar voo ou desembarque. Nenhuma compilação ou teste executado pelo agente. Usuário deve conferir andar/correr, girar e desembarcar, nos dois lados e com outro jogador em multiplayer. Nível recomendado: Medium. Sem commit.
+
+### Visibilidade em primeira pessoa — aguardando usuário
+
+Renderer reduz para 60% o tamanho visual do dragão no ombro apenas quando a câmera em primeira pessoa pertence ao dono. Terceira pessoa, câmera de outro jogador, tamanho real/colisão e comportamento permanecem iguais. A escala é recalculada a cada extração de render state para restaurar o tamanho ao alternar câmera ou desembarcar. Sem compilação, testes ou runClient pelo agente. Usuário deve conferir os dois ombros em primeira pessoa e alternar F5, além de observar outro jogador. Nível recomendado: Medium. Sem commit.
+
+### Altura da miniatura em primeira pessoa — aguardando teste humano
+
+Usuário relatou que a redução deixou o bebê baixo demais. A escala visual continua em 60%, mas o renderer compensa a altura usando uma âncora de 10/16 bloco junto ao pescoço: deslocamento vertical de (1 − escala) × altura da âncora × escala base, ou +0,25 bloco na escala base 1. Assim a miniatura encolhe em torno da região do pescoço, em vez dos pés. Compensação exclusiva da primeira pessoa do dono; posição real e terceira pessoa não mudam. Sem compilação ou testes pelo agente. Conferir altura e campo de visão ao andar/girar e alternar F5.
+
+### Estabilização do ombro ao caminhar — teste humano pendente
+
+Usuário aprovou o tamanho atual, mas ainda observou glitches durante a caminhada. A primeira pessoa agora ancora posição e yaw na própria câmera (`Camera.position()`/`yRot()`), em vez da interpolação do dono e do yaw corporal que varia ao andar/strafe. A rotação relativa residual da cabeça é zerada nessa visão. Escala 60% e compensação vertical anteriores preservadas; terceira pessoa continua presa ao corpo do dono. Nenhuma compilação ou teste executado pelo agente. Conferir caminhada frontal, corrida, movimento lateral e giro nos dois ombros, alternando F5; relatar se a oscilação persiste. Nível recomendado: High. Sem commit.
