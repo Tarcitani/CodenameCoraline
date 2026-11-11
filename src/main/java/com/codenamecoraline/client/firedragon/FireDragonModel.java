@@ -19,6 +19,7 @@ public final class FireDragonModel extends EntityModel<FireDragonRenderState> {
     private final ModelPart head;
     private final ModelPart neck;
     private final ModelPart[] joints;
+    private final ModelPart[] shoulderCoil;
     private final KeyframeAnimation[] clips;
 
     public FireDragonModel(ModelPart root) {
@@ -26,6 +27,9 @@ public final class FireDragonModel extends EntityModel<FireDragonRenderState> {
         var lookup = root.createPartLookup();
         head = lookup.apply("head");
         neck = lookup.apply("neck_base");
+        shoulderCoil = new ModelPart[] {lookup.apply("torso"), neck, lookup.apply("neck_mid"),
+                lookup.apply("neck_top"), head, lookup.apply("tail_1"), lookup.apply("tail_2"),
+                lookup.apply("tail_3"), lookup.apply("tail_4")};
         joints = root.getAllParts().toArray(ModelPart[]::new);
         clips = new KeyframeAnimation[FireDragonAnimations.CLIPS.length];
         for (int i = 0; i < clips.length; i++) clips[i] = FireDragonAnimations.CLIPS[i].bake(root);
@@ -44,7 +48,18 @@ public final class FireDragonModel extends EntityModel<FireDragonRenderState> {
         super.setupAnim(state);
         if (state.preview) { applyPose(state.clip, state.clipTicks); return; }
         if (state.deathTime > 0) { applyPose(FireDragonAnimation.DEATH, state.deathTime); return; }
+        if (state.perched) {
+            applyPose(FireDragonAnimation.SHOULDER, state.ageInTicks);
+            if (state.shoulderSide > 0) for (ModelPart joint : shoulderCoil) {
+                joint.yRot = -joint.yRot;
+                joint.zRot = -joint.zRot;
+            }
+            return;
+        }
         if (state.hurtTicks > 0) { applyPose(FireDragonAnimation.HURT, 10 - state.hurtTicks); return; }
+        if (state.clip != FireDragonAnimation.NONE && state.clip != FireDragonAnimation.BREATHE) {
+            applyPose(state.clip, state.clipTicks); return;
+        }
         if (state.sitting) applyPose(FireDragonAnimation.SIT, 12);
         else if (state.airborne) applyPose(FireDragonAnimation.FLY, state.ageInTicks);
         else if (state.walkAnimationSpeed > 0.01F) {

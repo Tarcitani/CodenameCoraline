@@ -48,9 +48,24 @@ def catalog():
     sit={'torso':(-12,0,0),'left_hind_upper':(-50,0,0),'right_hind_upper':(-50,0,0),'left_hind_lower':(70,0,0),'right_hind_lower':(70,0,0),'neck_base':(12,0,0),'tail_1':(12,0,0)}
     clip('sit',12,rot={k:[[0,0,0,0],[12,*v]] for k,v in sit.items()},pos={'torso':[[0,0,0,0],[12,0,-1,0]]})
     clip('stand',12,rot={k:[[0,*v],[12,0,0,0]] for k,v in sit.items()},pos={'torso':[[0,0,-1,0],[12,0,0,0]]})
-    shoulder=dict(sit)
-    shoulder.update({'left_wing_upper':(0,-12,8),'right_wing_upper':(0,12,-8),'tail_1':(18,0,0),'tail_2':(20,0,0),'tail_3':(15,0,0)})
-    clip('shoulder',40,True,rot={k:[[0,*v],[40,*v]] for k,v in shoulder.items()},pos={'torso':[[0,0,-1,0],[40,0,-1,0]]})
+    # Left shoulder: tuck the feet, fold the wings and coil the tail toward the player's neck.
+    # The renderer mirrors central Y/Z channels for the right shoulder.
+    shoulder={'torso':(6,-10,-8),'neck_base':(12,-18,6),'neck_mid':(6,-12,0),
+        'head':(12,-12,8),'tail_1':(4,42,-8),'tail_2':(-2,48,0),
+        'tail_3':(-4,45,0),'tail_4':(-6,38,0),
+        'left_wing_upper':(5,-20,12),'right_wing_upper':(5,20,-12),
+        'left_wing_forearm':(0,55,-28),'right_wing_forearm':(0,-55,28),
+        'left_wing_tip':(0,25,10),'right_wing_tip':(0,-25,-10)}
+    for side in ['left','right']:
+        for leg in ['front','hind']:
+            shoulder[f'{side}_{leg}_upper']=(-65,0,0)
+            shoulder[f'{side}_{leg}_lower']=(95,0,0)
+            shoulder[f'{side}_{leg}_foot']=(-30,0,0)
+    shoulder_tracks={k:[[0,*v],[40,*v]] for k,v in shoulder.items()}
+    shoulder_tracks['torso']=[[0,6,-10,-8],[20,7,-10,-8],[40,6,-10,-8]]
+    shoulder_tracks['neck_mid']=[[0,6,-12,0],[20,7,-12,0],[40,6,-12,0]]
+    shoulder_tracks['tail_4']=[[0,-6,38,0],[20,-6,40,0],[40,-6,38,0]]
+    clip('shoulder',40,True,rot=shoulder_tracks,pos={'torso':[[0,0,1,0],[20,0,1.15,0],[40,0,1,0]]})
     clip('eat',24,rot={'neck_base':frames((20,0,0),24),'head':frames((12,0,0),24),'jaw':[[0,0,0,0],[6,18,0,0],[10,0,0,0],[14,18,0,0],[18,0,0,0],[24,0,0,0]]})
     clip('play_chase',100,True,rot={'torso':[[0,-5,-8,0],[25,-5,8,0],[50,-5,-8,0],[75,-5,8,0],[100,-5,-8,0]],'tail_1':[[0,0,15,0],[50,0,-15,0],[100,0,15,0]],'head':frames((-10,12,0),100)})
     clip('greet',30,rot={'neck_base':frames((-5,12,0),30),'head':frames((0,15,12),30),'tail_2':frames((0,12,0),30)})
@@ -103,6 +118,8 @@ def generate():
         '        return new AnimationChannel(rotation ? AnimationChannel.Targets.ROTATION : AnimationChannel.Targets.POSITION, keys);',
         '    }','}']
     (ROOT/'src/main/java/com/codenamecoraline/client/firedragon/FireDragonAnimations.java').write_text('\n'.join(java)+'\n',encoding='utf-8')
+    doc += ['', '## Ombro: referência enrolada', '',
+        'Clipe de 40 ticks: patas recolhidas, asas fechadas sobre o dorso, cabeça acomodada e cauda curvada para dentro. Pequena respiração no tronco/pescoço e ajuste da ponta da cauda. No ombro direito, o renderizador espelha Y/Z das juntas centrais (tronco, pescoço, cabeça e cauda), incluindo a rotação de bind. Sem espelhar UVs ou escalar negativamente a malha. Pose e altura ainda aguardam teste visual do usuário.']
     from generate_fire_dragon_assets import geometry, PARTS
     geometry()
     doc += ['', '## Bind pose e pivôs', '',
