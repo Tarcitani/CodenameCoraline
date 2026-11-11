@@ -89,6 +89,12 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
             systemProperty 'coraline.matriarchAnimTests', 'true'
         }
+        fireDragonTest {
+            type = 'gameTestServer'
+            gameDirectory = file('build/fire-dragon-gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'coraline.fireDragonTests', 'true'
+        }
         feyRavenTest {
             type = 'gameTestServer'
             gameDirectory = file('build/fey-raven-gametest')
