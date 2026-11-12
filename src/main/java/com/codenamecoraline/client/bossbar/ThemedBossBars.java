@@ -42,6 +42,7 @@ public final class ThemedBossBars {
         register("entity." + CodenameCoraline.MOD_ID + ".ten_threads_witch", witchBar);
         register("bossbar." + CodenameCoraline.MOD_ID + ".ten_threads_witch.stage", witchBar);
         register("bossbar." + CodenameCoraline.MOD_ID + ".ten_threads_witch.fury", witchBar);
+        register("entity." + CodenameCoraline.MOD_ID + ".soul_reaper", new SoulReaperBossBar());
     }
 
     private ThemedBossBars() {}
