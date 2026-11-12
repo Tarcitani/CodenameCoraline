@@ -283,3 +283,27 @@ Usuário relatou que a redução deixou o bebê baixo demais. A escala visual co
 ### Estabilização do ombro ao caminhar — teste humano pendente
 
 Usuário aprovou o tamanho atual, mas ainda observou glitches durante a caminhada. A primeira pessoa agora ancora posição e yaw na própria câmera (`Camera.position()`/`yRot()`), em vez da interpolação do dono e do yaw corporal que varia ao andar/strafe. A rotação relativa residual da cabeça é zerada nessa visão. Escala 60% e compensação vertical anteriores preservadas; terceira pessoa continua presa ao corpo do dono. Nenhuma compilação ou teste executado pelo agente. Conferir caminhada frontal, corrida, movimento lateral e giro nos dois ombros, alternando F5; relatar se a oscilação persiste. Nível recomendado: High. Sem commit.
+## Ceifeiro das Almas Vagas (`soul_reaper`) — 2026-11-08
+
+- `.\gradlew.bat runSoulReaperTest`: **VALIDADO em 2026-11-08** em **6 execuções consecutivas** (`All 13 required tests passed :)` — 12 testes em `SoulReaperGameTests` mais 1 do framework; logs em `build/logs/fatia4_round1..6.log`) + `.\gradlew.bat build` verde (`build/logs/fatia4_build.log`) e regressão `.\gradlew.bat runLastGiftCollectorTest` verde (`build/logs/fatia4_regression_collector.log`).
+- Cobertura de `SoulReaperGameTests` (12 testes):
+  1. `soul_reaper_registration_and_attributes`
+  2. `soul_reaper_immunities_and_anti_burst`
+  3. `omen_hare_spawn_rules_and_wisp_binding`
+  4. `soul_reaper_models_and_animations_baking`
+  5. `omen_hare_metamorphosis_and_awakening`
+  6. `soul_reaper_desolation_aura_and_frost`
+  7. `soul_reaper_stages_healing_and_scaling`
+  8. `soul_reaper_original_attacks_and_anti_whiff`
+  9. `soul_reaper_frontal_attacks_and_exclusive_f4`
+  10. `soul_reaper_seven_anti_instakill_rules`
+  11. `soul_reaper_provenance_nullification_and_taunt`
+  12. `soul_reaper_items_scythe_brooch_and_spirit`
+- Problemas técnicos resolvidos durante a implementação:
+  - **Relógio interno em testes diretos (`serverTicks` vs `Entity.tickCount`):** Em Minecraft, `Entity.tickCount` é incrementado por `ServerLevel.tickNonPassenger` fora de `entity.tick()`. Testes que invocam `reaper.tick()` diretamente em loop síncrono não avançavam `tickCount`, impedindo a resolução agendada de anulações (`T0 + 20t`). Solução: contador interno `serverTicks` incrementado no início de `SoulReaper.tick()`.
+  - **Sobreposição de `EXCLUSION_RADIUS = 128` entre arenas paralelas do GameTestRunner:** O `GameTestRunner` instancia todas as arenas do batch lado a lado (~30 blocos de distância). Entidades não descartadas ao final de um teste bloqueavam `OmenHare.checkSpawnRules` em arenas vizinhas. Solução: descarte explícito (`.discard()`) ao final de cada teste e limpeza inicial na arena de teste de spawn.
+- Geração reprodutível de recursos:
+  1. `python tools/generate_soul_reaper_assets.py` — verifica 0 colisões de UV em `256×256` (`soul_reaper`), `64×64` (`omen_hare`) e `32×32` (`wandering_soul_wisp`) e gera texturas de entidades, ovos e itens (`soul_reaper_scythe`, `frost_spiral_brooch`, `ancient_ice_shard`, `frozen_soul_essence`, `soul_reaper_portrait`).
+  2. `python tools/generate_boss_bar_soul_reaper.py` — gera `textures/gui/boss_bar/soul_reaper.png` (`256×64`).
+  3. `.\gradlew.bat -I tools/soul-reaper-sketches.gradle exportSoulReaperSketchModel` e `python tools/generate_soul_reaper_sketches.py` — exportam 12 poses 3D e geram `build/soul-reaper-sketches/soul_reaper_pose_sheet.png`, `omen_hare_pose_sheet.png` e `textures/gui/bestiary/soul_reaper_{anatomy,combat,spoils}.png`.
+- **Pendente:** validação visual e acústica interativa em sessão de `runClient`.

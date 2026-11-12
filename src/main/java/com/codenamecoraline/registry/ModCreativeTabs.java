@@ -34,6 +34,8 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.FIRE_DRAGON_SPAWN_EGG.get());
                         output.accept(ModItems.FEY_RAVEN_SPAWN_EGG.get());
                         output.accept(ModItems.BRIMSTONE_SALAMANDER_SPAWN_EGG.get());
+                        output.accept(ModItems.SOUL_REAPER_SPAWN_EGG.get());
+                        output.accept(ModItems.OMEN_HARE_SPAWN_EGG.get());
                     })
                     .build());
 
@@ -46,6 +48,7 @@ public final class ModCreativeTabs {
             event.accept(ModItems.DEADROOT_CLUB.get());
             event.accept(ModItems.CRIMSON_OATH_GREATSWORD.get());
             event.accept(ModItems.TEN_THREADS_STAFF.get());
+            event.accept(ModItems.SOUL_REAPER_SCYTHE.get());
             event.accept(ModItems.REDCAP_DAGGER.get());
             event.accept(ModItems.REDCAP_PIKESTAFF.get());
             event.accept(ModItems.REDCAP_CAP.get());
@@ -55,6 +58,7 @@ public final class ModCreativeTabs {
             event.accept(ModItems.HOLLOW_TRUNK_IDOL.get());
             event.accept(ModItems.STAINED_OATH_CREST.get());
             event.accept(ModItems.CURSED_SPINDLE.get());
+            event.accept(ModItems.FROST_SPIRAL_BROOCH.get());
         } else if (event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
             event.accept(ModItems.REDCAP_NAIL.get());
             event.accept(ModItems.REDCAP_TOOTH.get());
@@ -73,6 +77,8 @@ public final class ModCreativeTabs {
             event.accept(ModItems.MATRIARCH_THIMBLE.get());
             event.accept(ModItems.FEY_FEATHER.get());
             event.accept(ModItems.BRIMSTONE_SCALE.get());
+            event.accept(ModItems.ANCIENT_ICE_SHARD.get());
+            event.accept(ModItems.FROZEN_SOUL_ESSENCE.get());
         } else if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             event.accept(ModItems.LITHOPHAGE_SPAWN_EGG.get());
             event.accept(ModItems.LAST_GIFT_COLLECTOR_SPAWN_EGG.get());
@@ -84,6 +90,8 @@ public final class ModCreativeTabs {
             event.accept(ModItems.FIRE_DRAGON_SPAWN_EGG.get());
             event.accept(ModItems.FEY_RAVEN_SPAWN_EGG.get());
             event.accept(ModItems.BRIMSTONE_SALAMANDER_SPAWN_EGG.get());
+            event.accept(ModItems.SOUL_REAPER_SPAWN_EGG.get());
+            event.accept(ModItems.OMEN_HARE_SPAWN_EGG.get());
         }
     }
 

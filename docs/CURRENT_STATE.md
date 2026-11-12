@@ -24,11 +24,12 @@ Ajustes posteriores ao teste humano: ombro sem empurrão e pose enrolada, mira p
 | Bruxa dos Dez Fios | Boss composto (Matriarca + 10 marionetes), 33 ataques, sistema de animação próprio | `design/ten_threads_witch.md`, `design/matriarch_animation.md` |
 | Corvo Feérico Companheiro | Domesticável com bagas brilhantes; ombro, coleta de itens brilhantes (1 slot), Sentinela Mística contra invisíveis | `design/fey_raven.md` |
 | Salamandra de Enxofre | Predador vulcânico do Nether, 8 estados, 3 ataques, 3 variantes de textura (Brimstone, Soulflame, Crimson) e estágio filhote com dinâmica familiar, combate juvenil e 6 texturas dedicadas | `design/brimstone_salamander.md` |
+| Ceifeiro das Almas Vagas (`soul_reaper`) | Boss colossal de 5,4m (bioma de neve), arauto `omen_hare` em nevascas, lacaio `wandering_soul_wisp`, 11 ataques (`O1–O5` + `F1–F6`), 7 regras anti-instakill pós-armadura, anulação por procedência (`A1–A6`), Foice das Almas Vagas, Broche da Espiral Frígida, barra temática, 4 conquistas e capítulo de 7 páginas no Bestiário (13/13 GameTests em 6 rodadas consecutivas) | `design/soul_reaper.md`, `design/soul_reaper_animation.md`, `design/soul_reaper_systems.md` |
 | Bestiário | Livro com capítulo ilustrado por mob/boss | `ARCHITECTURE.md` |
 
 
 ## Validação
-- Os GameTests rodam por tarefas `run<Mob>Test` (lista em `build.gradle`). Contagens recentes: Comandante 34, Quebra-Copas 35, Bruxa 30, Salamandra de Enxofre 23, Matriarca 20, Cobrador 18, Basilisco 17, Litófago 11, Porrete 9, Corvo Feérico 8.
+- Os GameTests rodam por tarefas `run<Mob>Test` (lista em `build.gradle`). Contagens recentes: Comandante 34, Quebra-Copas 35, Bruxa 30, Salamandra de Enxofre 23, Matriarca 20, Cobrador 18, Basilisco 17, Ceifeiro das Almas Vagas 13, Litófago 11, Porrete 9, Corvo Feérico 8.
 - Em 2026-11-05 o `build` e o `runTenThreadsWitchTest` ainda não tinham sido executados pelo agente (o Gradle não roda no shell de alguns agentes; ver `DEVELOPMENT.md`). Confirme no seu terminal.
 
 ## Em desenvolvimento

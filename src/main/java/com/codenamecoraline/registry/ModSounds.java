@@ -151,6 +151,20 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> SCIMITAR_REPRISE_HIT = register("item.architect_scimitar.reprise_hit");
     public static final DeferredHolder<SoundEvent, SoundEvent> SCIMITAR_REPRISE_FADE = register("item.architect_scimitar.reprise_fade");
 
+    // Soul Reaper and Omen Hare (docs/design/soul_reaper.md §1.5)
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_REAPER_AMBIENT = register("entity.soul_reaper.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_REAPER_STEP = register("entity.soul_reaper.step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_REAPER_HURT = register("entity.soul_reaper.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_REAPER_DEATH = register("entity.soul_reaper.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_REAPER_AWAKEN = register("entity.soul_reaper.awaken");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_REAPER_SCYTHE_SLASH = register("entity.soul_reaper.scythe_slash");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_REAPER_BLINK = register("entity.soul_reaper.blink");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_REAPER_SOUL_HARVEST = register("entity.soul_reaper.soul_harvest");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SOUL_REAPER_NULLIFY = register("entity.soul_reaper.nullify");
+    public static final DeferredHolder<SoundEvent, SoundEvent> OMEN_HARE_AMBIENT = register("entity.omen_hare.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> OMEN_HARE_HURT = register("entity.omen_hare.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> OMEN_HARE_RUPTURE = register("entity.omen_hare.rupture");
+
     /** The signature sound of each puppet (steps and attacks), one event per kind. */
     private static final java.util.EnumMap<com.codenamecoraline.entity.ten_threads_witch.PuppetKind, DeferredHolder<SoundEvent, SoundEvent>> PUPPET_ACTIONS =
             new java.util.EnumMap<>(com.codenamecoraline.entity.ten_threads_witch.PuppetKind.class);

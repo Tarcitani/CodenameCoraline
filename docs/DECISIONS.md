@@ -292,3 +292,14 @@ Registro apenas de decisões relevantes: contexto, decisão e consequências. N�
 **Decisão.** Usar o mecanismo oficial do NeoForge: `ArmPose` implementa `IExtensibleEnum`, então `META-INF/enumextensions.json` (declarado em `neoforge.mods.toml` com `enumExtensions`) acrescenta `CODENAMECORALINE_SCIMITAR_PARRY` e `CODENAMECORALINE_SCIMITAR_COUNTER`, cada uma com um `IArmPoseTransformer` (`client/architect/ScimitarArmPoses`). A primeira pessoa usa `IClientItemExtensions.applyForgeHandTransform`. O cliente reconhece o aparo pela flag de `CUSTOM_MODEL_DATA` que o servidor grava no item, sem pacote de rede novo.
 
 **Consequências.** É a primeira extensão de enum do mod: novas poses de item seguem o mesmo arquivo. Os nomes precisam do prefixo do mod id (o carregador recusa o contrário). As classes referenciadas são só do cliente e só carregam lá. A aparência das poses só é validada no `runClient`.
+
+## D-040 — Rig de duas mãos com `scythe_root` sob `chest`, teto pós-armadura e anulação por procedência no Ceifeiro das Almas Vagas
+
+**Contexto.** O Ceifeiro das Almas Vagas (`soul_reaper`, 5,4m) empunha uma foice de 6 metros com as duas mãos durante 33 animações complexas (incluindo troca de mão em `F6`), precisa escalar para grupos grandes sem permitir *instakill* em jogadores nem invalidar armaduras endgame, e deve punir o consumo de poções/maçãs douradas sem apagar auras legítimas pré-existentes (como beacons ou totens).
+
+**Decisão.**
+1. *Ancoragem da foice:* `scythe_root` é filho direto de `chest` (o mesmo pai das clavículas `left_clavicle`/`right_clavicle`), com dois nós de empunhadura (`grip_upper` e `grip_lower`), garantindo que a arma acompanhe toda inclinação e torção da coluna no mesmo espaço coordenado dos braços.
+2. *7 Regras Anti-Instakill pós-armadura:* o teto de 65% da vida máxima e a Regra do Fôlego (piso de 1,0 PV para quem iniciou a sequência com ≥ 80% PV) são aplicados em `LivingDamageEvent.Pre` (depois da redução de armadura e encantamentos), preservando o valor de Netherite/Proteção IV e impedindo morte em um único golpe.
+3. *Anulação por procedência:* `LivingEntityUseItemEvent.Start` grava um snapshot dos efeitos ativos e da vida antes do consumo; `Finish` calcula apenas o delta (efeitos recém-adicionados ou ampliados), emite aviso imediato em `T0` e agenda a remoção seletiva em `T0 + 20t` (`8t` no Estágio 3), cobrando a cura instantânea até o piso seguro de `2,0 PV`.
+
+**Consequências.** Zero pacotes de rede extras (sincronização via `SynchedEntityData` + eventos pontuais `180–193`), 63 juntas validadas sem colisão de UV em atlas 256×256 e combate determinístico testado em `SoulReaperGameTests`.

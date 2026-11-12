@@ -9,10 +9,12 @@ import com.codenamecoraline.item.CommandmentTabletItem;
 import com.codenamecoraline.item.CursedSpindleItem;
 import com.codenamecoraline.item.TenThreadsStaffItem;
 import com.codenamecoraline.item.DeadrootClubItem;
+import com.codenamecoraline.item.FrostSpiralBroochItem;
 import com.codenamecoraline.item.HollowTrunkIdolItem;
 import com.codenamecoraline.item.MistFlaskItem;
 import com.codenamecoraline.item.RenegadeGreataxeItem;
 import com.codenamecoraline.item.SilentBellItem;
+import com.codenamecoraline.item.SoulReaperScytheItem;
 import com.codenamecoraline.item.StainedOathCrestItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
@@ -53,6 +55,10 @@ public final class ModItems {
     /** Obsidian steel edged with gold: the Crimson Oath Greatsword (10 attack damage in all, a heavy netherite-grade blade). */
     private static final ToolMaterial CRIMSON_OATH = new ToolMaterial(
             BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 2100, 8.0F, 4.0F, 15, ItemTags.NETHERITE_TOOL_MATERIALS);
+
+    /** Meteoric frost-iron: the Scythe of Wandering Souls (10 attack damage in all, 1.2 attack speed). */
+    private static final ToolMaterial METEORIC_FROST_IRON = new ToolMaterial(
+            BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 2300, 8.0F, 4.0F, 16, ItemTags.NETHERITE_TOOL_MATERIALS);
 
     /** Items that repair the Staff of the Ten Threads (see data/codenamecoraline/tags/item/puppet_remnants.json). */
     public static final TagKey<Item> PUPPET_REMNANTS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "puppet_remnants"));
@@ -211,6 +217,27 @@ public final class ModItems {
                             Component.translatable("item.codenamecoraline.architect_scimitar.lore2").withStyle(ChatFormatting.GRAY)))));
     /** The Architect's face, used only as the icon of his story advancements. */
     public static final DeferredItem<Item> ARCHITECT_PORTRAIT = ITEMS.registerSimpleItem("architect_portrait",
+            () -> new Item.Properties().stacksTo(1));
+
+    public static final DeferredItem<Item> SOUL_REAPER_SPAWN_EGG = ITEMS.registerItem("soul_reaper_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.SOUL_REAPER.get()));
+    public static final DeferredItem<Item> OMEN_HARE_SPAWN_EGG = ITEMS.registerItem("omen_hare_spawn_egg", SpawnEggItem::new,
+            () -> new Item.Properties().spawnEgg(ModEntities.OMEN_HARE.get()));
+    public static final DeferredItem<Item> ANCIENT_ICE_SHARD = ITEMS.registerSimpleItem("ancient_ice_shard");
+    public static final DeferredItem<Item> FROZEN_SOUL_ESSENCE = ITEMS.registerSimpleItem("frozen_soul_essence",
+            () -> new Item.Properties().rarity(Rarity.UNCOMMON));
+    public static final DeferredItem<Item> SOUL_REAPER_SCYTHE = ITEMS.registerItem("soul_reaper_scythe", SoulReaperScytheItem::new,
+            properties -> properties.sword(METEORIC_FROST_IRON, 5.0F, -2.8F).rarity(Rarity.EPIC)
+                    .component(DataComponents.LORE, new ItemLore(List.of(
+                            Component.translatable("item.codenamecoraline.soul_reaper_scythe.lore1").withStyle(ChatFormatting.AQUA),
+                            Component.translatable("item.codenamecoraline.soul_reaper_scythe.lore2").withStyle(ChatFormatting.GRAY)))));
+    public static final DeferredItem<Item> FROST_SPIRAL_BROOCH = ITEMS.registerItem("frost_spiral_brooch", FrostSpiralBroochItem::new,
+            properties -> properties.stacksTo(1).rarity(Rarity.RARE)
+                    .component(DataComponents.LORE, new ItemLore(List.of(
+                            Component.translatable("item.codenamecoraline.frost_spiral_brooch.lore1").withStyle(ChatFormatting.AQUA),
+                            Component.translatable("item.codenamecoraline.frost_spiral_brooch.lore2").withStyle(ChatFormatting.GRAY)))));
+    /** The Soul Reaper's cowl, used only as the icon of his story advancements. */
+    public static final DeferredItem<Item> SOUL_REAPER_PORTRAIT = ITEMS.registerSimpleItem("soul_reaper_portrait",
             () -> new Item.Properties().stacksTo(1));
 
     // Retired rewards stay registered to preserve items in existing worlds; no drops or recipes.

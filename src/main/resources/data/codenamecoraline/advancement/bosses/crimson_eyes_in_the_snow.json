@@ -1,0 +1,41 @@
+{
+  "parent": "minecraft:adventure/root",
+  "criteria": {
+    "struck_omen_hare": {
+      "trigger": "minecraft:player_hurt_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "codenamecoraline:omen_hare"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.crimson_eyes_in_the_snow.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:soul_reaper_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.crimson_eyes_in_the_snow.title"
+    }
+  },
+  "requirements": [
+    [
+      "struck_omen_hare"
+    ]
+  ]
+}
+

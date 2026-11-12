@@ -113,6 +113,12 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
             systemProperty 'coraline.architectTests', 'true'
         }
+        soulReaperTest {
+            type = 'gameTestServer'
+            gameDirectory = file('build/soul-reaper-gametest')
+            systemProperty 'neoforge.enabledGameTestNamespaces', mod_id
+            systemProperty 'coraline.soulReaperTests', 'true'
+        }
         // Applies to all run configurations above.
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'

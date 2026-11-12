@@ -1,0 +1,37 @@
+{
+  "parent": "codenamecoraline:bosses/reaper_of_wandering_souls",
+  "criteria": {
+    "has_soul_reaper_scythe": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "codenamecoraline:soul_reaper_scythe"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.harvest_the_harvester.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:soul_reaper_scythe"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.harvest_the_harvester.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_soul_reaper_scythe"
+    ]
+  ]
+}
+

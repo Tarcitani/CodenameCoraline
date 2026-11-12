@@ -1,0 +1,41 @@
+{
+  "parent": "codenamecoraline:bosses/crimson_eyes_in_the_snow",
+  "criteria": {
+    "killed_soul_reaper": {
+      "trigger": "minecraft:player_killed_entity",
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "codenamecoraline:soul_reaper"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.reaper_of_wandering_souls.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:soul_reaper_portrait"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.reaper_of_wandering_souls.title"
+    }
+  },
+  "requirements": [
+    [
+      "killed_soul_reaper"
+    ]
+  ]
+}
+

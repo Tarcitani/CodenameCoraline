@@ -1,0 +1,37 @@
+{
+  "parent": "codenamecoraline:bosses/reaper_of_wandering_souls",
+  "criteria": {
+    "has_frost_spiral_brooch": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "codenamecoraline:frost_spiral_brooch"
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.spiral_of_eternal_frost.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "codenamecoraline:frost_spiral_brooch"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.spiral_of_eternal_frost.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_frost_spiral_brooch"
+    ]
+  ]
+}
+

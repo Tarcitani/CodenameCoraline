@@ -1925,5 +1925,179 @@
         "pitch": 0.6
       }
     ]
+  },
+  "entity.soul_reaper.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.soul_reaper.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:block.bell.resonate",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 0.65
+      },
+      {
+        "name": "minecraft:block.amethyst_block.resonate",
+        "type": "event",
+        "pitch": 0.55,
+        "volume": 0.75
+      }
+    ]
+  },
+  "entity.soul_reaper.step": {
+    "subtitle": "subtitles.codenamecoraline.entity.soul_reaper.step",
+    "sounds": [
+      {
+        "name": "minecraft:block.deepslate.hit",
+        "type": "event",
+        "pitch": 0.55,
+        "volume": 0.7
+      },
+      {
+        "name": "minecraft:block.chain.step",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 0.65
+      }
+    ]
+  },
+  "entity.soul_reaper.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.soul_reaper.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:block.glass.break",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 0.85
+      },
+      {
+        "name": "minecraft:entity.iron_golem.hurt",
+        "type": "event",
+        "pitch": 0.55,
+        "volume": 0.9
+      }
+    ]
+  },
+  "entity.soul_reaper.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.soul_reaper.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.wither.death",
+        "type": "event",
+        "pitch": 0.55,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:block.amethyst_cluster.break",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 1.1
+      }
+    ]
+  },
+  "entity.soul_reaper.awaken": {
+    "subtitle": "subtitles.codenamecoraline.entity.soul_reaper.awaken",
+    "sounds": [
+      {
+        "name": "minecraft:entity.warden.roar",
+        "type": "event",
+        "pitch": 0.65,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:entity.lightning_bolt.thunder",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 0.9
+      }
+    ]
+  },
+  "entity.soul_reaper.scythe_slash": {
+    "subtitle": "subtitles.codenamecoraline.entity.soul_reaper.scythe_slash",
+    "sounds": [
+      {
+        "name": "minecraft:entity.player.attack.sweep",
+        "type": "event",
+        "pitch": 0.55,
+        "volume": 1.1
+      },
+      {
+        "name": "minecraft:entity.iron_golem.attack",
+        "type": "event",
+        "pitch": 0.65,
+        "volume": 1.0
+      }
+    ]
+  },
+  "entity.soul_reaper.blink": {
+    "subtitle": "subtitles.codenamecoraline.entity.soul_reaper.blink",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.chime",
+        "type": "event",
+        "pitch": 0.55,
+        "volume": 1.0
+      }
+    ]
+  },
+  "entity.soul_reaper.soul_harvest": {
+    "subtitle": "subtitles.codenamecoraline.entity.soul_reaper.soul_harvest",
+    "sounds": [
+      {
+        "name": "minecraft:block.bell.resonate",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 1.1
+      }
+    ]
+  },
+  "entity.soul_reaper.nullify": {
+    "subtitle": "subtitles.codenamecoraline.entity.soul_reaper.nullify",
+    "sounds": [
+      {
+        "name": "minecraft:block.glass.break",
+        "type": "event",
+        "pitch": 0.65,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:block.amethyst_cluster.break",
+        "type": "event",
+        "pitch": 0.6,
+        "volume": 1.0
+      }
+    ]
+  },
+  "entity.omen_hare.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.omen_hare.ambient",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.chime",
+        "type": "event",
+        "pitch": 0.85,
+        "volume": 0.55
+      }
+    ]
+  },
+  "entity.omen_hare.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.omen_hare.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.hit",
+        "type": "event",
+        "pitch": 1.1,
+        "volume": 0.8
+      }
+    ]
+  },
+  "entity.omen_hare.rupture": {
+    "subtitle": "subtitles.codenamecoraline.entity.omen_hare.rupture",
+    "sounds": [
+      {
+        "name": "minecraft:block.bell.resonate",
+        "type": "event",
+        "pitch": 0.5,
+        "volume": 1.2
+      }
+    ]
   }
 }
