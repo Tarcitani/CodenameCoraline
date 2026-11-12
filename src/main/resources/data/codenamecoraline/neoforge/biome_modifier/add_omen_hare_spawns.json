@@ -1,0 +1,13 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "#codenamecoraline:spawns_omen_hare",
+  "spawners": [
+    {
+      "type": "codenamecoraline:omen_hare",
+      "weight": 8,
+      "minCount": 1,
+      "maxCount": 1
+    }
+  ]
+}
+

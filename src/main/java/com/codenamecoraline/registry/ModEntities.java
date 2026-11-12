@@ -15,6 +15,9 @@ import com.codenamecoraline.entity.lithophage.AmberShard;
 import com.codenamecoraline.entity.lithophage.Lithophage;
 import com.codenamecoraline.entity.canopy.CanopyBreaker;
 import com.codenamecoraline.entity.architect.Architect;
+import com.codenamecoraline.entity.reaper.OmenHare;
+import com.codenamecoraline.entity.reaper.SoulReaper;
+import com.codenamecoraline.entity.reaper.WanderingSoulWisp;
 import com.codenamecoraline.entity.crimson.CrimsonAshVanguard;
 import com.codenamecoraline.entity.ten_threads_witch.MatriarchWitchEntity;
 import com.codenamecoraline.entity.ten_threads_witch.PuppetEntity;
@@ -222,6 +225,34 @@ public final class ModEntities {
                     .sized(0.25F, 0.25F).fireImmune().clientTrackingRange(8).updateInterval(1)
                     .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
 
+    /** Colossal winter psychopomp boss (5.4m tall): Reaper of Wandering Souls. */
+    public static final DeferredHolder<EntityType<?>, EntityType<SoulReaper>> SOUL_REAPER = ENTITY_TYPES.register("soul_reaper",
+            id -> EntityType.Builder.of(SoulReaper::new, MobCategory.MONSTER)
+                    .sized(SoulReaper.WIDTH, SoulReaper.HEIGHT).eyeHeight(SoulReaper.EYE_HEIGHT)
+                    .clientTrackingRange(10)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    /** Ruby-eyed albino herald that spawns in snowstorms and awakens the Soul Reaper when slain. */
+    public static final DeferredHolder<EntityType<?>, EntityType<OmenHare>> OMEN_HARE = ENTITY_TYPES.register("omen_hare",
+            id -> EntityType.Builder.of(OmenHare::new, MobCategory.CREATURE)
+                    .sized(OmenHare.WIDTH, OmenHare.HEIGHT).eyeHeight(OmenHare.EYE_HEIGHT)
+                    .clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    /** Ethereal 6-HP soul wisp tethered to the Soul Reaper's brooch in Stage 2+. */
+    public static final DeferredHolder<EntityType<?>, EntityType<WanderingSoulWisp>> WANDERING_SOUL_WISP = ENTITY_TYPES.register("wandering_soul_wisp",
+            id -> EntityType.Builder.of(WanderingSoulWisp::new, MobCategory.MONSTER)
+                    .sized(WanderingSoulWisp.WIDTH, WanderingSoulWisp.HEIGHT).eyeHeight(WanderingSoulWisp.EYE_HEIGHT)
+                    .clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
+    /** Post-death rising spirit of the Soul Reaper. */
+    public static final DeferredHolder<EntityType<?>, EntityType<BossSpirit>> SOUL_REAPER_SPIRIT = ENTITY_TYPES.register("soul_reaper_spirit",
+            id -> EntityType.Builder.<BossSpirit>of(BossSpirit::new, MobCategory.MISC)
+                    .sized(SoulReaper.WIDTH, SoulReaper.HEIGHT).noSave().fireImmune()
+                    .clientTrackingRange(10)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, id)));
+
     private ModEntities() {}
 
     public static EntityType<PuppetEntity> puppet(PuppetKind kind) {
@@ -255,6 +286,10 @@ public final class ModEntities {
         event.put(FEY_RAVEN.get(), FeyRaven.createAttributes().build());
         event.put(BRIMSTONE_SALAMANDER.get(), BrimstoneSalamander.createAttributes().build());
         event.put(ARCHITECT.get(), Architect.createAttributes().build());
+        event.put(SOUL_REAPER.get(), SoulReaper.createAttributes().build());
+        event.put(OMEN_HARE.get(), OmenHare.createAttributes().build());
+        event.put(WANDERING_SOUL_WISP.get(), WanderingSoulWisp.createAttributes().build());
+        event.put(SOUL_REAPER_SPIRIT.get(), BossSpirit.createAttributes().build());
     }
 
     private static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {
@@ -270,5 +305,7 @@ public final class ModEntities {
                 FeyRaven::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
         event.register(BRIMSTONE_SALAMANDER.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING,
                 BrimstoneSalamander::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(OMEN_HARE.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                OmenHare::checkSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 }

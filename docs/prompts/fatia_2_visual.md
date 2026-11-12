@@ -1,4 +1,4 @@
-# Prompt: Fatia 2 — Visual e rigging
+ # Prompt: Fatia 2 — Visual e rigging
 
 Modelo sugerido: Opus ou Sonnet. É a fatia onde mais se perde qualidade: não economize aqui.
 
