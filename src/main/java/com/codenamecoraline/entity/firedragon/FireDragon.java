@@ -1,6 +1,7 @@
 package com.codenamecoraline.entity.firedragon;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -55,8 +56,9 @@ public final class FireDragon extends TamableAnimal {
         satiety = Math.min(100, satiety + 25);
         growthRemaining = Math.max(0, growthRemaining - Math.max(1, (growthRemaining + 9) / 10));
         playVisual(FireDragonAnimation.EAT);
+        companion.onFed();
     }
-    void eatMeat() { satiety = Math.min(100, satiety + 25); playVisual(FireDragonAnimation.EAT); }
+    void eatMeat() { satiety = Math.min(100, satiety + 25); playVisual(FireDragonAnimation.EAT); companion.onFed(); }
     public boolean canDamage(net.minecraft.world.entity.Entity target) {
         if (!(target instanceof net.minecraft.world.entity.LivingEntity living) || target == this || !living.isAlive()
                 || living.isInvulnerable() || isAlliedTo(target)) return false;
@@ -71,7 +73,9 @@ public final class FireDragon extends TamableAnimal {
         }
         return true;
     }
-    void companionSocial(FireDragon other, FireDragonAnimation clip) { companion.acceptSocial(other, clip); }
+    boolean canSocialize() { return companion.isAvailableForSocial(); }
+    void startSocial(FireDragon other, FireDragonAnimation clip, boolean initiator) { companion.acceptSocial(other, clip, initiator); }
+    void stopSocial() { companion.cancelSocial(); }
     public boolean landOnShoulder(Player player) { return companion.perch(player); }
     private void tickNutrition() {
         if (++hungerTicks >= 600) { hungerTicks = 0; satiety = Math.max(0, satiety - 1); }
@@ -118,7 +122,11 @@ public final class FireDragon extends TamableAnimal {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide() || isVisualPreview() || !isAlive()) return;
+        if (level().isClientSide()) {
+            if (isAlive() && !isOnShoulder()) spawnClientParticles();
+            return;
+        }
+        if (isVisualPreview() || !isAlive()) return;
         tickNutrition();
         if (!isNoAi()) companion.tick();
         if (getVisualAnimation() != FireDragonAnimation.NONE
@@ -131,6 +139,28 @@ public final class FireDragon extends TamableAnimal {
                 case 1 -> FireDragonAnimation.IDLE_WINGS;
                 default -> FireDragonAnimation.IDLE_TAIL;
             });
+        }
+    }
+
+    private void spawnClientParticles() {
+        FireDragonAnimation clip = getVisualAnimation();
+        if (clip == FireDragonAnimation.NONE) return;
+        double yaw = Math.toRadians(yHeadRot);
+        double mx = getX() - Math.sin(yaw) * 0.45D;
+        double my = getY() + EYE_HEIGHT - 0.05D;
+        double mz = getZ() + Math.cos(yaw) * 0.45D;
+        if (clip == FireDragonAnimation.FIRE_WINDUP && tickCount % 2 == 0) {
+            level().addParticle(ParticleTypes.FLAME, mx, my, mz,
+                    (random.nextDouble() - 0.5D) * 0.02D, 0.02D, (random.nextDouble() - 0.5D) * 0.02D);
+        } else if (clip == FireDragonAnimation.IDLE_TAIL && tickCount % 3 == 0) {
+            float clipTicks = getVisualAnimationTicks(0);
+            if (clipTicks >= 16.0F && clipTicks <= 26.0F) {
+                level().addParticle(ParticleTypes.SMOKE, mx, my, mz,
+                        -Math.sin(yaw) * 0.02D, 0.03D, Math.cos(yaw) * 0.02D);
+            }
+        } else if (clip == FireDragonAnimation.EAT && tickCount % 4 == 0) {
+            level().addParticle(ParticleTypes.SMOKE, mx, my - 0.05D, mz,
+                    (random.nextDouble() - 0.5D) * 0.02D, 0.02D, (random.nextDouble() - 0.5D) * 0.02D);
         }
     }
 

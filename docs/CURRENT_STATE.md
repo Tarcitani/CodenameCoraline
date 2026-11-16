@@ -57,3 +57,5 @@ Dragão no ombro: redução visual para 60% exclusivamente na primeira pessoa do
 Miniatura no ombro em primeira pessoa: compensação vertical de +0,25 bloco na escala padrão para manter a região do pescoço na altura anterior; tamanho continua 60%, teste humano pendente.
 
 Tamanho do dragão no ombro aprovado pelo usuário; ancoragem à câmera em primeira pessoa escrita para reduzir glitches ao caminhar, mantendo escala/altura. Aguardando teste humano.
+
+Dragão (Fatia 3 concluída em 2026-11-15): vínculo, comandos, ombro com estabilização em 1ª pessoa, bola de fogo com mira preditiva, caça/pesca/alimentação com partículas, socialização completa (`GREET`, `IMITATE_WINGS`, `REST_TOGETHER`, `PLAY_CHASE`) e transições `SIT`/`STAND`/`TAKEOFF`/`LAND` com proteção sobre líquidos. Validação em 4 rodadas consecutivas (`runFireDragonTest` 15/15, `runFeyRavenTest` 9/9, `runBrimstoneSalamanderTest` 23/23). Próxima etapa: Fatia 4 (sons, Bestiário, 3 conquistas e docs) e revisão visual em `runClient`.

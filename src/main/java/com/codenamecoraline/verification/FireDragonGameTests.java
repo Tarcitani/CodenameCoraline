@@ -29,7 +29,10 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
-/** Server-only integration coverage for the baby foundation, with no client model dependency. */
+/**
+ * Server-only integration coverage for the baby foundation, with no client
+ * model dependency.
+ */
 @EventBusSubscriber(modid = CodenameCoraline.MOD_ID)
 public final class FireDragonGameTests {
     private static final Map<String, Consumer<GameTestHelper>> TESTS = Map.ofEntries(
@@ -39,14 +42,18 @@ public final class FireDragonGameTests {
             Map.entry("fire_dragon_appearance_persistence", FireDragonGameTests::appearancePersistence),
             Map.entry("fire_dragon_visual_idles", FireDragonGameTests::visualIdles),
             Map.entry("fire_dragon_taming_food_and_commands", FireDragonGameTests::tamingFoodAndCommands),
-            Map.entry("fire_dragon_owner_persistence_and_protection", FireDragonGameTests::ownerPersistenceAndProtection),
+            Map.entry("fire_dragon_owner_persistence_and_protection",
+                    FireDragonGameTests::ownerPersistenceAndProtection),
             Map.entry("fire_dragon_shoulder_controls", FireDragonGameTests::shoulderControls),
             Map.entry("fire_dragon_fireball_cooked_loot", FireDragonGameTests::fireballCookedLoot),
             Map.entry("fire_dragon_shoulder_no_push", FireDragonGameTests::shoulderNoPush),
             Map.entry("fire_dragon_repeated_hits_retaliation", FireDragonGameTests::repeatedHitsRetaliation),
-            Map.entry("fire_dragon_predictive_aim", FireDragonGameTests::predictiveAim));
+            Map.entry("fire_dragon_predictive_aim", FireDragonGameTests::predictiveAim),
+            Map.entry("fire_dragon_social_interaction", FireDragonGameTests::socialInteraction),
+            Map.entry("fire_dragon_transition_clips", FireDragonGameTests::transitionClips));
 
-    private FireDragonGameTests() {}
+    private FireDragonGameTests() {
+    }
 
     private static Identifier id(String name) {
         return Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, name);
@@ -54,14 +61,16 @@ public final class FireDragonGameTests {
 
     @SubscribeEvent
     public static void functions(RegisterEvent event) {
-        if (!Boolean.getBoolean("coraline.fireDragonTests")) return;
+        if (!Boolean.getBoolean("coraline.fireDragonTests"))
+            return;
         event.register(Registries.TEST_FUNCTION,
                 registry -> TESTS.forEach((name, fn) -> registry.register(id(name), fn)));
     }
 
     @SubscribeEvent
     public static void tests(RegisterGameTestsEvent event) {
-        if (!Boolean.getBoolean("coraline.fireDragonTests")) return;
+        if (!Boolean.getBoolean("coraline.fireDragonTests"))
+            return;
         var environment = event.registerEnvironment(id("fire_dragon_test_environment"));
         TESTS.forEach((name, fn) -> event.registerTest(id(name),
                 new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, id(name)),
@@ -77,7 +86,8 @@ public final class FireDragonGameTests {
         helper.assertValueEqual(dragon.getAttributeValue(Attributes.FLYING_SPEED), 0.2D, "Flight attribute only");
         helper.assertValueEqual(dragon.getAttributeValue(Attributes.ATTACK_DAMAGE), 3.0D, "Damage attribute");
         helper.assertValueEqual(dragon.getAttributeValue(Attributes.FOLLOW_RANGE), 16.0D, "Follow range");
-        helper.assertValueEqual(dragon.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 0.0D, "Knockback resistance");
+        helper.assertValueEqual(dragon.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 0.0D,
+                "Knockback resistance");
         helper.assertValueEqual(dragon.getBbWidth(), FireDragon.WIDTH, "Width");
         helper.assertValueEqual(dragon.getBbHeight(), FireDragon.HEIGHT, "Height");
         helper.assertTrue(Math.abs(dragon.getEyeHeight() - FireDragon.EYE_HEIGHT) < 0.001F, "Eye height");
@@ -100,16 +110,20 @@ public final class FireDragonGameTests {
         var type = ModEntities.FIRE_DRAGON.get();
         var level = helper.getLevel();
         var pos = helper.absolutePos(new BlockPos(5, 3, 5));
-        helper.assertFalse(SpawnPlacements.checkSpawnRules(type, level, EntitySpawnReason.NATURAL, pos, level.getRandom()),
+        helper.assertFalse(
+                SpawnPlacements.checkSpawnRules(type, level, EntitySpawnReason.NATURAL, pos, level.getRandom()),
                 "Natural spawning must remain disabled until nest design");
-        helper.assertFalse(FireDragon.checkSpawnRules(type, level, EntitySpawnReason.CHUNK_GENERATION, pos, level.getRandom()),
+        helper.assertFalse(
+                FireDragon.checkSpawnRules(type, level, EntitySpawnReason.CHUNK_GENERATION, pos, level.getRandom()),
                 "Chunk generation must not create unguarded babies");
         FireDragon dragon = (FireDragon) ((SpawnEggItem) ModItems.FIRE_DRAGON_SPAWN_EGG.get())
-                .getType(new ItemStack(ModItems.FIRE_DRAGON_SPAWN_EGG.get())).spawn(level, pos, EntitySpawnReason.SPAWN_ITEM_USE);
+                .getType(new ItemStack(ModItems.FIRE_DRAGON_SPAWN_EGG.get()))
+                .spawn(level, pos, EntitySpawnReason.SPAWN_ITEM_USE);
         helper.assertTrue(dragon != null && dragon.isAlive(), "Spawn egg type creates a living dragon");
         helper.assertFalse(dragon.isTame(), "Spawn egg dragon is wild");
         helper.runAfterDelay(5, () -> {
-            helper.assertTrue(dragon.isAlive() && dragon.getTarget() == null, "Inert spawn remains alive without combat");
+            helper.assertTrue(dragon.isAlive() && dragon.getTarget() == null,
+                    "Inert spawn remains alive without combat");
             helper.succeed();
         });
     }
@@ -147,7 +161,8 @@ public final class FireDragonGameTests {
             helper.assertTrue(dragon.getVisualAnimationTicks(0) >= 0, "Non-negative synchronized clip clock");
         });
         helper.runAfterDelay(170, () -> {
-            helper.assertValueEqual(dragon.getVisualAnimation(), FireDragonAnimation.NONE, "Idle returns to base breathing");
+            helper.assertValueEqual(dragon.getVisualAnimation(), FireDragonAnimation.NONE,
+                    "Idle returns to base breathing");
             helper.succeed();
         });
     }
@@ -158,14 +173,16 @@ public final class FireDragonGameTests {
         owner.getAbilities().instabuild = false;
         owner.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.SALMON, 64));
         dragon.getRandom().setSeed(4096);
-        for (int i = 0; i < 64 && !dragon.isTame(); i++) dragon.mobInteract(owner, net.minecraft.world.InteractionHand.MAIN_HAND);
+        for (int i = 0; i < 64 && !dragon.isTame(); i++)
+            dragon.mobInteract(owner, net.minecraft.world.InteractionHand.MAIN_HAND);
         helper.assertTrue(dragon.isOwnedBy(owner), "Salmon creates owner bond");
         helper.assertTrue(owner.getMainHandItem().getCount() < 64, "Taming consumes food");
         dragon.setHealth(10);
         int before = dragon.getGrowthRemaining();
         dragon.mobInteract(owner, net.minecraft.world.InteractionHand.MAIN_HAND);
         helper.assertValueEqual(dragon.getHealth(), 14F, "Salmon heals four HP");
-        helper.assertValueEqual(dragon.getGrowthRemaining(), before - (before + 9) / 10, "Salmon accelerates remaining baby timer");
+        helper.assertValueEqual(dragon.getGrowthRemaining(), before - (before + 9) / 10,
+                "Salmon accelerates remaining baby timer");
         helper.assertFalse(dragon.isOrderedToSit(), "Feeding does not toggle command");
         owner.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         dragon.mobInteract(owner, net.minecraft.world.InteractionHand.MAIN_HAND);
@@ -178,11 +195,15 @@ public final class FireDragonGameTests {
     private static void ownerPersistenceAndProtection(GameTestHelper helper) {
         var owner = helper.makeMockServerPlayerInLevel();
         FireDragon dragon = helper.spawnWithNoFreeWill(ModEntities.FIRE_DRAGON.get(), new BlockPos(3, 2, 3));
-        dragon.tame(owner); dragon.setOrderedToSit(true); dragon.setAppearance(0, 4, 2); dragon.feedSalmon();
+        dragon.tame(owner);
+        dragon.setOrderedToSit(true);
+        dragon.setAppearance(0, 4, 2);
+        dragon.feedSalmon();
         var out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, helper.getLevel().registryAccess());
         dragon.saveWithoutId(out);
         FireDragon loaded = ModEntities.FIRE_DRAGON.get().create(helper.getLevel(), EntitySpawnReason.LOAD);
-        loaded.load(TagValueInput.create(ProblemReporter.DISCARDING, helper.getLevel().registryAccess(), out.buildResult()));
+        loaded.load(TagValueInput.create(ProblemReporter.DISCARDING, helper.getLevel().registryAccess(),
+                out.buildResult()));
         helper.assertTrue(loaded.getOwnerReference().equals(dragon.getOwnerReference()), "Owner UUID persists");
         helper.assertTrue(loaded.isOrderedToSit(), "Wait order persists");
         helper.assertValueEqual(loaded.getGrowthRemaining(), dragon.getGrowthRemaining(), "Growth persists");
@@ -198,12 +219,14 @@ public final class FireDragonGameTests {
     }
 
     private static void shoulderControls(GameTestHelper helper) {
-        for (int x = 2; x <= 9; x++) for (int z = 2; z <= 9; z++)
-            helper.setBlock(new BlockPos(x, 1, z), net.minecraft.world.level.block.Blocks.STONE);
+        for (int x = 2; x <= 9; x++)
+            for (int z = 2; z <= 9; z++)
+                helper.setBlock(new BlockPos(x, 1, z), net.minecraft.world.level.block.Blocks.STONE);
         var owner = helper.makeMockServerPlayerInLevel();
         owner.setPos(helper.absoluteVec(new net.minecraft.world.phys.Vec3(5, 2, 5)));
         FireDragon dragon = helper.spawnWithNoFreeWill(ModEntities.FIRE_DRAGON.get(), new BlockPos(6, 2, 5));
-        dragon.tame(owner); dragon.setNoAi(false);
+        dragon.tame(owner);
+        dragon.setNoAi(false);
         var uuid = dragon.getUUID();
         owner.setShiftKeyDown(true);
         owner.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.SALMON));
@@ -229,14 +252,15 @@ public final class FireDragonGameTests {
         var pig = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityType.PIG, new BlockPos(6, 2, 5));
         pig.setHealth(3);
         var shot = new com.codenamecoraline.entity.firedragon.DragonFireball(helper.getLevel(), dragon);
-        var aim = pig.getEyePosition().subtract(shot.position());
+        var aim = pig.getBoundingBox().getCenter().subtract(shot.position());
         shot.shoot(aim.x, aim.y, aim.z, .8F, 0);
         helper.getLevel().addFreshEntity(shot);
         helper.runAfterDelay(30, () -> {
             helper.assertTrue(pig.isDeadOrDying() || pig.isRemoved(), "Fireball kills three-HP prey");
             var items = helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class,
                     pig.getBoundingBox().inflate(4));
-            helper.assertTrue(items.stream().anyMatch(e -> e.getItem().is(Items.COOKED_PORKCHOP)), "Lethal fire yields cooked meat");
+            helper.assertTrue(items.stream().anyMatch(e -> e.getItem().is(Items.COOKED_PORKCHOP)),
+                    "Lethal fire yields cooked meat");
             helper.assertFalse(items.stream().anyMatch(e -> e.getItem().is(Items.PORKCHOP)), "No duplicate raw meat");
             helper.succeed();
         });
@@ -258,22 +282,25 @@ public final class FireDragonGameTests {
     }
 
     private static void repeatedHitsRetaliation(GameTestHelper helper) {
-        for (int x = 2; x <= 10; x++) for (int z = 2; z <= 10; z++)
-            helper.setBlock(new BlockPos(x, 1, z), net.minecraft.world.level.block.Blocks.STONE);
+        for (int x = 2; x <= 10; x++)
+            for (int z = 2; z <= 10; z++)
+                helper.setBlock(new BlockPos(x, 1, z), net.minecraft.world.level.block.Blocks.STONE);
         var owner = helper.makeMockServerPlayerInLevel();
         owner.setPos(helper.absoluteVec(new net.minecraft.world.phys.Vec3(3, 2, 4)));
         FireDragon dragon = helper.spawnWithNoFreeWill(ModEntities.FIRE_DRAGON.get(), new BlockPos(4, 2, 5));
-        dragon.tame(owner); dragon.setNoAi(false);
+        dragon.tame(owner);
+        dragon.setNoAi(false);
         var attacker = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityType.ZOMBIE, new BlockPos(9, 2, 5));
         attacker.setInvulnerable(false);
         dragon.hurtServer(helper.getLevel(), dragon.damageSources().mobAttack(attacker), 1);
         helper.assertValueEqual(dragon.getTarget(), attacker, "Accepted damage acquires aggressor immediately");
         helper.assertValueEqual(dragon.getState(), FireDragon.State.DEFENDING, "Defense interrupts idle");
-        for (int tick : new int[] {3, 6, 9}) helper.runAfterDelay(tick, () -> {
-            dragon.invulnerableTime = 0;
-            dragon.hurtServer(helper.getLevel(), dragon.damageSources().mobAttack(attacker), 1);
-            helper.assertValueEqual(dragon.getTarget(), attacker, "Repeated hit retains target");
-        });
+        for (int tick : new int[] { 3, 6, 9 })
+            helper.runAfterDelay(tick, () -> {
+                dragon.invulnerableTime = 0;
+                dragon.hurtServer(helper.getLevel(), dragon.damageSources().mobAttack(attacker), 1);
+                helper.assertValueEqual(dragon.getTarget(), attacker, "Repeated hit retains target");
+            });
         helper.runAfterDelay(13, () -> {
             helper.assertTrue(helper.getLevel().getEntitiesOfClass(
                     com.codenamecoraline.entity.firedragon.DragonFireball.class,
@@ -307,5 +334,58 @@ public final class FireDragonGameTests {
         dragon.hurtServer(helper.getLevel(), dragon.damageSources().generic(), 4.0F);
         helper.assertTrue(dragon.getHealth() < initial, "Ordinary damage must still work");
         helper.succeed();
+    }
+
+    private static void socialInteraction(GameTestHelper helper) {
+        var owner = helper.makeMockServerPlayerInLevel();
+        owner.setPos(helper.absoluteVec(new net.minecraft.world.phys.Vec3(5, 2, 5)));
+        FireDragon first = helper.spawn(ModEntities.FIRE_DRAGON.get(), new BlockPos(4, 2, 5));
+        FireDragon second = helper.spawn(ModEntities.FIRE_DRAGON.get(), new BlockPos(6, 2, 5));
+        first.tame(owner);
+        second.tame(owner);
+        helper.runAfterDelay(45, () -> {
+            helper.assertValueEqual(first.getState(), FireDragon.State.SOCIAL, "First dragon enters social state");
+            helper.assertValueEqual(second.getState(), FireDragon.State.SOCIAL, "Second dragon enters social state");
+            first.setOrderedToSit(true);
+        });
+        helper.runAfterDelay(48, () -> {
+            helper.assertValueEqual(first.getState(), FireDragon.State.SITTING, "Sitting dragon exits social state");
+            helper.assertTrue(second.getState() != FireDragon.State.SOCIAL, "Partner exits social state when partner sits");
+            helper.succeed();
+        });
+    }
+
+    private static void transitionClips(GameTestHelper helper) {
+        var owner = helper.makeMockServerPlayerInLevel();
+        owner.setPos(helper.absoluteVec(new net.minecraft.world.phys.Vec3(5, 2, 5)));
+        FireDragon dragon = helper.spawn(ModEntities.FIRE_DRAGON.get(), new BlockPos(5, 2, 5));
+        dragon.tame(owner);
+        helper.runAfterDelay(2, () -> {
+            dragon.mobInteract(owner, net.minecraft.world.InteractionHand.MAIN_HAND);
+        });
+        helper.runAfterDelay(4, () -> {
+            helper.assertValueEqual(dragon.getVisualAnimation(), FireDragonAnimation.SIT, "Sitting triggers SIT clip");
+            dragon.mobInteract(owner, net.minecraft.world.InteractionHand.MAIN_HAND);
+        });
+        helper.runAfterDelay(6, () -> {
+            helper.assertValueEqual(dragon.getVisualAnimation(), FireDragonAnimation.STAND, "Standing triggers STAND clip");
+        });
+        helper.runAfterDelay(20, () -> {
+            dragon.setNoGravity(true);
+            dragon.setPos(dragon.getX(), dragon.getY() + 1.5, dragon.getZ());
+            dragon.setOnGround(false);
+        });
+        helper.runAfterDelay(22, () -> {
+            helper.assertValueEqual(dragon.getVisualAnimation(), FireDragonAnimation.TAKEOFF, "Flight start triggers TAKEOFF clip");
+        });
+        helper.runAfterDelay(38, () -> {
+            dragon.setNoGravity(false);
+            dragon.setPos(dragon.getX(), helper.absoluteVec(new net.minecraft.world.phys.Vec3(5, 2, 5)).y, dragon.getZ());
+            dragon.setOnGround(true);
+        });
+        helper.runAfterDelay(40, () -> {
+            helper.assertValueEqual(dragon.getVisualAnimation(), FireDragonAnimation.LAND, "Touchdown triggers LAND clip");
+            helper.succeed();
+        });
     }
 }

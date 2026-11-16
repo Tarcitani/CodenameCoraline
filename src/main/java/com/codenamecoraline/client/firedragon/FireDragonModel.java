@@ -57,10 +57,16 @@ public final class FireDragonModel extends EntityModel<FireDragonRenderState> {
             return;
         }
         if (state.hurtTicks > 0) { applyPose(FireDragonAnimation.HURT, 10 - state.hurtTicks); return; }
-        if (state.clip != FireDragonAnimation.NONE && state.clip != FireDragonAnimation.BREATHE) {
+        if (state.clip == FireDragonAnimation.PLAY_CHASE) {
+            if (state.airborne) applyPose(FireDragonAnimation.FLY, state.ageInTicks);
+            else if (state.walkAnimationSpeed > 0.01F) {
+                for (ModelPart joint : joints) joint.resetPose();
+                clips[FireDragonAnimation.WALK.ordinal()].applyWalk(state.walkAnimationPos, state.walkAnimationSpeed, 1.0F, 2.0F);
+            } else applyPose(FireDragonAnimation.BREATHE, state.ageInTicks);
+            clips[FireDragonAnimation.PLAY_CHASE.ordinal()].apply((long) (Math.max(0, state.clipTicks) * 50.0F), 1.0F);
+        } else if (state.clip != FireDragonAnimation.NONE && state.clip != FireDragonAnimation.BREATHE) {
             applyPose(state.clip, state.clipTicks); return;
-        }
-        if (state.sitting) applyPose(FireDragonAnimation.SIT, 12);
+        } else if (state.sitting) applyPose(FireDragonAnimation.SIT, 12);
         else if (state.airborne) applyPose(FireDragonAnimation.FLY, state.ageInTicks);
         else if (state.walkAnimationSpeed > 0.01F) {
             for (ModelPart joint : joints) joint.resetPose();

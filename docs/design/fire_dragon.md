@@ -112,7 +112,7 @@
 | 1. Fundação | concluída | 2026-11-11 | agente: `compileJava` e `build` aprovados; `runFireDragonTest runFeyRavenTest runBrimstoneSalamanderTest` em 4 rodadas consecutivas: 4/4, 9/9, 23/23 por rodada (contagens do servidor incluem teste do framework) |
 | 2. Visual e rigging | modelo/idles aprovados; demais clipes em revisão | 2026-11-11 | geradores, compileJava/build, exportador de 75 poses e runClient executados; 4 rodadas Dragão/Corvo/Salamandra aprovadas (6/6, 9/9, 23/23 por rodada) |
 | 2b. Revisão visual (humano) | modelo e animações paradas aprovados pelo usuário | 2026-11-11 | usuário autorizou continuar a IA; demais clipes precisam ser observados durante seus testes |
-| 3. IA e combate | escrita; aguardando compilação e testes do usuário | 2026-11-11 | nenhum comando de teste/compilação executado pelo agente nesta etapa |
+| 3. IA e combate | concluída | 2026-11-15 | `compileJava` OK; `runFireDragonTest runFeyRavenTest runBrimstoneSalamanderTest` em 4 rodadas consecutivas: 15/15, 9/9, 23/23 por rodada (`build/logs/fire_dragon_fatia3_round_1.log` a `_4.log`). Revisão visual final das animações novas no `runClient` fica para conferência humana |
 | 4. Polimento e docs | pendente | não iniciada | não executado |
 | 5. Relatório | pendente | não iniciada | não executado |
 
@@ -229,4 +229,26 @@ Usuário relatou que a redução deixou o bebê baixo demais. A escala visual co
 
 ### Estabilização do ombro ao caminhar — teste humano pendente
 
-Usuário aprovou o tamanho atual, mas ainda observou glitches durante a caminhada. A primeira pessoa agora ancora posição e yaw na própria câmera (`Camera.position()`/`yRot()`), em vez da interpolação do dono e do yaw corporal que varia ao andar/strafe. A rotação relativa residual da cabeça é zerada nessa visão. Escala 60% e compensação vertical anteriores preservadas; terceira pessoa continua presa ao corpo do dono. Nenhuma compilação ou teste executado pelo agente. Conferir caminhada frontal, corrida, movimento lateral e giro nos dois ombros, alternando F5; relatar se a oscilação persiste. Nível recomendado: High. Sem commit.
+Usuário aprovou o tamanho atual, mas ainda observou glitches durante a caminhada. A primeira pessoa agora ancora posição e yaw na própria câmera (`Camera.position()`/`yRot()`), em vez da interpolação do dono e do yaw corporal que varia ao andar/strafe. A rotação relativa residual da cabeça é zerada nessa visão. Escala 60% e compensação vertical anteriores preservadas; terceira pessoa continua presa ao corpo do dono. Nenhuma compilação ou teste executado pelo agente. Conferir caminhada frontal, corrida, movimento lateral e giro nos dois ombros, alternando F5; relatar se a oscilação persiste. Nível recomendado: High.
+
+### Caça, alimentação e partículas — ajustes escritos, teste humano pendente
+
+- **Perseguição na caça (`FireDragonCompanion`):** durante `hunting`, o bebê não recua mais da própria presa quando está a menos de 4 blocos em cooldown; mantém perseguição a até 6 blocos (voando baixo a ~1,5 bloco acima de peixes na água) e mantém o ataque único de bola de fogo. O recuo permanece exclusivo do combate defensivo (`DEFENDING`).
+- **Coleta e pausa ao comer (`EAT`):** itens de carne na água são abordados por cima (`+0,6` bloco) com alcance de coleta ampliado (`2` blocos) para evitar afundar; ao comer carne caída ou receber salmão fora do ombro, `eatTicks` pausa a locomoção pelos 24 ticks da animação `EAT` (mantendo interrupção imediata para defesa ou teletransporte se o dono se afastar >24 blocos).
+- **Partículas cosméticas (`FireDragon`):** lado cliente emite `FLAME` na boca durante `FIRE_WINDUP`, `SMOKE` breve durante `IDLE_TAIL` (ticks 16–26) e `SMOKE` leve ao mastigar (`EAT`), sem pacotes extras de rede.
+- **Pendente:** transições de voo/pouso (`TAKEOFF`, `LAND`, `SIT`, `STAND`) e testes visuais no cliente (`runClient`).
+
+### Socialização (`SOCIAL`) — implementada, aguardando revisão visual
+
+- **Elegibilidade e cancelamento (`FireDragonCompanion`):** só inicia entre dois bebês do mesmo dono que estejam livres (sem alvo, sem sentar, sem ombro, sem comer/fome crítica e sem cooldown social). Se um dos dois sentar, subir no ombro, entrar em combate, comer ou o dono se afastar (`> 8` blocos), ambos encerram a socialização imediatamente.
+- **Comportamentos distintos:**
+  - `GREET` e `REST_TOGETHER`: aproximam até `~1,8` bloco antes de iniciar o clipe, depois param frente a frente pelo tempo exato do clipe (`30` e `100` ticks).
+  - `IMITATE_WINGS`: iniciador abre as asas e o parceiro imita `15` ticks depois, olhando um para o outro.
+  - `PLAY_CHASE`: um persegue e o outro foge em arco ao redor da área do dono (dentro de 8 blocos), invertendo os papéis aos 50 ticks. No [FireDragonModel.java](file:///c:/Users/Venti/CodenameCoraline/src/main/java/com/codenamecoraline/client/firedragon/FireDragonModel.java), `PLAY_CHASE` roda sobre `WALK`/`FLY` sem resetar as juntas no meio, mantendo pernas e asas em movimento.
+- **Teste:** adicionado `fire_dragon_social_interaction` em [FireDragonGameTests.java](file:///c:/Users/Venti/CodenameCoraline/src/main/java/com/codenamecoraline/verification/FireDragonGameTests.java).
+
+### Transições de voo, pouso e sentar (`TAKEOFF`, `LAND`, `SIT`, `STAND`) — concluída na Fatia 3
+
+- **Transições (`FireDragonCompanion.updateTransitionClips`):** alternar sentado dispara `SIT` (12 ticks) e `STAND` (12 ticks); entrar em voo ativo (`noGravity` + sair do chão) dispara `TAKEOFF` (16 ticks) e tocar o chão após ≥6 ticks no ar dispara `LAND` (16 ticks), respeitando prioridade de clipes de combate/comida/socialização.
+- **Pouso seguro sobre líquidos (`isOverLiquid`):** ao seguir o dono dentro de 3 blocos, evita desativar a gravidade e afundar se estiver diretamente sobre água ou lava.
+- **Teste e aceite:** adicionado `fire_dragon_transition_clips`; `compileJava` aprovado e 4 rodadas consecutivas (`runFireDragonTest` 15/15, `runFeyRavenTest` 9/9, `runBrimstoneSalamanderTest` 23/23) aprovadas em `build/logs/fire_dragon_fatia3_round_1.log` a `_4.log`. Próxima etapa: **Fatia 4 (`fatia_4_polimento.md`)** (sons, Bestiário, 3 conquistas e docs). Sem commit.

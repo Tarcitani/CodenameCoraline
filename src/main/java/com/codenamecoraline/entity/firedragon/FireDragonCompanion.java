@@ -23,8 +23,13 @@ final class FireDragonCompanion {
     private boolean shiftHeld;
     private boolean exitRequested;
     private int ownerHurt, ownerAttack, selfHurt;
-    private int shotCooldown, attackTick = -1, unseenTicks, mealCooldown, socialTicks;
+    private int shotCooldown, attackTick = -1, unseenTicks, mealCooldown, socialTicks, socialDelay, eatTicks, airborneTicks;
     private FireDragon socialPartner;
+    private FireDragonAnimation socialClip;
+    private boolean socialClipStarted;
+    private boolean socialInitiator;
+    private boolean wasAirborne;
+    private boolean wasSitting;
     private ItemEntity mealTarget;
     private boolean hunting;
     private boolean personalThreat;
@@ -38,9 +43,20 @@ final class FireDragonCompanion {
 
     FireDragonCompanion(FireDragon dragon) { d = dragon; }
     void resetAfterLoad() {
-        shiftHeld = true; exitRequested = false; attackTick = -1; socialTicks = 0;
-        socialPartner = null; mealTarget = null; hunting = false;
+        shiftHeld = true; exitRequested = false; attackTick = -1; eatTicks = 0; airborneTicks = 0;
+        wasAirborne = !d.onGround() && !d.isInWater();
+        wasSitting = d.isInSittingPose();
+        cancelSocial(); mealTarget = null; hunting = false;
         trackedTarget = null; previousTargetPosition = null; targetMotion = Vec3.ZERO;
+    }
+
+    boolean isAvailableForSocial() {
+        return d.isTame() && d.isAlive() && !d.isOnShoulder() && !d.isOrderedToSit()
+                && d.getTarget() == null && eatTicks <= 0 && !seekingFood && socialTicks <= 0 && socialCooldown <= 0;
+    }
+
+    void onFed() {
+        if (!d.isOnShoulder()) eatTicks = FireDragonAnimation.EAT.ticks;
     }
 
     void tick() {
@@ -51,6 +67,7 @@ final class FireDragonCompanion {
         if (d.getSatiety() >= 55) seekingFood = false;
         LivingEntity owner = d.getOwner();
         if (d.isOnShoulder()) { maintainShoulder(owner); return; }
+        updateTransitionClips();
         if (d.isTame() && (owner == null || !owner.isAlive())) {
             if (owner != null && !owner.isAlive()) d.setOrderedToSit(true);
             if (d.getTarget() != null && d.canDamage(d.getTarget()) && d.distanceToSqr(d.getTarget()) <= LEASH_SQR) {
@@ -82,23 +99,34 @@ final class FireDragonCompanion {
                 || (d.isOrderedToSit() && d.distanceToSqr(target) > 64))) {
             d.setTarget(null); attackTick = -1; target = null;
         }
-        if (target != null) { socialTicks = 0; fight(target); return; }
+        if (target != null) { interruptSocial(); eatTicks = 0; fight(target); return; }
         attackTick = -1;
+        if (eatTicks > 0) {
+            interruptSocial();
+            --eatTicks;
+            if (d.distanceToSqr(owner) > 24 * 24) { eatTicks = 0; relocate(owner.position()); return; }
+            stop();
+            d.setInSittingPose(d.isOrderedToSit());
+            d.setState(d.isOrderedToSit() ? FireDragon.State.SITTING : FireDragon.State.FOLLOWING);
+            return;
+        }
         if (d.isOrderedToSit()) {
-            stop(); d.setInSittingPose(true); d.setState(FireDragon.State.SITTING); return;
+            interruptSocial(); stop(); d.setInSittingPose(true); d.setState(FireDragon.State.SITTING); return;
         }
         d.setInSittingPose(false);
-        if (d.distanceToSqr(owner) > 24 * 24) { relocate(owner.position()); return; }
-        if (d.distanceToSqr(owner) > 64) { socialTicks = 0; follow(owner); return; }
+        if (d.distanceToSqr(owner) > 24 * 24) { interruptSocial(); relocate(owner.position()); return; }
+        if (d.distanceToSqr(owner) > 64) { interruptSocial(); follow(owner); return; }
         if (d.tickCount % 40 == 0) scan(owner);
         if (d.getTarget() != null) return;
-        if (seekingFood && tickMeal(owner)) return;
-        if (socialTicks > 0 && socialPartner != null && socialPartner.isAlive() && socialPartner.getTarget() == null
-                && socialPartner.distanceToSqr(owner) <= LEASH_SQR) {
-            d.setState(FireDragon.State.SOCIAL);
-            --socialTicks;
-            if (d.tickCount % 10 == 0 && d.distanceToSqr(socialPartner) > 4) move(socialPartner.position());
-            return;
+        if (seekingFood && tickMeal(owner)) { interruptSocial(); return; }
+        if (socialTicks > 0) {
+            if (socialPartner != null && socialPartner.isAlive() && !socialPartner.isOnShoulder()
+                    && !socialPartner.isOrderedToSit() && socialPartner.getTarget() == null
+                    && socialPartner.distanceToSqr(owner) <= LEASH_SQR) {
+                tickSocial(owner);
+                return;
+            }
+            cancelSocial();
         }
         follow(owner);
     }
@@ -127,7 +155,7 @@ final class FireDragonCompanion {
             personalThreat = personal;
             if (d.getTarget() == target && !hunting) return;
             d.setTarget(target); hunting = false; attackTick = -1; unseenTicks = 0;
-            socialTicks = 0; mealTarget = null; defenseOrigin = d.position();
+            interruptSocial(); eatTicks = 0; mealTarget = null; defenseOrigin = d.position();
             trackedTarget = null; d.setInSittingPose(false);
             d.setState(FireDragon.State.DEFENDING);
         }
@@ -143,11 +171,12 @@ final class FireDragonCompanion {
         boolean visible = d.hasLineOfSight(target);
         if (!visible) ++unseenTicks; else unseenTicks = 0;
         if (unseenTicks > 100 || (hunting && d.getSatiety() >= 55)) { d.setTarget(null); return; }
-        if (attackTick < 0 && (d.distanceToSqr(target) > 100 || !visible)) {
-            if (d.tickCount % 10 == 0) move(target.position().add(0, target.isInWater() ? 2 : 1, 0));
+        double pursueRangeSqr = hunting ? 36 : 100;
+        if (attackTick < 0 && (d.distanceToSqr(target) > pursueRangeSqr || !visible)) {
+            if (d.tickCount % 10 == 0) move(approachPoint(target));
             return;
         }
-        if (attackTick < 0 && d.distanceToSqr(target) < 16 && shotCooldown > 0) {
+        if (!hunting && attackTick < 0 && d.distanceToSqr(target) < 16 && shotCooldown > 0) {
             if (d.tickCount % 5 == 0) retreat(target);
             return;
         }
@@ -190,6 +219,12 @@ final class FireDragonCompanion {
         trackedTarget = target; previousTargetPosition = target.position(); targetSampleTime = now;
     }
 
+    private static Vec3 approachPoint(LivingEntity target) {
+        return target.isInWater()
+                ? new Vec3(target.getX(), target.getY() + 1.5, target.getZ())
+                : target.position().add(0, 1, 0);
+    }
+
     private void retreat(LivingEntity target) {
         Vec3 away = d.position().subtract(target.position()).multiply(1, 0, 1);
         if (away.lengthSqr() < .01) away = new Vec3(1, 0, 0);
@@ -215,25 +250,130 @@ final class FireDragonCompanion {
         for (LivingEntity e : nearby) {
             if (e.distanceToSqr(owner) > LEASH_SQR) continue;
             if (prey(e) && d.canDamage(e) && (closest == null || d.distanceToSqr(e) < d.distanceToSqr(closest))) closest = e;
-            if (e instanceof FireDragon f && f != d && f.isTame() && !f.isOnShoulder()
-                    && !f.isOrderedToSit() && f.getTarget() == null && f.getOwnerReference() != null
+            if (e instanceof FireDragon f && f != d && f.canSocialize() && f.getOwnerReference() != null
                     && f.getOwnerReference().equals(d.getOwnerReference()) && d.distanceToSqr(f) < 36) friend = f;
         }
         if (seekingFood && mealTarget == null && closest != null) {
             hunting = true; unseenTicks = 0; d.setTarget(closest);
-        } else if (friend != null && socialCooldown == 0 && d.getId() < friend.getId()) {
-            socialPartner = friend; socialTicks = 100; socialCooldown = 400;
+        } else if (friend != null && isAvailableForSocial() && d.getId() < friend.getId()) {
             FireDragonAnimation clip = switch (d.getRandom().nextInt(4)) {
                 case 0 -> FireDragonAnimation.GREET;
                 case 1 -> FireDragonAnimation.IMITATE_WINGS;
                 case 2 -> FireDragonAnimation.REST_TOGETHER;
                 default -> FireDragonAnimation.PLAY_CHASE;
             };
-            d.playVisual(clip); friend.companionSocial(d, clip);
+            acceptSocial(friend, clip, true);
+            friend.startSocial(d, clip, false);
         }
     }
-    void acceptSocial(FireDragon other, FireDragonAnimation clip) {
-        socialPartner = other; socialTicks = 100; socialCooldown = 400; d.playVisual(clip);
+
+    void acceptSocial(FireDragon other, FireDragonAnimation clip, boolean initiator) {
+        socialPartner = other;
+        socialClip = clip;
+        socialInitiator = initiator;
+        socialCooldown = 400;
+        socialDelay = 0;
+        socialClipStarted = false;
+        switch (clip) {
+            case GREET, REST_TOGETHER -> socialTicks = clip.ticks + 30;
+            case IMITATE_WINGS -> {
+                socialTicks = clip.ticks + 15;
+                if (initiator) {
+                    socialClipStarted = true;
+                    d.playVisual(clip);
+                } else {
+                    socialDelay = 15;
+                }
+            }
+            case PLAY_CHASE -> {
+                socialTicks = clip.ticks;
+                socialClipStarted = true;
+                d.playVisual(clip);
+            }
+            default -> cancelSocial();
+        }
+    }
+
+    void cancelSocial() {
+        socialTicks = 0;
+        socialDelay = 0;
+        socialPartner = null;
+        socialClip = null;
+        socialClipStarted = false;
+        FireDragonAnimation current = d.getVisualAnimation();
+        if (current == FireDragonAnimation.GREET || current == FireDragonAnimation.IMITATE_WINGS
+                || current == FireDragonAnimation.REST_TOGETHER || current == FireDragonAnimation.PLAY_CHASE) {
+            d.playVisual(FireDragonAnimation.NONE);
+        }
+    }
+
+    private void interruptSocial() {
+        if (socialTicks <= 0 && socialPartner == null) return;
+        FireDragon partner = socialPartner;
+        cancelSocial();
+        if (partner != null) partner.stopSocial();
+    }
+
+    private void tickSocial(LivingEntity owner) {
+        d.setState(FireDragon.State.SOCIAL);
+        --socialTicks;
+        d.getLookControl().setLookAt(socialPartner, 45, 45);
+        switch (socialClip) {
+            case GREET, REST_TOGETHER -> {
+                if (!socialClipStarted) {
+                    if (d.distanceToSqr(socialPartner) > 3.24) {
+                        if (d.tickCount % 5 == 0) move(socialPartner.position());
+                    } else {
+                        stop();
+                        face(socialPartner.position());
+                        socialClipStarted = true;
+                        socialTicks = socialClip.ticks;
+                        d.playVisual(socialClip);
+                    }
+                } else {
+                    stop();
+                    face(socialPartner.position());
+                }
+            }
+            case IMITATE_WINGS -> {
+                stop();
+                face(socialPartner.position());
+                if (!socialClipStarted && --socialDelay <= 0) {
+                    socialClipStarted = true;
+                    d.playVisual(FireDragonAnimation.IMITATE_WINGS);
+                }
+            }
+            case PLAY_CHASE -> {
+                boolean chasing = (socialTicks >= 50) == socialInitiator;
+                if (chasing) {
+                    if (d.distanceToSqr(socialPartner) > 2.25) {
+                        if (d.tickCount % 6 == 0) move(socialPartner.position());
+                    } else {
+                        stop();
+                        face(socialPartner.position());
+                    }
+                } else if (d.tickCount % 6 == 0) {
+                    Vec3 away = d.position().subtract(socialPartner.position()).multiply(1, 0, 1);
+                    if (away.lengthSqr() < 0.01) away = new Vec3(1, 0, 0);
+                    Vec3 norm = away.normalize();
+                    Vec3 tangent = new Vec3(-norm.z, 0, norm.x);
+                    Vec3 goal = d.position().add(norm.scale(2.5)).add(tangent.scale(2.0));
+                    if (goal.distanceToSqr(owner.position()) > 64) {
+                        goal = owner.position().add(norm.scale(3.0));
+                    }
+                    move(goal);
+                }
+            }
+            default -> cancelSocial();
+        }
+        if (socialTicks <= 0) cancelSocial();
+    }
+
+    private void face(Vec3 target) {
+        Vec3 delta = target.subtract(d.position());
+        if (delta.horizontalDistanceSqr() < 0.0001) return;
+        d.setYRot((float) Math.toDegrees(Math.atan2(-delta.x, delta.z)));
+        d.yBodyRot = d.getYRot();
     }
     private static boolean meat(ItemStack s) {
         return s.is(Items.PORKCHOP) || s.is(Items.COOKED_PORKCHOP) || s.is(Items.BEEF) || s.is(Items.COOKED_BEEF)
@@ -254,18 +394,57 @@ final class FireDragonCompanion {
     private boolean tickMeal(LivingEntity owner) {
         if (mealTarget == null || !mealTarget.isAlive() || !meat(mealTarget.getItem())
                 || mealTarget.distanceToSqr(owner) > LEASH_SQR) { mealTarget = null; return false; }
-        if (d.distanceToSqr(mealTarget) > 2) {
-            if (d.tickCount % 10 == 0) move(mealTarget.position().add(0,.2,0));
+        boolean inWater = mealTarget.isInWater();
+        double pickupReachSqr = inWater ? 4.0 : 2.0;
+        if (d.distanceToSqr(mealTarget) > pickupReachSqr) {
+            if (d.tickCount % 10 == 0) move(mealTarget.position().add(0, inWater ? 0.6 : 0.2, 0));
         } else if (mealCooldown == 0) {
             mealTarget.getItem().shrink(1); if (mealTarget.getItem().isEmpty()) mealTarget.discard();
             d.eatMeat(); mealCooldown = 40;
         }
         return true;
     }
+    private void updateTransitionClips() {
+        boolean airborne = !d.onGround() && !d.isInWater();
+        if (airborne) ++airborneTicks;
+        FireDragonAnimation current = d.getVisualAnimation();
+        boolean canOverride = current == FireDragonAnimation.NONE || current == FireDragonAnimation.IDLE_SNIFF
+                || current == FireDragonAnimation.IDLE_WINGS || current == FireDragonAnimation.IDLE_TAIL;
+        boolean sitting = d.isInSittingPose();
+        if (sitting && !wasSitting && (canOverride || current == FireDragonAnimation.STAND)) {
+            d.playVisual(FireDragonAnimation.SIT);
+        } else if (!sitting && wasSitting && (canOverride || current == FireDragonAnimation.SIT)) {
+            d.playVisual(FireDragonAnimation.STAND);
+        }
+        wasSitting = sitting;
+        if (!sitting) {
+            if (!wasAirborne && airborne && d.isNoGravity() && canOverride) {
+                d.playVisual(FireDragonAnimation.TAKEOFF);
+            } else if (wasAirborne && !airborne && d.onGround() && !d.isInWater() && airborneTicks >= 6
+                    && (canOverride || current == FireDragonAnimation.TAKEOFF)) {
+                d.playVisual(FireDragonAnimation.LAND);
+            }
+        }
+        if (!airborne) airborneTicks = 0;
+        wasAirborne = airborne;
+    }
+
     private void follow(LivingEntity owner) {
         d.setState(FireDragon.State.FOLLOWING);
-        if (d.distanceToSqr(owner) > 9 && d.tickCount % 10 == 0) move(owner.position().add(0, 1, 0));
-        else if (d.distanceToSqr(owner) <= 9) stop();
+        if (d.distanceToSqr(owner) > 9) {
+            if (d.tickCount % 10 == 0) move(owner.position().add(0, 1, 0));
+        } else if (isOverLiquid()) {
+            d.getNavigation().stop();
+            d.setNoGravity(true);
+            d.setDeltaMovement(Vec3.ZERO);
+        } else {
+            stop();
+        }
+    }
+
+    private boolean isOverLiquid() {
+        BlockPos pos = d.blockPosition();
+        return !d.level().getFluidState(pos).isEmpty() || !d.level().getFluidState(pos.below()).isEmpty();
     }
     private void stop() {
         d.getNavigation().stop(); d.setNoGravity(false);
@@ -298,7 +477,8 @@ final class FireDragonCompanion {
         int side = left ? -1 : 1;
         if (!clearShoulder(shoulderPosition(owner, side))) return false;
         d.setShoulderSide(left ? -1 : 1); shiftHeld = owner.isShiftKeyDown(); exitRequested = false;
-        d.setTarget(null); attackTick = -1; socialTicks = 0; d.getNavigation().stop();
+        wasAirborne = false; airborneTicks = 0; wasSitting = false;
+        d.setTarget(null); attackTick = -1; interruptSocial(); eatTicks = 0; d.getNavigation().stop();
         d.setOrderedToSit(false); d.setInSittingPose(false); d.setNoGravity(true);
         d.setState(FireDragon.State.SHOULDER); d.playVisual(FireDragonAnimation.SHOULDER);
         maintainShoulder(owner); return true;
