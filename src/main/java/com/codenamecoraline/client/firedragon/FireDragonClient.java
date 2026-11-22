@@ -15,11 +15,12 @@ public final class FireDragonClient {
     @SubscribeEvent
     static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(FireDragonModel.LAYER, FireDragonModel::createBodyLayer);
+        event.registerLayerDefinition(DragonFireballModel.LAYER, DragonFireballModel::createBodyLayer);
     }
 
     @SubscribeEvent
     static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(ModEntities.DRAGON_FIREBALL.get(), net.minecraft.client.renderer.entity.ThrownItemRenderer::new);
+        event.registerEntityRenderer(ModEntities.DRAGON_FIREBALL.get(), DragonFireballRenderer::new);
         event.registerEntityRenderer(ModEntities.FIRE_DRAGON.get(), FireDragonRenderer::new);
     }
 }

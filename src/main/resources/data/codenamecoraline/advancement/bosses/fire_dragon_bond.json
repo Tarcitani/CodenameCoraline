@@ -1,0 +1,34 @@
+{
+  "parent": "codenamecoraline:bosses/fire_dragon_ember",
+  "criteria": {
+    "tamed_fire_dragon": {
+      "trigger": "minecraft:tame_animal",
+      "conditions": {
+        "entity": {
+          "type": "codenamecoraline:fire_dragon"
+        }
+      }
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.fire_dragon_bond.description"
+    },
+    "frame": "goal",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:salmon"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.fire_dragon_bond.title"
+    }
+  },
+  "requirements": [
+    [
+      "tamed_fire_dragon"
+    ]
+  ]
+}

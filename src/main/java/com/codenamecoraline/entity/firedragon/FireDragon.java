@@ -1,10 +1,15 @@
 package com.codenamecoraline.entity.firedragon;
 
+import com.codenamecoraline.CodenameCoraline;
+import com.codenamecoraline.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.level.storage.ValueInput;
@@ -56,7 +61,14 @@ public final class FireDragon extends TamableAnimal {
         satiety = Math.min(100, satiety + 25);
         growthRemaining = Math.max(0, growthRemaining - Math.max(1, (growthRemaining + 9) / 10));
         playVisual(FireDragonAnimation.EAT);
+        playSound(ModSounds.FIRE_DRAGON_PURR.get(), 0.55F, 1.05F);
         companion.onFed();
+    }
+
+    static void awardAdvancement(Player player, String name, String criterion) {
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer sp) || sp.level().getServer() == null) return;
+        var holder = sp.level().getServer().getAdvancements().get(Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "bosses/" + name));
+        if (holder != null) sp.getAdvancements().award(holder, criterion);
     }
     void eatMeat() { satiety = Math.min(100, satiety + 25); playVisual(FireDragonAnimation.EAT); companion.onFed(); }
     public boolean canDamage(net.minecraft.world.entity.Entity target) {
@@ -146,17 +158,42 @@ public final class FireDragon extends TamableAnimal {
         FireDragonAnimation clip = getVisualAnimation();
         if (clip == FireDragonAnimation.NONE) return;
         double yaw = Math.toRadians(yHeadRot);
-        double mx = getX() - Math.sin(yaw) * 0.45D;
+        double fx = -Math.sin(yaw);
+        double fz = Math.cos(yaw);
+        double mx = getX() + fx * 0.45D;
         double my = getY() + EYE_HEIGHT - 0.05D;
-        double mz = getZ() + Math.cos(yaw) * 0.45D;
-        if (clip == FireDragonAnimation.FIRE_WINDUP && tickCount % 2 == 0) {
-            level().addParticle(ParticleTypes.FLAME, mx, my, mz,
-                    (random.nextDouble() - 0.5D) * 0.02D, 0.02D, (random.nextDouble() - 0.5D) * 0.02D);
+        double mz = getZ() + fz * 0.45D;
+        if (clip == FireDragonAnimation.FIRE_WINDUP) {
+            float clipTicks = getVisualAnimationTicks(0);
+            double angle = (tickCount * 1.15D) + random.nextDouble() * 0.6D;
+            double radius = Math.max(0.12D, 0.36D - clipTicks * 0.02D);
+            double px = mx + Math.cos(angle) * radius;
+            double py = my + (random.nextDouble() - 0.5D) * 0.18D;
+            double pz = mz + Math.sin(angle) * radius;
+            level().addParticle(ParticleTypes.SMALL_FLAME, px, py, pz,
+                    (mx - px) * 0.18D, (my - py) * 0.18D, (mz - pz) * 0.18D);
+            if (tickCount % 2 == 0) {
+                level().addParticle(ParticleTypes.SMOKE, px, py, pz,
+                        (mx - px) * 0.12D, 0.015D, (mz - pz) * 0.12D);
+            }
+            if (clipTicks >= 6.0F) {
+                level().addParticle(ParticleTypes.FLAME, mx, my, mz,
+                        fx * 0.04D + (random.nextDouble() - 0.5D) * 0.02D, 0.02D,
+                        fz * 0.04D + (random.nextDouble() - 0.5D) * 0.02D);
+            }
+        } else if (clip == FireDragonAnimation.FIRE_RECOVERY && tickCount % 2 == 0) {
+            level().addParticle(ParticleTypes.SMOKE, mx, my + 0.02D, mz,
+                    fx * 0.015D + (random.nextDouble() - 0.5D) * 0.015D, 0.035D,
+                    fz * 0.015D + (random.nextDouble() - 0.5D) * 0.015D);
+            if (tickCount % 4 == 0) {
+                level().addParticle(ParticleTypes.SMALL_FLAME, mx, my, mz,
+                        fx * 0.02D, 0.02D, fz * 0.02D);
+            }
         } else if (clip == FireDragonAnimation.IDLE_TAIL && tickCount % 3 == 0) {
             float clipTicks = getVisualAnimationTicks(0);
             if (clipTicks >= 16.0F && clipTicks <= 26.0F) {
                 level().addParticle(ParticleTypes.SMOKE, mx, my, mz,
-                        -Math.sin(yaw) * 0.02D, 0.03D, Math.cos(yaw) * 0.02D);
+                        fx * 0.02D, 0.03D, fz * 0.02D);
             }
         } else if (clip == FireDragonAnimation.EAT && tickCount % 4 == 0) {
             level().addParticle(ParticleTypes.SMOKE, mx, my - 0.05D, mz,
@@ -291,6 +328,8 @@ public final class FireDragon extends TamableAnimal {
                 if (random.nextFloat() < (hatched ? 0.5F : 0.33F)) {
                     tame(player);
                     setOrderedToSit(false);
+                    awardAdvancement(player, "fire_dragon_ember", "interact_fire_dragon");
+                    playSound(ModSounds.FIRE_DRAGON_PURR.get(), 0.6F, 1.0F);
                     level().broadcastEntityEvent(this, (byte) 7);
                 } else level().broadcastEntityEvent(this, (byte) 6);
             }
@@ -309,6 +348,26 @@ public final class FireDragon extends TamableAnimal {
     @Override
     public boolean canMate(Animal other) {
         return false;
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return ModSounds.FIRE_DRAGON_AMBIENT.get();
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return ModSounds.FIRE_DRAGON_HURT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return ModSounds.FIRE_DRAGON_DEATH.get();
+    }
+
+    @Override
+    protected void playStepSound(BlockPos pos, BlockState state) {
+        playSound(ModSounds.FIRE_DRAGON_STEP.get(), 0.4F, 1.0F);
     }
 
     @Override

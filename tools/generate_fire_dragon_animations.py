@@ -31,10 +31,24 @@ def catalog():
         wings[f'{side}_wing_upper']=[[0,0,sign*65,-sign*35],[4,0,sign*65,sign*55],[8,0,sign*65,-sign*35],[12,0,sign*65,sign*55],[16,0,sign*65,-sign*35]]
         wings[f'{side}_wing_forearm']=[[0,0,-sign*18,0],[4,0,-sign*18,-sign*20],[8,0,-sign*18,0],[12,0,-sign*18,-sign*20],[16,0,-sign*18,0]]
         wings[f'{side}_wing_tip']=frames((0,-sign*18,sign*12),16,start=(0,-sign*18,0),end=(0,-sign*18,0))
-        for leg in ['front','hind']:
-            wings[f'{side}_{leg}_upper']=[[0,-35,0,0],[16,-35,0,0]]
-            wings[f'{side}_{leg}_lower']=[[0,55,0,0],[16,55,0,0]]
-    clip('fly',16,True,wings,{'torso':frames((0,1,0),16)})
+        # Tucked legs kick/flex gently in sync with the wingbeats (slight left/right offset).
+        f_a, f_b = (-30, -44) if sign > 0 else (-42, -30)
+        h_a, h_b = (-32, -48) if sign > 0 else (-46, -32)
+        wings[f'{side}_front_upper']=[[0,f_a,0,0],[4,f_b,0,0],[8,f_a,0,0],[12,f_b,0,0],[16,f_a,0,0]]
+        wings[f'{side}_front_lower']=[[0,48,0,0],[4,64,0,0],[8,48,0,0],[12,64,0,0],[16,48,0,0]]
+        wings[f'{side}_front_foot']=[[0,-10,0,0],[4,-24,0,0],[8,-10,0,0],[12,-24,0,0],[16,-10,0,0]]
+        wings[f'{side}_hind_upper']=[[0,h_a,0,0],[4,h_b,0,0],[8,h_a,0,0],[12,h_b,0,0],[16,h_a,0,0]]
+        wings[f'{side}_hind_lower']=[[0,52,0,0],[4,68,0,0],[8,52,0,0],[12,68,0,0],[16,52,0,0]]
+        wings[f'{side}_hind_foot']=[[0,-14,0,0],[4,-28,0,0],[8,-14,0,0],[12,-28,0,0],[16,-14,0,0]]
+    wings['torso']=[[0,4,0,0],[4,-4,0,0],[8,4,0,0],[12,-4,0,0],[16,4,0,0]]
+    wings['neck_base']=[[0,-6,0,0],[4,2,0,0],[8,-6,0,0],[12,2,0,0],[16,-6,0,0]]
+    wings['neck_mid']=[[0,3,2,0],[4,-2,0,0],[8,3,-2,0],[12,-2,0,0],[16,3,2,0]]
+    wings['head']=[[0,2,4,2],[4,-3,0,-2],[8,2,-4,2],[12,-3,0,-2],[16,2,4,2]]
+    wings['tail_1']=[[0,-6,6,0],[4,4,0,0],[8,-6,-6,0],[12,4,0,0],[16,-6,6,0]]
+    wings['tail_2']=[[0,-2,10,0],[4,-8,4,0],[8,-2,-10,0],[12,-8,-4,0],[16,-2,10,0]]
+    wings['tail_3']=[[0,4,12,0],[4,-6,8,0],[8,4,-12,0],[12,-6,-8,0],[16,4,12,0]]
+    wings['tail_4']=[[0,8,14,0],[4,-4,10,0],[8,8,-14,0],[12,-4,-10,0],[16,8,14,0]]
+    clip('fly',16,True,wings,{'torso':[[0,0,0,0],[4,0,1.2,0],[8,0,0,0],[12,0,1.2,0],[16,0,0,0]]})
     clip('takeoff',16,rot={'torso':frames((-10,0,0),16,end=(-10,0,0)),'left_wing_upper':frames((0,65,-35),16,end=(0,65,-35)),'right_wing_upper':frames((0,-65,35),16,end=(0,-65,35))},pos={'torso':[[0,0,0,0],[6,0,-1,0],[16,0,2,0]]})
     clip('land',16,rot={'torso':frames((8,0,0),16),'left_wing_upper':frames((0,65,-25),16),'right_wing_upper':frames((0,-65,25),16)},pos={'torso':frames((0,-1.2,0),16)})
     prep={'torso':(-7,0,0),'neck_base':(-12,0,0),'neck_mid':(8,0,0),'head':(-8,0,0),'jaw':(24,0,0),'tail_1':(12,0,0),'left_hind_upper':(10,0,0),'right_hind_upper':(10,0,0)}

@@ -143,6 +143,14 @@ def main():
             frames.append(img.convert("RGB"))
         duration={"idle":167,"walk":83,"fly":67,"fire":117}[family]
         frames[0].save(SKETCH_DIR/f"animation_{family}.gif",save_all=True,append_images=frames[1:],duration=duration,loop=0,disposal=2)
-    print("Saved anatomy.png, colors.png, poses.png, 23 individual poses and four animated GIFs.")
+    bestiary_dir = ASSETS.parent / "textures/gui/bestiary"
+    bestiary_dir.mkdir(parents=True, exist_ok=True)
+    for name, pose, w, h, yaw, pitch in [
+        ("anatomy", "idle", 112, 80, 0.65, 0.14),
+        ("combat", "fire_windup_peak", 112, 72, 0.72, 0.14),
+        ("spoils", "shoulder", 112, 64, 0.55, 0.16),
+    ]:
+        render_pose_image(pose, w, h, yaw=yaw, pitch=pitch, sepia_mode=True).save(bestiary_dir / f"fire_dragon_{name}.png")
+    print("Saved anatomy.png, colors.png, poses.png, 23 individual poses, 4 GIFs and 3 bestiary sketches.")
 
 if __name__ == "__main__": main()

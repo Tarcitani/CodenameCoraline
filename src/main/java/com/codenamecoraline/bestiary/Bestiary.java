@@ -105,8 +105,16 @@ public final class Bestiary {
             BestiaryPage.text("edicts"),
             BestiaryPage.sketch("spoils", "soul_reaper_spoils", 112, 64)));
 
+    public static final BestiaryEntry FIRE_DRAGON = new BestiaryEntry("fire_dragon", List.of(
+            BestiaryPage.sketch("anatomy", "fire_dragon_anatomy", 112, 80),
+            BestiaryPage.text("lore"),
+            BestiaryPage.text("bond"),
+            BestiaryPage.sketch("combat", "fire_dragon_combat", 112, 72),
+            BestiaryPage.text("social"),
+            BestiaryPage.sketch("spoils", "fire_dragon_spoils", 112, 64)));
+
     public static final List<BestiaryEntry> ENTRIES = List.of(REDCAP, BASILISK, LITHOPHAGE, LAST_GIFT_COLLECTOR, CANOPY_BREAKER,
-            CRIMSON_COMMANDER, TEN_THREADS_WITCH, FEY_RAVEN, BRIMSTONE_SALAMANDER, SOUL_REAPER);
+            CRIMSON_COMMANDER, TEN_THREADS_WITCH, FEY_RAVEN, BRIMSTONE_SALAMANDER, FIRE_DRAGON, SOUL_REAPER);
 
     private Bestiary() {}
 }

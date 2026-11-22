@@ -1,0 +1,29 @@
+{
+  "parent": "codenamecoraline:bosses/fire_dragon_bond",
+  "criteria": {
+    "trigger": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.fire_dragon_shoulder.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:feather"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.fire_dragon_shoulder.title"
+    }
+  },
+  "requirements": [
+    [
+      "trigger"
+    ]
+  ]
+}

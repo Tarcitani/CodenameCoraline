@@ -1,6 +1,7 @@
 package com.codenamecoraline.entity.firedragon;
 
 import com.codenamecoraline.registry.ModEntities;
+import com.codenamecoraline.registry.ModSounds;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
@@ -41,8 +42,22 @@ public final class DragonFireball extends ThrowableItemProjectile {
     @Override protected double getDefaultGravity() { return 0; }
     @Override public void tick() {
         super.tick();
-        if (level().isClientSide()) level().addParticle(ParticleTypes.FLAME, getX(), getY(), getZ(), 0, 0, 0);
-        else if (tickCount > 30 || !(getOwner() instanceof FireDragon d) || !d.isAlive() || d.isOnShoulder()) discard();
+        if (level().isClientSide()) {
+            var vel = getDeltaMovement();
+            double angle = tickCount * 1.25D;
+            double ox = Math.cos(angle) * 0.11D;
+            double oz = Math.sin(angle) * 0.11D;
+            double bx = getX() - vel.x * 0.35D;
+            double by = getY() - vel.y * 0.35D;
+            double bz = getZ() - vel.z * 0.35D;
+            level().addParticle(ParticleTypes.FLAME, bx + ox, by + 0.04D, bz + oz,
+                    -vel.x * 0.12D, 0.015D, -vel.z * 0.12D);
+            level().addParticle(ParticleTypes.SMALL_FLAME, bx - ox, by + 0.08D, bz - oz,
+                    -vel.x * 0.18D + (random.nextDouble() - 0.5D) * 0.04D, 0.02D,
+                    -vel.z * 0.18D + (random.nextDouble() - 0.5D) * 0.04D);
+            level().addParticle(ParticleTypes.SMOKE, bx - vel.x * 0.45D, by + 0.06D, bz - vel.z * 0.45D,
+                    (random.nextDouble() - 0.5D) * 0.02D, 0.025D, (random.nextDouble() - 0.5D) * 0.02D);
+        } else if (tickCount > 30 || !(getOwner() instanceof FireDragon d) || !d.isAlive() || d.isOnShoulder()) discard();
     }
     @Override protected void onHitEntity(EntityHitResult hit) {
         if (!(level() instanceof ServerLevel level) || !(getOwner() instanceof FireDragon owner)
@@ -55,6 +70,13 @@ public final class DragonFireball extends ThrowableItemProjectile {
     }
     @Override protected void onHit(HitResult hit) {
         super.onHit(hit);
-        if (!level().isClientSide()) discard();
+        if (level() instanceof ServerLevel serverLevel) {
+            var loc = hit.getLocation();
+            serverLevel.sendParticles(ParticleTypes.FLAME, loc.x, loc.y, loc.z, 8, 0.18, 0.18, 0.18, 0.08);
+            serverLevel.sendParticles(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z, 6, 0.22, 0.22, 0.22, 0.1);
+            serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, loc.x, loc.y + 0.05, loc.z, 3, 0.15, 0.15, 0.15, 0.03);
+            playSound(ModSounds.FIRE_DRAGON_IMPACT.get(), 0.55F, 1.0F);
+            discard();
+        }
     }
 }

@@ -260,9 +260,10 @@ Executados pelo agente com sucesso:
 
 Comandos `/summon` e `VisualPreview` ficam na ficha. Não use `--quickPlaySingleplayer` como opção direta do Gradle: não é uma opção da tarefa; a inspeção usou o menu normal do jogo. O exportador Java deve estar em UTF-8 sem BOM (`javac` rejeita U+FEFF no início do arquivo).
 
-## Dragão de Fogo — testes exclusivos do usuário (2026-11-11)
+## Dragão de Fogo (`fire_dragon`) — Fatias 3 e 4 validadas (2026-11-15 / 2026-11-22)
 
-Por instrução explícita do usuário, TODOS os testes são feitos por ele, incluindo compileJava/build, GameTests e runClient. Não executar esses comandos como agente. Evidências anteriores permanecem históricas. Fatia 3 escrita sem compilação ou testes: executar primeiro `.\gradlew.bat compileJava`, depois `.\gradlew.bat runFireDragonTest` e `.\gradlew.bat runClient`. Suíte ampliada de 5 para 9 testes próprios, ainda não executada. Roteiro manual, limitações e regressões em `design/fire_dragon.md`, seção 3. Não marcar aceito antes dos resultados humanos. Ombro usa a entidade no mundo; incluir save/load, logout, dois dragões, papagaios/corvo e teto baixo nos testes.
+- **Fatia 3 (2026-11-15):** `compileJava` + 4 rodadas consecutivas de `runFireDragonTest runFeyRavenTest runBrimstoneSalamanderTest` aprovadas (`15/15`, `9/9`, `23/23` por rodada; logs `build/logs/fire_dragon_fatia3_round_1..4.log`).
+- **Fatia 4 (2026-11-22):** `py -3.14 tools/generate_fire_dragon_sketches.py` gerou as 3 gravuras sépia do Bestiário (`112×80`, `112×72`, `112×64`) em `textures/gui/bestiary/`. `.\gradlew.bat build` (`build/logs/fire_dragon_fatia4_build.log`) e 4 rodadas consecutivas de `.\gradlew.bat runFireDragonTest runFeyRavenTest runBrimstoneSalamanderTest` aprovadas (`16/16`, `9/9`, `23/23` por rodada; logs `build/logs/fire_dragon_fatia4_round_1..4.log`). Conferência sonora/visual no `runClient` fica pendente de revisão humana.
 
 ### Ajustes de ombro/combate após relato do usuário
 

@@ -50,7 +50,8 @@ public final class FireDragonGameTests {
             Map.entry("fire_dragon_repeated_hits_retaliation", FireDragonGameTests::repeatedHitsRetaliation),
             Map.entry("fire_dragon_predictive_aim", FireDragonGameTests::predictiveAim),
             Map.entry("fire_dragon_social_interaction", FireDragonGameTests::socialInteraction),
-            Map.entry("fire_dragon_transition_clips", FireDragonGameTests::transitionClips));
+            Map.entry("fire_dragon_transition_clips", FireDragonGameTests::transitionClips),
+            Map.entry("fire_dragon_bestiary_sounds_and_advancements", FireDragonGameTests::bestiarySoundsAndAdvancements));
 
     private FireDragonGameTests() {
     }
@@ -387,5 +388,40 @@ public final class FireDragonGameTests {
             helper.assertValueEqual(dragon.getVisualAnimation(), FireDragonAnimation.LAND, "Touchdown triggers LAND clip");
             helper.succeed();
         });
+    }
+
+    private static void bestiarySoundsAndAdvancements(GameTestHelper helper) {
+        helper.assertTrue(
+                com.codenamecoraline.bestiary.Bestiary.ENTRIES.contains(com.codenamecoraline.bestiary.Bestiary.FIRE_DRAGON)
+                        && com.codenamecoraline.bestiary.Bestiary.FIRE_DRAGON.pages().size() == 6,
+                "Fire Dragon 6-page chapter must be registered in Bestiary");
+        for (var sound : java.util.List.of(
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_AMBIENT,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_PURR,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_HUNGRY,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_HURT,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_DEATH,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_STEP,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_FLAP,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_WINDUP,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_SHOOT,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_IMPACT,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_PLAY)) {
+            helper.assertTrue(sound.get() != null, "Sound registered: " + sound.getId());
+        }
+        var advancements = helper.getLevel().getServer().getAdvancements();
+        for (String adv : java.util.List.of("bosses/fire_dragon_ember", "bosses/fire_dragon_bond", "bosses/fire_dragon_shoulder")) {
+            helper.assertTrue(advancements.get(id(adv)) != null, "Advancement loaded: " + adv);
+        }
+        for (String path : java.util.List.of(
+                "textures/entity/fire_dragon/fireball.png",
+                "textures/entity/fire_dragon/fireball_glow.png",
+                "textures/gui/bestiary/fire_dragon_anatomy.png",
+                "textures/gui/bestiary/fire_dragon_combat.png",
+                "textures/gui/bestiary/fire_dragon_spoils.png")) {
+            helper.assertTrue(FireDragonGameTests.class.getResource("/assets/codenamecoraline/" + path) != null,
+                    "Packaged bestiary sketch present: " + path);
+        }
+        helper.succeed();
     }
 }

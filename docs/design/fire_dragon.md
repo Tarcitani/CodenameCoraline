@@ -113,7 +113,7 @@
 | 2. Visual e rigging | modelo/idles aprovados; demais clipes em revisão | 2026-11-11 | geradores, compileJava/build, exportador de 75 poses e runClient executados; 4 rodadas Dragão/Corvo/Salamandra aprovadas (6/6, 9/9, 23/23 por rodada) |
 | 2b. Revisão visual (humano) | modelo e animações paradas aprovados pelo usuário | 2026-11-11 | usuário autorizou continuar a IA; demais clipes precisam ser observados durante seus testes |
 | 3. IA e combate | concluída | 2026-11-15 | `compileJava` OK; `runFireDragonTest runFeyRavenTest runBrimstoneSalamanderTest` em 4 rodadas consecutivas: 15/15, 9/9, 23/23 por rodada (`build/logs/fire_dragon_fatia3_round_1.log` a `_4.log`). Revisão visual final das animações novas no `runClient` fica para conferência humana |
-| 4. Polimento e docs | pendente | não iniciada | não executado |
+| 4. Polimento e docs | concluída | 2026-11-22 | `.\gradlew.bat build` OK; 4 rodadas consecutivas de `runFireDragonTest runFeyRavenTest runBrimstoneSalamanderTest`: 16/16, 9/9, 23/23 por rodada (`build/logs/fire_dragon_fatia4_build.log` e `_round_1..4.log`). Conferência sonora/visual no `runClient` fica para o usuário |
 | 5. Relatório | pendente | não iniciada | não executado |
 
 - **Próximo passo:** usuário rodar compileJava, runFireDragonTest e runClient; enviar resultado/erros. Corrigir e repetir conforme resultado. Não marcar fatia 3 concluída antes das evidências. Jovem, adulto e incubação ficam para depois.
@@ -251,4 +251,12 @@ Usuário aprovou o tamanho atual, mas ainda observou glitches durante a caminhad
 
 - **Transições (`FireDragonCompanion.updateTransitionClips`):** alternar sentado dispara `SIT` (12 ticks) e `STAND` (12 ticks); entrar em voo ativo (`noGravity` + sair do chão) dispara `TAKEOFF` (16 ticks) e tocar o chão após ≥6 ticks no ar dispara `LAND` (16 ticks), respeitando prioridade de clipes de combate/comida/socialização.
 - **Pouso seguro sobre líquidos (`isOverLiquid`):** ao seguir o dono dentro de 3 blocos, evita desativar a gravidade e afundar se estiver diretamente sobre água ou lava.
-- **Teste e aceite:** adicionado `fire_dragon_transition_clips`; `compileJava` aprovado e 4 rodadas consecutivas (`runFireDragonTest` 15/15, `runFeyRavenTest` 9/9, `runBrimstoneSalamanderTest` 23/23) aprovadas em `build/logs/fire_dragon_fatia3_round_1.log` a `_4.log`. Próxima etapa: **Fatia 4 (`fatia_4_polimento.md`)** (sons, Bestiário, 3 conquistas e docs). Sem commit.
+- **Teste e aceite:** adicionado `fire_dragon_transition_clips`; `compileJava` aprovado e 4 rodadas consecutivas (`runFireDragonTest` 15/15, `runFeyRavenTest` 9/9, `runBrimstoneSalamanderTest` 23/23) aprovadas em `build/logs/fire_dragon_fatia3_round_1.log` a `_4.log`.
+
+## 5. Fatia 4 — Polimento, sons, Bestiário, conquistas e docs (2026-11-22)
+
+- **Tabela de saque:** `data/codenamecoraline/loot_table/entities/fire_dragon.json` com `pools: []` (bebê não deixa itens nem XP).
+- **Sons (`ModSounds` + `sounds.json` + legendas `en_us`/`pt_br`):** 11 eventos registrados reutilizando eventos vanilla verificados no projeto (`ambient`, `purr`, `hungry`, `hurt`, `death`, `step`, `flap`, `windup`, `shoot`, `impact`, `play`) e conectados a `FireDragon`, `FireDragonCompanion` e `DragonFireball`.
+- **Bestiário (`Bestiary.FIRE_DRAGON`):** capítulo de 6 páginas (`anatomy`, `lore`, `bond`, `combat`, `social`, `spoils`) com textos em `en_us`/`pt_br` sem descrever sistemas pendentes como existentes; 3 gravuras sépia (`112×80`, `112×72`, `112×64`) geradas por `py -3.14 tools/generate_fire_dragon_sketches.py` em `textures/gui/bestiary/fire_dragon_{anatomy,combat,spoils}.png`.
+- **Conquistas (`advancement/bosses/`):** `fire_dragon_ember` ("Uma pequena brasa", ícone `minecraft:egg`), `fire_dragon_bond` ("Laços de fogo", ícone `minecraft:salmon`) e `fire_dragon_shoulder` ("Companhia nas alturas", ícone `minecraft:feather`, concedida em `FireDragonCompanion.perch`); domesticar um bebê selvagem libera também a entrada inicial `fire_dragon_ember`.
+- **Validação e aceite:** adicionado `fire_dragon_bestiary_sounds_and_advancements` em [FireDragonGameTests.java](file:///c:/Users/Venti/CodenameCoraline/src/main/java/com/codenamecoraline/verification/FireDragonGameTests.java); `.\gradlew.bat build` OK e 4 rodadas consecutivas (`runFireDragonTest` 16/16, `runFeyRavenTest` 9/9, `runBrimstoneSalamanderTest` 23/23) aprovadas (`build/logs/fire_dragon_fatia4_round_1..4.log`). Próxima etapa: **Fatia 5 (`docs/prompts/relatorio.md`)** em sessão nova e revisão manual no `runClient`. Sem commit.

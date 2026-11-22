@@ -2099,5 +2099,73 @@
         "volume": 1.2
       }
     ]
+  },
+  "entity.fire_dragon.ambient": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.ambient",
+    "sounds": [
+      { "name": "minecraft:entity.parrot.ambient", "type": "event", "pitch": 0.55, "volume": 0.45 },
+      { "name": "minecraft:entity.fox.ambient", "type": "event", "pitch": 0.75, "volume": 0.45 }
+    ]
+  },
+  "entity.fire_dragon.purr": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.purr",
+    "sounds": [
+      { "name": "minecraft:entity.fox.ambient", "type": "event", "pitch": 0.55, "volume": 0.6 }
+    ]
+  },
+  "entity.fire_dragon.hungry": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.hungry",
+    "sounds": [
+      { "name": "minecraft:entity.fox.screech", "type": "event", "pitch": 1.15, "volume": 0.45 }
+    ]
+  },
+  "entity.fire_dragon.hurt": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.hurt",
+    "sounds": [
+      { "name": "minecraft:entity.parrot.hurt", "type": "event", "pitch": 0.6, "volume": 0.65 }
+    ]
+  },
+  "entity.fire_dragon.death": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.death",
+    "sounds": [
+      { "name": "minecraft:entity.parrot.death", "type": "event", "pitch": 0.5, "volume": 0.7 }
+    ]
+  },
+  "entity.fire_dragon.step": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.step",
+    "sounds": [
+      { "name": "minecraft:block.basalt.step", "type": "event", "pitch": 1.25, "volume": 0.4 }
+    ]
+  },
+  "entity.fire_dragon.flap": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.flap",
+    "sounds": [
+      { "name": "minecraft:entity.parrot.fly", "type": "event", "pitch": 0.65, "volume": 0.5 }
+    ]
+  },
+  "entity.fire_dragon.windup": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.windup",
+    "sounds": [
+      { "name": "minecraft:block.lava.ambient", "type": "event", "pitch": 1.3, "volume": 0.55 }
+    ]
+  },
+  "entity.fire_dragon.shoot": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.shoot",
+    "sounds": [
+      { "name": "minecraft:entity.blaze.shoot", "type": "event", "pitch": 1.35, "volume": 0.65 }
+    ]
+  },
+  "entity.fire_dragon.impact": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.impact",
+    "sounds": [
+      { "name": "minecraft:block.lava.pop", "type": "event", "pitch": 1.25, "volume": 0.55 },
+      { "name": "minecraft:block.lava.extinguish", "type": "event", "pitch": 1.4, "volume": 0.45 }
+    ]
+  },
+  "entity.fire_dragon.play": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.play",
+    "sounds": [
+      { "name": "minecraft:entity.parrot.ambient", "type": "event", "pitch": 0.95, "volume": 0.5 }
+    ]
   }
 }

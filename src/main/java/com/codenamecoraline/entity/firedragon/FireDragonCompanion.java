@@ -14,6 +14,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import com.codenamecoraline.entity.raven.FeyRaven;
+import com.codenamecoraline.registry.ModSounds;
 
 /** Server coordinator: shoulder > defense > command > food > social > follow. */
 final class FireDragonCompanion {
@@ -67,6 +68,12 @@ final class FireDragonCompanion {
         if (d.getSatiety() >= 55) seekingFood = false;
         LivingEntity owner = d.getOwner();
         if (d.isOnShoulder()) { maintainShoulder(owner); return; }
+        if (!d.onGround() && !d.isInWater() && d.tickCount % 12 == 0) {
+            d.playSound(ModSounds.FIRE_DRAGON_FLAP.get(), 0.45F, 1.0F);
+        }
+        if (seekingFood && d.isTame() && d.tickCount % 160 == 0) {
+            d.playSound(ModSounds.FIRE_DRAGON_HUNGRY.get(), 0.45F, 1.0F);
+        }
         updateTransitionClips();
         if (d.isTame() && (owner == null || !owner.isAlive())) {
             if (owner != null && !owner.isAlive()) d.setOrderedToSit(true);
@@ -184,6 +191,7 @@ final class FireDragonCompanion {
         if (attackTick < 0) {
             if (shotCooldown > 0) return;
             attackTick = 0; d.playVisual(FireDragonAnimation.FIRE_WINDUP);
+            d.playSound(ModSounds.FIRE_DRAGON_WINDUP.get(), 0.55F, 1.0F);
         }
         if (++attackTick == 12) {
             var shot = new DragonFireball(d.level(), d);
@@ -195,8 +203,18 @@ final class FireDragonCompanion {
             Vec3 aim = aimPoint.subtract(shot.position());
             shot.shoot(aim.x, aim.y, aim.z, DragonFireball.SPEED, 0);
             d.level().addFreshEntity(shot);
+            if (d.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                Vec3 dir = aim.normalize();
+                double mx = shot.getX() + dir.x * 0.35;
+                double my = shot.getY() + dir.y * 0.25;
+                double mz = shot.getZ() + dir.z * 0.35;
+                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME, mx, my, mz, 5, 0.12, 0.12, 0.12, 0.06);
+                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SMALL_FLAME, mx, my, mz, 4, 0.15, 0.15, 0.15, 0.08);
+                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE, mx, my, mz, 3, 0.12, 0.12, 0.12, 0.03);
+            }
             shotCooldown = SHOT_COOLDOWN;
             d.playVisual(FireDragonAnimation.FIRE_RELEASE);
+            d.playSound(ModSounds.FIRE_DRAGON_SHOOT.get(), 0.65F, 1.0F);
         } else if (attackTick == 13) d.playVisual(FireDragonAnimation.FIRE_RECOVERY);
         if (attackTick >= 28) attackTick = -1;
     }
@@ -292,6 +310,7 @@ final class FireDragonCompanion {
             }
             default -> cancelSocial();
         }
+        if (initiator && socialClip != null) d.playSound(ModSounds.FIRE_DRAGON_PLAY.get(), 0.5F, 1.0F);
     }
 
     void cancelSocial() {
@@ -481,6 +500,7 @@ final class FireDragonCompanion {
         d.setTarget(null); attackTick = -1; interruptSocial(); eatTicks = 0; d.getNavigation().stop();
         d.setOrderedToSit(false); d.setInSittingPose(false); d.setNoGravity(true);
         d.setState(FireDragon.State.SHOULDER); d.playVisual(FireDragonAnimation.SHOULDER);
+        FireDragon.awardAdvancement(owner, "fire_dragon_shoulder", "trigger");
         maintainShoulder(owner); return true;
     }
     private void maintainShoulder(LivingEntity owner) {

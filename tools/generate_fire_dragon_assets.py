@@ -153,6 +153,108 @@ def write_geometry():
     out=ROOT/'build/fire-dragon-sketches'; out.mkdir(parents=True,exist_ok=True)
     (out/'geometry.json').write_text(json.dumps(dict(parts=PARTS,boxes=BOXES)),encoding='utf-8')
 
+def write_fireball_textures(folder):
+    base = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+    glow = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+
+    def put(x, y, col, gcol=None):
+        if 0 <= x < 64 and 0 <= y < 64:
+            base.putpixel((x, y), col)
+            if gcol is not None:
+                glow.putpixel((x, y), gcol)
+
+    def fire_color(t, alpha=255):
+        # t in [0..1]: 0=white-hot core, 0.35=bright yellow, 0.65=fiery orange, 1.0=deep ember red
+        stops = [
+            (0.00, (255, 254, 232)),
+            (0.28, (255, 232, 84)),
+            (0.58, (255, 148, 22)),
+            (0.82, (232, 62, 12)),
+            (1.00, (148, 22, 8)),
+        ]
+        t = max(0.0, min(1.0, t))
+        for i in range(len(stops) - 1):
+            t0, c0 = stops[i]
+            t1, c1 = stops[i + 1]
+            if t <= t1:
+                f = (t - t0) / max(1e-6, t1 - t0)
+                return (
+                    int(c0[0] + (c1[0] - c0[0]) * f),
+                    int(c0[1] + (c1[1] - c0[1]) * f),
+                    int(c0[2] + (c1[2] - c0[2]) * f),
+                    alpha,
+                )
+        return (148, 22, 8, alpha)
+
+    # 1. Core (0,0) 16x8: white-hot incandescent
+    for y in range(0, 8):
+        for x in range(0, 16):
+            n = ((x * 11 + y * 7) % 13) / 13.0
+            put(x, y, fire_color(0.05 + n * 0.22, 255), fire_color(0.02 + n * 0.12, 220))
+
+    # 2. Inner shell (0,10) 20x10: bright yellow-gold swirling flame
+    for y in range(10, 20):
+        for x in range(0, 20):
+            n = ((x * 7 + y * 13) % 17) / 17.0
+            a = 235 if n > 0.18 else 140
+            put(x, y, fire_color(0.22 + n * 0.35, a), fire_color(0.18 + n * 0.25, 160))
+
+    # 3. Outer shell (24,0) 24x12: turbulent orange flame with cutout windows
+    for y in range(0, 12):
+        for x in range(24, 48):
+            wave = math.sin(x * 0.75 + y * 0.55) * 0.5 + 0.5
+            n = ((x * 5 + y * 9) % 11) / 11.0
+            if wave * 0.6 + n * 0.4 < 0.30:
+                continue
+            t = 0.42 + (1.0 - wave) * 0.42
+            a = int(170 + 80 * wave)
+            put(x, y, fire_color(t, a), fire_color(t * 0.85, int(a * 0.55)))
+
+    # 4. Crown flame petals (0,22) 14x7: bright base -> fiery wispy tips
+    for y in range(22, 29):
+        for x in range(0, 14):
+            prog = (y - 22) / 6.0
+            n = ((x * 9 + y * 5) % 11) / 11.0
+            if prog > 0.72 and n < 0.45:
+                continue
+            a = int(245 * (1.0 - prog * 0.45))
+            put(x, y, fire_color(0.28 + prog * 0.62, a), fire_color(0.22 + prog * 0.5, int(a * 0.6)))
+
+    # 5. Tail segments: base (24,14 20x10), mid (24,26 18x9), tip (24,37 14x7)
+    for ox, oy, w, h, t0, t1, a0 in [
+        (24, 14, 20, 10, 0.30, 0.68, 225),
+        (24, 26, 18, 9, 0.50, 0.88, 195),
+        (24, 37, 14, 7, 0.68, 1.00, 165),
+    ]:
+        for dy in range(h):
+            for dx in range(w):
+                prog = dy / max(1, h - 1)
+                n = ((dx * 7 + dy * 11) % 13) / 13.0
+                if prog > 0.75 and n < 0.35:
+                    continue
+                t = t0 + (t1 - t0) * prog + (n - 0.5) * 0.12
+                a = int(a0 * (1.0 - prog * 0.38))
+                put(ox + dx, oy + dy, fire_color(t, a), fire_color(t * 0.9, int(a * 0.5)))
+
+    # 6. Crossed comet flame fins (0,46) 52x16: wide glowing head tapering into ragged comet tail
+    for dy in range(16):
+        prog = dy / 15.0  # 0=front near core, 1=tail tip
+        for dx in range(52):
+            # Map local U within each 10px face strip so both top/bottom faces taper symmetrically
+            local_u = (dx % 10) / 9.0
+            center_dist = abs(local_u - 0.5) * 2.0
+            width_limit = max(0.12, (1.0 - prog * 0.88))
+            flutter = 0.14 * math.sin(dy * 1.1 + dx * 0.9)
+            if center_dist > width_limit + flutter:
+                continue
+            edge = center_dist / max(0.05, width_limit + flutter)
+            t = min(1.0, 0.18 + prog * 0.72 + edge * 0.25)
+            a = int(max(40, min(245, 240 * (1.0 - prog * 0.62) * (1.0 - edge * 0.45))))
+            put(dx, 46 + dy, fire_color(t, a), fire_color(t * 0.85, int(a * 0.65)))
+
+    base.save(folder / 'fireball.png')
+    glow.save(folder / 'fireball_glow.png')
+
 def main():
     geometry(); pack(); write_geometry()
     folder=ASSETS/'entity/fire_dragon'; folder.mkdir(parents=True,exist_ok=True)
@@ -162,6 +264,7 @@ def main():
                 base,glow=skin(primary,secondary,accent)
                 base.save(folder/f'{primary}_{secondary}_{accent}.png')
     _,glow=skin(2,4,0); glow.save(folder/'eyes.png')
+    write_fireball_textures(folder)
     # Keep the foundation item reproducible.
     egg=Image.new('RGBA',(16,16),(0,0,0,0))
     palette=tones(PALETTES[2])
@@ -172,6 +275,6 @@ def main():
                 egg.putpixel((x,y),color)
     (ASSETS/'item').mkdir(parents=True,exist_ok=True)
     egg.save(ASSETS/'item/fire_dragon_spawn_egg.png')
-    print('Generated 125 color combinations, transparent emissive eyes and spawn egg.')
+    print('Generated 125 color combinations, transparent emissive eyes, 3D fireball textures and spawn egg.')
 
 if __name__=='__main__': main()

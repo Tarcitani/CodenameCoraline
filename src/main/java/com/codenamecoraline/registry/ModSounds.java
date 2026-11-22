@@ -165,6 +165,19 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> OMEN_HARE_HURT = register("entity.omen_hare.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> OMEN_HARE_RUPTURE = register("entity.omen_hare.rupture");
 
+    // Fire Dragon baby (docs/design/fire_dragon.md §1.5)
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_AMBIENT = register("entity.fire_dragon.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_PURR = register("entity.fire_dragon.purr");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_HUNGRY = register("entity.fire_dragon.hungry");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_HURT = register("entity.fire_dragon.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_DEATH = register("entity.fire_dragon.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_STEP = register("entity.fire_dragon.step");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_FLAP = register("entity.fire_dragon.flap");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_WINDUP = register("entity.fire_dragon.windup");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_SHOOT = register("entity.fire_dragon.shoot");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_IMPACT = register("entity.fire_dragon.impact");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_PLAY = register("entity.fire_dragon.play");
+
     /** The signature sound of each puppet (steps and attacks), one event per kind. */
     private static final java.util.EnumMap<com.codenamecoraline.entity.ten_threads_witch.PuppetKind, DeferredHolder<SoundEvent, SoundEvent>> PUPPET_ACTIONS =
             new java.util.EnumMap<>(com.codenamecoraline.entity.ten_threads_witch.PuppetKind.class);
