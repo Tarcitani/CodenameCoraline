@@ -3,6 +3,9 @@ package com.codenamecoraline.entity.firedragon;
 import com.codenamecoraline.registry.ModEntities;
 import com.codenamecoraline.registry.ModSounds;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,13 +20,36 @@ import net.minecraft.world.phys.HitResult;
 /** Non-explosive fire bolt. Ignites before lethal damage so vanilla loot can cook meat. */
 public final class DragonFireball extends ThrowableItemProjectile {
     public static final float SPEED = .8F;
+    public static final float YOUNG_SPEED = .9F;
     private static final double AIR_DRAG = .99;
+    private static final EntityDataAccessor<Float> SCALE =
+            SynchedEntityData.defineId(DragonFireball.class, EntityDataSerializers.FLOAT);
+
+    private float damage = 3.0F;
+    private int maxLife = 30;
+    private int igniteSeconds = 3;
 
     public DragonFireball(EntityType<? extends DragonFireball> type, Level level) { super(type, level); }
     public DragonFireball(Level level, FireDragon owner) {
+        this(level, owner, 3.0F, 1.0F, 30, 3);
+    }
+    public DragonFireball(Level level, FireDragon owner, float damage, float scale, int maxLife, int igniteSeconds) {
         super(ModEntities.DRAGON_FIREBALL.get(), owner, level, new ItemStack(Items.FIRE_CHARGE));
         setPos(owner.getX(), owner.getEyeY(), owner.getZ());
+        this.damage = damage;
+        this.maxLife = maxLife;
+        this.igniteSeconds = igniteSeconds;
+        this.entityData.set(SCALE, scale);
     }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(SCALE, 1.0F);
+    }
+
+    public float getVisualScale() { return entityData.get(SCALE); }
+    public float getFireballDamage() { return damage; }
     /** Bounded leading of the torso, including vanilla air drag; no homing after release. */
     public static net.minecraft.world.phys.Vec3 aimPoint(net.minecraft.world.phys.Vec3 origin,
             net.minecraft.world.phys.Vec3 center, net.minecraft.world.phys.Vec3 velocity) {
@@ -57,15 +83,15 @@ public final class DragonFireball extends ThrowableItemProjectile {
                     -vel.z * 0.18D + (random.nextDouble() - 0.5D) * 0.04D);
             level().addParticle(ParticleTypes.SMOKE, bx - vel.x * 0.45D, by + 0.06D, bz - vel.z * 0.45D,
                     (random.nextDouble() - 0.5D) * 0.02D, 0.025D, (random.nextDouble() - 0.5D) * 0.02D);
-        } else if (tickCount > 30 || !(getOwner() instanceof FireDragon d) || !d.isAlive() || d.isOnShoulder()) discard();
+        } else if (tickCount > maxLife || !(getOwner() instanceof FireDragon d) || !d.isAlive() || d.isOnShoulder()) discard();
     }
     @Override protected void onHitEntity(EntityHitResult hit) {
         if (!(level() instanceof ServerLevel level) || !(getOwner() instanceof FireDragon owner)
                 || owner.isOnShoulder() || !owner.canDamage(hit.getEntity())) return;
         if (hit.getEntity() instanceof LivingEntity target) {
             int previousFire = target.getRemainingFireTicks();
-            target.igniteForSeconds(3);
-            if (!target.hurtServer(level, damageSources().thrown(this, owner), 3)) target.setRemainingFireTicks(previousFire);
+            target.igniteForSeconds(igniteSeconds);
+            if (!target.hurtServer(level, damageSources().thrown(this, owner), damage)) target.setRemainingFireTicks(previousFire);
         }
     }
     @Override protected void onHit(HitResult hit) {

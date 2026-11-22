@@ -44,6 +44,7 @@ public final class DragonFireballRenderer extends EntityRenderer<DragonFireball,
     @Override
     public void extractRenderState(DragonFireball entity, DragonFireballRenderState state, float partialTick) {
         super.extractRenderState(entity, state, partialTick);
+        state.visualScale = entity.getVisualScale();
         Vec3 vel = entity.getDeltaMovement();
         if (vel.lengthSqr() > 1.0E-6D) {
             double horiz = Math.sqrt(vel.x * vel.x + vel.z * vel.z);
@@ -66,7 +67,7 @@ public final class DragonFireballRenderer extends EntityRenderer<DragonFireball,
         poseStack.translate(0.0F, 0.14F, 0.0F);
         poseStack.mulPose(Axis.YP.rotationDegrees(state.yRot));
         poseStack.mulPose(Axis.XP.rotationDegrees(state.xRot));
-        float pulse = 0.86F + 0.08F * Mth.sin(state.ageInTicks * 0.9F);
+        float pulse = (0.86F + 0.08F * Mth.sin(state.ageInTicks * 0.9F)) * state.visualScale;
         poseStack.scale(pulse, pulse, pulse);
         submitNodeCollector.submitModel(
                 this.model,

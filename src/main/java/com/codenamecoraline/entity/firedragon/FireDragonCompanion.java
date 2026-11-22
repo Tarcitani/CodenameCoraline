@@ -19,12 +19,20 @@ import com.codenamecoraline.registry.ModSounds;
 /** Server coordinator: shoulder > defense > command > food > social > follow. */
 final class FireDragonCompanion {
     private static final double LEASH_SQR = 16 * 16;
+    private static final double YOUNG_LEASH_SQR = 20 * 20;
     private static final int SHOT_COOLDOWN = 60;
+    private static final int YOUNG_SHOT_COOLDOWN = 50;
+    private static final int BITE_COOLDOWN = 30;
+    private static final int BREATH_COOLDOWN = 100;
+    private enum AttackKind { NONE, FIREBALL, BITE, BREATH }
     private final FireDragon d;
     private boolean shiftHeld;
     private boolean exitRequested;
     private int ownerHurt, ownerAttack, selfHurt;
-    private int shotCooldown, attackTick = -1, unseenTicks, mealCooldown, socialTicks, socialDelay, eatTicks, airborneTicks;
+    private int shotCooldown, biteCooldown, breathCooldown, attackTick = -1, unseenTicks, mealCooldown, socialTicks, socialDelay, eatTicks, airborneTicks;
+    private int territorialTicks, provokedTicks;
+    private AttackKind activeAttack = AttackKind.NONE;
+    private Vec3 territoryOrigin;
     private FireDragon socialPartner;
     private FireDragonAnimation socialClip;
     private boolean socialClipStarted;
@@ -44,12 +52,30 @@ final class FireDragonCompanion {
 
     FireDragonCompanion(FireDragon dragon) { d = dragon; }
     void resetAfterLoad() {
-        shiftHeld = true; exitRequested = false; attackTick = -1; eatTicks = 0; airborneTicks = 0;
+        shiftHeld = true; exitRequested = false; attackTick = -1; activeAttack = AttackKind.NONE;
+        eatTicks = 0; airborneTicks = 0; territorialTicks = 0; provokedTicks = 0;
         wasAirborne = !d.onGround() && !d.isInWater();
         wasSitting = d.isInSittingPose();
         cancelSocial(); mealTarget = null; hunting = false;
         trackedTarget = null; previousTargetPosition = null; targetMotion = Vec3.ZERO;
     }
+
+    boolean canTameWildYoung(Player player) {
+        return d.getTarget() == null && provokedTicks <= 0;
+    }
+
+    boolean dismountForEvolution() {
+        if (!d.isOnShoulder()) return true;
+        LivingEntity owner = d.getOwner();
+        Vec3 anchor = owner != null ? owner.position() : d.position();
+        if (!relocate(anchor)) return false;
+        d.setShoulderSide(0);
+        d.playVisual(FireDragonAnimation.NONE);
+        d.setState(FireDragon.State.FOLLOWING);
+        return true;
+    }
+
+    private double leashSqr() { return d.isYoung() ? YOUNG_LEASH_SQR : LEASH_SQR; }
 
     boolean isAvailableForSocial() {
         return d.isTame() && d.isAlive() && !d.isOnShoulder() && !d.isOrderedToSit()
@@ -62,27 +88,31 @@ final class FireDragonCompanion {
 
     void tick() {
         if (shotCooldown > 0) --shotCooldown;
+        if (biteCooldown > 0) --biteCooldown;
+        if (breathCooldown > 0) --breathCooldown;
         if (mealCooldown > 0) --mealCooldown;
         if (socialCooldown > 0) --socialCooldown;
+        if (provokedTicks > 0) --provokedTicks;
         if (d.getSatiety() <= 30) seekingFood = true;
         if (d.getSatiety() >= 55) seekingFood = false;
         LivingEntity owner = d.getOwner();
         if (d.isOnShoulder()) { maintainShoulder(owner); return; }
         if (!d.onGround() && !d.isInWater() && d.tickCount % 12 == 0) {
-            d.playSound(ModSounds.FIRE_DRAGON_FLAP.get(), 0.45F, 1.0F);
+            d.playSound(ModSounds.FIRE_DRAGON_FLAP.get(), 0.45F, d.isYoung() ? 0.85F : 1.0F);
         }
         if (seekingFood && d.isTame() && d.tickCount % 160 == 0) {
-            d.playSound(ModSounds.FIRE_DRAGON_HUNGRY.get(), 0.45F, 1.0F);
+            d.playSound(ModSounds.FIRE_DRAGON_HUNGRY.get(), 0.45F, d.isYoung() ? 0.85F : 1.0F);
         }
         updateTransitionClips();
         if (d.isTame() && (owner == null || !owner.isAlive())) {
             if (owner != null && !owner.isAlive()) d.setOrderedToSit(true);
-            if (d.getTarget() != null && d.canDamage(d.getTarget()) && d.distanceToSqr(d.getTarget()) <= LEASH_SQR) {
+            if (d.getTarget() != null && d.canDamage(d.getTarget()) && d.distanceToSqr(d.getTarget()) <= leashSqr()) {
                 fight(d.getTarget()); return;
             }
             d.setTarget(null); stop(); d.setState(FireDragon.State.SITTING); return;
         }
         if (!d.isTame()) {
+            if (d.isYoung()) { tickWildYoung(); return; }
             LivingEntity threat = d.getTarget();
             if (threat != null && !(threat instanceof Player) && d.canDamage(threat)
                     && defenseOrigin != null && threat.position().distanceToSqr(defenseOrigin) <= LEASH_SQR) {
@@ -102,12 +132,12 @@ final class FireDragonCompanion {
             if (scavenge(owner) && hunting) { d.setTarget(null); hunting = false; }
         }
         LivingEntity target = d.getTarget();
-        if (target != null && (!d.canDamage(target) || (target.distanceToSqr(owner) > LEASH_SQR && !(personalThreat && d.distanceToSqr(target) <= 64))
+        if (target != null && (!d.canDamage(target) || (target.distanceToSqr(owner) > leashSqr() && !(personalThreat && d.distanceToSqr(target) <= 100))
                 || (d.isOrderedToSit() && d.distanceToSqr(target) > 64))) {
-            d.setTarget(null); attackTick = -1; target = null;
+            d.setTarget(null); attackTick = -1; activeAttack = AttackKind.NONE; target = null;
         }
         if (target != null) { interruptSocial(); eatTicks = 0; fight(target); return; }
-        attackTick = -1;
+        attackTick = -1; activeAttack = AttackKind.NONE;
         if (eatTicks > 0) {
             interruptSocial();
             --eatTicks;
@@ -138,9 +168,67 @@ final class FireDragonCompanion {
         follow(owner);
     }
 
+    private void tickWildYoung() {
+        if (territoryOrigin == null) territoryOrigin = d.position();
+        LivingEntity threat = d.getTarget();
+        if (threat != null && d.canDamage(threat)
+                && (threat.position().distanceToSqr(territoryOrigin) <= YOUNG_LEASH_SQR || provokedTicks > 0)) {
+            fight(threat);
+            return;
+        }
+        d.setTarget(null);
+        attackTick = -1;
+        activeAttack = AttackKind.NONE;
+        d.setState(FireDragon.State.WILD_IDLE);
+        Player intruder = nearestSurvivalPlayer(6.0D);
+        if (intruder != null && d.canDamage(intruder)) {
+            boolean offersSalmon = intruder.getMainHandItem().is(Items.SALMON) || intruder.getOffhandItem().is(Items.SALMON);
+            if (offersSalmon && provokedTicks <= 0) {
+                territorialTicks = 0;
+                stop();
+                face(intruder.position());
+                d.getLookControl().setLookAt(intruder, 45, 45);
+                return;
+            }
+            stop();
+            face(intruder.position());
+            d.getLookControl().setLookAt(intruder, 60, 60);
+            if (territorialTicks == 0 || territorialTicks % 40 == 0) {
+                d.playVisual(FireDragonAnimation.GROWL);
+                d.playSound(ModSounds.FIRE_DRAGON_GROWL.get(), 0.75F, 1.0F);
+            }
+            if (++territorialTicks >= 60) {
+                provokedTicks = 200;
+                territorialTicks = 0;
+                defend(intruder, true);
+            }
+            return;
+        }
+        if (territorialTicks > 0) territorialTicks = Math.max(0, territorialTicks - 2);
+        if (d.tickCount % 160 == 0) {
+            Vec3 patrol = territoryOrigin.add(d.getRandom().nextInt(9) - 4, 1, d.getRandom().nextInt(9) - 4);
+            move(patrol);
+        }
+    }
+
+    private Player nearestSurvivalPlayer(double radius) {
+        Player nearest = d.level().getNearestPlayer(d, radius);
+        if (nearest != null && !nearest.isCreative() && !nearest.isSpectator()) return nearest;
+        double bestSqr = radius * radius;
+        Player best = null;
+        for (Player candidate : d.level().getEntitiesOfClass(Player.class, d.getBoundingBox().inflate(radius))) {
+            if (candidate.isCreative() || candidate.isSpectator() || !candidate.isAlive()) continue;
+            double distSqr = d.distanceToSqr(candidate);
+            if (distSqr <= bestSqr) { bestSqr = distSqr; best = candidate; }
+        }
+        return best;
+    }
+
     /** Damage callback avoids missing a first-tick hit and interrupts non-combat tasks immediately. */
     void onDamaged(LivingEntity attacker) {
-        if (d.isOnShoulder() || (!d.isTame() && attacker instanceof Player)) return;
+        if (d.isOnShoulder()) return;
+        if (!d.isTame() && d.isBabyStage() && attacker instanceof Player) return;
+        if (!d.isTame() && d.isYoung() && attacker instanceof Player) provokedTicks = 300;
         if (d.canDamage(attacker)) defend(attacker, true);
     }
 
@@ -178,6 +266,7 @@ final class FireDragonCompanion {
         boolean visible = d.hasLineOfSight(target);
         if (!visible) ++unseenTicks; else unseenTicks = 0;
         if (unseenTicks > 100 || (hunting && d.getSatiety() >= 55)) { d.setTarget(null); return; }
+        if (d.isYoung()) { fightYoung(target, visible); return; }
         double pursueRangeSqr = hunting ? 36 : 100;
         if (attackTick < 0 && (d.distanceToSqr(target) > pursueRangeSqr || !visible)) {
             if (d.tickCount % 10 == 0) move(approachPoint(target));
@@ -190,33 +279,130 @@ final class FireDragonCompanion {
         stop();
         if (attackTick < 0) {
             if (shotCooldown > 0) return;
-            attackTick = 0; d.playVisual(FireDragonAnimation.FIRE_WINDUP);
+            attackTick = 0; activeAttack = AttackKind.FIREBALL; d.playVisual(FireDragonAnimation.FIRE_WINDUP);
             d.playSound(ModSounds.FIRE_DRAGON_WINDUP.get(), 0.55F, 1.0F);
         }
+        tickFireballAttack(target, visible, false);
+    }
+
+    private void fightYoung(LivingEntity target, boolean visible) {
+        double distSqr = d.distanceToSqr(target);
+        if (attackTick >= 0) {
+            stop();
+            switch (activeAttack) {
+                case BITE -> tickBiteAttack(target);
+                case BREATH -> tickBreathAttack(target, visible);
+                default -> tickFireballAttack(target, visible, true);
+            }
+            return;
+        }
+        if (!visible || distSqr > (hunting ? 64 : 324)) {
+            if (d.tickCount % 8 == 0) move(approachPoint(target));
+            return;
+        }
+        if (distSqr <= 7.84 && biteCooldown == 0) {
+            stop();
+            attackTick = 0; activeAttack = AttackKind.BITE;
+            d.playVisual(FireDragonAnimation.BITE_WINDUP);
+            return;
+        }
+        if (!hunting && distSqr <= 36.0 && breathCooldown == 0) {
+            stop();
+            attackTick = 0; activeAttack = AttackKind.BREATH;
+            d.playVisual(FireDragonAnimation.BREATH_WINDUP);
+            d.playSound(ModSounds.FIRE_DRAGON_WINDUP.get(), 0.65F, 0.85F);
+            return;
+        }
+        if (shotCooldown == 0) {
+            stop();
+            attackTick = 0; activeAttack = AttackKind.FIREBALL;
+            d.playVisual(FireDragonAnimation.FIRE_WINDUP);
+            d.playSound(ModSounds.FIRE_DRAGON_WINDUP.get(), 0.65F, 0.85F);
+            return;
+        }
+        if (distSqr > 7.84 && d.tickCount % 8 == 0) move(approachPoint(target));
+        else stop();
+    }
+
+    private void tickFireballAttack(LivingEntity target, boolean visible, boolean young) {
         if (++attackTick == 12) {
-            var shot = new DragonFireball(d.level(), d);
+            var shot = young
+                    ? new DragonFireball(d.level(), d, 6.0F, 1.35F, 40, 4)
+                    : new DragonFireball(d.level(), d);
+            double maxRangeSqr = young ? 324 : 144;
             Vec3 center = target.position().add(0, target.getBbHeight() * .5, 0);
             Vec3 aimPoint = DragonFireball.aimPoint(shot.position(), center, targetMotion);
-            if (!visible || !d.canDamage(target) || d.distanceToSqr(target) > 144 || !clearShot(shot.position(), aimPoint, target)) {
-                attackTick = -1; shotCooldown = 20; d.playVisual(FireDragonAnimation.NONE); return;
+            if (!visible || !d.canDamage(target) || d.distanceToSqr(target) > maxRangeSqr || !clearShot(shot.position(), aimPoint, target)) {
+                attackTick = -1; activeAttack = AttackKind.NONE; shotCooldown = 20; d.playVisual(FireDragonAnimation.NONE); return;
             }
             Vec3 aim = aimPoint.subtract(shot.position());
-            shot.shoot(aim.x, aim.y, aim.z, DragonFireball.SPEED, 0);
+            shot.shoot(aim.x, aim.y, aim.z, young ? DragonFireball.YOUNG_SPEED : DragonFireball.SPEED, 0);
             d.level().addFreshEntity(shot);
             if (d.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
                 Vec3 dir = aim.normalize();
-                double mx = shot.getX() + dir.x * 0.35;
+                double mx = shot.getX() + dir.x * (young ? 0.6 : 0.35);
                 double my = shot.getY() + dir.y * 0.25;
-                double mz = shot.getZ() + dir.z * 0.35;
-                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME, mx, my, mz, 5, 0.12, 0.12, 0.12, 0.06);
-                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SMALL_FLAME, mx, my, mz, 4, 0.15, 0.15, 0.15, 0.08);
-                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE, mx, my, mz, 3, 0.12, 0.12, 0.12, 0.03);
+                double mz = shot.getZ() + dir.z * (young ? 0.6 : 0.35);
+                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME, mx, my, mz, young ? 9 : 5, 0.16, 0.16, 0.16, 0.08);
+                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SMALL_FLAME, mx, my, mz, young ? 7 : 4, 0.2, 0.2, 0.2, 0.1);
+                serverLevel.sendParticles(net.minecraft.core.particles.ParticleTypes.SMOKE, mx, my, mz, young ? 5 : 3, 0.15, 0.15, 0.15, 0.04);
             }
-            shotCooldown = SHOT_COOLDOWN;
+            shotCooldown = young ? YOUNG_SHOT_COOLDOWN : SHOT_COOLDOWN;
             d.playVisual(FireDragonAnimation.FIRE_RELEASE);
-            d.playSound(ModSounds.FIRE_DRAGON_SHOOT.get(), 0.65F, 1.0F);
+            d.playSound(ModSounds.FIRE_DRAGON_SHOOT.get(), young ? 0.75F : 0.65F, young ? 0.85F : 1.0F);
         } else if (attackTick == 13) d.playVisual(FireDragonAnimation.FIRE_RECOVERY);
-        if (attackTick >= 28) attackTick = -1;
+        if (attackTick >= 28) { attackTick = -1; activeAttack = AttackKind.NONE; }
+    }
+
+    private void tickBiteAttack(LivingEntity target) {
+        if (++attackTick == 8) {
+            if (!d.canDamage(target) || d.distanceToSqr(target) > 10.24) {
+                attackTick = -1; activeAttack = AttackKind.NONE; biteCooldown = 12; d.playVisual(FireDragonAnimation.NONE); return;
+            }
+            d.playVisual(FireDragonAnimation.BITE_STRIKE);
+            d.playSound(ModSounds.FIRE_DRAGON_BITE.get(), 0.8F, 1.0F);
+            if (d.level() instanceof net.minecraft.server.level.ServerLevel sl) {
+                int prevFire = target.getRemainingFireTicks();
+                target.igniteForSeconds(3);
+                if (!target.hurtServer(sl, d.damageSources().mobAttack(d), 6.0F)) target.setRemainingFireTicks(prevFire);
+                sl.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME,
+                        target.getX(), target.getY() + target.getBbHeight() * 0.5, target.getZ(), 8, 0.25, 0.2, 0.25, 0.07);
+            }
+            biteCooldown = BITE_COOLDOWN;
+        } else if (attackTick == 12) d.playVisual(FireDragonAnimation.BITE_RECOVERY);
+        if (attackTick >= 20) { attackTick = -1; activeAttack = AttackKind.NONE; }
+    }
+
+    private void tickBreathAttack(LivingEntity target, boolean visible) {
+        ++attackTick;
+        if (attackTick == 10) {
+            if (!visible || !d.canDamage(target) || d.distanceToSqr(target) > 42.25) {
+                attackTick = -1; activeAttack = AttackKind.NONE; breathCooldown = 25; d.playVisual(FireDragonAnimation.NONE); return;
+            }
+            d.playVisual(FireDragonAnimation.BREATH_ACTIVE);
+            d.playSound(ModSounds.FIRE_DRAGON_BREATH.get(), 0.75F, 1.0F);
+            breathCooldown = BREATH_COOLDOWN;
+        }
+        if (attackTick >= 10 && attackTick < 34 && (attackTick - 10) % 6 == 0
+                && d.level() instanceof net.minecraft.server.level.ServerLevel sl) {
+            double yaw = Math.toRadians(d.getYRot());
+            Vec3 forward = new Vec3(-Math.sin(yaw), 0, Math.cos(yaw)).normalize();
+            Vec3 mouth = d.position().add(forward.scale(0.9)).add(0, d.getEyeHeight() - 0.1, 0);
+            for (int step = 1; step <= 5; step++) {
+                Vec3 pt = mouth.add(forward.scale(step * 1.05));
+                sl.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME, pt.x, pt.y, pt.z, 3, 0.25 + step * 0.08, 0.2, 0.25 + step * 0.08, 0.04);
+            }
+            for (LivingEntity victim : sl.getEntitiesOfClass(LivingEntity.class, d.getBoundingBox().inflate(6.5))) {
+                if (!d.canDamage(victim) || d.distanceToSqr(victim) > 36.0) continue;
+                Vec3 toVictim = victim.position().subtract(d.position()).multiply(1, 0, 1);
+                if (toVictim.lengthSqr() > 0.01 && toVictim.normalize().dot(forward) < 0.55) continue;
+                if (!d.hasLineOfSight(victim)) continue;
+                int prevFire = victim.getRemainingFireTicks();
+                victim.igniteForSeconds(3);
+                if (!victim.hurtServer(sl, d.damageSources().mobAttack(d), 2.0F)) victim.setRemainingFireTicks(prevFire);
+            }
+        } else if (attackTick == 34) d.playVisual(FireDragonAnimation.BREATH_RECOVERY);
+        if (attackTick >= 44) { attackTick = -1; activeAttack = AttackKind.NONE; }
     }
     private boolean clearShot(Vec3 start, Vec3 end, LivingEntity target) {
         if (d.level().clip(new ClipContext(start, end, ClipContext.Block.COLLIDER,
@@ -476,13 +662,14 @@ final class FireDragonCompanion {
         }
         d.getNavigation().stop(); d.setNoGravity(true);
         Vec3 delta = goal.subtract(d.position());
-        d.setDeltaMovement(delta.lengthSqr() < .04 ? Vec3.ZERO : delta.normalize().scale(.2));
+        double flySpeed = d.isYoung() ? 0.30 : 0.20;
+        d.setDeltaMovement(delta.lengthSqr() < .04 ? Vec3.ZERO : delta.normalize().scale(flySpeed));
         d.setYRot((float) Math.toDegrees(Math.atan2(-delta.x, delta.z)));
         d.yBodyRot = d.getYRot();
     }
 
     boolean perch(Player owner) {
-        if (!d.isTame() || !d.isOwnedBy(owner) || !owner.isAlive() || d.isOnShoulder()) return false;
+        if (!d.isBabyStage() || !d.isTame() || !d.isOwnedBy(owner) || !owner.isAlive() || d.isOnShoulder()) return false;
         boolean left = owner.getShoulderParrotLeft().isEmpty(), right = owner.getShoulderParrotRight().isEmpty();
         for (Entity e : d.level().getEntities(d, owner.getBoundingBox().inflate(3))) {
             if (e instanceof FireDragon f && f.isOnShoulder() && f.getOwnerReference() != null
@@ -533,7 +720,8 @@ final class FireDragonCompanion {
         return !d.level().getBlockCollisions(d, box).iterator().hasNext();
     }
     private boolean relocate(Vec3 origin) {
-        for (int dy = 0; dy <= 2; dy++) for (int dx = -2; dx <= 2; dx++) for (int dz = -2; dz <= 2; dz++) {
+        int[] dys = {0, -1, 1, -2, 2};
+        for (int dy : dys) for (int dx = -2; dx <= 2; dx++) for (int dz = -2; dz <= 2; dz++) {
             if (dx == 0 && dz == 0) continue;
             BlockPos p = BlockPos.containing(origin).offset(dx, dy, dz);
             if (!d.level().hasChunkAt(p)) continue;

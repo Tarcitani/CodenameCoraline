@@ -26,31 +26,90 @@ def catalog():
             walk[f'{side}_{leg}_lower']=[[0,-swing*.4,0,0],[10,swing*.4,0,0],[20,-swing*.4,0,0]]
     walk['tail_1']=[[0,0,-6,0],[10,0,6,0],[20,0,-6,0]]
     clip('walk',20,True,walk,{'torso':[[0,0,0,0],[5,0,.3,0],[10,0,0,0],[15,0,.3,0],[20,0,0,0]]})
+    # Asymmetric Drogon-style flight clip (24 ticks = 1.2s base cycle, used by preview/exporter and as reference;
+    # live flight in FireDragonAnimController layers smooth speed/glide/climb/dive/bank dynamics).
+    # 62% powerful downstroke (0..15), 38% quick folded recovery upstroke (15..24), delayed torso heave (Image 1-3).
     wings={}
     for side,sign in [('left',1),('right',-1)]:
-        wings[f'{side}_wing_upper']=[[0,0,sign*65,-sign*35],[4,0,sign*65,sign*55],[8,0,sign*65,-sign*35],[12,0,sign*65,sign*55],[16,0,sign*65,-sign*35]]
-        wings[f'{side}_wing_forearm']=[[0,0,-sign*18,0],[4,0,-sign*18,-sign*20],[8,0,-sign*18,0],[12,0,-sign*18,-sign*20],[16,0,-sign*18,0]]
-        wings[f'{side}_wing_tip']=frames((0,-sign*18,sign*12),16,start=(0,-sign*18,0),end=(0,-sign*18,0))
-        # Tucked legs kick/flex gently in sync with the wingbeats (slight left/right offset).
-        f_a, f_b = (-30, -44) if sign > 0 else (-42, -30)
-        h_a, h_b = (-32, -48) if sign > 0 else (-46, -32)
-        wings[f'{side}_front_upper']=[[0,f_a,0,0],[4,f_b,0,0],[8,f_a,0,0],[12,f_b,0,0],[16,f_a,0,0]]
-        wings[f'{side}_front_lower']=[[0,48,0,0],[4,64,0,0],[8,48,0,0],[12,64,0,0],[16,48,0,0]]
-        wings[f'{side}_front_foot']=[[0,-10,0,0],[4,-24,0,0],[8,-10,0,0],[12,-24,0,0],[16,-10,0,0]]
-        wings[f'{side}_hind_upper']=[[0,h_a,0,0],[4,h_b,0,0],[8,h_a,0,0],[12,h_b,0,0],[16,h_a,0,0]]
-        wings[f'{side}_hind_lower']=[[0,52,0,0],[4,68,0,0],[8,52,0,0],[12,68,0,0],[16,52,0,0]]
-        wings[f'{side}_hind_foot']=[[0,-14,0,0],[4,-28,0,0],[8,-14,0,0],[12,-28,0,0],[16,-14,0,0]]
-    wings['torso']=[[0,4,0,0],[4,-4,0,0],[8,4,0,0],[12,-4,0,0],[16,4,0,0]]
-    wings['neck_base']=[[0,-6,0,0],[4,2,0,0],[8,-6,0,0],[12,2,0,0],[16,-6,0,0]]
-    wings['neck_mid']=[[0,3,2,0],[4,-2,0,0],[8,3,-2,0],[12,-2,0,0],[16,3,2,0]]
-    wings['head']=[[0,2,4,2],[4,-3,0,-2],[8,2,-4,2],[12,-3,0,-2],[16,2,4,2]]
-    wings['tail_1']=[[0,-6,6,0],[4,4,0,0],[8,-6,-6,0],[12,4,0,0],[16,-6,6,0]]
-    wings['tail_2']=[[0,-2,10,0],[4,-8,4,0],[8,-2,-10,0],[12,-8,-4,0],[16,-2,10,0]]
-    wings['tail_3']=[[0,4,12,0],[4,-6,8,0],[8,4,-12,0],[12,-6,-8,0],[16,4,12,0]]
-    wings['tail_4']=[[0,8,14,0],[4,-4,10,0],[8,8,-14,0],[12,-4,-10,0],[16,8,14,0]]
-    clip('fly',16,True,wings,{'torso':[[0,0,0,0],[4,0,1.2,0],[8,0,0,0],[12,0,1.2,0],[16,0,0,0]]})
-    clip('takeoff',16,rot={'torso':frames((-10,0,0),16,end=(-10,0,0)),'left_wing_upper':frames((0,65,-35),16,end=(0,65,-35)),'right_wing_upper':frames((0,-65,35),16,end=(0,-65,35))},pos={'torso':[[0,0,0,0],[6,0,-1,0],[16,0,2,0]]})
-    clip('land',16,rot={'torso':frames((8,0,0),16),'left_wing_upper':frames((0,65,-25),16),'right_wing_upper':frames((0,-65,25),16)},pos={'torso':frames((0,-1.2,0),16)})
+        wings[f'{side}_wing_upper']=[
+            [0, -8, sign*58, -sign*46],
+            [6, -12, sign*68, -sign*10],
+            [12, 8, sign*76, sign*48],
+            [15, 10, sign*70, sign*54],
+            [19, -4, sign*50, sign*4],
+            [24, -8, sign*58, -sign*46],
+        ]
+        wings[f'{side}_wing_forearm']=[
+            [0, 0, -sign*12, sign*16],
+            [6, 0, -sign*22, sign*6],
+            [12, 0, -sign*18, -sign*18],
+            [15, 0, -sign*10, -sign*26],
+            [19, 0, sign*24, -sign*44],
+            [24, 0, -sign*12, sign*16],
+        ]
+        wings[f'{side}_wing_tip']=[
+            [0, 0, -sign*14, sign*22],
+            [6, 0, -sign*20, sign*12],
+            [12, 0, -sign*18, -sign*10],
+            [15, 0, -sign*12, -sign*24],
+            [19, 0, sign*16, -sign*36],
+            [24, 0, -sign*14, sign*22],
+        ]
+        # Front legs tucked neatly under chest, hind legs swept cleanly back with subtle inertia
+        wings[f'{side}_front_upper']=[[0,-48,0,0],[12,-54,0,0],[18,-44,0,0],[24,-48,0,0]]
+        wings[f'{side}_front_lower']=[[0,72,0,0],[12,78,0,0],[18,66,0,0],[24,72,0,0]]
+        wings[f'{side}_front_foot']=[[0,-24,0,0],[12,-28,0,0],[24,-24,0,0]]
+        wings[f'{side}_hind_upper']=[[0,42,0,0],[12,50,0,0],[18,36,0,0],[24,42,0,0]]
+        wings[f'{side}_hind_lower']=[[0,28,0,0],[12,20,0,0],[18,34,0,0],[24,28,0,0]]
+        wings[f'{side}_hind_foot']=[[0,24,0,0],[12,30,0,0],[24,24,0,0]]
+    # Delayed body heave: High Point right after downstroke (15..17), Low Point right after upstroke (2..4)
+    wings['torso']=[[0,4,0,0],[6,2,0,0],[12,-6,0,0],[16,-4,0,0],[20,3,0,0],[24,4,0,0]]
+    wings['neck_base']=[[0,-5,0,0],[6,-3,0,0],[12,6,0,0],[16,4,0,0],[20,-3,0,0],[24,-5,0,0]]
+    wings['neck_mid']=[[0,2,0,0],[12,-3,0,0],[24,2,0,0]]
+    wings['head']=[[0,2,0,0],[12,-2,0,0],[24,2,0,0]]
+    wings['tail_1']=[[0,-6,0,0],[6,5,0,0],[12,8,0,0],[18,-5,0,0],[24,-6,0,0]]
+    wings['tail_2']=[[0,-10,0,0],[8,2,0,0],[15,12,0,0],[21,-4,0,0],[24,-10,0,0]]
+    wings['tail_3']=[[0,-8,0,0],[10,-4,0,0],[18,14,0,0],[24,-8,0,0]]
+    wings['tail_4']=[[0,-4,0,0],[12,-8,0,0],[20,16,0,0],[24,-4,0,0]]
+    clip('fly',24,True,wings,{'torso':[[0,0,-1.0,0],[6,0,-.4,0],[12,0,1.2,0],[16,0,1.8,0],[20,0,.2,0],[24,0,-1.0,0]]})
+    # Takeoff (16t): crouch & lower head -> unfold wings base-to-tip -> power downstroke + hind-leg launch -> tuck legs
+    tk={
+        'torso':[[0,0,0,0],[4,10,0,0],[8,-4,0,0],[12,-18,0,0],[16,-10,0,0]],
+        'neck_base':[[0,0,0,0],[4,14,0,0],[8,-6,0,0],[12,-12,0,0],[16,-6,0,0]],
+        'neck_mid':[[0,0,0,0],[4,6,0,0],[12,-6,0,0],[16,0,0,0]],
+        'head':[[0,0,0,0],[4,-8,0,0],[12,10,0,0],[16,4,0,0]],
+        'tail_1':[[0,0,0,0],[4,-8,0,0],[12,18,0,0],[16,10,0,0]],
+        'tail_2':[[0,0,0,0],[6,-10,0,0],[14,16,0,0],[16,8,0,0]],
+        'tail_3':[[0,0,0,0],[8,-8,0,0],[16,12,0,0]],
+    }
+    for side,sign in [('left',1),('right',-1)]:
+        tk[f'{side}_wing_upper']=[[0,0,0,0],[4,0,sign*35,-sign*20],[8,-10,sign*68,-sign*48],[12,8,sign*74,sign*52],[16,-6,sign*60,-sign*32]]
+        tk[f'{side}_wing_forearm']=[[0,0,0,0],[4,0,sign*18,sign*10],[8,0,-sign*18,sign*12],[12,0,-sign*18,-sign*20],[16,0,-sign*12,sign*8]]
+        tk[f'{side}_wing_tip']=[[0,0,0,0],[6,0,sign*10,sign*12],[10,0,-sign*18,sign*10],[13,0,-sign*16,-sign*22],[16,0,-sign*12,sign*12]]
+        tk[f'{side}_front_upper']=[[0,0,0,0],[4,-32,0,0],[9,-10,0,0],[16,-48,0,0]]
+        tk[f'{side}_front_lower']=[[0,0,0,0],[4,48,0,0],[9,18,0,0],[16,72,0,0]]
+        tk[f'{side}_hind_upper']=[[0,0,0,0],[4,-38,0,0],[9,36,0,0],[16,42,0,0]]
+        tk[f'{side}_hind_lower']=[[0,0,0,0],[4,58,0,0],[9,-12,0,0],[16,28,0,0]]
+    clip('takeoff',16,rot=tk,pos={'torso':[[0,0,0,0],[4,0,-1.8,0],[9,0,1.2,0],[16,0,2.2,0]]})
+    # Land (16t): upright braking flare (Image 4/5 Rokunin!) -> wide wing brake -> legs reach down -> impact crouch -> fold wings
+    ld={
+        'torso':[[0,-14,0,0],[4,-24,0,0],[8,-10,0,0],[11,10,0,0],[16,0,0,0]],
+        'neck_base':[[0,-8,0,0],[4,16,0,0],[8,8,0,0],[11,12,0,0],[16,0,0,0]],
+        'neck_mid':[[0,0,0,0],[4,8,0,0],[11,-4,0,0],[16,0,0,0]],
+        'head':[[0,6,0,0],[4,-12,0,0],[11,-6,0,0],[16,0,0,0]],
+        'tail_1':[[0,10,0,0],[4,22,0,0],[9,12,0,0],[12,-6,0,0],[16,0,0,0]],
+        'tail_2':[[0,8,0,0],[5,18,0,0],[12,-8,0,0],[16,0,0,0]],
+        'tail_3':[[0,6,0,0],[6,14,0,0],[13,-6,0,0],[16,0,0,0]],
+    }
+    for side,sign in [('left',1),('right',-1)]:
+        ld[f'{side}_wing_upper']=[[0,-6,sign*65,-sign*30],[4,18,sign*74,-sign*18],[8,12,sign*62,sign*26],[12,4,sign*28,-sign*8],[16,0,0,0]]
+        ld[f'{side}_wing_forearm']=[[0,0,-sign*16,0],[4,0,-sign*22,-sign*10],[8,0,sign*12,-sign*16],[12,0,sign*16,-sign*8],[16,0,0,0]]
+        ld[f'{side}_wing_tip']=[[0,0,-sign*14,0],[5,0,-sign*18,-sign*12],[10,0,sign*10,-sign*12],[16,0,0,0]]
+        ld[f'{side}_front_upper']=[[0,-46,0,0],[5,-28,0,0],[9,-18,0,0],[12,-24,0,0],[16,0,0,0]]
+        ld[f'{side}_front_lower']=[[0,68,0,0],[5,20,0,0],[9,14,0,0],[12,42,0,0],[16,0,0,0]]
+        ld[f'{side}_hind_upper']=[[0,36,0,0],[5,-36,0,0],[9,-20,0,0],[12,-30,0,0],[16,0,0,0]]
+        ld[f'{side}_hind_lower']=[[0,24,0,0],[5,26,0,0],[9,18,0,0],[12,48,0,0],[16,0,0,0]]
+    clip('land',16,rot=ld,pos={'torso':[[0,0,1.4,0],[5,0,.8,0],[9,0,-.4,0],[12,0,-1.8,0],[16,0,0,0]]})
     prep={'torso':(-7,0,0),'neck_base':(-12,0,0),'neck_mid':(8,0,0),'head':(-8,0,0),'jaw':(24,0,0),'tail_1':(12,0,0),'left_hind_upper':(10,0,0),'right_hind_upper':(10,0,0)}
     hit={'torso':(5,0,0),'neck_base':(10,0,0),'neck_mid':(-10,0,0),'head':(-5,0,0),'jaw':(32,0,0),'tail_1':(-6,0,0),'left_hind_upper':(-4,0,0),'right_hind_upper':(-4,0,0)}
     clip('fire_windup',12,rot={k:[[0,0,0,0],[12,*v]] for k,v in prep.items()},pos={'torso':[[0,0,0,0],[12,0,-.3,.7]]})
@@ -59,9 +118,9 @@ def catalog():
     clip('hurt',8,rot={'torso':frames((0,0,-8),8,at=.25),'neck_base':frames((-12,0,0),8,at=.25),'head':frames((10,0,0),8,at=.25)})
     clip('stun',20,rot={'neck_base':frames((15,0,0),20),'head':frames((12,0,8),20)})
     clip('death',20,rot={'torso':[[0,0,0,0],[12,0,0,70],[20,0,0,85]],'neck_base':[[0,0,0,0],[20,20,0,0]],'tail_2':[[0,0,0,0],[20,0,-15,0]]},pos={'torso':[[0,0,0,0],[20,0,-2,0]]})
-    sit={'torso':(-12,0,0),'left_hind_upper':(-50,0,0),'right_hind_upper':(-50,0,0),'left_hind_lower':(70,0,0),'right_hind_lower':(70,0,0),'neck_base':(12,0,0),'tail_1':(12,0,0)}
-    clip('sit',12,rot={k:[[0,0,0,0],[12,*v]] for k,v in sit.items()},pos={'torso':[[0,0,0,0],[12,0,-1,0]]})
-    clip('stand',12,rot={k:[[0,*v],[12,0,0,0]] for k,v in sit.items()},pos={'torso':[[0,0,-1,0],[12,0,0,0]]})
+    sit={'torso':(-12,0,0),'left_hind_upper':(-52,0,0),'right_hind_upper':(-52,0,0),'left_hind_lower':(74,0,0),'right_hind_lower':(74,0,0),'left_hind_foot':(-22,0,0),'right_hind_foot':(-22,0,0),'left_front_upper':(10,0,0),'right_front_upper':(10,0,0),'neck_base':(12,0,0),'neck_mid':(-4,0,0),'tail_1':(10,20,0),'tail_2':(4,24,0),'tail_3':(0,22,0),'tail_4':(-2,16,0)}
+    clip('sit',12,rot={k:[[0,0,0,0],[12,*v]] for k,v in sit.items()},pos={'torso':[[0,0,0,0],[12,0,-1.2,0]]})
+    clip('stand',12,rot={k:[[0,*v],[12,0,0,0]] for k,v in sit.items()},pos={'torso':[[0,0,-1.2,0],[12,0,0,0]]})
     # Left shoulder: tuck the feet, fold the wings and coil the tail toward the player's neck.
     # The renderer mirrors central Y/Z channels for the right shoulder.
     shoulder={'torso':(6,-10,-8),'neck_base':(12,-18,6),'neck_mid':(6,-12,0),
@@ -86,6 +145,35 @@ def catalog():
     clip('imitate_wings',40,rot={'left_wing_upper':frames((0,45,-25),40,at=.35),'right_wing_upper':frames((0,-45,25),40,at=.65),'head':frames((-5,0,8),40)})
     rest=dict(sit); rest.update({'neck_base':(25,0,0),'head':(15,0,-10),'tail_1':(0,25,0),'tail_2':(0,25,0),'tail_3':(0,20,0)})
     clip('rest_together',100,rot={k:[[0,0,0,0],[30,*v],[100,*v]] for k,v in rest.items()},pos={'torso':[[0,0,0,0],[30,0,-1.3,0],[100,0,-1.3,0]]})
+    # Young dragon combat and territorial clips (shared joint names).
+    bite_w={'torso':(-6,0,0),'neck_base':(-18,0,0),'neck_mid':(-10,0,0),'head':(-10,0,0),'jaw':(36,0,0),'tail_1':(10,0,0)}
+    bite_s={'torso':(8,0,0),'neck_base':(20,0,0),'neck_mid':(14,0,0),'head':(6,0,0),'jaw':(2,0,0),'tail_1':(-8,0,0)}
+    clip('bite_windup',8,rot={k:[[0,0,0,0],[8,*v]] for k,v in bite_w.items()},pos={'torso':[[0,0,0,0],[8,0,0,.9]]})
+    clip('bite_strike',4,rot={k:[[0,*bite_w[k]],[4,*v]] for k,v in bite_s.items()},pos={'torso':[[0,0,0,.9],[4,0,-.4,-1.4]]})
+    clip('bite_recovery',8,rot={k:[[0,*v],[8,0,0,0]] for k,v in bite_s.items()},pos={'torso':[[0,0,-.4,-1.4],[8,0,0,0]]})
+    br_w={'torso':(-8,0,0),'neck_base':(-14,0,0),'neck_mid':(10,0,0),'head':(-6,0,0),'jaw':(28,0,0),'left_wing_upper':(0,45,-20),'right_wing_upper':(0,-45,20),'tail_1':(10,0,0)}
+    clip('breath_windup',10,rot={k:[[0,0,0,0],[10,*v]] for k,v in br_w.items()},pos={'torso':[[0,0,0,0],[10,0,-.4,.8]]})
+    clip('breath_active',24,rot={
+        'torso':[[0,-4,0,0],[12,-4,0,0],[24,-4,0,0]],
+        'neck_base':[[0,6,-14,0],[12,6,14,0],[24,6,-10,0]],
+        'neck_mid':[[0,-4,-10,0],[12,-4,10,0],[24,-4,-6,0]],
+        'head':[[0,-4,-12,0],[12,-4,12,0],[24,-4,-8,0]],
+        'jaw':[[0,34,0,0],[12,32,0,0],[24,30,0,0]],
+        'left_wing_upper':[[0,0,50,-22],[12,0,55,-18],[24,0,50,-22]],
+        'right_wing_upper':[[0,0,-50,22],[12,0,-55,18],[24,0,-50,22]],
+        'tail_1':[[0,0,12,0],[12,0,-12,0],[24,0,10,0]],
+    },pos={'torso':[[0,0,-.2,-.3],[24,0,-.2,-.3]]})
+    br_end={'torso':(-4,0,0),'neck_base':(6,-10,0),'neck_mid':(-4,-6,0),'head':(-4,-8,0),'jaw':(30,0,0),'left_wing_upper':(0,50,-22),'right_wing_upper':(0,-50,22),'tail_1':(0,10,0)}
+    clip('breath_recovery',10,rot={k:[[0,*v],[10,0,0,0]] for k,v in br_end.items()},pos={'torso':[[0,0,-.2,-.3],[10,0,0,0]]})
+    clip('growl',24,rot={
+        'torso':frames((8,0,0),24),
+        'neck_base':frames((14,0,0),24),
+        'head':[[0,0,0,0],[6,-10,8,0],[14,-10,-8,0],[24,0,0,0]],
+        'jaw':[[0,0,0,0],[6,26,0,0],[18,22,0,0],[24,0,0,0]],
+        'left_wing_upper':frames((0,38,-22),24),
+        'right_wing_upper':frames((0,-38,22),24),
+        'tail_1':[[0,0,0,0],[12,0,14,0],[24,0,0,0]],
+    },pos={'torso':frames((0,-.8,0),24)})
 
 def generate():
     catalog()
@@ -127,7 +215,7 @@ def generate():
         '            keys[i] = new Keyframe(frames[j], rotation',
         '                    ? KeyframeAnimations.degreeVec(frames[j+1], frames[j+2], frames[j+3])',
         '                    : KeyframeAnimations.posVec(frames[j+1], frames[j+2], frames[j+3]),',
-        '                    AnimationChannel.Interpolations.LINEAR);',
+        '                    AnimationChannel.Interpolations.CATMULLROM);',
         '        }',
         '        return new AnimationChannel(rotation ? AnimationChannel.Targets.ROTATION : AnimationChannel.Targets.POSITION, keys);',
         '    }','}']

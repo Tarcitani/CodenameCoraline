@@ -16,26 +16,51 @@ import net.minecraft.util.Mth;
 public final class FireDragonModel extends EntityModel<FireDragonRenderState> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(
             Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "fire_dragon"), "main");
-    private final ModelPart head;
-    private final ModelPart neck;
+    public static final ModelLayerLocation YOUNG_LAYER = new ModelLayerLocation(
+            Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "fire_dragon"), "young");
+    static final class Rig {
+        final ModelPart torso, belly;
+        final ModelPart neckBase, neckMid, neckTop, head, jaw;
+        final ModelPart leftWingUpper, leftWingForearm, leftWingTip;
+        final ModelPart rightWingUpper, rightWingForearm, rightWingTip;
+        final ModelPart leftFrontUpper, leftFrontLower, leftFrontFoot;
+        final ModelPart rightFrontUpper, rightFrontLower, rightFrontFoot;
+        final ModelPart leftHindUpper, leftHindLower, leftHindFoot;
+        final ModelPart rightHindUpper, rightHindLower, rightHindFoot;
+        final ModelPart[] tail;
+
+        Rig(ModelPart root) {
+            var l = root.createPartLookup();
+            torso = l.apply("torso"); belly = l.apply("belly");
+            neckBase = l.apply("neck_base"); neckMid = l.apply("neck_mid"); neckTop = l.apply("neck_top");
+            head = l.apply("head"); jaw = l.apply("jaw");
+            leftWingUpper = l.apply("left_wing_upper"); leftWingForearm = l.apply("left_wing_forearm"); leftWingTip = l.apply("left_wing_tip");
+            rightWingUpper = l.apply("right_wing_upper"); rightWingForearm = l.apply("right_wing_forearm"); rightWingTip = l.apply("right_wing_tip");
+            leftFrontUpper = l.apply("left_front_upper"); leftFrontLower = l.apply("left_front_lower"); leftFrontFoot = l.apply("left_front_foot");
+            rightFrontUpper = l.apply("right_front_upper"); rightFrontLower = l.apply("right_front_lower"); rightFrontFoot = l.apply("right_front_foot");
+            leftHindUpper = l.apply("left_hind_upper"); leftHindLower = l.apply("left_hind_lower"); leftHindFoot = l.apply("left_hind_foot");
+            rightHindUpper = l.apply("right_hind_upper"); rightHindLower = l.apply("right_hind_lower"); rightHindFoot = l.apply("right_hind_foot");
+            tail = new ModelPart[] { l.apply("tail_1"), l.apply("tail_2"), l.apply("tail_3"), l.apply("tail_4") };
+        }
+    }
+
+    private final Rig rig;
     private final ModelPart[] joints;
     private final ModelPart[] shoulderCoil;
     private final KeyframeAnimation[] clips;
 
     public FireDragonModel(ModelPart root) {
         super(root);
-        var lookup = root.createPartLookup();
-        head = lookup.apply("head");
-        neck = lookup.apply("neck_base");
-        shoulderCoil = new ModelPart[] {lookup.apply("torso"), neck, lookup.apply("neck_mid"),
-                lookup.apply("neck_top"), head, lookup.apply("tail_1"), lookup.apply("tail_2"),
-                lookup.apply("tail_3"), lookup.apply("tail_4")};
+        rig = new Rig(root);
+        shoulderCoil = new ModelPart[] {rig.torso, rig.neckBase, rig.neckMid,
+                rig.neckTop, rig.head, rig.tail[0], rig.tail[1], rig.tail[2], rig.tail[3]};
         joints = root.getAllParts().toArray(ModelPart[]::new);
         clips = new KeyframeAnimation[FireDragonAnimations.CLIPS.length];
         for (int i = 0; i < clips.length; i++) clips[i] = FireDragonAnimations.CLIPS[i].bake(root);
     }
 
     public static LayerDefinition createBodyLayer() { return FireDragonGeometry.createBodyLayer(); }
+    public static LayerDefinition createYoungBodyLayer() { return FireDragonYoungGeometry.createBodyLayer(); }
 
     /** Shared by the real renderer and the offline exporter; no alternate preview geometry. */
     public void applyPose(FireDragonAnimation clip, float ticks) {
@@ -56,25 +81,37 @@ public final class FireDragonModel extends EntityModel<FireDragonRenderState> {
             }
             return;
         }
-        if (state.hurtTicks > 0) { applyPose(FireDragonAnimation.HURT, 10 - state.hurtTicks); return; }
+        if (state.hurtTicks > 0) {
+            applyPose(FireDragonAnimation.HURT, 10 - state.hurtTicks);
+            FireDragonAnimController.smoothCrossFade(joints, state);
+            return;
+        }
         if (state.clip == FireDragonAnimation.PLAY_CHASE) {
-            if (state.airborne) applyPose(FireDragonAnimation.FLY, state.ageInTicks);
+            for (ModelPart joint : joints) joint.resetPose();
+            FireDragonAnimController.applyLocomotion(rig, state);
+            clips[FireDragonAnimation.PLAY_CHASE.ordinal()].apply((long) (Math.max(0, state.clipTicks) * 50.0F), 1.0F);
+            FireDragonAnimController.smoothCrossFade(joints, state);
+            return;
+        }
+        if (state.clip != FireDragonAnimation.NONE && state.clip != FireDragonAnimation.BREATHE) {
+            applyPose(state.clip, state.clipTicks);
+            // Keep gentle delayed tail motion alive during non-full-body action clips (idles, eat, growl, fire)
+            if (state.animState != null && state.clip != FireDragonAnimation.REST_TOGETHER) {
+                for (int i = 0; i < 4; i++) rig.tail[i].yRot += state.animState.tailYawLag[i] * (0.30F + i * 0.10F);
+            }
+            FireDragonAnimController.smoothCrossFade(joints, state);
+            return;
+        }
+        for (ModelPart joint : joints) joint.resetPose();
+        if (state.animState != null) {
+            FireDragonAnimController.applyLocomotion(rig, state);
+            FireDragonAnimController.smoothCrossFade(joints, state);
+        } else {
+            if (state.sitting) applyPose(FireDragonAnimation.SIT, 12);
+            else if (state.airborne) applyPose(FireDragonAnimation.FLY, state.ageInTicks);
             else if (state.walkAnimationSpeed > 0.01F) {
-                for (ModelPart joint : joints) joint.resetPose();
                 clips[FireDragonAnimation.WALK.ordinal()].applyWalk(state.walkAnimationPos, state.walkAnimationSpeed, 1.0F, 2.0F);
             } else applyPose(FireDragonAnimation.BREATHE, state.ageInTicks);
-            clips[FireDragonAnimation.PLAY_CHASE.ordinal()].apply((long) (Math.max(0, state.clipTicks) * 50.0F), 1.0F);
-        } else if (state.clip != FireDragonAnimation.NONE && state.clip != FireDragonAnimation.BREATHE) {
-            applyPose(state.clip, state.clipTicks); return;
-        } else if (state.sitting) applyPose(FireDragonAnimation.SIT, 12);
-        else if (state.airborne) applyPose(FireDragonAnimation.FLY, state.ageInTicks);
-        else if (state.walkAnimationSpeed > 0.01F) {
-            for (ModelPart joint : joints) joint.resetPose();
-            clips[FireDragonAnimation.WALK.ordinal()].applyWalk(state.walkAnimationPos, state.walkAnimationSpeed, 1.0F, 2.0F);
-        } else if (state.clip != FireDragonAnimation.NONE) applyPose(state.clip, state.clipTicks);
-        else applyPose(FireDragonAnimation.BREATHE, state.ageInTicks);
-        neck.yRot += Mth.clamp(state.yRot, -55, 55) * Mth.DEG_TO_RAD * 0.35F;
-        head.yRot += Mth.clamp(state.yRot, -55, 55) * Mth.DEG_TO_RAD * 0.65F;
-        head.xRot += Mth.clamp(state.xRot, -25, 30) * Mth.DEG_TO_RAD * 0.5F;
+        }
     }
 }

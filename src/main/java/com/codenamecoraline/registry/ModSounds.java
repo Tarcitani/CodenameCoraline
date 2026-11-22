@@ -177,6 +177,10 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_SHOOT = register("entity.fire_dragon.shoot");
     public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_IMPACT = register("entity.fire_dragon.impact");
     public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_PLAY = register("entity.fire_dragon.play");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_EVOLVE = register("entity.fire_dragon.evolve");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_BITE = register("entity.fire_dragon.bite");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_BREATH = register("entity.fire_dragon.breath");
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE_DRAGON_GROWL = register("entity.fire_dragon.growl");
 
     /** The signature sound of each puppet (steps and attacks), one event per kind. */
     private static final java.util.EnumMap<com.codenamecoraline.entity.ten_threads_witch.PuppetKind, DeferredHolder<SoundEvent, SoundEvent>> PUPPET_ACTIONS =

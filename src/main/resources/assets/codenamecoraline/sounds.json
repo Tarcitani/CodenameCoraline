@@ -2167,5 +2167,33 @@
     "sounds": [
       { "name": "minecraft:entity.parrot.ambient", "type": "event", "pitch": 0.95, "volume": 0.5 }
     ]
+  },
+  "entity.fire_dragon.evolve": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.evolve",
+    "sounds": [
+      { "name": "minecraft:entity.blaze.shoot", "type": "event", "pitch": 0.7, "volume": 0.9 },
+      { "name": "minecraft:block.amethyst_block.resonate", "type": "event", "pitch": 0.85, "volume": 0.7 }
+    ]
+  },
+  "entity.fire_dragon.bite": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.bite",
+    "sounds": [
+      { "name": "minecraft:entity.evoker_fangs.attack", "type": "event", "pitch": 1.1, "volume": 0.8 },
+      { "name": "minecraft:entity.fox.bite", "type": "event", "pitch": 0.8, "volume": 0.8 }
+    ]
+  },
+  "entity.fire_dragon.breath": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.breath",
+    "sounds": [
+      { "name": "minecraft:entity.blaze.shoot", "type": "event", "pitch": 0.95, "volume": 0.65 },
+      { "name": "minecraft:block.lava.ambient", "type": "event", "pitch": 1.2, "volume": 0.5 }
+    ]
+  },
+  "entity.fire_dragon.growl": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.growl",
+    "sounds": [
+      { "name": "minecraft:entity.fox.screech", "type": "event", "pitch": 0.55, "volume": 0.75 },
+      { "name": "minecraft:block.lava.pop", "type": "event", "pitch": 0.7, "volume": 0.5 }
+    ]
   }
 }

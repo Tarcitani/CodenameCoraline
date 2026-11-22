@@ -15,6 +15,7 @@ public final class FireDragonClient {
     @SubscribeEvent
     static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(FireDragonModel.LAYER, FireDragonModel::createBodyLayer);
+        event.registerLayerDefinition(FireDragonModel.YOUNG_LAYER, FireDragonModel::createYoungBodyLayer);
         event.registerLayerDefinition(DragonFireballModel.LAYER, DragonFireballModel::createBodyLayer);
     }
 

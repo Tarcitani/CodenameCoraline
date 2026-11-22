@@ -9,25 +9,30 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 
-/** Emissive eye highlights, sharing the exact base UV coordinates. */
+/** Emissive eye highlights, sharing the exact base UV coordinates for baby and young stages. */
 public final class FireDragonEyesLayer extends EyesLayer<FireDragonRenderState, FireDragonModel> {
-    private static final RenderType EYE_GLOW = RenderTypes.eyes(
+    private static final RenderType BABY_EYE_GLOW = RenderTypes.eyes(
             Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "textures/entity/fire_dragon/eyes.png"));
+    private static final RenderType YOUNG_EYE_GLOW = RenderTypes.eyes(
+            Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "textures/entity/fire_dragon/young/eyes.png"));
 
-    public FireDragonEyesLayer(RenderLayerParent<FireDragonRenderState, FireDragonModel> parent) {
+    private final boolean forYoung;
+
+    public FireDragonEyesLayer(RenderLayerParent<FireDragonRenderState, FireDragonModel> parent, boolean forYoung) {
         super(parent);
+        this.forYoung = forYoung;
     }
 
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords,
                        FireDragonRenderState state, float yRot, float xRot) {
-        if (state.glowing) {
+        if (state.glowing && state.young == forYoung) {
             super.submit(poseStack, submitNodeCollector, lightCoords, state, yRot, xRot);
         }
     }
 
     @Override
     public RenderType renderType() {
-        return EYE_GLOW;
+        return forYoung ? YOUNG_EYE_GLOW : BABY_EYE_GLOW;
     }
 }

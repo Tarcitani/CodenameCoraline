@@ -8,7 +8,7 @@ public enum FireDragonAnimation {
     IDLE_WINGS(36, false),
     IDLE_TAIL(40, false),
     WALK(20, true),
-    FLY(16, true),
+    FLY(24, true),
     TAKEOFF(16, false),
     LAND(16, false),
     FIRE_WINDUP(12, false),
@@ -24,7 +24,14 @@ public enum FireDragonAnimation {
     PLAY_CHASE(100, true),
     GREET(30, false),
     IMITATE_WINGS(40, false),
-    REST_TOGETHER(100, false);
+    REST_TOGETHER(100, false),
+    BITE_WINDUP(8, false),
+    BITE_STRIKE(4, false),
+    BITE_RECOVERY(8, false),
+    BREATH_WINDUP(10, false),
+    BREATH_ACTIVE(24, false),
+    BREATH_RECOVERY(10, false),
+    GROWL(24, false);
     public final int ticks;
     public final boolean looping;
     FireDragonAnimation(int ticks, boolean looping) { this.ticks = ticks; this.looping = looping; }

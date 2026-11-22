@@ -51,7 +51,9 @@ public final class FireDragonGameTests {
             Map.entry("fire_dragon_predictive_aim", FireDragonGameTests::predictiveAim),
             Map.entry("fire_dragon_social_interaction", FireDragonGameTests::socialInteraction),
             Map.entry("fire_dragon_transition_clips", FireDragonGameTests::transitionClips),
-            Map.entry("fire_dragon_bestiary_sounds_and_advancements", FireDragonGameTests::bestiarySoundsAndAdvancements));
+            Map.entry("fire_dragon_bestiary_sounds_and_advancements", FireDragonGameTests::bestiarySoundsAndAdvancements),
+            Map.entry("fire_dragon_young_evolution_and_persistence", FireDragonGameTests::youngEvolutionAndPersistence),
+            Map.entry("fire_dragon_young_combat_and_territorial", FireDragonGameTests::youngCombatAndTerritorial));
 
     private FireDragonGameTests() {
     }
@@ -406,7 +408,11 @@ public final class FireDragonGameTests {
                 com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_WINDUP,
                 com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_SHOOT,
                 com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_IMPACT,
-                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_PLAY)) {
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_PLAY,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_EVOLVE,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_BITE,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_BREATH,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_GROWL)) {
             helper.assertTrue(sound.get() != null, "Sound registered: " + sound.getId());
         }
         var advancements = helper.getLevel().getServer().getAdvancements();
@@ -416,6 +422,8 @@ public final class FireDragonGameTests {
         for (String path : java.util.List.of(
                 "textures/entity/fire_dragon/fireball.png",
                 "textures/entity/fire_dragon/fireball_glow.png",
+                "textures/entity/fire_dragon/young/2_4_0.png",
+                "textures/entity/fire_dragon/young/eyes.png",
                 "textures/gui/bestiary/fire_dragon_anatomy.png",
                 "textures/gui/bestiary/fire_dragon_combat.png",
                 "textures/gui/bestiary/fire_dragon_spoils.png")) {
@@ -423,5 +431,63 @@ public final class FireDragonGameTests {
                     "Packaged bestiary sketch present: " + path);
         }
         helper.succeed();
+    }
+
+    private static void youngEvolutionAndPersistence(GameTestHelper helper) {
+        var owner = helper.makeMockServerPlayerInLevel();
+        owner.setPos(helper.absoluteVec(new net.minecraft.world.phys.Vec3(5, 2, 5)));
+        FireDragon dragon = helper.spawnWithNoFreeWill(ModEntities.FIRE_DRAGON.get(), new BlockPos(6, 2, 5));
+        dragon.setAppearance(3, 1, 4);
+        dragon.tame(owner);
+        var originalUuid = dragon.getUUID();
+        helper.assertTrue(dragon.landOnShoulder(owner), "Baby mounts shoulder before evolution");
+        helper.assertTrue(dragon.evolveToYoung(), "Evolution dismounts safely and promotes to young");
+        helper.assertFalse(dragon.isOnShoulder(), "Evolved young is no longer on shoulder");
+        helper.assertTrue(dragon.isYoung(), "Stage is YOUNG");
+        helper.assertValueEqual(dragon.getUUID(), originalUuid, "UUID preserved on evolution");
+        helper.assertValueEqual(dragon.getColorCode(), 3 * 25 + 1 * 5 + 4, "All 3 colors preserved");
+        helper.assertValueEqual(dragon.getMaxHealth(), 48.0F, "Young max health");
+        helper.assertValueEqual(dragon.getAttributeValue(Attributes.ARMOR), 5.0D, "Young armor");
+        helper.assertValueEqual(dragon.getAttributeValue(Attributes.ATTACK_DAMAGE), 6.0D, "Young attack damage");
+        helper.assertValueEqual(dragon.getAttributeValue(Attributes.FOLLOW_RANGE), 24.0D, "Young follow range");
+        helper.assertValueEqual(dragon.getBbWidth(), FireDragon.YOUNG_WIDTH, "Young width");
+        helper.assertValueEqual(dragon.getBbHeight(), FireDragon.YOUNG_HEIGHT, "Young height");
+        helper.assertValueEqual(dragon.getGrowthRemaining(), FireDragon.YOUNG_GROWTH_TICKS, "Young growth timer reset");
+        helper.assertFalse(dragon.landOnShoulder(owner), "Young dragon cannot perch on shoulder");
+        var out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, helper.getLevel().registryAccess());
+        dragon.saveWithoutId(out);
+        var saved = out.buildResult();
+        FireDragon loaded = ModEntities.FIRE_DRAGON.get().create(helper.getLevel(), EntitySpawnReason.LOAD);
+        helper.assertTrue(loaded != null, "Load factory");
+        loaded.load(TagValueInput.create(ProblemReporter.DISCARDING, helper.getLevel().registryAccess(), saved));
+        helper.assertTrue(loaded.isYoung(), "Young stage persists across save/load");
+        helper.assertValueEqual(loaded.getMaxHealth(), 48.0F, "Loaded young max health");
+        helper.assertValueEqual(loaded.getGrowthRemaining(), FireDragon.YOUNG_GROWTH_TICKS, "Loaded young growth");
+        helper.succeed();
+    }
+
+    private static void youngCombatAndTerritorial(GameTestHelper helper) {
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        player.setPos(helper.absoluteVec(new net.minecraft.world.phys.Vec3(5, 2, 5)));
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.SALMON));
+        helper.getLevel().addFreshEntity(player);
+        FireDragon wild = helper.spawn(ModEntities.FIRE_DRAGON.get(), new BlockPos(7, 2, 5));
+        wild.setStage(FireDragon.Stage.YOUNG);
+        helper.runAfterDelay(25, () -> {
+            helper.assertTrue(wild.getTarget() == null, "Wild young stays calm while player holds raw salmon");
+            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        });
+        helper.runAfterDelay(95, () -> {
+            helper.assertTrue(wild.getTarget() == player, "Wild young turns hostile after territorial warning expires");
+            wild.setTarget(null);
+            wild.tame(player);
+            var zombie = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityType.ZOMBIE, new BlockPos(7, 2, 7));
+            float startHp = zombie.getHealth();
+            wild.setTarget(zombie);
+            helper.runAfterDelay(25, () -> {
+                helper.assertTrue(zombie.getHealth() < startHp || zombie.isDeadOrDying(), "Young dragon damages close hostile with bite/fire");
+                helper.succeed();
+            });
+        });
     }
 }

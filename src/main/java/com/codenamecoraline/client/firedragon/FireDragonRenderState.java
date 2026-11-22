@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 /** Visual snapshot only; never drives combat or movement. */
 public final class FireDragonRenderState extends LivingEntityRenderState {
     public int colorCode = 70;
+    public boolean young;
     public boolean airborne;
     public boolean sitting;
     public boolean perched;
@@ -16,4 +17,6 @@ public final class FireDragonRenderState extends LivingEntityRenderState {
     public FireDragonAnimation clip = FireDragonAnimation.NONE;
     public float clipTicks;
     public float hurtTicks;
+    public float dt;
+    FireDragonAnimController.ClientState animState;
 }

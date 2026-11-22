@@ -30,41 +30,77 @@ Rotações: deltas x/y/z em graus em relação ao bind pose; `KeyframeAnimations
 | walk | 20 | right_hind_lower / rot | 0 → -8.8,0,0; 10 → 8.8,0,0; 20 → -8.8,0,0 | pendente de revisão visual |
 | walk | 20 | tail_1 / rot | 0 → 0,-6,0; 10 → 0,6,0; 20 → 0,-6,0 | pendente de revisão visual |
 | walk | 20 | torso / pos | 0 → 0,0,0; 5 → 0,0.3,0; 10 → 0,0,0; 15 → 0,0.3,0; 20 → 0,0,0 | pendente de revisão visual |
-| fly | 16 | left_wing_upper / rot | 0 → 0,65,-35; 4 → 0,65,55; 8 → 0,65,-35; 12 → 0,65,55; 16 → 0,65,-35 | pendente de revisão visual |
-| fly | 16 | left_wing_forearm / rot | 0 → 0,-18,0; 4 → 0,-18,-20; 8 → 0,-18,0; 12 → 0,-18,-20; 16 → 0,-18,0 | pendente de revisão visual |
-| fly | 16 | left_wing_tip / rot | 0 → 0,-18,0; 8.0 → 0,-18,12; 16 → 0,-18,0 | pendente de revisão visual |
-| fly | 16 | left_front_upper / rot | 0 → -30,0,0; 4 → -44,0,0; 8 → -30,0,0; 12 → -44,0,0; 16 → -30,0,0 | pendente de revisão visual |
-| fly | 16 | left_front_lower / rot | 0 → 48,0,0; 4 → 64,0,0; 8 → 48,0,0; 12 → 64,0,0; 16 → 48,0,0 | pendente de revisão visual |
-| fly | 16 | left_front_foot / rot | 0 → -10,0,0; 4 → -24,0,0; 8 → -10,0,0; 12 → -24,0,0; 16 → -10,0,0 | pendente de revisão visual |
-| fly | 16 | left_hind_upper / rot | 0 → -32,0,0; 4 → -48,0,0; 8 → -32,0,0; 12 → -48,0,0; 16 → -32,0,0 | pendente de revisão visual |
-| fly | 16 | left_hind_lower / rot | 0 → 52,0,0; 4 → 68,0,0; 8 → 52,0,0; 12 → 68,0,0; 16 → 52,0,0 | pendente de revisão visual |
-| fly | 16 | left_hind_foot / rot | 0 → -14,0,0; 4 → -28,0,0; 8 → -14,0,0; 12 → -28,0,0; 16 → -14,0,0 | pendente de revisão visual |
-| fly | 16 | right_wing_upper / rot | 0 → 0,-65,35; 4 → 0,-65,-55; 8 → 0,-65,35; 12 → 0,-65,-55; 16 → 0,-65,35 | pendente de revisão visual |
-| fly | 16 | right_wing_forearm / rot | 0 → 0,18,0; 4 → 0,18,20; 8 → 0,18,0; 12 → 0,18,20; 16 → 0,18,0 | pendente de revisão visual |
-| fly | 16 | right_wing_tip / rot | 0 → 0,18,0; 8.0 → 0,18,-12; 16 → 0,18,0 | pendente de revisão visual |
-| fly | 16 | right_front_upper / rot | 0 → -42,0,0; 4 → -30,0,0; 8 → -42,0,0; 12 → -30,0,0; 16 → -42,0,0 | pendente de revisão visual |
-| fly | 16 | right_front_lower / rot | 0 → 48,0,0; 4 → 64,0,0; 8 → 48,0,0; 12 → 64,0,0; 16 → 48,0,0 | pendente de revisão visual |
-| fly | 16 | right_front_foot / rot | 0 → -10,0,0; 4 → -24,0,0; 8 → -10,0,0; 12 → -24,0,0; 16 → -10,0,0 | pendente de revisão visual |
-| fly | 16 | right_hind_upper / rot | 0 → -46,0,0; 4 → -32,0,0; 8 → -46,0,0; 12 → -32,0,0; 16 → -46,0,0 | pendente de revisão visual |
-| fly | 16 | right_hind_lower / rot | 0 → 52,0,0; 4 → 68,0,0; 8 → 52,0,0; 12 → 68,0,0; 16 → 52,0,0 | pendente de revisão visual |
-| fly | 16 | right_hind_foot / rot | 0 → -14,0,0; 4 → -28,0,0; 8 → -14,0,0; 12 → -28,0,0; 16 → -14,0,0 | pendente de revisão visual |
-| fly | 16 | torso / rot | 0 → 4,0,0; 4 → -4,0,0; 8 → 4,0,0; 12 → -4,0,0; 16 → 4,0,0 | pendente de revisão visual |
-| fly | 16 | neck_base / rot | 0 → -6,0,0; 4 → 2,0,0; 8 → -6,0,0; 12 → 2,0,0; 16 → -6,0,0 | pendente de revisão visual |
-| fly | 16 | neck_mid / rot | 0 → 3,2,0; 4 → -2,0,0; 8 → 3,-2,0; 12 → -2,0,0; 16 → 3,2,0 | pendente de revisão visual |
-| fly | 16 | head / rot | 0 → 2,4,2; 4 → -3,0,-2; 8 → 2,-4,2; 12 → -3,0,-2; 16 → 2,4,2 | pendente de revisão visual |
-| fly | 16 | tail_1 / rot | 0 → -6,6,0; 4 → 4,0,0; 8 → -6,-6,0; 12 → 4,0,0; 16 → -6,6,0 | pendente de revisão visual |
-| fly | 16 | tail_2 / rot | 0 → -2,10,0; 4 → -8,4,0; 8 → -2,-10,0; 12 → -8,-4,0; 16 → -2,10,0 | pendente de revisão visual |
-| fly | 16 | tail_3 / rot | 0 → 4,12,0; 4 → -6,8,0; 8 → 4,-12,0; 12 → -6,-8,0; 16 → 4,12,0 | pendente de revisão visual |
-| fly | 16 | tail_4 / rot | 0 → 8,14,0; 4 → -4,10,0; 8 → 8,-14,0; 12 → -4,-10,0; 16 → 8,14,0 | pendente de revisão visual |
-| fly | 16 | torso / pos | 0 → 0,0,0; 4 → 0,1.2,0; 8 → 0,0,0; 12 → 0,1.2,0; 16 → 0,0,0 | pendente de revisão visual |
-| takeoff | 16 | torso / rot | 0 → 0,0,0; 8.0 → -10,0,0; 16 → -10,0,0 | pendente de revisão visual |
-| takeoff | 16 | left_wing_upper / rot | 0 → 0,0,0; 8.0 → 0,65,-35; 16 → 0,65,-35 | pendente de revisão visual |
-| takeoff | 16 | right_wing_upper / rot | 0 → 0,0,0; 8.0 → 0,-65,35; 16 → 0,-65,35 | pendente de revisão visual |
-| takeoff | 16 | torso / pos | 0 → 0,0,0; 6 → 0,-1,0; 16 → 0,2,0 | pendente de revisão visual |
-| land | 16 | torso / rot | 0 → 0,0,0; 8.0 → 8,0,0; 16 → 0,0,0 | pendente de revisão visual |
-| land | 16 | left_wing_upper / rot | 0 → 0,0,0; 8.0 → 0,65,-25; 16 → 0,0,0 | pendente de revisão visual |
-| land | 16 | right_wing_upper / rot | 0 → 0,0,0; 8.0 → 0,-65,25; 16 → 0,0,0 | pendente de revisão visual |
-| land | 16 | torso / pos | 0 → 0,0,0; 8.0 → 0,-1.2,0; 16 → 0,0,0 | pendente de revisão visual |
+| fly | 24 | left_wing_upper / rot | 0 → -8,58,-46; 6 → -12,68,-10; 12 → 8,76,48; 15 → 10,70,54; 19 → -4,50,4; 24 → -8,58,-46 | pendente de revisão visual |
+| fly | 24 | left_wing_forearm / rot | 0 → 0,-12,16; 6 → 0,-22,6; 12 → 0,-18,-18; 15 → 0,-10,-26; 19 → 0,24,-44; 24 → 0,-12,16 | pendente de revisão visual |
+| fly | 24 | left_wing_tip / rot | 0 → 0,-14,22; 6 → 0,-20,12; 12 → 0,-18,-10; 15 → 0,-12,-24; 19 → 0,16,-36; 24 → 0,-14,22 | pendente de revisão visual |
+| fly | 24 | left_front_upper / rot | 0 → -48,0,0; 12 → -54,0,0; 18 → -44,0,0; 24 → -48,0,0 | pendente de revisão visual |
+| fly | 24 | left_front_lower / rot | 0 → 72,0,0; 12 → 78,0,0; 18 → 66,0,0; 24 → 72,0,0 | pendente de revisão visual |
+| fly | 24 | left_front_foot / rot | 0 → -24,0,0; 12 → -28,0,0; 24 → -24,0,0 | pendente de revisão visual |
+| fly | 24 | left_hind_upper / rot | 0 → 42,0,0; 12 → 50,0,0; 18 → 36,0,0; 24 → 42,0,0 | pendente de revisão visual |
+| fly | 24 | left_hind_lower / rot | 0 → 28,0,0; 12 → 20,0,0; 18 → 34,0,0; 24 → 28,0,0 | pendente de revisão visual |
+| fly | 24 | left_hind_foot / rot | 0 → 24,0,0; 12 → 30,0,0; 24 → 24,0,0 | pendente de revisão visual |
+| fly | 24 | right_wing_upper / rot | 0 → -8,-58,46; 6 → -12,-68,10; 12 → 8,-76,-48; 15 → 10,-70,-54; 19 → -4,-50,-4; 24 → -8,-58,46 | pendente de revisão visual |
+| fly | 24 | right_wing_forearm / rot | 0 → 0,12,-16; 6 → 0,22,-6; 12 → 0,18,18; 15 → 0,10,26; 19 → 0,-24,44; 24 → 0,12,-16 | pendente de revisão visual |
+| fly | 24 | right_wing_tip / rot | 0 → 0,14,-22; 6 → 0,20,-12; 12 → 0,18,10; 15 → 0,12,24; 19 → 0,-16,36; 24 → 0,14,-22 | pendente de revisão visual |
+| fly | 24 | right_front_upper / rot | 0 → -48,0,0; 12 → -54,0,0; 18 → -44,0,0; 24 → -48,0,0 | pendente de revisão visual |
+| fly | 24 | right_front_lower / rot | 0 → 72,0,0; 12 → 78,0,0; 18 → 66,0,0; 24 → 72,0,0 | pendente de revisão visual |
+| fly | 24 | right_front_foot / rot | 0 → -24,0,0; 12 → -28,0,0; 24 → -24,0,0 | pendente de revisão visual |
+| fly | 24 | right_hind_upper / rot | 0 → 42,0,0; 12 → 50,0,0; 18 → 36,0,0; 24 → 42,0,0 | pendente de revisão visual |
+| fly | 24 | right_hind_lower / rot | 0 → 28,0,0; 12 → 20,0,0; 18 → 34,0,0; 24 → 28,0,0 | pendente de revisão visual |
+| fly | 24 | right_hind_foot / rot | 0 → 24,0,0; 12 → 30,0,0; 24 → 24,0,0 | pendente de revisão visual |
+| fly | 24 | torso / rot | 0 → 4,0,0; 6 → 2,0,0; 12 → -6,0,0; 16 → -4,0,0; 20 → 3,0,0; 24 → 4,0,0 | pendente de revisão visual |
+| fly | 24 | neck_base / rot | 0 → -5,0,0; 6 → -3,0,0; 12 → 6,0,0; 16 → 4,0,0; 20 → -3,0,0; 24 → -5,0,0 | pendente de revisão visual |
+| fly | 24 | neck_mid / rot | 0 → 2,0,0; 12 → -3,0,0; 24 → 2,0,0 | pendente de revisão visual |
+| fly | 24 | head / rot | 0 → 2,0,0; 12 → -2,0,0; 24 → 2,0,0 | pendente de revisão visual |
+| fly | 24 | tail_1 / rot | 0 → -6,0,0; 6 → 5,0,0; 12 → 8,0,0; 18 → -5,0,0; 24 → -6,0,0 | pendente de revisão visual |
+| fly | 24 | tail_2 / rot | 0 → -10,0,0; 8 → 2,0,0; 15 → 12,0,0; 21 → -4,0,0; 24 → -10,0,0 | pendente de revisão visual |
+| fly | 24 | tail_3 / rot | 0 → -8,0,0; 10 → -4,0,0; 18 → 14,0,0; 24 → -8,0,0 | pendente de revisão visual |
+| fly | 24 | tail_4 / rot | 0 → -4,0,0; 12 → -8,0,0; 20 → 16,0,0; 24 → -4,0,0 | pendente de revisão visual |
+| fly | 24 | torso / pos | 0 → 0,-1.0,0; 6 → 0,-0.4,0; 12 → 0,1.2,0; 16 → 0,1.8,0; 20 → 0,0.2,0; 24 → 0,-1.0,0 | pendente de revisão visual |
+| takeoff | 16 | torso / rot | 0 → 0,0,0; 4 → 10,0,0; 8 → -4,0,0; 12 → -18,0,0; 16 → -10,0,0 | pendente de revisão visual |
+| takeoff | 16 | neck_base / rot | 0 → 0,0,0; 4 → 14,0,0; 8 → -6,0,0; 12 → -12,0,0; 16 → -6,0,0 | pendente de revisão visual |
+| takeoff | 16 | neck_mid / rot | 0 → 0,0,0; 4 → 6,0,0; 12 → -6,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| takeoff | 16 | head / rot | 0 → 0,0,0; 4 → -8,0,0; 12 → 10,0,0; 16 → 4,0,0 | pendente de revisão visual |
+| takeoff | 16 | tail_1 / rot | 0 → 0,0,0; 4 → -8,0,0; 12 → 18,0,0; 16 → 10,0,0 | pendente de revisão visual |
+| takeoff | 16 | tail_2 / rot | 0 → 0,0,0; 6 → -10,0,0; 14 → 16,0,0; 16 → 8,0,0 | pendente de revisão visual |
+| takeoff | 16 | tail_3 / rot | 0 → 0,0,0; 8 → -8,0,0; 16 → 12,0,0 | pendente de revisão visual |
+| takeoff | 16 | left_wing_upper / rot | 0 → 0,0,0; 4 → 0,35,-20; 8 → -10,68,-48; 12 → 8,74,52; 16 → -6,60,-32 | pendente de revisão visual |
+| takeoff | 16 | left_wing_forearm / rot | 0 → 0,0,0; 4 → 0,18,10; 8 → 0,-18,12; 12 → 0,-18,-20; 16 → 0,-12,8 | pendente de revisão visual |
+| takeoff | 16 | left_wing_tip / rot | 0 → 0,0,0; 6 → 0,10,12; 10 → 0,-18,10; 13 → 0,-16,-22; 16 → 0,-12,12 | pendente de revisão visual |
+| takeoff | 16 | left_front_upper / rot | 0 → 0,0,0; 4 → -32,0,0; 9 → -10,0,0; 16 → -48,0,0 | pendente de revisão visual |
+| takeoff | 16 | left_front_lower / rot | 0 → 0,0,0; 4 → 48,0,0; 9 → 18,0,0; 16 → 72,0,0 | pendente de revisão visual |
+| takeoff | 16 | left_hind_upper / rot | 0 → 0,0,0; 4 → -38,0,0; 9 → 36,0,0; 16 → 42,0,0 | pendente de revisão visual |
+| takeoff | 16 | left_hind_lower / rot | 0 → 0,0,0; 4 → 58,0,0; 9 → -12,0,0; 16 → 28,0,0 | pendente de revisão visual |
+| takeoff | 16 | right_wing_upper / rot | 0 → 0,0,0; 4 → 0,-35,20; 8 → -10,-68,48; 12 → 8,-74,-52; 16 → -6,-60,32 | pendente de revisão visual |
+| takeoff | 16 | right_wing_forearm / rot | 0 → 0,0,0; 4 → 0,-18,-10; 8 → 0,18,-12; 12 → 0,18,20; 16 → 0,12,-8 | pendente de revisão visual |
+| takeoff | 16 | right_wing_tip / rot | 0 → 0,0,0; 6 → 0,-10,-12; 10 → 0,18,-10; 13 → 0,16,22; 16 → 0,12,-12 | pendente de revisão visual |
+| takeoff | 16 | right_front_upper / rot | 0 → 0,0,0; 4 → -32,0,0; 9 → -10,0,0; 16 → -48,0,0 | pendente de revisão visual |
+| takeoff | 16 | right_front_lower / rot | 0 → 0,0,0; 4 → 48,0,0; 9 → 18,0,0; 16 → 72,0,0 | pendente de revisão visual |
+| takeoff | 16 | right_hind_upper / rot | 0 → 0,0,0; 4 → -38,0,0; 9 → 36,0,0; 16 → 42,0,0 | pendente de revisão visual |
+| takeoff | 16 | right_hind_lower / rot | 0 → 0,0,0; 4 → 58,0,0; 9 → -12,0,0; 16 → 28,0,0 | pendente de revisão visual |
+| takeoff | 16 | torso / pos | 0 → 0,0,0; 4 → 0,-1.8,0; 9 → 0,1.2,0; 16 → 0,2.2,0 | pendente de revisão visual |
+| land | 16 | torso / rot | 0 → -14,0,0; 4 → -24,0,0; 8 → -10,0,0; 11 → 10,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | neck_base / rot | 0 → -8,0,0; 4 → 16,0,0; 8 → 8,0,0; 11 → 12,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | neck_mid / rot | 0 → 0,0,0; 4 → 8,0,0; 11 → -4,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | head / rot | 0 → 6,0,0; 4 → -12,0,0; 11 → -6,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | tail_1 / rot | 0 → 10,0,0; 4 → 22,0,0; 9 → 12,0,0; 12 → -6,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | tail_2 / rot | 0 → 8,0,0; 5 → 18,0,0; 12 → -8,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | tail_3 / rot | 0 → 6,0,0; 6 → 14,0,0; 13 → -6,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | left_wing_upper / rot | 0 → -6,65,-30; 4 → 18,74,-18; 8 → 12,62,26; 12 → 4,28,-8; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | left_wing_forearm / rot | 0 → 0,-16,0; 4 → 0,-22,-10; 8 → 0,12,-16; 12 → 0,16,-8; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | left_wing_tip / rot | 0 → 0,-14,0; 5 → 0,-18,-12; 10 → 0,10,-12; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | left_front_upper / rot | 0 → -46,0,0; 5 → -28,0,0; 9 → -18,0,0; 12 → -24,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | left_front_lower / rot | 0 → 68,0,0; 5 → 20,0,0; 9 → 14,0,0; 12 → 42,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | left_hind_upper / rot | 0 → 36,0,0; 5 → -36,0,0; 9 → -20,0,0; 12 → -30,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | left_hind_lower / rot | 0 → 24,0,0; 5 → 26,0,0; 9 → 18,0,0; 12 → 48,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | right_wing_upper / rot | 0 → -6,-65,30; 4 → 18,-74,18; 8 → 12,-62,-26; 12 → 4,-28,8; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | right_wing_forearm / rot | 0 → 0,16,0; 4 → 0,22,10; 8 → 0,-12,16; 12 → 0,-16,8; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | right_wing_tip / rot | 0 → 0,14,0; 5 → 0,18,12; 10 → 0,-10,12; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | right_front_upper / rot | 0 → -46,0,0; 5 → -28,0,0; 9 → -18,0,0; 12 → -24,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | right_front_lower / rot | 0 → 68,0,0; 5 → 20,0,0; 9 → 14,0,0; 12 → 42,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | right_hind_upper / rot | 0 → 36,0,0; 5 → -36,0,0; 9 → -20,0,0; 12 → -30,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | right_hind_lower / rot | 0 → 24,0,0; 5 → 26,0,0; 9 → 18,0,0; 12 → 48,0,0; 16 → 0,0,0 | pendente de revisão visual |
+| land | 16 | torso / pos | 0 → 0,1.4,0; 5 → 0,0.8,0; 9 → 0,-0.4,0; 12 → 0,-1.8,0; 16 → 0,0,0 | pendente de revisão visual |
 | fire_windup | 12 | torso / rot | 0 → 0,0,0; 12 → -7,0,0 | pendente de revisão visual |
 | fire_windup | 12 | neck_base / rot | 0 → 0,0,0; 12 → -12,0,0 | pendente de revisão visual |
 | fire_windup | 12 | neck_mid / rot | 0 → 0,0,0; 12 → 8,0,0 | pendente de revisão visual |
@@ -102,21 +138,37 @@ Rotações: deltas x/y/z em graus em relação ao bind pose; `KeyframeAnimations
 | death | 20 | tail_2 / rot | 0 → 0,0,0; 20 → 0,-15,0 | pendente de revisão visual |
 | death | 20 | torso / pos | 0 → 0,0,0; 20 → 0,-2,0 | pendente de revisão visual |
 | sit | 12 | torso / rot | 0 → 0,0,0; 12 → -12,0,0 | pendente de revisão visual |
-| sit | 12 | left_hind_upper / rot | 0 → 0,0,0; 12 → -50,0,0 | pendente de revisão visual |
-| sit | 12 | right_hind_upper / rot | 0 → 0,0,0; 12 → -50,0,0 | pendente de revisão visual |
-| sit | 12 | left_hind_lower / rot | 0 → 0,0,0; 12 → 70,0,0 | pendente de revisão visual |
-| sit | 12 | right_hind_lower / rot | 0 → 0,0,0; 12 → 70,0,0 | pendente de revisão visual |
+| sit | 12 | left_hind_upper / rot | 0 → 0,0,0; 12 → -52,0,0 | pendente de revisão visual |
+| sit | 12 | right_hind_upper / rot | 0 → 0,0,0; 12 → -52,0,0 | pendente de revisão visual |
+| sit | 12 | left_hind_lower / rot | 0 → 0,0,0; 12 → 74,0,0 | pendente de revisão visual |
+| sit | 12 | right_hind_lower / rot | 0 → 0,0,0; 12 → 74,0,0 | pendente de revisão visual |
+| sit | 12 | left_hind_foot / rot | 0 → 0,0,0; 12 → -22,0,0 | pendente de revisão visual |
+| sit | 12 | right_hind_foot / rot | 0 → 0,0,0; 12 → -22,0,0 | pendente de revisão visual |
+| sit | 12 | left_front_upper / rot | 0 → 0,0,0; 12 → 10,0,0 | pendente de revisão visual |
+| sit | 12 | right_front_upper / rot | 0 → 0,0,0; 12 → 10,0,0 | pendente de revisão visual |
 | sit | 12 | neck_base / rot | 0 → 0,0,0; 12 → 12,0,0 | pendente de revisão visual |
-| sit | 12 | tail_1 / rot | 0 → 0,0,0; 12 → 12,0,0 | pendente de revisão visual |
-| sit | 12 | torso / pos | 0 → 0,0,0; 12 → 0,-1,0 | pendente de revisão visual |
+| sit | 12 | neck_mid / rot | 0 → 0,0,0; 12 → -4,0,0 | pendente de revisão visual |
+| sit | 12 | tail_1 / rot | 0 → 0,0,0; 12 → 10,20,0 | pendente de revisão visual |
+| sit | 12 | tail_2 / rot | 0 → 0,0,0; 12 → 4,24,0 | pendente de revisão visual |
+| sit | 12 | tail_3 / rot | 0 → 0,0,0; 12 → 0,22,0 | pendente de revisão visual |
+| sit | 12 | tail_4 / rot | 0 → 0,0,0; 12 → -2,16,0 | pendente de revisão visual |
+| sit | 12 | torso / pos | 0 → 0,0,0; 12 → 0,-1.2,0 | pendente de revisão visual |
 | stand | 12 | torso / rot | 0 → -12,0,0; 12 → 0,0,0 | pendente de revisão visual |
-| stand | 12 | left_hind_upper / rot | 0 → -50,0,0; 12 → 0,0,0 | pendente de revisão visual |
-| stand | 12 | right_hind_upper / rot | 0 → -50,0,0; 12 → 0,0,0 | pendente de revisão visual |
-| stand | 12 | left_hind_lower / rot | 0 → 70,0,0; 12 → 0,0,0 | pendente de revisão visual |
-| stand | 12 | right_hind_lower / rot | 0 → 70,0,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | left_hind_upper / rot | 0 → -52,0,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | right_hind_upper / rot | 0 → -52,0,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | left_hind_lower / rot | 0 → 74,0,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | right_hind_lower / rot | 0 → 74,0,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | left_hind_foot / rot | 0 → -22,0,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | right_hind_foot / rot | 0 → -22,0,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | left_front_upper / rot | 0 → 10,0,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | right_front_upper / rot | 0 → 10,0,0; 12 → 0,0,0 | pendente de revisão visual |
 | stand | 12 | neck_base / rot | 0 → 12,0,0; 12 → 0,0,0 | pendente de revisão visual |
-| stand | 12 | tail_1 / rot | 0 → 12,0,0; 12 → 0,0,0 | pendente de revisão visual |
-| stand | 12 | torso / pos | 0 → 0,-1,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | neck_mid / rot | 0 → -4,0,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | tail_1 / rot | 0 → 10,20,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | tail_2 / rot | 0 → 4,24,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | tail_3 / rot | 0 → 0,22,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | tail_4 / rot | 0 → -2,16,0; 12 → 0,0,0 | pendente de revisão visual |
+| stand | 12 | torso / pos | 0 → 0,-1.2,0; 12 → 0,0,0 | pendente de revisão visual |
 | shoulder | 40 | torso / rot | 0 → 6,-10,-8; 20 → 7,-10,-8; 40 → 6,-10,-8 | pendente de revisão visual |
 | shoulder | 40 | neck_base / rot | 0 → 12,-18,6; 40 → 12,-18,6 | pendente de revisão visual |
 | shoulder | 40 | neck_mid / rot | 0 → 6,-12,0; 20 → 7,-12,0; 40 → 6,-12,0 | pendente de revisão visual |
@@ -157,16 +209,78 @@ Rotações: deltas x/y/z em graus em relação ao bind pose; `KeyframeAnimations
 | imitate_wings | 40 | right_wing_upper / rot | 0 → 0,0,0; 26.0 → 0,-45,25; 40 → 0,0,0 | pendente de revisão visual |
 | imitate_wings | 40 | head / rot | 0 → 0,0,0; 20.0 → -5,0,8; 40 → 0,0,0 | pendente de revisão visual |
 | rest_together | 100 | torso / rot | 0 → 0,0,0; 30 → -12,0,0; 100 → -12,0,0 | pendente de revisão visual |
-| rest_together | 100 | left_hind_upper / rot | 0 → 0,0,0; 30 → -50,0,0; 100 → -50,0,0 | pendente de revisão visual |
-| rest_together | 100 | right_hind_upper / rot | 0 → 0,0,0; 30 → -50,0,0; 100 → -50,0,0 | pendente de revisão visual |
-| rest_together | 100 | left_hind_lower / rot | 0 → 0,0,0; 30 → 70,0,0; 100 → 70,0,0 | pendente de revisão visual |
-| rest_together | 100 | right_hind_lower / rot | 0 → 0,0,0; 30 → 70,0,0; 100 → 70,0,0 | pendente de revisão visual |
+| rest_together | 100 | left_hind_upper / rot | 0 → 0,0,0; 30 → -52,0,0; 100 → -52,0,0 | pendente de revisão visual |
+| rest_together | 100 | right_hind_upper / rot | 0 → 0,0,0; 30 → -52,0,0; 100 → -52,0,0 | pendente de revisão visual |
+| rest_together | 100 | left_hind_lower / rot | 0 → 0,0,0; 30 → 74,0,0; 100 → 74,0,0 | pendente de revisão visual |
+| rest_together | 100 | right_hind_lower / rot | 0 → 0,0,0; 30 → 74,0,0; 100 → 74,0,0 | pendente de revisão visual |
+| rest_together | 100 | left_hind_foot / rot | 0 → 0,0,0; 30 → -22,0,0; 100 → -22,0,0 | pendente de revisão visual |
+| rest_together | 100 | right_hind_foot / rot | 0 → 0,0,0; 30 → -22,0,0; 100 → -22,0,0 | pendente de revisão visual |
+| rest_together | 100 | left_front_upper / rot | 0 → 0,0,0; 30 → 10,0,0; 100 → 10,0,0 | pendente de revisão visual |
+| rest_together | 100 | right_front_upper / rot | 0 → 0,0,0; 30 → 10,0,0; 100 → 10,0,0 | pendente de revisão visual |
 | rest_together | 100 | neck_base / rot | 0 → 0,0,0; 30 → 25,0,0; 100 → 25,0,0 | pendente de revisão visual |
+| rest_together | 100 | neck_mid / rot | 0 → 0,0,0; 30 → -4,0,0; 100 → -4,0,0 | pendente de revisão visual |
 | rest_together | 100 | tail_1 / rot | 0 → 0,0,0; 30 → 0,25,0; 100 → 0,25,0 | pendente de revisão visual |
-| rest_together | 100 | head / rot | 0 → 0,0,0; 30 → 15,0,-10; 100 → 15,0,-10 | pendente de revisão visual |
 | rest_together | 100 | tail_2 / rot | 0 → 0,0,0; 30 → 0,25,0; 100 → 0,25,0 | pendente de revisão visual |
 | rest_together | 100 | tail_3 / rot | 0 → 0,0,0; 30 → 0,20,0; 100 → 0,20,0 | pendente de revisão visual |
+| rest_together | 100 | tail_4 / rot | 0 → 0,0,0; 30 → -2,16,0; 100 → -2,16,0 | pendente de revisão visual |
+| rest_together | 100 | head / rot | 0 → 0,0,0; 30 → 15,0,-10; 100 → 15,0,-10 | pendente de revisão visual |
 | rest_together | 100 | torso / pos | 0 → 0,0,0; 30 → 0,-1.3,0; 100 → 0,-1.3,0 | pendente de revisão visual |
+| bite_windup | 8 | torso / rot | 0 → 0,0,0; 8 → -6,0,0 | pendente de revisão visual |
+| bite_windup | 8 | neck_base / rot | 0 → 0,0,0; 8 → -18,0,0 | pendente de revisão visual |
+| bite_windup | 8 | neck_mid / rot | 0 → 0,0,0; 8 → -10,0,0 | pendente de revisão visual |
+| bite_windup | 8 | head / rot | 0 → 0,0,0; 8 → -10,0,0 | pendente de revisão visual |
+| bite_windup | 8 | jaw / rot | 0 → 0,0,0; 8 → 36,0,0 | pendente de revisão visual |
+| bite_windup | 8 | tail_1 / rot | 0 → 0,0,0; 8 → 10,0,0 | pendente de revisão visual |
+| bite_windup | 8 | torso / pos | 0 → 0,0,0; 8 → 0,0,0.9 | pendente de revisão visual |
+| bite_strike | 4 | torso / rot | 0 → -6,0,0; 4 → 8,0,0 | pendente de revisão visual |
+| bite_strike | 4 | neck_base / rot | 0 → -18,0,0; 4 → 20,0,0 | pendente de revisão visual |
+| bite_strike | 4 | neck_mid / rot | 0 → -10,0,0; 4 → 14,0,0 | pendente de revisão visual |
+| bite_strike | 4 | head / rot | 0 → -10,0,0; 4 → 6,0,0 | pendente de revisão visual |
+| bite_strike | 4 | jaw / rot | 0 → 36,0,0; 4 → 2,0,0 | pendente de revisão visual |
+| bite_strike | 4 | tail_1 / rot | 0 → 10,0,0; 4 → -8,0,0 | pendente de revisão visual |
+| bite_strike | 4 | torso / pos | 0 → 0,0,0.9; 4 → 0,-0.4,-1.4 | pendente de revisão visual |
+| bite_recovery | 8 | torso / rot | 0 → 8,0,0; 8 → 0,0,0 | pendente de revisão visual |
+| bite_recovery | 8 | neck_base / rot | 0 → 20,0,0; 8 → 0,0,0 | pendente de revisão visual |
+| bite_recovery | 8 | neck_mid / rot | 0 → 14,0,0; 8 → 0,0,0 | pendente de revisão visual |
+| bite_recovery | 8 | head / rot | 0 → 6,0,0; 8 → 0,0,0 | pendente de revisão visual |
+| bite_recovery | 8 | jaw / rot | 0 → 2,0,0; 8 → 0,0,0 | pendente de revisão visual |
+| bite_recovery | 8 | tail_1 / rot | 0 → -8,0,0; 8 → 0,0,0 | pendente de revisão visual |
+| bite_recovery | 8 | torso / pos | 0 → 0,-0.4,-1.4; 8 → 0,0,0 | pendente de revisão visual |
+| breath_windup | 10 | torso / rot | 0 → 0,0,0; 10 → -8,0,0 | pendente de revisão visual |
+| breath_windup | 10 | neck_base / rot | 0 → 0,0,0; 10 → -14,0,0 | pendente de revisão visual |
+| breath_windup | 10 | neck_mid / rot | 0 → 0,0,0; 10 → 10,0,0 | pendente de revisão visual |
+| breath_windup | 10 | head / rot | 0 → 0,0,0; 10 → -6,0,0 | pendente de revisão visual |
+| breath_windup | 10 | jaw / rot | 0 → 0,0,0; 10 → 28,0,0 | pendente de revisão visual |
+| breath_windup | 10 | left_wing_upper / rot | 0 → 0,0,0; 10 → 0,45,-20 | pendente de revisão visual |
+| breath_windup | 10 | right_wing_upper / rot | 0 → 0,0,0; 10 → 0,-45,20 | pendente de revisão visual |
+| breath_windup | 10 | tail_1 / rot | 0 → 0,0,0; 10 → 10,0,0 | pendente de revisão visual |
+| breath_windup | 10 | torso / pos | 0 → 0,0,0; 10 → 0,-0.4,0.8 | pendente de revisão visual |
+| breath_active | 24 | torso / rot | 0 → -4,0,0; 12 → -4,0,0; 24 → -4,0,0 | pendente de revisão visual |
+| breath_active | 24 | neck_base / rot | 0 → 6,-14,0; 12 → 6,14,0; 24 → 6,-10,0 | pendente de revisão visual |
+| breath_active | 24 | neck_mid / rot | 0 → -4,-10,0; 12 → -4,10,0; 24 → -4,-6,0 | pendente de revisão visual |
+| breath_active | 24 | head / rot | 0 → -4,-12,0; 12 → -4,12,0; 24 → -4,-8,0 | pendente de revisão visual |
+| breath_active | 24 | jaw / rot | 0 → 34,0,0; 12 → 32,0,0; 24 → 30,0,0 | pendente de revisão visual |
+| breath_active | 24 | left_wing_upper / rot | 0 → 0,50,-22; 12 → 0,55,-18; 24 → 0,50,-22 | pendente de revisão visual |
+| breath_active | 24 | right_wing_upper / rot | 0 → 0,-50,22; 12 → 0,-55,18; 24 → 0,-50,22 | pendente de revisão visual |
+| breath_active | 24 | tail_1 / rot | 0 → 0,12,0; 12 → 0,-12,0; 24 → 0,10,0 | pendente de revisão visual |
+| breath_active | 24 | torso / pos | 0 → 0,-0.2,-0.3; 24 → 0,-0.2,-0.3 | pendente de revisão visual |
+| breath_recovery | 10 | torso / rot | 0 → -4,0,0; 10 → 0,0,0 | pendente de revisão visual |
+| breath_recovery | 10 | neck_base / rot | 0 → 6,-10,0; 10 → 0,0,0 | pendente de revisão visual |
+| breath_recovery | 10 | neck_mid / rot | 0 → -4,-6,0; 10 → 0,0,0 | pendente de revisão visual |
+| breath_recovery | 10 | head / rot | 0 → -4,-8,0; 10 → 0,0,0 | pendente de revisão visual |
+| breath_recovery | 10 | jaw / rot | 0 → 30,0,0; 10 → 0,0,0 | pendente de revisão visual |
+| breath_recovery | 10 | left_wing_upper / rot | 0 → 0,50,-22; 10 → 0,0,0 | pendente de revisão visual |
+| breath_recovery | 10 | right_wing_upper / rot | 0 → 0,-50,22; 10 → 0,0,0 | pendente de revisão visual |
+| breath_recovery | 10 | tail_1 / rot | 0 → 0,10,0; 10 → 0,0,0 | pendente de revisão visual |
+| breath_recovery | 10 | torso / pos | 0 → 0,-0.2,-0.3; 10 → 0,0,0 | pendente de revisão visual |
+| growl | 24 | torso / rot | 0 → 0,0,0; 12.0 → 8,0,0; 24 → 0,0,0 | pendente de revisão visual |
+| growl | 24 | neck_base / rot | 0 → 0,0,0; 12.0 → 14,0,0; 24 → 0,0,0 | pendente de revisão visual |
+| growl | 24 | head / rot | 0 → 0,0,0; 6 → -10,8,0; 14 → -10,-8,0; 24 → 0,0,0 | pendente de revisão visual |
+| growl | 24 | jaw / rot | 0 → 0,0,0; 6 → 26,0,0; 18 → 22,0,0; 24 → 0,0,0 | pendente de revisão visual |
+| growl | 24 | left_wing_upper / rot | 0 → 0,0,0; 12.0 → 0,38,-22; 24 → 0,0,0 | pendente de revisão visual |
+| growl | 24 | right_wing_upper / rot | 0 → 0,0,0; 12.0 → 0,-38,22; 24 → 0,0,0 | pendente de revisão visual |
+| growl | 24 | tail_1 / rot | 0 → 0,0,0; 12 → 0,14,0; 24 → 0,0,0 | pendente de revisão visual |
+| growl | 24 | torso / pos | 0 → 0,0,0; 12.0 → 0,-0.8,0; 24 → 0,0,0 | pendente de revisão visual |
 
 ## Ombro: referência enrolada
 
