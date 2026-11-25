@@ -31,7 +31,11 @@ public enum FireDragonAnimation {
     BREATH_WINDUP(10, false),
     BREATH_ACTIVE(24, false),
     BREATH_RECOVERY(10, false),
-    GROWL(24, false);
+    GROWL(24, false),
+    CLAW_WINDUP(8, false),
+    CLAW_STRIKE(6, false),
+    CLAW_RECOVERY(8, false),
+    ROAR(28, false);
     public final int ticks;
     public final boolean looping;
     FireDragonAnimation(int ticks, boolean looping) { this.ticks = ticks; this.looping = looping; }

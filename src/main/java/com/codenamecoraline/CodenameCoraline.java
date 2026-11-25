@@ -2,6 +2,7 @@ package com.codenamecoraline;
 
 import com.codenamecoraline.registry.ModCreativeTabs;
 import com.codenamecoraline.registry.ModEffects;
+import com.codenamecoraline.registry.ModMenus;
 import com.codenamecoraline.registry.ModPotions;
 import com.codenamecoraline.registry.ModEntities;
 import com.codenamecoraline.registry.ModItems;
@@ -28,6 +29,7 @@ public final class CodenameCoraline {
         ModPotions.register(modEventBus);
         ModEntities.register(modEventBus);
         ModItems.register(modEventBus);
+        ModMenus.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         LOGGER.info("{} loaded (entities, companions, effects and Bestiary registered)", MOD_ID);
     }

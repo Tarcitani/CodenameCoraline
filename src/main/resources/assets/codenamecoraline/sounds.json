@@ -2195,5 +2195,19 @@
       { "name": "minecraft:entity.fox.screech", "type": "event", "pitch": 0.55, "volume": 0.75 },
       { "name": "minecraft:block.lava.pop", "type": "event", "pitch": 0.7, "volume": 0.5 }
     ]
+  },
+  "entity.fire_dragon.roar": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.roar",
+    "sounds": [
+      { "name": "minecraft:entity.ravager.roar", "type": "event", "pitch": 0.52, "volume": 1.0 },
+      { "name": "minecraft:entity.blaze.death", "type": "event", "pitch": 0.48, "volume": 0.9 }
+    ]
+  },
+  "entity.fire_dragon.claw": {
+    "subtitle": "subtitles.codenamecoraline.entity.fire_dragon.claw",
+    "sounds": [
+      { "name": "minecraft:entity.player.attack.sweep", "type": "event", "pitch": 0.65, "volume": 0.9 },
+      { "name": "minecraft:entity.evoker_fangs.attack", "type": "event", "pitch": 0.85, "volume": 0.75 }
+    ]
   }
 }

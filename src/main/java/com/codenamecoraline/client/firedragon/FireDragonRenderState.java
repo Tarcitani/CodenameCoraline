@@ -7,6 +7,8 @@ import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 public final class FireDragonRenderState extends LivingEntityRenderState {
     public int colorCode = 70;
     public boolean young;
+    public boolean adult;
+    public boolean saddled;
     public boolean airborne;
     public boolean sitting;
     public boolean perched;

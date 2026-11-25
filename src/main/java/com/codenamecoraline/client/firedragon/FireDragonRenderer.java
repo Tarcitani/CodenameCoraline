@@ -11,6 +11,7 @@ public final class FireDragonRenderer extends MobRenderer<FireDragon, FireDragon
     private static final double FIRST_PERSON_SHOULDER_ANCHOR_HEIGHT = 10.0 / 16.0;
     private static final Identifier[] SKINS = new Identifier[125];
     private static final Identifier[] YOUNG_SKINS = new Identifier[125];
+    private static final Identifier[] ADULT_SKINS = new Identifier[125];
     static {
         for (int p = 0; p < 5; p++) for (int s = 0; s < 5; s++) for (int a = 0; a < 5; a++) {
             int idx = p * 25 + s * 5 + a;
@@ -18,27 +19,32 @@ public final class FireDragonRenderer extends MobRenderer<FireDragon, FireDragon
                     "textures/entity/fire_dragon/" + p + "_" + s + "_" + a + ".png");
             YOUNG_SKINS[idx] = Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID,
                     "textures/entity/fire_dragon/young/" + p + "_" + s + "_" + a + ".png");
+            ADULT_SKINS[idx] = Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID,
+                    "textures/entity/fire_dragon/adult/" + p + "_" + s + "_" + a + ".png");
         }
     }
     private final FireDragonModel babyModel;
     private final FireDragonModel youngModel;
+    private final FireDragonModel adultModel;
 
     public FireDragonRenderer(EntityRendererProvider.Context context) {
         super(context, new FireDragonModel(context.bakeLayer(FireDragonModel.LAYER)), 0.3F);
         this.babyModel = this.model;
         this.youngModel = new FireDragonModel(context.bakeLayer(FireDragonModel.YOUNG_LAYER));
-        addLayer(new FireDragonEyesLayer(this, false));
-        addLayer(new FireDragonEyesLayer(this, true));
+        this.adultModel = new FireDragonModel(context.bakeLayer(FireDragonModel.ADULT_LAYER));
+        addLayer(new FireDragonEyesLayer(this, FireDragon.Stage.BABY));
+        addLayer(new FireDragonEyesLayer(this, FireDragon.Stage.YOUNG));
+        addLayer(new FireDragonEyesLayer(this, FireDragon.Stage.ADULT));
     }
     @Override public FireDragonRenderState createRenderState() { return new FireDragonRenderState(); }
     @Override public Identifier getTextureLocation(FireDragonRenderState state) {
-        return state.young ? YOUNG_SKINS[state.colorCode] : SKINS[state.colorCode];
+        return state.adult ? ADULT_SKINS[state.colorCode] : state.young ? YOUNG_SKINS[state.colorCode] : SKINS[state.colorCode];
     }
     @Override public void submit(FireDragonRenderState state, com.mojang.blaze3d.vertex.PoseStack poseStack,
             net.minecraft.client.renderer.SubmitNodeCollector submitNodeCollector,
             net.minecraft.client.renderer.state.level.CameraRenderState cameraRenderState) {
-        this.model = state.young ? this.youngModel : this.babyModel;
-        this.shadowRadius = state.young ? 0.55F : 0.3F;
+        this.model = state.adult ? this.adultModel : state.young ? this.youngModel : this.babyModel;
+        this.shadowRadius = state.adult ? 1.2F : state.young ? 0.55F : 0.3F;
         super.submit(state, poseStack, submitNodeCollector, cameraRenderState);
     }
     @Override public net.minecraft.world.phys.Vec3 getRenderOffset(FireDragonRenderState state) {
@@ -50,6 +56,9 @@ public final class FireDragonRenderer extends MobRenderer<FireDragon, FireDragon
         state.hurtTicks = Math.max(0, entity.hurtTime - partialTick);
         state.colorCode = entity.getColorCode();
         state.young = entity.isYoung();
+        state.adult = entity.isAdult();
+        state.saddled = entity.isSaddled();
+        if (state.adult) state.scale *= 1.38F;
         state.airborne = !entity.onGround() && !entity.isInWater();
         state.perched = entity.isOnShoulder();
         state.shoulderSide = entity.getShoulderSide();

@@ -34,8 +34,8 @@ final class FireDragonAnimController {
         // Adult params reserved for when Stage.ADULT is added to FireDragon.
         static final StageParams ADULT = new StageParams(0.20F, 1.16F, 1.45F, 0.85F, 0.90F, 0.12F, 0.14F, 0.55F);
 
-        static StageParams of(boolean young) {
-            return young ? YOUNG : BABY;
+        static StageParams of(boolean young, boolean adult) {
+            return adult ? ADULT : young ? YOUNG : BABY;
         }
     }
 
@@ -56,7 +56,7 @@ final class FireDragonAnimController {
         final float[] neckYawLag = new float[3];
         float[] prevX, prevY, prevZ, prevXR, prevYR, prevZR;
         boolean hasPrevPose;
-        boolean prevYoung;
+        int prevStageOrdinal = -1;
     }
 
     static ClientState stateFor(FireDragon entity) {
@@ -69,12 +69,13 @@ final class FireDragonAnimController {
         float age = entity.tickCount + partialTick;
         float dt = s.lastAge < 0.0F ? 0.0F : Mth.clamp(age - s.lastAge, 0.0F, 2.5F);
         s.lastAge = age;
-        if (s.prevYoung != out.young) {
+        int stageOrd = out.adult ? 2 : out.young ? 1 : 0;
+        if (s.prevStageOrdinal != stageOrd) {
             s.hasPrevPose = false;
-            s.prevYoung = out.young;
+            s.prevStageOrdinal = stageOrd;
         }
 
-        StageParams params = StageParams.of(out.young);
+        StageParams params = StageParams.of(out.young, out.adult);
         var vel = entity.getDeltaMovement();
         float horizSpeed = (float) Math.sqrt(vel.x * vel.x + vel.z * vel.z);
         float vertVel = (float) vel.y;
@@ -145,7 +146,7 @@ final class FireDragonAnimController {
     static void applyLocomotion(FireDragonModel.Rig r, FireDragonRenderState state) {
         ClientState s = state.animState;
         if (s == null) return;
-        StageParams p = StageParams.of(state.young);
+        StageParams p = StageParams.of(state.young, state.adult);
         float t = state.ageInTicks;
 
         float idleW = Mth.clamp(1.0F - s.walkWeight - s.runWeight - s.airWeight - s.sitWeight, 0.0F, 1.0F);

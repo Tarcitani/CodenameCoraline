@@ -18,8 +18,11 @@ public final class FireDragonModel extends EntityModel<FireDragonRenderState> {
             Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "fire_dragon"), "main");
     public static final ModelLayerLocation YOUNG_LAYER = new ModelLayerLocation(
             Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "fire_dragon"), "young");
+    public static final ModelLayerLocation ADULT_LAYER = new ModelLayerLocation(
+            Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "fire_dragon"), "adult");
     static final class Rig {
         final ModelPart torso, belly;
+        final @org.jspecify.annotations.Nullable ModelPart saddle;
         final ModelPart neckBase, neckMid, neckTop, head, jaw;
         final ModelPart leftWingUpper, leftWingForearm, leftWingTip;
         final ModelPart rightWingUpper, rightWingForearm, rightWingTip;
@@ -32,6 +35,7 @@ public final class FireDragonModel extends EntityModel<FireDragonRenderState> {
         Rig(ModelPart root) {
             var l = root.createPartLookup();
             torso = l.apply("torso"); belly = l.apply("belly");
+            saddle = torso.hasChild("saddle") ? torso.getChild("saddle") : null;
             neckBase = l.apply("neck_base"); neckMid = l.apply("neck_mid"); neckTop = l.apply("neck_top");
             head = l.apply("head"); jaw = l.apply("jaw");
             leftWingUpper = l.apply("left_wing_upper"); leftWingForearm = l.apply("left_wing_forearm"); leftWingTip = l.apply("left_wing_tip");
@@ -61,6 +65,7 @@ public final class FireDragonModel extends EntityModel<FireDragonRenderState> {
 
     public static LayerDefinition createBodyLayer() { return FireDragonGeometry.createBodyLayer(); }
     public static LayerDefinition createYoungBodyLayer() { return FireDragonYoungGeometry.createBodyLayer(); }
+    public static LayerDefinition createAdultBodyLayer() { return FireDragonAdultGeometry.createBodyLayer(); }
 
     /** Shared by the real renderer and the offline exporter; no alternate preview geometry. */
     public void applyPose(FireDragonAnimation clip, float ticks) {
@@ -71,6 +76,7 @@ public final class FireDragonModel extends EntityModel<FireDragonRenderState> {
     @Override
     public void setupAnim(FireDragonRenderState state) {
         super.setupAnim(state);
+        if (rig.saddle != null) rig.saddle.visible = state.saddled;
         if (state.preview) { applyPose(state.clip, state.clipTicks); return; }
         if (state.deathTime > 0) { applyPose(FireDragonAnimation.DEATH, state.deathTime); return; }
         if (state.perched) {

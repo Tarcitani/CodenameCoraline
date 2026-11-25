@@ -4,12 +4,20 @@ import com.codenamecoraline.CodenameCoraline;
 import com.codenamecoraline.registry.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.level.storage.ValueInput;
@@ -36,7 +44,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jspecify.annotations.Nullable;
 
-/** Baby and Young Fire Dragon entity sharing persistent UUID, owner, colors and server-authoritative companion AI. */
+/** Baby, Young and Adult Fire Dragon entity sharing persistent UUID, owner, colors, 10-slot saddle chest and aerial mount. */
 public final class FireDragon extends TamableAnimal {
     public static final float WIDTH = 0.55F;
     public static final float HEIGHT = 0.65F;
@@ -44,12 +52,18 @@ public final class FireDragon extends TamableAnimal {
     public static final float YOUNG_WIDTH = 1.0F;
     public static final float YOUNG_HEIGHT = 1.1F;
     public static final float YOUNG_EYE_HEIGHT = 0.95F;
+    public static final float ADULT_WIDTH = 2.2F;
+    public static final float ADULT_HEIGHT = 2.0F;
+    public static final float ADULT_EYE_HEIGHT = 1.7F;
     public static final int BABY_GROWTH_TICKS = 72000;
     public static final int YOUNG_GROWTH_TICKS = 144000;
     private static final EntityDimensions BABY_DIMENSIONS = EntityDimensions.scalable(WIDTH, HEIGHT).withEyeHeight(EYE_HEIGHT);
     private static final EntityDimensions YOUNG_DIMENSIONS = EntityDimensions.scalable(YOUNG_WIDTH, YOUNG_HEIGHT).withEyeHeight(YOUNG_EYE_HEIGHT);
+    private static final EntityDimensions ADULT_DIMENSIONS = EntityDimensions.scalable(ADULT_WIDTH, ADULT_HEIGHT).withEyeHeight(ADULT_EYE_HEIGHT);
+    private static final Identifier MOUNT_CAMERA_ID = Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "dragon_mount_camera");
+    private static final AttributeModifier MOUNT_CAMERA_MOD = new AttributeModifier(MOUNT_CAMERA_ID, 4.0D, AttributeModifier.Operation.ADD_VALUE);
 
-    public enum Stage { BABY, YOUNG }
+    public enum Stage { BABY, YOUNG, ADULT }
     private static final Stage[] STAGES = Stage.values();
 
     public enum State { WILD_IDLE, FOLLOWING, SITTING, SHOULDER, HUNTING, DEFENDING, SOCIAL }
@@ -57,7 +71,18 @@ public final class FireDragon extends TamableAnimal {
     private static final EntityDataAccessor<Integer> STAGE = SynchedEntityData.defineId(FireDragon.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> STATE = SynchedEntityData.defineId(FireDragon.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SHOULDER = SynchedEntityData.defineId(FireDragon.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> SADDLED = SynchedEntityData.defineId(FireDragon.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> ABILITY_COOLDOWNS = SynchedEntityData.defineId(FireDragon.class, EntityDataSerializers.INT);
     private final FireDragonCompanion companion = new FireDragonCompanion(this);
+    private final SimpleContainer dragonInventory = new SimpleContainer(FireDragonMenu.DRAGON_SLOTS) {
+        @Override
+        public void setChanged() {
+            super.setChanged();
+            syncSaddled();
+        }
+    };
+    private boolean riderAscend;
+    private boolean riderDescend;
     private int satiety = 100;
     private int hungerTicks;
     private int growthRemaining = BABY_GROWTH_TICKS;
@@ -65,9 +90,39 @@ public final class FireDragon extends TamableAnimal {
     public Stage getStage() { return STAGES[entityData.get(STAGE)]; }
     public boolean isBabyStage() { return getStage() == Stage.BABY; }
     public boolean isYoung() { return getStage() == Stage.YOUNG; }
+    public boolean isAdult() { return getStage() == Stage.ADULT; }
+    public boolean isSaddled() { return entityData.get(SADDLED); }
+    public SimpleContainer getDragonInventory() { return dragonInventory; }
+    public void syncSaddled() {
+        entityData.set(SADDLED, dragonInventory.getItem(FireDragonMenu.SADDLE_SLOT).is(Items.SADDLE));
+    }
+    void syncAbilityCooldowns(int meteor, int breath, int rend, int roar) {
+        int packed = (Math.clamp(meteor, 0, 255))
+                | (Math.clamp(breath, 0, 255) << 8)
+                | (Math.clamp(rend, 0, 255) << 16)
+                | (Math.clamp(roar, 0, 255) << 24);
+        if (entityData.get(ABILITY_COOLDOWNS) != packed) entityData.set(ABILITY_COOLDOWNS, packed);
+    }
+    public int getAbilityCooldown(int index) {
+        return (entityData.get(ABILITY_COOLDOWNS) >>> (index * 8)) & 0xFF;
+    }
+    public void setRiderVerticalInput(boolean ascend, boolean descend) {
+        this.riderAscend = ascend;
+        this.riderDescend = descend;
+    }
+    public void triggerMountedAbility(net.minecraft.server.level.ServerPlayer rider, int abilityIndex) {
+        if (isAdult() && isOwnedBy(rider)) companion.triggerMountedAbility(rider, abilityIndex);
+    }
+    public void toggleSitOrder() {
+        setOrderedToSit(!isOrderedToSit());
+        setInSittingPose(isOrderedToSit());
+        getNavigation().stop();
+        setTarget(null);
+    }
     public void setStage(Stage stage) {
         if (getStage() == stage) return;
         entityData.set(STAGE, stage.ordinal());
+        this.xpReward = stage == Stage.ADULT ? 25 : 0;
         applyStageAttributes(stage);
         refreshDimensions();
     }
@@ -79,15 +134,18 @@ public final class FireDragon extends TamableAnimal {
     void setShoulderSide(int side) { entityData.set(SHOULDER, side); }
     void setState(State state) { entityData.set(STATE, state.ordinal()); }
     public void feedSalmon() {
-        heal(isYoung() ? 6.0F : 4.0F);
+        heal(isAdult() ? 10.0F : isYoung() ? 6.0F : 4.0F);
         satiety = Math.min(100, satiety + 25);
-        if (growthRemaining > 0) {
+        if (!isAdult() && growthRemaining > 0) {
             growthRemaining = Math.max(0, growthRemaining - Math.max(1, (growthRemaining + 9) / 10));
         }
         playVisual(FireDragonAnimation.EAT);
-        playSound(ModSounds.FIRE_DRAGON_PURR.get(), 0.55F, isYoung() ? 0.85F : 1.05F);
+        playSound(ModSounds.FIRE_DRAGON_PURR.get(), 0.55F, isAdult() ? 0.72F : isYoung() ? 0.85F : 1.05F);
         companion.onFed();
-        if (!level().isClientSide() && isBabyStage() && growthRemaining <= 0) evolveToYoung();
+        if (!level().isClientSide()) {
+            if (isBabyStage() && growthRemaining <= 0) evolveToYoung();
+            else if (isYoung() && growthRemaining <= 0) evolveToAdult();
+        }
     }
 
     public boolean evolveToYoung() {
@@ -106,14 +164,56 @@ public final class FireDragon extends TamableAnimal {
         return true;
     }
 
+    public boolean evolveToAdult() {
+        if (!isYoung()) return false;
+        float ratio = getMaxHealth() > 0.0F ? getHealth() / getMaxHealth() : 1.0F;
+        setStage(Stage.ADULT);
+        setHealth(Math.min(getMaxHealth(), Math.max(1.0F, getMaxHealth() * ratio)));
+        growthRemaining = 0;
+        playVisual(FireDragonAnimation.ROAR);
+        playSound(ModSounds.FIRE_DRAGON_EVOLVE.get(), 1.1F, 0.78F);
+        playSound(ModSounds.FIRE_DRAGON_ROAR.get(), 1.0F, 0.9F);
+        if (level() instanceof ServerLevel sl) {
+            sl.sendParticles(ParticleTypes.FLAME, getX(), getY() + 1.0D, getZ(), 48, 0.9D, 0.8D, 0.9D, 0.14D);
+            sl.sendParticles(ParticleTypes.SMALL_FLAME, getX(), getY() + 1.0D, getZ(), 36, 1.0D, 0.85D, 1.0D, 0.16D);
+            sl.sendParticles(ParticleTypes.LARGE_SMOKE, getX(), getY() + 1.1D, getZ(), 20, 0.85D, 0.7D, 0.85D, 0.06D);
+        }
+        return true;
+    }
+
     private void applyStageAttributes(Stage stage) {
-        boolean young = stage == Stage.YOUNG;
-        setBaseAttr(Attributes.MAX_HEALTH, young ? 48.0D : 20.0D);
-        setBaseAttr(Attributes.ARMOR, young ? 5.0D : 2.0D);
-        setBaseAttr(Attributes.MOVEMENT_SPEED, young ? 0.28D : 0.25D);
-        setBaseAttr(Attributes.FLYING_SPEED, young ? 0.30D : 0.20D);
-        setBaseAttr(Attributes.ATTACK_DAMAGE, young ? 6.0D : 3.0D);
-        setBaseAttr(Attributes.FOLLOW_RANGE, young ? 24.0D : 16.0D);
+        switch (stage) {
+            case BABY -> {
+                setBaseAttr(Attributes.MAX_HEALTH, 20.0D);
+                setBaseAttr(Attributes.ARMOR, 2.0D);
+                setBaseAttr(Attributes.ARMOR_TOUGHNESS, 0.0D);
+                setBaseAttr(Attributes.KNOCKBACK_RESISTANCE, 0.0D);
+                setBaseAttr(Attributes.MOVEMENT_SPEED, 0.25D);
+                setBaseAttr(Attributes.FLYING_SPEED, 0.20D);
+                setBaseAttr(Attributes.ATTACK_DAMAGE, 3.0D);
+                setBaseAttr(Attributes.FOLLOW_RANGE, 16.0D);
+            }
+            case YOUNG -> {
+                setBaseAttr(Attributes.MAX_HEALTH, 48.0D);
+                setBaseAttr(Attributes.ARMOR, 5.0D);
+                setBaseAttr(Attributes.ARMOR_TOUGHNESS, 0.0D);
+                setBaseAttr(Attributes.KNOCKBACK_RESISTANCE, 0.15D);
+                setBaseAttr(Attributes.MOVEMENT_SPEED, 0.28D);
+                setBaseAttr(Attributes.FLYING_SPEED, 0.30D);
+                setBaseAttr(Attributes.ATTACK_DAMAGE, 6.0D);
+                setBaseAttr(Attributes.FOLLOW_RANGE, 24.0D);
+            }
+            case ADULT -> {
+                setBaseAttr(Attributes.MAX_HEALTH, 120.0D);
+                setBaseAttr(Attributes.ARMOR, 10.0D);
+                setBaseAttr(Attributes.ARMOR_TOUGHNESS, 4.0D);
+                setBaseAttr(Attributes.KNOCKBACK_RESISTANCE, 0.50D);
+                setBaseAttr(Attributes.MOVEMENT_SPEED, 0.30D);
+                setBaseAttr(Attributes.FLYING_SPEED, 0.55D);
+                setBaseAttr(Attributes.ATTACK_DAMAGE, 11.0D);
+                setBaseAttr(Attributes.FOLLOW_RANGE, 32.0D);
+            }
+        }
     }
 
     private void setBaseAttr(net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attr, double val) {
@@ -123,7 +223,11 @@ public final class FireDragon extends TamableAnimal {
 
     @Override
     public EntityDimensions getDefaultDimensions(Pose pose) {
-        return isYoung() ? YOUNG_DIMENSIONS : BABY_DIMENSIONS;
+        return switch (getStage()) {
+            case BABY -> BABY_DIMENSIONS;
+            case YOUNG -> YOUNG_DIMENSIONS;
+            case ADULT -> ADULT_DIMENSIONS;
+        };
     }
 
     @Override
@@ -159,9 +263,9 @@ public final class FireDragon extends TamableAnimal {
     public boolean landOnShoulder(Player player) { return companion.perch(player); }
     private void tickNutrition() {
         if (++hungerTicks >= 600) { hungerTicks = 0; satiety = Math.max(0, satiety - 1); }
-        if (satiety > 0 && growthRemaining > 0) --growthRemaining;
+        if (!isAdult() && satiety > 0 && growthRemaining > 0) --growthRemaining;
         if (isBabyStage() && growthRemaining <= 0) evolveToYoung();
-        // Young remains Young at zero until the Adult stage is implemented.
+        else if (isYoung() && growthRemaining <= 0) evolveToAdult();
     }
     private static final FireDragonAnimation[] VISUAL_CLIPS = FireDragonAnimation.values();
     private static final EntityDataAccessor<Integer> COLORS = SynchedEntityData.defineId(FireDragon.class, EntityDataSerializers.INT);
@@ -176,6 +280,8 @@ public final class FireDragon extends TamableAnimal {
         builder.define(STAGE, Stage.BABY.ordinal());
         builder.define(STATE, State.WILD_IDLE.ordinal());
         builder.define(SHOULDER, 0);
+        builder.define(SADDLED, false);
+        builder.define(ABILITY_COOLDOWNS, 0);
         builder.define(COLORS, 70);
         builder.define(CLIP, 0);
         builder.define(CLIP_START, 0L);
@@ -230,14 +336,14 @@ public final class FireDragon extends TamableAnimal {
         double yaw = Math.toRadians(yHeadRot);
         double fx = -Math.sin(yaw);
         double fz = Math.cos(yaw);
-        double forward = isYoung() ? 0.95D : 0.45D;
+        double forward = isAdult() ? 1.85D : isYoung() ? 0.95D : 0.45D;
         double mx = getX() + fx * forward;
         double my = getY() + getEyeHeight() - 0.08D;
         double mz = getZ() + fz * forward;
         if (clip == FireDragonAnimation.FIRE_WINDUP || clip == FireDragonAnimation.BREATH_WINDUP) {
             float clipTicks = getVisualAnimationTicks(0);
             double angle = (tickCount * 1.15D) + random.nextDouble() * 0.6D;
-            double radius = Math.max(0.14D, (isYoung() ? 0.52D : 0.36D) - clipTicks * 0.025D);
+            double radius = Math.max(0.14D, (isAdult() ? 0.80D : isYoung() ? 0.52D : 0.36D) - clipTicks * 0.025D);
             double px = mx + Math.cos(angle) * radius;
             double py = my + (random.nextDouble() - 0.5D) * 0.22D;
             double pz = mz + Math.sin(angle) * radius;
@@ -253,17 +359,24 @@ public final class FireDragon extends TamableAnimal {
                         fz * 0.05D + (random.nextDouble() - 0.5D) * 0.02D);
             }
         } else if (clip == FireDragonAnimation.BREATH_ACTIVE) {
-            for (int i = 0; i < 4; i++) {
-                double spread = (random.nextDouble() - 0.5D) * 0.55D;
+            int count = isAdult() ? 7 : 4;
+            for (int i = 0; i < count; i++) {
+                double spread = (random.nextDouble() - 0.5D) * (isAdult() ? 0.65D : 0.55D);
                 double syaw = yaw + spread;
                 double sx = -Math.sin(syaw);
                 double sz = Math.cos(syaw);
-                double speed = 0.28D + random.nextDouble() * 0.22D;
+                double speed = (isAdult() ? 0.42D : 0.28D) + random.nextDouble() * 0.24D;
                 level().addParticle(i % 2 == 0 ? ParticleTypes.FLAME : ParticleTypes.SMALL_FLAME,
-                        mx, my, mz, sx * speed, (random.nextDouble() - 0.45D) * 0.08D, sz * speed);
+                        mx, my, mz, sx * speed, (random.nextDouble() - 0.45D) * 0.10D, sz * speed);
             }
             if (tickCount % 2 == 0) {
-                level().addParticle(ParticleTypes.SMOKE, mx, my + 0.05D, mz, fx * 0.16D, 0.04D, fz * 0.16D);
+                level().addParticle(ParticleTypes.SMOKE, mx, my + 0.05D, mz, fx * 0.20D, 0.04D, fz * 0.20D);
+            }
+        } else if (clip == FireDragonAnimation.ROAR) {
+            for (int i = 0; i < 3; i++) {
+                double a = random.nextDouble() * Math.PI * 2.0D;
+                level().addParticle(i == 0 ? ParticleTypes.FLAME : ParticleTypes.SMOKE,
+                        mx, my + 0.15D, mz, Math.cos(a) * 0.14D, 0.06D, Math.sin(a) * 0.14D);
             }
         } else if (clip == FireDragonAnimation.GROWL && tickCount % 2 == 0) {
             level().addParticle(ParticleTypes.SMOKE, mx, my, mz, fx * 0.05D, 0.03D, fz * 0.05D);
@@ -303,7 +416,7 @@ public final class FireDragon extends TamableAnimal {
     @Override
     protected void addAdditionalSaveData(ValueOutput output) {
         super.addAdditionalSaveData(output);
-        output.putString("Stage", isYoung() ? "young" : "baby");
+        output.putString("Stage", isAdult() ? "adult" : isYoung() ? "young" : "baby");
         output.putInt("Satiety", satiety);
         output.putInt("HungerTicks", hungerTicks);
         output.putInt("GrowthRemaining", growthRemaining);
@@ -313,21 +426,31 @@ public final class FireDragon extends TamableAnimal {
         output.putInt("SecondaryColor", getSecondaryColor());
         output.putInt("AccentColor", getAccentColor());
         output.putString("VisualPreview", isVisualPreview() ? getVisualAnimation().name() : "none");
+        for (int i = 0; i < dragonInventory.getContainerSize(); i++) {
+            ItemStack stack = dragonInventory.getItem(i);
+            if (!stack.isEmpty()) output.store("DragonSlot_" + i, ItemStack.CODEC, stack);
+        }
     }
 
     @Override
     protected void readAdditionalSaveData(ValueInput input) {
         super.readAdditionalSaveData(input);
         float loadedHealth = getHealth();
-        Stage loadedStage = "young".equalsIgnoreCase(input.getStringOr("Stage", "baby")) ? Stage.YOUNG : Stage.BABY;
+        String stageName = input.getStringOr("Stage", "baby");
+        Stage loadedStage = "adult".equalsIgnoreCase(stageName) ? Stage.ADULT
+                : "young".equalsIgnoreCase(stageName) ? Stage.YOUNG : Stage.BABY;
         setStage(loadedStage);
         if (loadedHealth > 0.0F) setHealth(Math.min(getMaxHealth(), loadedHealth));
-        int maxGrowth = isYoung() ? YOUNG_GROWTH_TICKS : BABY_GROWTH_TICKS;
+        int maxGrowth = isAdult() ? 0 : isYoung() ? YOUNG_GROWTH_TICKS : BABY_GROWTH_TICKS;
         satiety = Math.clamp(input.getIntOr("Satiety", 100), 0, 100);
         hungerTicks = Math.clamp(input.getIntOr("HungerTicks", 0), 0, 599);
-        growthRemaining = Math.clamp(input.getIntOr("GrowthRemaining", maxGrowth), 0, maxGrowth);
+        growthRemaining = maxGrowth == 0 ? 0 : Math.clamp(input.getIntOr("GrowthRemaining", maxGrowth), 0, maxGrowth);
         hatched = input.getBooleanOr("Hatched", false);
         setShoulderSide(isTame() && isBabyStage() ? Math.clamp(input.getIntOr("DragonShoulder", 0), -1, 1) : 0);
+        for (int i = 0; i < dragonInventory.getContainerSize(); i++) {
+            dragonInventory.setItem(i, input.read("DragonSlot_" + i, ItemStack.CODEC).orElse(ItemStack.EMPTY));
+        }
+        syncSaddled();
         companion.resetAfterLoad();
         setAppearance(input.getIntOr("PrimaryColor", 2), input.getIntOr("SecondaryColor", 4), input.getIntOr("AccentColor", 0));
         FireDragonAnimation preview = FireDragonAnimation.fromName(input.getStringOr("VisualPreview", "none"));
@@ -410,9 +533,34 @@ public final class FireDragon extends TamableAnimal {
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack held = player.getItemInHand(hand);
+        if (!isTame() && isAdult()) {
+            if (!level().isClientSide()) playSound(ModSounds.FIRE_DRAGON_GROWL.get(), 0.9F, 0.72F);
+            return InteractionResult.PASS;
+        }
         if (isTame() && !isOwnedBy(player)) return InteractionResult.PASS;
         if (!isTame() && !held.is(Items.SALMON)) return InteractionResult.PASS;
         if (level().isClientSide()) return InteractionResult.SUCCESS;
+        if (isAdult() && isTame()) {
+            if (player.isShiftKeyDown()) {
+                openDragonMenu(player);
+                return InteractionResult.SUCCESS;
+            }
+            if (held.is(Items.SALMON)) {
+                if (!player.getAbilities().instabuild) held.shrink(1);
+                feedSalmon();
+                return InteractionResult.SUCCESS;
+            }
+            if (isSaddled()) {
+                setOrderedToSit(false);
+                setInSittingPose(false);
+                player.startRiding(this);
+                awardAdvancement(player, "fire_dragon_wings", "trigger");
+            } else {
+                playSound(ModSounds.FIRE_DRAGON_GROWL.get(), 0.65F, 1.05F);
+                player.sendOverlayMessage(Component.translatable("entity.codenamecoraline.fire_dragon.need_saddle"));
+            }
+            return InteractionResult.SUCCESS;
+        }
         if (isTame() && player.isShiftKeyDown()) {
             if (isBabyStage()) landOnShoulder(player);
             return InteractionResult.SUCCESS;
@@ -448,6 +596,141 @@ public final class FireDragon extends TamableAnimal {
     @Override
     public boolean canMate(Animal other) {
         return false;
+    }
+
+    public void openDragonMenu(Player player) {
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer sp) || !isAdult() || !isOwnedBy(player)) return;
+        ContainerData syncedData = new ContainerData() {
+            @Override public int get(int index) {
+                return switch (index) {
+                    case 0 -> isOrderedToSit() ? 1 : 0;
+                    case 1 -> Math.round(getHealth() * 10.0F);
+                    case 2 -> Math.round(getMaxHealth() * 10.0F);
+                    case 3 -> getSatiety();
+                    default -> 0;
+                };
+            }
+            @Override public void set(int index, int value) {}
+            @Override public int getCount() { return 4; }
+        };
+        sp.openMenu(new SimpleMenuProvider(
+                (id, inv, p) -> new FireDragonMenu(id, inv, this, dragonInventory, syncedData),
+                getDisplayName()),
+                buf -> buf.writeVarInt(getId()));
+    }
+
+    @Override
+    protected void dropEquipment(ServerLevel level) {
+        super.dropEquipment(level);
+        for (int i = 0; i < dragonInventory.getContainerSize(); i++) {
+            ItemStack stack = dragonInventory.getItem(i);
+            if (!stack.isEmpty()) {
+                spawnAtLocation(level, stack.copy());
+                dragonInventory.setItem(i, ItemStack.EMPTY);
+            }
+        }
+        syncSaddled();
+    }
+
+    @Override
+    protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
+        super.dropCustomDeathLoot(level, source, recentlyHit);
+        if (isAdult()) {
+            int rods = 1 + random.nextInt(3);
+            int charges = 2 + random.nextInt(3);
+            spawnAtLocation(level, new ItemStack(Items.BLAZE_ROD, rods));
+            spawnAtLocation(level, new ItemStack(Items.FIRE_CHARGE, charges));
+        }
+    }
+
+    @Override
+    protected boolean canAddPassenger(Entity passenger) {
+        return getPassengers().isEmpty() && isAdult() && isSaddled() && passenger instanceof Player p && isOwnedBy(p);
+    }
+
+    @Override
+    public @Nullable LivingEntity getControllingPassenger() {
+        if (isAdult() && isSaddled() && getFirstPassenger() instanceof Player rider && isOwnedBy(rider)) {
+            return rider;
+        }
+        return null;
+    }
+
+    @Override
+    public Vec3 getPassengerRidingPosition(Entity passenger) {
+        double yaw = Math.toRadians(yBodyRot);
+        double forward = 0.25D;
+        return new Vec3(getX() - Math.sin(yaw) * forward, getY() + 1.82D, getZ() + Math.cos(yaw) * forward);
+    }
+
+    @Override
+    protected void addPassenger(Entity passenger) {
+        super.addPassenger(passenger);
+        if (!level().isClientSide() && passenger instanceof Player rider) {
+            var cam = rider.getAttribute(Attributes.CAMERA_DISTANCE);
+            if (cam != null && !cam.hasModifier(MOUNT_CAMERA_ID)) cam.addTransientModifier(MOUNT_CAMERA_MOD);
+        }
+    }
+
+    @Override
+    protected void removePassenger(Entity passenger) {
+        super.removePassenger(passenger);
+        riderAscend = false;
+        riderDescend = false;
+        setNoGravity(false);
+        if (!level().isClientSide() && passenger instanceof Player rider) {
+            var cam = rider.getAttribute(Attributes.CAMERA_DISTANCE);
+            if (cam != null) cam.removeModifier(MOUNT_CAMERA_ID);
+        }
+    }
+
+    @Override
+    protected void tickRidden(Player rider, Vec3 travelVector) {
+        super.tickRidden(rider, travelVector);
+        setRot(rider.getYRot(), net.minecraft.util.Mth.clamp(rider.getXRot() * 0.5F, -45.0F, 45.0F));
+        yRotO = yBodyRot = yHeadRot = getYRot();
+        if (riderAscend && onGround()) {
+            setNoGravity(true);
+            setDeltaMovement(getDeltaMovement().x, 0.42D, getDeltaMovement().z);
+            playVisual(FireDragonAnimation.TAKEOFF);
+        }
+    }
+
+    @Override
+    public void travel(Vec3 travelVector) {
+        if (isAlive() && getControllingPassenger() instanceof Player rider) {
+            boolean flying = !onGround() || riderAscend;
+            if (flying) {
+                setNoGravity(true);
+                Vec3 look = rider.getLookAngle();
+                double fwd = rider.zza;
+                double side = rider.xxa;
+                double speed = 0.58D;
+                Vec3 horizRight = new Vec3(Math.cos(Math.toRadians(rider.getYRot())), 0.0D, Math.sin(Math.toRadians(rider.getYRot())));
+                Vec3 move = look.scale(fwd * speed).add(horizRight.scale(side * 0.34D));
+                double vy = move.y;
+                if (riderAscend) vy = Math.max(vy, 0.36D);
+                if (riderDescend) vy = Math.min(vy, -0.40D);
+                // Smooth hover damping when no movement input is pressed
+                if (Math.abs(fwd) < 0.01D && Math.abs(side) < 0.01D && !riderAscend && !riderDescend) {
+                    setDeltaMovement(getDeltaMovement().scale(0.82D));
+                } else {
+                    Vec3 desired = new Vec3(move.x, vy, move.z);
+                    setDeltaMovement(getDeltaMovement().lerp(desired, 0.35D));
+                }
+                move(net.minecraft.world.entity.MoverType.SELF, getDeltaMovement());
+                if (onGround() && !riderAscend) {
+                    setNoGravity(false);
+                }
+                calculateEntityAnimation(false);
+                return;
+            }
+            setNoGravity(false);
+            setSpeed((float) getAttributeValue(Attributes.MOVEMENT_SPEED));
+            super.travel(new Vec3(rider.xxa * 0.5D, travelVector.y, rider.zza));
+            return;
+        }
+        super.travel(travelVector);
     }
 
     @Override

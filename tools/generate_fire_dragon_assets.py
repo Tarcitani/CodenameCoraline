@@ -106,6 +106,8 @@ def skin(primary,secondary,accent):
         if mat=='dark': rgb=(24,19,18)
         if mat=='ivory': rgb=(244,224,173)
         if mat=='eye': rgb=(242,174,45)
+        if mat=='leather': rgb=(112,58,28)
+        if mat=='leather_gold': rgb=(208,158,46)
         palette=tones(rgb)
         for yy in range(h+d):
             for xx in range(2*(w+d)):
@@ -191,6 +193,95 @@ def young_geometry():
     for i in range(3):
         part(f'crest_{i}', 'torso', (0, -3, i * 3 - 3))
         box(f'crest_{i}', f'crest_{i}', (-.5, -1.5, 0), (1, 2, 2), 'accent')
+
+def adult_geometry():
+    PARTS.clear(); BOXES.clear()
+    # Colossal adult dragon inspired by references: crowned horns, cheek frill spikes, nasal horn,
+    # muscular plated chest/neck, huge wings with elbow claws, heavy talons, whip tail spade, and toggleable 3D saddle.
+    # Ground check: torso y=8 + leg upper y=3 + lower y=5 + foot y=6 + foot height 2 = 24 exact ground.
+    part('torso', 'root', (0, 8, 0))
+    box('torso', 'torso', (-4.5, -4, -7.5), (9, 8, 15))
+    part('belly', 'torso', (0, 0, 0))
+    box('belly', 'belly', (-3.5, -1.5, -7.7), (7, 5, 14), 'secondary', .25)
+    # 3D Dragon Saddle (toggled visible only when saddled)
+    part('saddle', 'torso', (0, -4.1, -2.0))
+    box('saddle_seat', 'saddle', (-3.6, -1.0, -3.5), (7.2, 1.4, 7.0), 'leather', .15)
+    box('saddle_pommel', 'saddle', (-2.4, -2.4, -3.8), (4.8, 1.8, 1.4), 'leather_gold')
+    box('saddle_cantle', 'saddle', (-2.6, -2.2, 2.4), (5.2, 1.6, 1.4), 'leather_gold')
+    box('saddle_strap_l', 'saddle', (4.3, 0.0, -1.8), (.6, 5.2, 3.6), 'leather')
+    box('saddle_strap_r', 'saddle', (-4.9, 0.0, -1.8), (.6, 5.2, 3.6), 'leather')
+    # Muscular S-curved neck
+    part('neck_base', 'torso', (0, -2.0, -7.0))
+    box('neck_base', 'neck_base', (-2.8, -2.6, -3.6), (5.6, 5.2, 5.4))
+    box('neck_base_plate', 'neck_base', (-2.0, 1.2, -3.5), (4.0, 1.8, 4.8), 'secondary')
+    box('neck_base_crest', 'neck_base', (-.5, -4.4, -2.4), (1.0, 2.2, 2.4), 'accent')
+    part('neck_mid', 'neck_base', (0, -2.0, -3.6))
+    box('neck_mid', 'neck_mid', (-2.3, -2.4, -4.6), (4.6, 4.6, 5.6))
+    box('neck_mid_plate', 'neck_mid', (-1.7, 1.1, -4.5), (3.4, 1.6, 5.0), 'secondary')
+    box('neck_mid_crest', 'neck_mid', (-.5, -4.2, -3.2), (1.0, 2.2, 2.4), 'accent')
+    part('neck_top', 'neck_mid', (0, -1.5, -4.4))
+    box('neck_top', 'neck_top', (-2.0, -2.0, -3.8), (4.0, 4.0, 4.8))
+    box('neck_top_crest', 'neck_top', (-.5, -3.6, -2.6), (1.0, 2.0, 2.2), 'accent')
+    # Crowned angular skull with nasal horn, cheek frills & heavy fangs
+    part('head', 'neck_top', (0, -.6, -3.6))
+    box('head', 'head', (-3.5, -3.0, -5.2), (7.0, 5.2, 6.8))
+    box('snout', 'head', (-2.5, -.8, -10.5), (5.0, 2.8, 6.0))
+    box('nasal_horn', 'head', (-.6, -2.8, -10.2), (1.2, 2.4, 1.4), 'accent')
+    part('jaw', 'head', (0, 1.8, -2.2))
+    box('jaw', 'jaw', (-2.3, 0, -7.8), (4.6, 1.8, 6.8), 'secondary')
+    for side, sign in [('left', 1), ('right', -1)]:
+        part(f'{side}_eye', 'head', (sign * 3.4, -.9, -3.4))
+        box(f'{side}_cheek', f'{side}_eye', (-.6, -1.6, -1.8), (1.2, 3.2, 3.6), 'primary')
+        # Fan-like cheek/jaw frill spikes (references #2, #6, #7)
+        box(f'{side}_frill_top', 'head', (sign * 3.2 - (0 if sign == 1 else 2.2), -1.6, -1.0), (2.2, 1.0, 3.2), 'accent')
+        box(f'{side}_frill_low', 'head', (sign * 2.8 - (0 if sign == 1 else 2.0), 0.6, -1.2), (2.0, 1.0, 3.0), 'accent')
+        box(f'{side}_eye_front', 'head', (sign * 1.75 - 1.0, -2.2, -5.4), (2.0, 1.6, .6), 'eye')
+        # Grand sweeping crown horns
+        part(f'{side}_horn', 'head', (sign * 2.5, -2.6, -.6), (-36, 0, sign * 22))
+        box(f'{side}_horn', f'{side}_horn', (-.9, -5.4, -.9), (1.8, 6.0, 1.8), 'accent')
+        part(f'{side}_horn_tip', f'{side}_horn', (0, -5.4, 0), (-30, 0, sign * 16))
+        box(f'{side}_horn_tip', f'{side}_horn_tip', (-.65, -4.6, -.65), (1.3, 5.0, 1.3), 'accent')
+        box(f'{side}_fang', 'head', (sign * 1.9 - .45, 1.6, -9.6), (.9, 1.6, .9), 'ivory')
+        # Colossal articulated wings with elbow claw
+        part(f'{side}_wing_upper', 'torso', (sign * 4.2, -3.0, -1.2), (0, -sign * 65, -sign * 40))
+        x = 0 if sign == 1 else -7.5
+        box(f'{side}_wing_upper', f'{side}_wing_upper', (x, -.8, -.8), (7.5, 1.6, 1.6), 'accent')
+        for step, depth in enumerate([7.5, 6.8, 6.0, 5.2]):
+            xx = step * 1.85 if sign == 1 else -(step + 1) * 1.85
+            box(f'{side}_membrane_inner_{step}', f'{side}_wing_upper', (xx, 0, .4), (1.85, .5, depth), 'secondary')
+        part(f'{side}_wing_forearm', f'{side}_wing_upper', (sign * 7.5, 0, 0), (0, sign * 18, sign * 8))
+        xf = 0 if sign == 1 else -9.0
+        box(f'{side}_wing_forearm', f'{side}_wing_forearm', (xf, -.7, -.7), (9.0, 1.4, 1.4), 'primary')
+        box(f'{side}_wing_claw', f'{side}_wing_forearm', (0 if sign == 1 else -1.4, -1.2, -2.8), (1.4, 1.4, 2.6), 'accent')
+        for step, depth in enumerate([9.5, 8.2, 6.8, 5.5]):
+            xx = step * 2.25 if sign == 1 else -(step + 1) * 2.25
+            box(f'{side}_membrane_outer_{step}', f'{side}_wing_forearm', (xx, 0, 0), (2.25, .5, depth), 'secondary')
+        part(f'{side}_wing_tip', f'{side}_wing_forearm', (sign * 9.0, 0, 0), (0, sign * 18, 0))
+        box(f'{side}_wing_tip', f'{side}_wing_tip', (0 if sign == 1 else -6.0, -.3, 0), (6.0, .6, 6.0), 'secondary')
+        # Muscular legs + heavy talons (torso y=8 + 3 + 5 + 6 + 2 = 24)
+        for which, z in [('front', -5.0), ('hind', 5.0)]:
+            name = f'{side}_{which}'
+            hind = which == 'hind'
+            part(f'{name}_upper', 'torso', (sign * 4.2, 3.0, z))
+            box(f'{name}_upper', f'{name}_upper', (-1.8, -.8, -1.8), (3.6, 5.6, 3.6) if not hind else (4.2, 6.2, 4.8))
+            part(f'{name}_lower', f'{name}_upper', (0, 5.0, 0))
+            box(f'{name}_lower', f'{name}_lower', (-1.4, 0, -1.4), (2.8, 6.0, 2.8))
+            part(f'{name}_foot', f'{name}_lower', (0, 6.0, -.8))
+            box(f'{name}_foot', f'{name}_foot', (-1.7, 0, -2.4), (3.4, 2.0, 4.6), 'secondary')
+            box(f'{name}_claw', f'{name}_foot', (-1.4, .6, -3.6), (2.8, 1.1, 1.8), 'accent')
+    # Long whip tail with tall dorsal crests & barbed tail spade
+    for i in range(1, 5):
+        parent = 'torso' if i == 1 else f'tail_{i-1}'
+        part(f'tail_{i}', parent, (0, -.3 if i == 1 else 0, 7.2 if i == 1 else 6.0), (-5 if i == 1 else -3, 4 if i == 3 else 0, 0))
+        width = 4.6 if i == 1 else 3.6 if i == 2 else 2.6 if i == 3 else 1.8
+        length = 6.8 if i == 1 else 6.4
+        box(f'tail_{i}', f'tail_{i}', (-width / 2, -width / 2, 0), (width, width, length))
+        box(f'tail_crest_{i}', f'tail_{i}', (-.6, -width / 2 - 2.0, 1.6), (1.2, 2.6, 2.6), 'accent')
+    box('tail_spade', 'tail_4', (-2.6, -.5, 4.8), (5.2, 1.0, 5.2), 'accent')
+    for i in range(3):
+        part(f'crest_{i}', 'torso', (0, -4.0, i * 4.2 - 4.2))
+        box(f'crest_{i}', f'crest_{i}', (-.6, -2.4, 0), (1.2, 3.0, 2.8), 'accent')
+
 
 def write_geometry(class_name='FireDragonGeometry', atlas_size=128, write_sketch_json=True):
     lines=['package com.codenamecoraline.client.firedragon;','',
@@ -343,6 +434,16 @@ def main():
                 base, glow = skin(primary, secondary, accent)
                 base.save(young_folder / f'{primary}_{secondary}_{accent}.png')
     _, glow = skin(2, 4, 0); glow.save(young_folder / 'eyes.png')
+    # Colossal Adult geometry, 3D saddle & 125 color skins (256x256 atlas).
+    SIZE = 256
+    adult_geometry(); pack(); write_geometry('FireDragonAdultGeometry', 256, False)
+    adult_folder = folder / 'adult'; adult_folder.mkdir(parents=True, exist_ok=True)
+    for primary in range(5):
+        for secondary in range(5):
+            for accent in range(5):
+                base, glow = skin(primary, secondary, accent)
+                base.save(adult_folder / f'{primary}_{secondary}_{accent}.png')
+    _, glow = skin(2, 4, 0); glow.save(adult_folder / 'eyes.png')
     # Keep the foundation item reproducible.
     egg=Image.new('RGBA',(16,16),(0,0,0,0))
     palette=tones(PALETTES[2])
@@ -353,6 +454,6 @@ def main():
                 egg.putpixel((x,y),color)
     (ASSETS/'item').mkdir(parents=True,exist_ok=True)
     egg.save(ASSETS/'item/fire_dragon_spawn_egg.png')
-    print('Generated 125 baby + 125 young skins, emissive eyes, 3D fireball textures and spawn egg.')
+    print('Generated 125 baby + 125 young + 125 adult skins, emissive eyes, 3D fireball textures and spawn egg.')
 
 if __name__=='__main__': main()

@@ -53,7 +53,9 @@ public final class FireDragonGameTests {
             Map.entry("fire_dragon_transition_clips", FireDragonGameTests::transitionClips),
             Map.entry("fire_dragon_bestiary_sounds_and_advancements", FireDragonGameTests::bestiarySoundsAndAdvancements),
             Map.entry("fire_dragon_young_evolution_and_persistence", FireDragonGameTests::youngEvolutionAndPersistence),
-            Map.entry("fire_dragon_young_combat_and_territorial", FireDragonGameTests::youngCombatAndTerritorial));
+            Map.entry("fire_dragon_young_combat_and_territorial", FireDragonGameTests::youngCombatAndTerritorial),
+            Map.entry("fire_dragon_adult_evolution_inventory_and_saddle", FireDragonGameTests::adultEvolutionInventoryAndSaddle),
+            Map.entry("fire_dragon_adult_abilities_and_drops", FireDragonGameTests::adultAbilitiesAndDrops));
 
     private FireDragonGameTests() {
     }
@@ -412,11 +414,14 @@ public final class FireDragonGameTests {
                 com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_EVOLVE,
                 com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_BITE,
                 com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_BREATH,
-                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_GROWL)) {
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_GROWL,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_ROAR,
+                com.codenamecoraline.registry.ModSounds.FIRE_DRAGON_CLAW)) {
             helper.assertTrue(sound.get() != null, "Sound registered: " + sound.getId());
         }
         var advancements = helper.getLevel().getServer().getAdvancements();
-        for (String adv : java.util.List.of("bosses/fire_dragon_ember", "bosses/fire_dragon_bond", "bosses/fire_dragon_shoulder")) {
+        for (String adv : java.util.List.of("bosses/fire_dragon_ember", "bosses/fire_dragon_bond",
+                "bosses/fire_dragon_shoulder", "bosses/fire_dragon_wings")) {
             helper.assertTrue(advancements.get(id(adv)) != null, "Advancement loaded: " + adv);
         }
         for (String path : java.util.List.of(
@@ -424,6 +429,8 @@ public final class FireDragonGameTests {
                 "textures/entity/fire_dragon/fireball_glow.png",
                 "textures/entity/fire_dragon/young/2_4_0.png",
                 "textures/entity/fire_dragon/young/eyes.png",
+                "textures/entity/fire_dragon/adult/2_4_0.png",
+                "textures/entity/fire_dragon/adult/eyes.png",
                 "textures/gui/bestiary/fire_dragon_anatomy.png",
                 "textures/gui/bestiary/fire_dragon_combat.png",
                 "textures/gui/bestiary/fire_dragon_spoils.png")) {
@@ -486,6 +493,122 @@ public final class FireDragonGameTests {
             wild.setTarget(zombie);
             helper.runAfterDelay(25, () -> {
                 helper.assertTrue(zombie.getHealth() < startHp || zombie.isDeadOrDying(), "Young dragon damages close hostile with bite/fire");
+                helper.succeed();
+            });
+        });
+    }
+
+    private static void adultEvolutionInventoryAndSaddle(GameTestHelper helper) {
+        var owner = helper.makeMockServerPlayerInLevel();
+        owner.setPos(helper.absoluteVec(new net.minecraft.world.phys.Vec3(5, 2, 5)));
+        FireDragon dragon = helper.spawnWithNoFreeWill(ModEntities.FIRE_DRAGON.get(), new BlockPos(6, 2, 5));
+        dragon.setAppearance(2, 4, 0);
+        dragon.tame(owner);
+        dragon.setStage(FireDragon.Stage.YOUNG);
+        var originalUuid = dragon.getUUID();
+        helper.assertTrue(dragon.evolveToAdult(), "Young promotes to adult");
+        helper.assertTrue(dragon.isAdult(), "Stage is ADULT");
+        helper.assertValueEqual(dragon.getUUID(), originalUuid, "UUID preserved on adult evolution");
+        helper.assertValueEqual(dragon.getColorCode(), 2 * 25 + 4 * 5, "All 3 colors preserved");
+        helper.assertValueEqual(dragon.getMaxHealth(), 120.0F, "Adult max health");
+        helper.assertValueEqual(dragon.getAttributeValue(Attributes.ARMOR), 10.0D, "Adult armor");
+        helper.assertValueEqual(dragon.getAttributeValue(Attributes.ARMOR_TOUGHNESS), 4.0D, "Adult toughness");
+        helper.assertValueEqual(dragon.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE), 0.50D, "Adult KB resist");
+        helper.assertValueEqual(dragon.getBbWidth(), FireDragon.ADULT_WIDTH, "Adult width");
+        helper.assertValueEqual(dragon.getBbHeight(), FireDragon.ADULT_HEIGHT, "Adult height");
+        helper.assertValueEqual(dragon.getGrowthRemaining(), 0, "Adult growth complete");
+
+        owner.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        dragon.mobInteract(owner, net.minecraft.world.InteractionHand.MAIN_HAND);
+        helper.assertFalse(owner.isPassenger(), "Cannot mount unsaddled adult");
+
+        dragon.getDragonInventory().setItem(com.codenamecoraline.entity.firedragon.FireDragonMenu.SADDLE_SLOT, new ItemStack(Items.SADDLE));
+        helper.assertTrue(dragon.isSaddled(), "Saddle slot updates synced flag");
+        dragon.mobInteract(owner, net.minecraft.world.InteractionHand.MAIN_HAND);
+        helper.assertTrue(owner.getVehicle() == dragon, "Saddled adult can be mounted");
+        var cam = owner.getAttribute(Attributes.CAMERA_DISTANCE);
+        helper.assertTrue(cam != null && cam.getValue() > cam.getBaseValue(), "Mounted camera distance expanded");
+        owner.stopRiding();
+        helper.assertTrue(cam == null || Math.abs(cam.getValue() - cam.getBaseValue()) < 0.001D, "Camera distance restored on dismount");
+
+        dragon.getDragonInventory().setItem(1, new ItemStack(Items.DIAMOND, 3));
+        dragon.getDragonInventory().setItem(10, new ItemStack(Items.SALMON, 5));
+        var out = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, helper.getLevel().registryAccess());
+        dragon.saveWithoutId(out);
+        FireDragon loaded = ModEntities.FIRE_DRAGON.get().create(helper.getLevel(), EntitySpawnReason.LOAD);
+        helper.assertTrue(loaded != null, "Load factory");
+        loaded.load(TagValueInput.create(ProblemReporter.DISCARDING, helper.getLevel().registryAccess(), out.buildResult()));
+        helper.assertTrue(loaded.isAdult(), "Adult stage persists across save/load");
+        helper.assertTrue(loaded.isSaddled(), "Saddle persists across save/load");
+        helper.assertValueEqual(loaded.getDragonInventory().getItem(1).getCount(), 3, "Cargo slot 1 persists");
+        helper.assertValueEqual(loaded.getDragonInventory().getItem(10).getCount(), 5, "Cargo slot 10 persists");
+
+        var menu = new com.codenamecoraline.entity.firedragon.FireDragonMenu(
+                1, owner.getInventory(), dragon, dragon.getDragonInventory(), new net.minecraft.world.inventory.SimpleContainerData(4));
+        helper.assertFalse(dragon.isOrderedToSit(), "Starts in Follow mode");
+        helper.assertTrue(menu.clickMenuButton(owner, com.codenamecoraline.entity.firedragon.FireDragonMenu.BUTTON_TOGGLE_ORDER),
+                "Menu button toggles order");
+        helper.assertTrue(dragon.isOrderedToSit(), "Order switched to Rest");
+        menu.clickMenuButton(owner, com.codenamecoraline.entity.firedragon.FireDragonMenu.BUTTON_TOGGLE_ORDER);
+        helper.assertFalse(dragon.isOrderedToSit(), "Order switched back to Follow");
+        helper.succeed();
+    }
+
+    private static void adultAbilitiesAndDrops(GameTestHelper helper) {
+        var intruder = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        intruder.setPos(helper.absoluteVec(new net.minecraft.world.phys.Vec3(3, 2, 3)));
+        intruder.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.SALMON, 16));
+        helper.getLevel().addFreshEntity(intruder);
+
+        FireDragon wild = helper.spawn(ModEntities.FIRE_DRAGON.get(), new BlockPos(7, 2, 3));
+        wild.setStage(FireDragon.Stage.ADULT);
+        wild.mobInteract(intruder, net.minecraft.world.InteractionHand.MAIN_HAND);
+        helper.assertFalse(wild.isTame(), "Wild adult cannot be tamed");
+
+        var owner = helper.makeMockServerPlayerInLevel();
+        owner.setPos(helper.absoluteVec(new net.minecraft.world.phys.Vec3(5, 2, 6)));
+        owner.setYRot(0.0F);
+        owner.setXRot(0.0F);
+        FireDragon mounted = helper.spawnWithNoFreeWill(ModEntities.FIRE_DRAGON.get(), new BlockPos(5, 2, 6));
+        mounted.tame(owner);
+        mounted.setStage(FireDragon.Stage.ADULT);
+        mounted.getDragonInventory().setItem(com.codenamecoraline.entity.firedragon.FireDragonMenu.SADDLE_SLOT, new ItemStack(Items.SADDLE));
+        owner.startRiding(mounted);
+        var zombie = helper.spawnWithNoFreeWill(net.minecraft.world.entity.EntityType.ZOMBIE, new BlockPos(5, 2, 9));
+        zombie.setInvulnerable(false);
+        float startHp = zombie.getHealth();
+
+        mounted.triggerMountedAbility(owner, 0);
+        mounted.triggerMountedAbility(owner, 2);
+        mounted.triggerMountedAbility(owner, 3);
+        mounted.triggerMountedAbility(owner, 1);
+
+        helper.assertTrue(mounted.getAbilityCooldown(0) > 0, "Meteor cooldown set");
+        helper.assertTrue(mounted.getAbilityCooldown(1) > 0, "Flame Torrent cooldown set");
+        helper.assertTrue(mounted.getAbilityCooldown(2) > 0, "Draconic Rend cooldown set");
+        helper.assertTrue(mounted.getAbilityCooldown(3) > 0, "Volcanic Roar cooldown set");
+        helper.assertTrue(zombie.getHealth() < startHp || zombie.isDeadOrDying(), "Draconic Rend damaged frontal enemy");
+        helper.assertTrue(zombie.hasEffect(net.minecraft.world.effect.MobEffects.WEAKNESS), "Volcanic Roar applied Weakness");
+        helper.assertTrue(zombie.hasEffect(net.minecraft.world.effect.MobEffects.SLOWNESS), "Volcanic Roar applied Slowness");
+        helper.assertTrue(!helper.getLevel().getEntitiesOfClass(
+                com.codenamecoraline.entity.firedragon.DragonFireball.class,
+                mounted.getBoundingBox().inflate(12)).isEmpty(), "Meteor spawned DragonFireball");
+        owner.stopRiding();
+
+        helper.runAfterDelay(15, () -> {
+            helper.assertTrue(wild.getTarget() == intruder, "Wild adult aggressively guards nest against Survival player");
+            wild.getDragonInventory().setItem(com.codenamecoraline.entity.firedragon.FireDragonMenu.SADDLE_SLOT, new ItemStack(Items.SADDLE));
+            wild.getDragonInventory().setItem(3, new ItemStack(Items.EMERALD, 2));
+            var deathPos = wild.position();
+            wild.hurtServer(helper.getLevel(), wild.damageSources().genericKill(), 500.0F);
+            helper.runAfterDelay(5, () -> {
+                var drops = helper.getLevel().getEntitiesOfClass(
+                        net.minecraft.world.entity.item.ItemEntity.class,
+                        new net.minecraft.world.phys.AABB(deathPos, deathPos).inflate(5.0D));
+                helper.assertTrue(drops.stream().anyMatch(e -> e.getItem().is(Items.BLAZE_ROD)), "Adult drops Blaze Rods");
+                helper.assertTrue(drops.stream().anyMatch(e -> e.getItem().is(Items.FIRE_CHARGE)), "Adult drops Fire Charges");
+                helper.assertTrue(drops.stream().anyMatch(e -> e.getItem().is(Items.SADDLE)), "Adult drops equipped saddle");
+                helper.assertTrue(drops.stream().anyMatch(e -> e.getItem().is(Items.EMERALD)), "Adult drops cargo items");
                 helper.succeed();
             });
         });

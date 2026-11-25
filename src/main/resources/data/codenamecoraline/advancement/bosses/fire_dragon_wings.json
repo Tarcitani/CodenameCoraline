@@ -1,0 +1,29 @@
+{
+  "parent": "codenamecoraline:bosses/fire_dragon_shoulder",
+  "criteria": {
+    "trigger": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.codenamecoraline.bosses.fire_dragon_wings.description"
+    },
+    "frame": "challenge",
+    "hidden": false,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:saddle"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.codenamecoraline.bosses.fire_dragon_wings.title"
+    }
+  },
+  "requirements": [
+    [
+      "trigger"
+    ]
+  ]
+}

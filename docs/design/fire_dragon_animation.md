@@ -281,6 +281,48 @@ Rotações: deltas x/y/z em graus em relação ao bind pose; `KeyframeAnimations
 | growl | 24 | right_wing_upper / rot | 0 → 0,0,0; 12.0 → 0,-38,22; 24 → 0,0,0 | pendente de revisão visual |
 | growl | 24 | tail_1 / rot | 0 → 0,0,0; 12 → 0,14,0; 24 → 0,0,0 | pendente de revisão visual |
 | growl | 24 | torso / pos | 0 → 0,0,0; 12.0 → 0,-0.8,0; 24 → 0,0,0 | pendente de revisão visual |
+| claw_windup | 8 | torso / rot | 0 → 0,0,0; 8 → -12,-14,6 | pendente de revisão visual |
+| claw_windup | 8 | neck_base / rot | 0 → 0,0,0; 8 → -14,10,0 | pendente de revisão visual |
+| claw_windup | 8 | head / rot | 0 → 0,0,0; 8 → -10,8,0 | pendente de revisão visual |
+| claw_windup | 8 | jaw / rot | 0 → 0,0,0; 8 → 32,0,0 | pendente de revisão visual |
+| claw_windup | 8 | right_front_upper / rot | 0 → 0,0,0; 8 → -72,-18,24 | pendente de revisão visual |
+| claw_windup | 8 | right_front_lower / rot | 0 → 0,0,0; 8 → 42,0,0 | pendente de revisão visual |
+| claw_windup | 8 | left_wing_upper / rot | 0 → 0,0,0; 8 → 0,32,-18 | pendente de revisão visual |
+| claw_windup | 8 | right_wing_upper / rot | 0 → 0,0,0; 8 → 0,-42,26 | pendente de revisão visual |
+| claw_windup | 8 | tail_1 / rot | 0 → 0,0,0; 8 → 8,18,0 | pendente de revisão visual |
+| claw_windup | 8 | torso / pos | 0 → 0,0,0; 8 → 0,0.6,0.8 | pendente de revisão visual |
+| claw_strike | 6 | torso / rot | 0 → -12,-14,6; 6 → 8,16,-8 | pendente de revisão visual |
+| claw_strike | 6 | neck_base / rot | 0 → -14,10,0; 6 → 18,-10,0 | pendente de revisão visual |
+| claw_strike | 6 | head / rot | 0 → -10,8,0; 6 → 8,-6,0 | pendente de revisão visual |
+| claw_strike | 6 | jaw / rot | 0 → 32,0,0; 6 → 4,0,0 | pendente de revisão visual |
+| claw_strike | 6 | right_front_upper / rot | 0 → -72,-18,24; 6 → 46,16,-14 | pendente de revisão visual |
+| claw_strike | 6 | right_front_lower / rot | 0 → 42,0,0; 6 → -18,0,0 | pendente de revisão visual |
+| claw_strike | 6 | left_wing_upper / rot | 0 → 0,32,-18; 6 → 0,18,-10 | pendente de revisão visual |
+| claw_strike | 6 | right_wing_upper / rot | 0 → 0,-42,26; 6 → 0,-20,12 | pendente de revisão visual |
+| claw_strike | 6 | tail_1 / rot | 0 → 8,18,0; 6 → -6,-16,0 | pendente de revisão visual |
+| claw_strike | 6 | torso / pos | 0 → 0,0.6,0.8; 6 → 0,-0.6,-1.6 | pendente de revisão visual |
+| claw_recovery | 8 | torso / rot | 0 → 8,16,-8; 8 → 0,0,0 | pendente de revisão visual |
+| claw_recovery | 8 | neck_base / rot | 0 → 18,-10,0; 8 → 0,0,0 | pendente de revisão visual |
+| claw_recovery | 8 | head / rot | 0 → 8,-6,0; 8 → 0,0,0 | pendente de revisão visual |
+| claw_recovery | 8 | jaw / rot | 0 → 4,0,0; 8 → 0,0,0 | pendente de revisão visual |
+| claw_recovery | 8 | right_front_upper / rot | 0 → 46,16,-14; 8 → 0,0,0 | pendente de revisão visual |
+| claw_recovery | 8 | right_front_lower / rot | 0 → -18,0,0; 8 → 0,0,0 | pendente de revisão visual |
+| claw_recovery | 8 | left_wing_upper / rot | 0 → 0,18,-10; 8 → 0,0,0 | pendente de revisão visual |
+| claw_recovery | 8 | right_wing_upper / rot | 0 → 0,-20,12; 8 → 0,0,0 | pendente de revisão visual |
+| claw_recovery | 8 | tail_1 / rot | 0 → -6,-16,0; 8 → 0,0,0 | pendente de revisão visual |
+| claw_recovery | 8 | torso / pos | 0 → 0,-0.6,-1.6; 8 → 0,0,0 | pendente de revisão visual |
+| roar | 28 | torso / rot | 0 → 0,0,0; 6 → -16,0,0; 20 → -18,0,0; 28 → 0,0,0 | pendente de revisão visual |
+| roar | 28 | neck_base / rot | 0 → 0,0,0; 6 → -24,0,0; 20 → -26,0,0; 28 → 0,0,0 | pendente de revisão visual |
+| roar | 28 | neck_mid / rot | 0 → 0,0,0; 6 → -10,0,0; 14 → -12,4,0; 20 → -10,-4,0; 28 → 0,0,0 | pendente de revisão visual |
+| roar | 28 | head / rot | 0 → 0,0,0; 6 → -16,0,0; 14 → -18,6,0; 20 → -16,-6,0; 28 → 0,0,0 | pendente de revisão visual |
+| roar | 28 | jaw / rot | 0 → 0,0,0; 6 → 44,0,0; 20 → 42,0,0; 28 → 0,0,0 | pendente de revisão visual |
+| roar | 28 | left_wing_upper / rot | 0 → 0,0,0; 7 → -8,68,-38; 20 → -6,64,-34; 28 → 0,0,0 | pendente de revisão visual |
+| roar | 28 | right_wing_upper / rot | 0 → 0,0,0; 7 → -8,-68,38; 20 → -6,-64,34; 28 → 0,0,0 | pendente de revisão visual |
+| roar | 28 | left_wing_forearm / rot | 0 → 0,0,0; 8 → 0,-18,12; 20 → 0,-16,10; 28 → 0,0,0 | pendente de revisão visual |
+| roar | 28 | right_wing_forearm / rot | 0 → 0,0,0; 8 → 0,18,-12; 20 → 0,16,-10; 28 → 0,0,0 | pendente de revisão visual |
+| roar | 28 | tail_1 / rot | 0 → 0,0,0; 8 → 14,12,0; 18 → 14,-12,0; 28 → 0,0,0 | pendente de revisão visual |
+| roar | 28 | tail_2 / rot | 0 → 0,0,0; 10 → 10,16,0; 20 → 10,-16,0; 28 → 0,0,0 | pendente de revisão visual |
+| roar | 28 | torso / pos | 0 → 0,0,0; 6 → 0,1.2,0; 20 → 0,1.2,0; 28 → 0,0,0 | pendente de revisão visual |
 
 ## Ombro: referência enrolada
 
