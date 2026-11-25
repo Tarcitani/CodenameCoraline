@@ -99,7 +99,14 @@ public final class FireDragonModel extends EntityModel<FireDragonRenderState> {
             FireDragonAnimController.smoothCrossFade(joints, state);
             return;
         }
-        if (state.clip != FireDragonAnimation.NONE && state.clip != FireDragonAnimation.BREATHE) {
+        if (state.clip != FireDragonAnimation.NONE
+                && state.clip != FireDragonAnimation.BREATHE
+                && (state.animState == null || (state.clip != FireDragonAnimation.TAKEOFF
+                && state.clip != FireDragonAnimation.LAND
+                && state.clip != FireDragonAnimation.SIT
+                && state.clip != FireDragonAnimation.STAND
+                && state.clip != FireDragonAnimation.WALK
+                && state.clip != FireDragonAnimation.FLY))) {
             applyPose(state.clip, state.clipTicks);
             // Keep gentle delayed tail motion alive during non-full-body action clips (idles, eat, growl, fire)
             if (state.animState != null && state.clip != FireDragonAnimation.REST_TOGETHER) {

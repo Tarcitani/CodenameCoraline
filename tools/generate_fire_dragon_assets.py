@@ -196,91 +196,289 @@ def young_geometry():
 
 def adult_geometry():
     PARTS.clear(); BOXES.clear()
-    # Colossal adult dragon inspired by references: crowned horns, cheek frill spikes, nasal horn,
-    # muscular plated chest/neck, huge wings with elbow claws, heavy talons, whip tail spade, and toggleable 3D saddle.
-    # Ground check: torso y=8 + leg upper y=3 + lower y=5 + foot y=6 + foot height 2 = 24 exact ground.
-    part('torso', 'root', (0, 8, 0))
-    box('torso', 'torso', (-4.5, -4, -7.5), (9, 8, 15))
+    # Colossal adult Fire Dragon sculpted from the turnaround & detail reference sheet:
+    # - Broad muscular chest tapering to athletic hindquarters, protected by overlapping throat/breast/belly scutes.
+    # - Proud S-curved neck (-26 deg base, -14 deg mid, +16 deg top, +24 deg head -> 0 deg net predatory gaze).
+    # - Fierce angular skull with heavy brow ridges, stepped classic snout, nasal horn, sagittal crest horns,
+    #   long swept primary crown horns, secondary outer horns, 3-tiered cheek spines, and strong fanged jaw.
+    # - Continuous fiery dorsal spine ridge from nape to tail tip, ending in flared lateral flame blades.
+    # - Massive bat-like wings with defined arm/forearm/finger bone struts, hooked elbow claws, and wide membranes.
+    # - Powerful reptilian legs with outer armor plates, heel spurs, and 3 distinct curved forward talons (ground y=24).
+    part('torso', 'root', (0, 8.0, 0))
+    box('torso_chest', 'torso', (-5.0, -4.4, -7.8), (10.0, 8.6, 8.4), 'primary')
+    box('torso_mid', 'torso', (-4.4, -4.0, 0.4), (8.8, 7.8, 4.2), 'primary')
+    box('torso_pelvis', 'torso', (-4.0, -3.6, 4.4), (8.0, 7.2, 3.8), 'primary')
+    box('dorsal_plate_front', 'torso', (-3.4, -4.9, -7.4), (6.8, 1.0, 7.8), 'armor_plate')
+    box('dorsal_plate_rear', 'torso', (-2.8, -4.5, 0.4), (5.6, 1.0, 7.4), 'armor_plate')
+    box('torso_spine_a', 'torso', (-0.55, -7.2, -6.8), (1.1, 2.8, 1.8), 'ember_spine')
+    box('torso_spine_b', 'torso', (-0.55, -6.9, 2.4), (1.1, 2.6, 2.0), 'ember_spine')
+    box('torso_spine_c', 'torso', (-0.5, -6.4, 5.4), (1.0, 2.4, 1.8), 'ember_spine')
+
+    # Overlapping breast & belly armor scutes (animates with breathing)
     part('belly', 'torso', (0, 0, 0))
-    box('belly', 'belly', (-3.5, -1.5, -7.7), (7, 5, 14), 'secondary', .25)
-    # 3D Dragon Saddle (toggled visible only when saddled)
-    part('saddle', 'torso', (0, -4.1, -2.0))
-    box('saddle_seat', 'saddle', (-3.6, -1.0, -3.5), (7.2, 1.4, 7.0), 'leather', .15)
-    box('saddle_pommel', 'saddle', (-2.4, -2.4, -3.8), (4.8, 1.8, 1.4), 'leather_gold')
-    box('saddle_cantle', 'saddle', (-2.6, -2.2, 2.4), (5.2, 1.6, 1.4), 'leather_gold')
-    box('saddle_strap_l', 'saddle', (4.3, 0.0, -1.8), (.6, 5.2, 3.6), 'leather')
-    box('saddle_strap_r', 'saddle', (-4.9, 0.0, -1.8), (.6, 5.2, 3.6), 'leather')
-    # Muscular S-curved neck
-    part('neck_base', 'torso', (0, -2.0, -7.0))
-    box('neck_base', 'neck_base', (-2.8, -2.6, -3.6), (5.6, 5.2, 5.4))
-    box('neck_base_plate', 'neck_base', (-2.0, 1.2, -3.5), (4.0, 1.8, 4.8), 'secondary')
-    box('neck_base_crest', 'neck_base', (-.5, -4.4, -2.4), (1.0, 2.2, 2.4), 'accent')
-    part('neck_mid', 'neck_base', (0, -2.0, -3.6))
-    box('neck_mid', 'neck_mid', (-2.3, -2.4, -4.6), (4.6, 4.6, 5.6))
-    box('neck_mid_plate', 'neck_mid', (-1.7, 1.1, -4.5), (3.4, 1.6, 5.0), 'secondary')
-    box('neck_mid_crest', 'neck_mid', (-.5, -4.2, -3.2), (1.0, 2.2, 2.4), 'accent')
-    part('neck_top', 'neck_mid', (0, -1.5, -4.4))
-    box('neck_top', 'neck_top', (-2.0, -2.0, -3.8), (4.0, 4.0, 4.8))
-    box('neck_top_crest', 'neck_top', (-.5, -3.6, -2.6), (1.0, 2.0, 2.2), 'accent')
-    # Crowned angular skull with nasal horn, cheek frills & heavy fangs
-    part('head', 'neck_top', (0, -.6, -3.6))
-    box('head', 'head', (-3.5, -3.0, -5.2), (7.0, 5.2, 6.8))
-    box('snout', 'head', (-2.5, -.8, -10.5), (5.0, 2.8, 6.0))
-    box('nasal_horn', 'head', (-.6, -2.8, -10.2), (1.2, 2.4, 1.4), 'accent')
-    part('jaw', 'head', (0, 1.8, -2.2))
-    box('jaw', 'jaw', (-2.3, 0, -7.8), (4.6, 1.8, 6.8), 'secondary')
+    box('breast_scute_top', 'belly', (-3.6, -2.6, -8.5), (7.2, 3.2, 1.6), 'scute')
+    box('breast_scute_low', 'belly', (-4.0, 0.4, -8.3), (8.0, 3.8, 2.4), 'scute')
+    box('belly_scute_1', 'belly', (-3.8, 2.3, -6.2), (7.6, 2.4, 5.2), 'scute', .15)
+    box('belly_scute_2', 'belly', (-3.4, 2.0, -1.2), (6.8, 2.2, 5.0), 'scute', .10)
+    box('belly_scute_3', 'belly', (-2.9, 1.7, 3.6), (5.8, 2.0, 4.2), 'scute')
+
+    # Sculpted 3D Dragon-Rider Saddle (toggled visible only when saddle is equipped in slot 0)
+    part('saddle', 'torso', (0, -5.0, -2.0))
+    box('saddle_pad', 'saddle', (-5.3, -0.4, -4.3), (10.6, 1.2, 8.6), 'leather', .10)
+    box('saddle_seat', 'saddle', (-3.9, -1.6, -3.5), (7.8, 1.4, 7.0), 'leather', .12)
+    box('saddle_pommel', 'saddle', (-3.0, -3.8, -4.1), (6.0, 2.6, 1.6), 'leather_gold')
+    box('saddle_cantle', 'saddle', (-3.2, -3.4, 2.5), (6.4, 2.2, 1.6), 'leather_gold')
+    box('saddle_strap_l', 'saddle', (5.05, 0.2, -2.0), (.7, 6.2, 4.0), 'leather')
+    box('saddle_strap_r', 'saddle', (-5.75, 0.2, -2.0), (.7, 6.2, 4.0), 'leather')
+    box('saddle_buckle_l', 'saddle', (5.15, 2.4, -1.1), (.8, 1.6, 2.2), 'leather_gold')
+    box('saddle_buckle_r', 'saddle', (-5.95, 2.4, -1.1), (.8, 1.6, 2.2), 'leather_gold')
+    box('saddle_stirrup_l', 'saddle', (5.2, 6.0, -0.8), (.6, 1.8, 1.6), 'leather_gold')
+    box('saddle_stirrup_r', 'saddle', (-5.8, 6.0, -0.8), (.6, 1.8, 1.6), 'leather_gold')
+
+    # Proud S-curved muscular neck with overlapping throat scutes & twin fiery nape spines per joint
+    part('neck_base', 'torso', (0, -2.2, -7.2), (-26, 0, 0))
+    box('neck_base', 'neck_base', (-3.0, -2.6, -4.8), (6.0, 5.2, 5.4), 'primary')
+    box('neck_base_armor', 'neck_base', (-2.2, -3.1, -4.6), (4.4, 1.0, 4.8), 'armor_plate')
+    box('neck_base_scute_1', 'neck_base', (-2.4, 0.6, -5.2), (4.8, 2.3, 2.6), 'scute')
+    box('neck_base_scute_2', 'neck_base', (-2.6, 1.1, -2.6), (5.2, 2.2, 2.6), 'scute')
+    box('neck_base_spine_1', 'neck_base', (-0.55, -5.4, -4.3), (1.1, 2.6, 1.8), 'ember_spine')
+    box('neck_base_spine_2', 'neck_base', (-0.6, -5.2, -2.1), (1.2, 2.5, 1.8), 'ember_spine')
+
+    part('neck_mid', 'neck_base', (0, -1.6, -4.2), (-14, 0, 0))
+    box('neck_mid', 'neck_mid', (-2.5, -2.3, -5.0), (5.0, 4.6, 5.4), 'primary')
+    box('neck_mid_armor', 'neck_mid', (-1.9, -2.8, -4.8), (3.8, 0.9, 4.8), 'armor_plate')
+    box('neck_mid_scute_1', 'neck_mid', (-2.0, 0.6, -5.3), (4.0, 2.0, 2.6), 'scute')
+    box('neck_mid_scute_2', 'neck_mid', (-2.2, 0.9, -2.7), (4.4, 2.0, 2.6), 'scute')
+    box('neck_mid_spine_1', 'neck_mid', (-0.5, -5.0, -4.4), (1.0, 2.5, 1.8), 'ember_spine')
+    box('neck_mid_spine_2', 'neck_mid', (-0.5, -4.8, -2.2), (1.0, 2.4, 1.8), 'ember_spine')
+
+    part('neck_top', 'neck_mid', (0, -1.4, -4.4), (16, 0, 0))
+    box('neck_top', 'neck_top', (-2.1, -2.0, -4.4), (4.2, 4.0, 4.8), 'primary')
+    box('neck_top_armor', 'neck_top', (-1.6, -2.4, -4.2), (3.2, 0.8, 4.2), 'armor_plate')
+    box('neck_top_scute', 'neck_top', (-1.7, 0.6, -4.6), (3.4, 1.8, 4.4), 'scute')
+    box('neck_top_spine_1', 'neck_top', (-0.45, -4.4, -3.9), (0.9, 2.2, 1.6), 'ember_spine')
+    box('neck_top_spine_2', 'neck_top', (-0.45, -4.2, -1.9), (0.9, 2.1, 1.6), 'ember_spine')
+
+    # Fierce angular skull with heavy brow ridges, classic snout, central sagittal crest, swept horns & cheek spines
+    part('head', 'neck_top', (0, -0.5, -3.8), (24, 0, 0))
+    box('head', 'head', (-3.6, -3.0, -5.4), (7.2, 5.0, 6.2), 'primary')
+    box('head_crown_plate', 'head', (-2.8, -3.5, -5.0), (5.6, 1.0, 5.6), 'armor_plate')
+    box('snout', 'head', (-2.6, -1.6, -10.2), (5.2, 3.0, 5.2), 'primary')
+    box('snout_tip', 'head', (-2.0, -1.2, -12.6), (4.0, 2.6, 2.6), 'primary')
+    box('snout_ridge', 'head', (-1.4, -2.1, -11.4), (2.8, 0.8, 6.4), 'armor_plate')
+    box('nasal_horn', 'head', (-0.5, -3.3, -12.2), (1.0, 2.2, 1.4), 'ember_horn')
+    box('central_crest_front', 'head', (-0.5, -5.2, -4.2), (1.0, 2.2, 2.4), 'ember_spine')
+    box('central_crest_main', 'head', (-0.6, -6.8, -1.8), (1.2, 3.8, 2.6), 'ember_spine')
+
+    part('jaw', 'head', (0, 1.6, -2.4))
+    box('jaw', 'jaw', (-2.4, 0.0, -7.2), (4.8, 1.8, 6.6), 'secondary')
+    box('jaw_tip', 'jaw', (-1.7, 0.0, -9.8), (3.4, 1.5, 2.8), 'secondary')
+    box('jaw_chin_scute', 'jaw', (-1.8, 1.4, -8.4), (3.6, 0.8, 6.8), 'scute')
+
     for side, sign in [('left', 1), ('right', -1)]:
-        part(f'{side}_eye', 'head', (sign * 3.4, -.9, -3.4))
-        box(f'{side}_cheek', f'{side}_eye', (-.6, -1.6, -1.8), (1.2, 3.2, 3.6), 'primary')
-        # Fan-like cheek/jaw frill spikes (references #2, #6, #7)
-        box(f'{side}_frill_top', 'head', (sign * 3.2 - (0 if sign == 1 else 2.2), -1.6, -1.0), (2.2, 1.0, 3.2), 'accent')
-        box(f'{side}_frill_low', 'head', (sign * 2.8 - (0 if sign == 1 else 2.0), 0.6, -1.2), (2.0, 1.0, 3.0), 'accent')
-        box(f'{side}_eye_front', 'head', (sign * 1.75 - 1.0, -2.2, -5.4), (2.0, 1.6, .6), 'eye')
-        # Grand sweeping crown horns
-        part(f'{side}_horn', 'head', (sign * 2.5, -2.6, -.6), (-36, 0, sign * 22))
-        box(f'{side}_horn', f'{side}_horn', (-.9, -5.4, -.9), (1.8, 6.0, 1.8), 'accent')
-        part(f'{side}_horn_tip', f'{side}_horn', (0, -5.4, 0), (-30, 0, sign * 16))
-        box(f'{side}_horn_tip', f'{side}_horn_tip', (-.65, -4.6, -.65), (1.3, 5.0, 1.3), 'accent')
-        box(f'{side}_fang', 'head', (sign * 1.9 - .45, 1.6, -9.6), (.9, 1.6, .9), 'ivory')
-        # Colossal articulated wings with elbow claw
-        part(f'{side}_wing_upper', 'torso', (sign * 4.2, -3.0, -1.2), (0, -sign * 65, -sign * 40))
-        x = 0 if sign == 1 else -7.5
-        box(f'{side}_wing_upper', f'{side}_wing_upper', (x, -.8, -.8), (7.5, 1.6, 1.6), 'accent')
-        for step, depth in enumerate([7.5, 6.8, 6.0, 5.2]):
-            xx = step * 1.85 if sign == 1 else -(step + 1) * 1.85
-            box(f'{side}_membrane_inner_{step}', f'{side}_wing_upper', (xx, 0, .4), (1.85, .5, depth), 'secondary')
-        part(f'{side}_wing_forearm', f'{side}_wing_upper', (sign * 7.5, 0, 0), (0, sign * 18, sign * 8))
-        xf = 0 if sign == 1 else -9.0
-        box(f'{side}_wing_forearm', f'{side}_wing_forearm', (xf, -.7, -.7), (9.0, 1.4, 1.4), 'primary')
-        box(f'{side}_wing_claw', f'{side}_wing_forearm', (0 if sign == 1 else -1.4, -1.2, -2.8), (1.4, 1.4, 2.6), 'accent')
-        for step, depth in enumerate([9.5, 8.2, 6.8, 5.5]):
+        part(f'{side}_eye', 'head', (sign * 3.4, -1.1, -3.8))
+        box(f'{side}_cheek', f'{side}_eye', (-0.7, -1.4, -2.0), (1.4, 3.2, 4.0), 'primary')
+        # Angled menacing brow ridge & glowing supernatural eye socket (visible from front and profile)
+        box(f'{side}_brow_ridge', 'head', (sign * 2.2 - (0 if sign == 1 else 1.8), -2.9, -6.8), (1.8, 0.9, 3.8), 'armor_plate')
+        box(f'{side}_eye_front', 'head', (sign * 1.95 - (0 if sign == 1 else 1.6), -2.1, -6.4), (1.6, 1.4, 2.2), 'eye')
+        # 3-tiered lateral cheek & occipital spines
+        box(f'{side}_frill_top', 'head', (sign * 3.3 - (0 if sign == 1 else 2.2), -1.8, -1.2), (2.2, 1.0, 3.6), 'ember_spine')
+        box(f'{side}_frill_mid', 'head', (sign * 3.1 - (0 if sign == 1 else 2.4), -0.4, -0.6), (2.4, 1.0, 4.0), 'ember_spine')
+        box(f'{side}_frill_low', 'head', (sign * 2.7 - (0 if sign == 1 else 2.0), 1.0, -1.0), (2.0, 1.0, 3.4), 'ember_spine')
+        # Primary long swept-back crown horns + secondary outer temporal horns
+        part(f'{side}_horn', 'head', (sign * 2.5, -2.8, -0.6), (-42, 0, sign * 22))
+        box(f'{side}_horn', f'{side}_horn', (-1.0, -6.2, -1.0), (2.0, 6.8, 2.0), 'ember_horn')
+        box(f'{side}_sub_horn', f'{side}_horn', (sign * 0.9 - (0 if sign == 1 else 1.3), -4.2, 0.8), (1.3, 5.2, 1.4), 'ember_horn')
+        part(f'{side}_horn_tip', f'{side}_horn', (0, -6.0, 0), (-26, 0, sign * 14))
+        box(f'{side}_horn_tip', f'{side}_horn_tip', (-0.7, -6.4, -0.7), (1.4, 6.8, 1.4), 'ember_spine')
+        box(f'{side}_sub_horn_tip', f'{side}_horn_tip', (sign * 0.8 - (0 if sign == 1 else 0.9), -3.6, 1.1), (0.9, 4.6, 1.0), 'ember_spine')
+        # Upper & lower predatory fangs
+        box(f'{side}_fang_front', 'head', (sign * 1.45 - .4, 1.3, -11.8), (.8, 1.5, .8), 'ivory')
+        box(f'{side}_fang_mid', 'head', (sign * 1.95 - .45, 1.3, -8.8), (.9, 1.6, .9), 'ivory')
+        box(f'{side}_fang_low', 'jaw', (sign * 1.35 - .35, -1.1, -9.0), (.7, 1.2, .7), 'ivory')
+
+        # Massive bat-like wings with defined bone struts, curved elbow claws & fiery-rimmed membranes
+        part(f'{side}_wing_upper', 'torso', (sign * 4.6, -3.4, -2.2), (0, -sign * 65, -sign * 40))
+        x = 0 if sign == 1 else -9.0
+        box(f'{side}_wing_upper', f'{side}_wing_upper', (x, -1.0, -1.0), (9.0, 2.0, 2.0), 'armor_plate')
+        box(f'{side}_wing_shoulder_spur', f'{side}_wing_upper', (0 if sign == 1 else -2.2, -1.3, -1.4), (2.2, 1.6, 2.2), 'ember_horn')
+        for step, depth in enumerate([11.0, 10.2, 9.4, 8.6]):
             xx = step * 2.25 if sign == 1 else -(step + 1) * 2.25
-            box(f'{side}_membrane_outer_{step}', f'{side}_wing_forearm', (xx, 0, 0), (2.25, .5, depth), 'secondary')
-        part(f'{side}_wing_tip', f'{side}_wing_forearm', (sign * 9.0, 0, 0), (0, sign * 18, 0))
-        box(f'{side}_wing_tip', f'{side}_wing_tip', (0 if sign == 1 else -6.0, -.3, 0), (6.0, .6, 6.0), 'secondary')
-        # Muscular legs + heavy talons (torso y=8 + 3 + 5 + 6 + 2 = 24)
-        for which, z in [('front', -5.0), ('hind', 5.0)]:
+            box(f'{side}_membrane_inner_{step}', f'{side}_wing_upper', (xx, 0, .4), (2.25, .5, depth), 'wing_membrane')
+
+        part(f'{side}_wing_forearm', f'{side}_wing_upper', (sign * 9.0, 0, 0), (0, sign * 18, sign * 8))
+        xf = 0 if sign == 1 else -12.0
+        box(f'{side}_wing_forearm', f'{side}_wing_forearm', (xf, -0.85, -0.85), (12.0, 1.7, 1.7), 'armor_plate')
+        box(f'{side}_wing_claw', f'{side}_wing_forearm', (0 if sign == 1 else -1.6, -1.3, -3.2), (1.6, 1.6, 2.8), 'ember_horn')
+        box(f'{side}_wing_claw_hook', f'{side}_wing_forearm', (0.2 if sign == 1 else -1.3, -1.0, -4.8), (1.1, 1.1, 1.8), 'ember_spine')
+        box(f'{side}_wing_strut_a', f'{side}_wing_forearm', (sign * 3.5 - (0 if sign == 1 else 1.0), -0.45, 0.5), (1.0, 0.9, 10.8), 'wing_bone')
+        box(f'{side}_wing_strut_b', f'{side}_wing_forearm', (sign * 8.0 - (0 if sign == 1 else 1.0), -0.45, 0.5), (1.0, 0.9, 9.2), 'wing_bone')
+        for step, depth in enumerate([12.5, 11.2, 9.8, 8.4]):
+            xx = step * 3.0 if sign == 1 else -(step + 1) * 3.0
+            box(f'{side}_membrane_outer_{step}', f'{side}_wing_forearm', (xx, 0, 0), (3.0, .5, depth), 'wing_membrane')
+
+        part(f'{side}_wing_tip', f'{side}_wing_forearm', (sign * 12.0, 0, 0), (0, sign * 18, 0))
+        box(f'{side}_wing_tip_bone', f'{side}_wing_tip', (0 if sign == 1 else -8.5, -0.6, -0.6), (8.5, 1.2, 1.2), 'wing_bone')
+        box(f'{side}_wing_strut_c', f'{side}_wing_tip', (sign * 3.5 - (0 if sign == 1 else 0.9), -0.4, 0.4), (0.9, 0.8, 6.8), 'wing_bone')
+        for step, depth in enumerate([7.6, 5.4]):
+            xx = step * 4.25 if sign == 1 else -(step + 1) * 4.25
+            box(f'{side}_wing_tip_{step}', f'{side}_wing_tip', (xx, -0.25, 0), (4.25, .5, depth), 'wing_membrane')
+
+        # Powerful reptilian legs with outer scale plates, heel spurs & 3 individual curved talons (y=8+2.8+5.2+6.0+2.0=24.0)
+        for which, z in [('front', -5.2), ('hind', 4.8)]:
             name = f'{side}_{which}'
             hind = which == 'hind'
-            part(f'{name}_upper', 'torso', (sign * 4.2, 3.0, z))
-            box(f'{name}_upper', f'{name}_upper', (-1.8, -.8, -1.8), (3.6, 5.6, 3.6) if not hind else (4.2, 6.2, 4.8))
-            part(f'{name}_lower', f'{name}_upper', (0, 5.0, 0))
-            box(f'{name}_lower', f'{name}_lower', (-1.4, 0, -1.4), (2.8, 6.0, 2.8))
-            part(f'{name}_foot', f'{name}_lower', (0, 6.0, -.8))
-            box(f'{name}_foot', f'{name}_foot', (-1.7, 0, -2.4), (3.4, 2.0, 4.6), 'secondary')
-            box(f'{name}_claw', f'{name}_foot', (-1.4, .6, -3.6), (2.8, 1.1, 1.8), 'accent')
-    # Long whip tail with tall dorsal crests & barbed tail spade
+            part(f'{name}_upper', 'torso', (sign * 4.5, 2.8, z))
+            box(f'{name}_upper', f'{name}_upper', (-2.0, -1.2, -2.0), (4.0, 6.4, 4.2) if not hind else (4.4, 6.8, 5.2), 'primary')
+            box(f'{name}_plate', f'{name}_upper', (sign * 1.4 - (0 if sign == 1 else 1.0), -0.8, -1.6), (1.0, 5.2, 3.4), 'armor_plate')
+            part(f'{name}_lower', f'{name}_upper', (0, 5.2, 0.2))
+            box(f'{name}_lower', f'{name}_lower', (-1.5, 0, -1.5), (3.0, 6.0, 3.2), 'primary')
+            box(f'{name}_shin_scute', f'{name}_lower', (-1.2, 0.4, -1.8), (2.4, 5.0, 0.8), 'armor_plate')
+            box(f'{name}_heel_spur', f'{name}_lower', (-0.5, 1.2, 1.4), (1.0, 1.8, 1.6), 'ember_spine')
+            part(f'{name}_foot', f'{name}_lower', (0, 6.0, -0.8))
+            box(f'{name}_foot', f'{name}_foot', (-2.0, 0, -2.6), (4.0, 2.0, 4.8), 'armor_plate')
+            box(f'{name}_claw_in', f'{name}_foot', (-1.85, .4, -4.6), (1.0, 1.6, 2.4), 'ember_horn')
+            box(f'{name}_claw_mid', f'{name}_foot', (-0.5, .3, -5.0), (1.0, 1.7, 2.8), 'ember_horn')
+            box(f'{name}_claw_out', f'{name}_foot', (0.85, .4, -4.6), (1.0, 1.6, 2.4), 'ember_horn')
+
+    # Long muscular flexible tail with ventral scutes, twin dorsal spines per segment & flaming tip blades
     for i in range(1, 5):
         parent = 'torso' if i == 1 else f'tail_{i-1}'
-        part(f'tail_{i}', parent, (0, -.3 if i == 1 else 0, 7.2 if i == 1 else 6.0), (-5 if i == 1 else -3, 4 if i == 3 else 0, 0))
-        width = 4.6 if i == 1 else 3.6 if i == 2 else 2.6 if i == 3 else 1.8
-        length = 6.8 if i == 1 else 6.4
-        box(f'tail_{i}', f'tail_{i}', (-width / 2, -width / 2, 0), (width, width, length))
-        box(f'tail_crest_{i}', f'tail_{i}', (-.6, -width / 2 - 2.0, 1.6), (1.2, 2.6, 2.6), 'accent')
-    box('tail_spade', 'tail_4', (-2.6, -.5, 4.8), (5.2, 1.0, 5.2), 'accent')
+        part(f'tail_{i}', parent, (0, -.3 if i == 1 else 0, 7.6 if i == 1 else 6.8), (-6 if i == 1 else -3, 4 if i == 3 else 0, 0))
+        width = 4.8 if i == 1 else 3.8 if i == 2 else 2.8 if i == 3 else 2.0
+        length = 7.6 if i == 1 else 7.4 if i == 2 else 7.2 if i == 3 else 7.0
+        box(f'tail_{i}', f'tail_{i}', (-width / 2, -width / 2, 0), (width, width, length), 'primary')
+        box(f'tail_scute_{i}', f'tail_{i}', (-width * 0.38, width * 0.25, 0.2), (width * 0.76, 0.9, length - 0.4), 'scute')
+        box(f'tail_crest_a_{i}', f'tail_{i}', (-.6, -width / 2 - 2.2, 1.0), (1.2, 2.6, 2.2), 'ember_spine')
+        box(f'tail_crest_b_{i}', f'tail_{i}', (-.55, -width / 2 - 2.0, 4.0), (1.1, 2.4, 2.2), 'ember_spine')
+    box('tail_3_blade_l', 'tail_3', (1.2, -0.4, 2.2), (2.2, 0.8, 4.4), 'ember_spine')
+    box('tail_3_blade_r', 'tail_3', (-3.4, -0.4, 2.2), (2.2, 0.8, 4.4), 'ember_spine')
+    box('tail_4_blade_l', 'tail_4', (0.8, -0.45, 1.0), (3.0, 0.9, 5.6), 'ember_spine')
+    box('tail_4_blade_r', 'tail_4', (-3.8, -0.45, 1.0), (3.0, 0.9, 5.6), 'ember_spine')
+    box('tail_spade', 'tail_4', (-1.4, -0.5, 6.2), (2.8, 1.0, 4.4), 'ember_spine')
     for i in range(3):
-        part(f'crest_{i}', 'torso', (0, -4.0, i * 4.2 - 4.2))
-        box(f'crest_{i}', f'crest_{i}', (-.6, -2.4, 0), (1.2, 3.0, 2.8), 'accent')
+        z_crest = -6.0 if i == 0 else (3.6 if i == 1 else 6.0)
+        part(f'crest_{i}', 'torso', (0, -4.6, z_crest), (-18 - i * 2, 0, 0))
+        box(f'crest_{i}', f'crest_{i}', (-.6, -3.2 + i * 0.2, -0.8), (1.2, 3.6 - i * 0.2, 2.2), 'ember_spine')
+
+
+def lerp_rgb(c0, c1, t):
+    t = max(0.0, min(1.0, t))
+    return (
+        int(round(c0[0] + (c1[0] - c0[0]) * t)),
+        int(round(c0[1] + (c1[1] - c0[1]) * t)),
+        int(round(c0[2] + (c1[2] - c0[2]) * t)),
+        255,
+    )
+
+
+def scale_rgb(rgb, mult):
+    return tuple(max(0, min(255, int(round(c * mult)))) for c in rgb[:3]) + (255,)
+
+
+def adult_skin(primary, secondary, accent):
+    """Uses the exact 5-color Baby/Young palette (Black, White, Red, Orange, Gold) with detailed scale, scute & membrane shading."""
+    image = Image.new('RGBA', (SIZE, SIZE), (0, 0, 0, 0))
+    glow = Image.new('RGBA', (SIZE, SIZE), (0, 0, 0, 0))
+    p_base = PALETTES[primary]
+    s_base = PALETTES[secondary]
+    a_base = PALETTES[accent]
+    a_low = scale_rgb(a_base, 0.58)[:3]
+    a_mid = a_base
+    a_hot = scale_rgb(a_base, 1.28)[:3]
+
+    for b in BOXES:
+        u, v = b['uv']
+        w, h, d = [math.ceil(n) for n in b['size']]
+        mat = b['material']
+        bname = b['name']
+
+        for yy in range(h + d):
+            for xx in range(2 * (w + d)):
+                is_top = yy < d
+                rel_y = (yy / max(1, d - 1)) if is_top else ((yy - d) / max(1, h - 1))
+
+                if mat in ('primary', 'armor_plate'):
+                    # Interlocking reptile scales in exact PrimaryColor with 3D bevel & subtle accent seams
+                    base = scale_rgb(p_base, 1.10 if mat == 'armor_plate' else 1.0)[:3]
+                    sx = (xx + (yy // 2) * 2) % 4
+                    sy = yy % 2
+                    grain = (((xx * 13 + yy * 7) % 11) - 5) * 0.015
+                    if sy == 1 and sx in (0, 3):
+                        col = scale_rgb(base, 0.50 + grain)
+                    elif sy == 0 and sx in (1, 2):
+                        col = scale_rgb(base, (1.20 if is_top else 1.12) + grain)
+                    else:
+                        col = scale_rgb(base, (1.04 if is_top else 0.92 - rel_y * 0.14) + grain)
+                    image.putpixel((u + xx, v + yy), col)
+
+                elif mat in ('scute', 'secondary'):
+                    # Overlapping horizontal chest, throat & belly armor plates in exact SecondaryColor
+                    band = yy % 3
+                    chevron = abs((xx % max(2, w)) - (w / 2.0)) / max(1.0, w / 2.0)
+                    if band == 0:
+                        col = scale_rgb(s_base, 0.54)
+                    elif band == 1:
+                        col = scale_rgb(s_base, 1.18 - chevron * 0.08)
+                    else:
+                        col = scale_rgb(s_base, 0.96 - chevron * 0.12)
+                    image.putpixel((u + xx, v + yy), col)
+
+                elif mat == 'wing_membrane':
+                    # Wing membrane in SecondaryColor shaded darker near the bone and brighter with veins toward the edge
+                    local_z = (yy % max(1, d)) / max(1, d - 1) if is_top else rel_y
+                    vein_wave = abs(math.sin(xx * 0.85 + yy * 0.55) * math.cos(xx * 0.35 - yy * 0.7))
+                    col = lerp_rgb(scale_rgb(s_base, 0.56)[:3], scale_rgb(s_base, 1.08)[:3], local_z)
+                    if vein_wave > 0.78 and local_z > 0.18:
+                        col = lerp_rgb(col[:3], a_hot, 0.35)
+                    image.putpixel((u + xx, v + yy), col)
+
+                elif mat == 'wing_bone':
+                    edge = xx == 0 or yy == 0 or yy == h + d - 1
+                    col = scale_rgb(p_base, 0.58 if edge else 0.92)
+                    image.putpixel((u + xx, v + yy), col)
+
+                elif mat in ('ember_spine', 'ember_horn'):
+                    # Horns, cheek frills, dorsal spines & tail blades in exact AccentColor (ribbed dark base -> bright tip)
+                    tip_factor = (1.0 - rel_y) if not is_top else 0.85
+                    if 'blade' in bname or 'spade' in bname or 'frill' in bname:
+                        tip_factor = max(tip_factor, (xx % max(2, d)) / max(1, d - 1))
+                    rib = 0.84 if (yy % 2 == 0 and mat == 'ember_horn') else 1.0
+                    col = lerp_rgb(a_low, a_mid if tip_factor < 0.65 else a_hot, tip_factor)
+                    col = scale_rgb(col[:3], rib)
+                    image.putpixel((u + xx, v + yy), col)
+
+                elif mat == 'ivory':
+                    col = lerp_rgb((184, 160, 126), (248, 236, 202), 1.0 - rel_y * 0.6)
+                    image.putpixel((u + xx, v + yy), col)
+
+                elif mat == 'leather':
+                    # Rich stitched dark saddle leather
+                    stitch = (xx % 4 == 0 and (yy == d + 1 or yy == h + d - 2))
+                    col = (164, 114, 62, 255) if stitch else scale_rgb((116, 56, 26), 0.72 if (xx == 0 or yy == h + d - 1) else 1.08 if is_top else 0.92)
+                    image.putpixel((u + xx, v + yy), col)
+
+                elif mat == 'leather_gold':
+                    # Polished gold trim, pommel, cantle, buckles & stirrups
+                    col = scale_rgb((226, 174, 48), 0.74 if (xx == 0 or yy == h + d - 1) else 1.18 if is_top else 0.98)
+                    image.putpixel((u + xx, v + yy), col)
+
+                elif mat == 'eye':
+                    # Bright glowing ember eyes matching Baby/Young readability
+                    for_pupil = not is_top and (xx % 3 == 1) and (d <= yy < d + h)
+                    if for_pupil:
+                        col = (255, 247, 211, 255) if yy == d else (35, 22, 15, 255)
+                    else:
+                        col = (255, 189, 57, 255)
+                    image.putpixel((u + xx, v + yy), col)
+                    if col == (255, 247, 211, 255) or col == (255, 189, 57, 255):
+                        glow.putpixel((u + xx, v + yy), col)
+
+        if bname == 'snout_tip':
+            for xx in [1, max(1, w - 2)]:
+                if d + 1 < h + d:
+                    image.putpixel((u + d + xx, v + d + 1), (32, 18, 15, 255))
+    return image, glow
 
 
 def write_geometry(class_name='FireDragonGeometry', atlas_size=128, write_sketch_json=True):
@@ -441,9 +639,9 @@ def main():
     for primary in range(5):
         for secondary in range(5):
             for accent in range(5):
-                base, glow = skin(primary, secondary, accent)
+                base, glow = adult_skin(primary, secondary, accent)
                 base.save(adult_folder / f'{primary}_{secondary}_{accent}.png')
-    _, glow = skin(2, 4, 0); glow.save(adult_folder / 'eyes.png')
+    _, glow = adult_skin(0, 1, 0); glow.save(adult_folder / 'eyes.png')
     # Keep the foundation item reproducible.
     egg=Image.new('RGBA',(16,16),(0,0,0,0))
     palette=tones(PALETTES[2])

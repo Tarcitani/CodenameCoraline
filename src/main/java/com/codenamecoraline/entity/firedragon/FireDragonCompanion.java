@@ -220,9 +220,9 @@ final class FireDragonCompanion {
             }
         }
         if (d.position().distanceToSqr(territoryOrigin) > ADULT_NEST_GUARD_SQR && d.tickCount % 15 == 0) {
-            move(territoryOrigin.add(0, 2, 0));
+            move(territoryOrigin);
         } else if (d.tickCount % 180 == 0) {
-            move(territoryOrigin.add(d.getRandom().nextInt(13) - 6, 2, d.getRandom().nextInt(13) - 6));
+            move(territoryOrigin.add(d.getRandom().nextInt(13) - 6, 0, d.getRandom().nextInt(13) - 6));
         }
     }
 
@@ -264,7 +264,7 @@ final class FireDragonCompanion {
         }
         if (territorialTicks > 0) territorialTicks = Math.max(0, territorialTicks - 2);
         if (d.tickCount % 160 == 0) {
-            Vec3 patrol = territoryOrigin.add(d.getRandom().nextInt(9) - 4, 1, d.getRandom().nextInt(9) - 4);
+            Vec3 patrol = territoryOrigin.add(d.getRandom().nextInt(9) - 4, 0, d.getRandom().nextInt(9) - 4);
             move(patrol);
         }
     }
@@ -439,11 +439,11 @@ final class FireDragonCompanion {
         if (!(d.level() instanceof net.minecraft.server.level.ServerLevel sl)) return;
         Vec3 flat = new Vec3(forward.x, 0, forward.z);
         Vec3 dir = flat.lengthSqr() > 1e-4 ? flat.normalize() : new Vec3(-Math.sin(Math.toRadians(d.getYRot())), 0, Math.cos(Math.toRadians(d.getYRot())));
-        Vec3 hitCenter = d.position().add(dir.scale(2.2)).add(0, 1.0, 0);
+        Vec3 hitCenter = d.position().add(dir.scale(2.8)).add(0, 1.2, 0);
         sl.sendParticles(net.minecraft.core.particles.ParticleTypes.FLAME, hitCenter.x, hitCenter.y, hitCenter.z, 14, 0.6, 0.4, 0.6, 0.1);
         sl.sendParticles(net.minecraft.core.particles.ParticleTypes.SWEEP_ATTACK, hitCenter.x, hitCenter.y, hitCenter.z, 2, 0.4, 0.2, 0.4, 0.0);
-        for (LivingEntity victim : sl.getEntitiesOfClass(LivingEntity.class, d.getBoundingBox().inflate(4.5))) {
-            if (!d.canDamage(victim) || d.distanceToSqr(victim) > 20.25) continue;
+        for (LivingEntity victim : sl.getEntitiesOfClass(LivingEntity.class, d.getBoundingBox().inflate(5.2))) {
+            if (!d.canDamage(victim) || d.distanceToSqr(victim) > 27.0) continue;
             Vec3 toVictim = victim.position().subtract(d.position()).multiply(1, 0, 1);
             if (toVictim.lengthSqr() > 0.01 && toVictim.normalize().dot(dir) < 0.25) continue;
             int prevFire = victim.getRemainingFireTicks();
@@ -913,7 +913,10 @@ final class FireDragonCompanion {
     private void follow(LivingEntity owner) {
         d.setState(FireDragon.State.FOLLOWING);
         if (d.distanceToSqr(owner) > 9) {
-            if (d.tickCount % 10 == 0) move(owner.position().add(0, 1, 0));
+            if (d.tickCount % 10 == 0) {
+                boolean ownerAirborne = !owner.onGround() && !owner.isInWater() && (owner.getY() - d.getY() > 2.0);
+                move(ownerAirborne ? owner.position().add(0, 1.0, 0) : owner.position());
+            }
         } else if (isOverLiquid()) {
             d.getNavigation().stop();
             d.setNoGravity(true);
@@ -932,12 +935,20 @@ final class FireDragonCompanion {
         d.setDeltaMovement(d.getDeltaMovement().multiply(.4, 1, .4));
     }
     private void move(Vec3 goal) {
+        Vec3 delta = goal.subtract(d.position());
+        double horizSqr = delta.x * delta.x + delta.z * delta.z;
+        boolean groundReachable = !isOverLiquid() && d.onGround() && Math.abs(delta.y) <= 1.8 && horizSqr <= 16.0 * 16.0;
+        if (groundReachable) {
+            d.setNoGravity(false);
+            if (d.getNavigation().moveTo(goal.x, goal.y, goal.z, 1.0)) {
+                return;
+            }
+        }
         if (d.level().clip(new ClipContext(d.getEyePosition(), goal.add(0,.3,0), ClipContext.Block.COLLIDER,
                 ClipContext.Fluid.NONE, d)).getType() != HitResult.Type.MISS) {
             d.setNoGravity(false); d.getNavigation().moveTo(goal.x, goal.y, goal.z, 1); return;
         }
         d.getNavigation().stop(); d.setNoGravity(true);
-        Vec3 delta = goal.subtract(d.position());
         double flySpeed = d.isAdult() ? 0.45 : d.isYoung() ? 0.30 : 0.20;
         d.setDeltaMovement(delta.lengthSqr() < .04 ? Vec3.ZERO : delta.normalize().scale(flySpeed));
         d.setYRot((float) Math.toDegrees(Math.atan2(-delta.x, delta.z)));

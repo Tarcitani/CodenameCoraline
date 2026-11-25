@@ -52,16 +52,16 @@ public final class FireDragon extends TamableAnimal {
     public static final float YOUNG_WIDTH = 1.0F;
     public static final float YOUNG_HEIGHT = 1.1F;
     public static final float YOUNG_EYE_HEIGHT = 0.95F;
-    public static final float ADULT_WIDTH = 2.2F;
-    public static final float ADULT_HEIGHT = 2.0F;
-    public static final float ADULT_EYE_HEIGHT = 1.7F;
+    public static final float ADULT_WIDTH = 2.85F;
+    public static final float ADULT_HEIGHT = 2.60F;
+    public static final float ADULT_EYE_HEIGHT = 2.20F;
     public static final int BABY_GROWTH_TICKS = 72000;
     public static final int YOUNG_GROWTH_TICKS = 144000;
     private static final EntityDimensions BABY_DIMENSIONS = EntityDimensions.scalable(WIDTH, HEIGHT).withEyeHeight(EYE_HEIGHT);
     private static final EntityDimensions YOUNG_DIMENSIONS = EntityDimensions.scalable(YOUNG_WIDTH, YOUNG_HEIGHT).withEyeHeight(YOUNG_EYE_HEIGHT);
     private static final EntityDimensions ADULT_DIMENSIONS = EntityDimensions.scalable(ADULT_WIDTH, ADULT_HEIGHT).withEyeHeight(ADULT_EYE_HEIGHT);
     private static final Identifier MOUNT_CAMERA_ID = Identifier.fromNamespaceAndPath(CodenameCoraline.MOD_ID, "dragon_mount_camera");
-    private static final AttributeModifier MOUNT_CAMERA_MOD = new AttributeModifier(MOUNT_CAMERA_ID, 4.0D, AttributeModifier.Operation.ADD_VALUE);
+    private static final AttributeModifier MOUNT_CAMERA_MOD = new AttributeModifier(MOUNT_CAMERA_ID, 7.5D, AttributeModifier.Operation.ADD_VALUE);
 
     public enum Stage { BABY, YOUNG, ADULT }
     private static final Stage[] STAGES = Stage.values();
@@ -336,7 +336,7 @@ public final class FireDragon extends TamableAnimal {
         double yaw = Math.toRadians(yHeadRot);
         double fx = -Math.sin(yaw);
         double fz = Math.cos(yaw);
-        double forward = isAdult() ? 1.85D : isYoung() ? 0.95D : 0.45D;
+        double forward = isAdult() ? 2.45D : isYoung() ? 0.95D : 0.45D;
         double mx = getX() + fx * forward;
         double my = getY() + getEyeHeight() - 0.08D;
         double mz = getZ() + fz * forward;
@@ -659,8 +659,8 @@ public final class FireDragon extends TamableAnimal {
     @Override
     public Vec3 getPassengerRidingPosition(Entity passenger) {
         double yaw = Math.toRadians(yBodyRot);
-        double forward = 0.25D;
-        return new Vec3(getX() - Math.sin(yaw) * forward, getY() + 1.82D, getZ() + Math.cos(yaw) * forward);
+        double forward = 0.30D;
+        return new Vec3(getX() - Math.sin(yaw) * forward, getY() + 3.55D, getZ() + Math.cos(yaw) * forward);
     }
 
     @Override
